@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
-import { OPSTELLINGEN_PER_SPELVORM, Player } from '../types'
+import { OPSTELLINGEN_PER_SPELVORM, opstellingTekst, Player } from '../types'
 import AddPlayerModal from '../components/AddPlayerModal'
 import DeletePlayerModal from '../components/DeletePlayerModal'
 import { tel } from '../statistiek'
@@ -77,7 +77,7 @@ export default function Players({ openAccount }: { openAccount: () => void }) {
             onClick={() => { kiesOpstelling(naam); tel(`opstelling-${naam}`) }}
             disabled={!magBewerken}
           >
-            {naam}
+            {opstellingTekst(naam)}
           </button>
         ))}
       </div>

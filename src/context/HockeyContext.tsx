@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { Club, GespeeldeWedstrijd, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
+import { Club, GespeeldeWedstrijd, isOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
@@ -125,14 +125,25 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   })
 
   const [opstelling, setOpstelling] = useState<OpstellingNaam>(() => {
-    const saved = localStorage.getItem(`${P}_opstelling`)
-    if (saved) return JSON.parse(saved)
+    const saved = lees<unknown>(P, 'opstelling', null)
+    if (isOpstelling(saved)) return saved
+    // Kort op test bestaande 11-tallen onder hun oude naam
+    if (saved === '3-3-3-1') return '2-4-4'
+    if (saved === '4-3-3') return '3-3-4'
     // Vorige versie bewaarde alleen de spelvorm (9 of 6)
     const oudeSpelvorm = localStorage.getItem(`${P}_spelvorm`)
     return OPSTELLINGEN_PER_SPELVORM[oudeSpelvorm ? (JSON.parse(oudeSpelvorm) as Spelvorm) : 9][0]
   })
   const spelvorm = spelvormVan(opstelling)
   const posities = veldPosities(opstelling)
+
+  // Een veldspeler op een plek die in deze opstelling niet (meer) bestaat (bv. een vervallen opstelling
+  // of een oude stand van een ander toestel): naar een vrije plek schuiven
+  useEffect(() => {
+    if (spelers.some(s => s.inVeld && !s.isKeeper && !posities.includes(s.positie))) {
+      zetSpelersRuw(huidig => pasOpstellingAan(huidig, posities))
+    }
+  }, [spelers, opstelling])
 
   useEffect(() => {
     localStorage.setItem(`${P}_opstelling`, JSON.stringify(opstelling))
@@ -403,7 +414,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
     setWisselingen(st.wisselingen)
     setScore(st.score)
     setDoelpunten(st.doelpunten)
-    setOpstelling(st.opstelling)
+    if (isOpstelling(st.opstelling)) setOpstelling(st.opstelling)
     setTimer(st.timer)
     zetWedstrijd(st.wedstrijd)
     // Undo van een ander toestel terugdraaien zou verwarrend zijn
@@ -446,7 +457,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
     zetWedstrijd(d.wedstrijd)
     setWedstrijden(d.wedstrijden)
     setScore(lees(OPSLAG, 'score', { wij: 0, zij: 0 }))
-    setOpstelling(lees(OPSLAG, 'opstelling', opstelling))
+    const oudeOpstelling = lees<unknown>(OPSLAG, 'opstelling', opstelling)
+    if (isOpstelling(oudeOpstelling)) setOpstelling(oudeOpstelling)
     setTimer(lees(OPSLAG, 'timer', { gestartOp: null, opgebouwd: 0 }))
     setHistory([])
   }

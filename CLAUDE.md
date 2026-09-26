@@ -44,13 +44,17 @@ Tabbladen tonen een icoon; alleen het actieve tabblad toont ook zijn naam (vier 
 - Geen meldingen (toasts) na een bevestiging. Bevestigingsvragen alleen bij resets en timer-stop.
 
 ### Opstellingen
-Posities (van voor naar achter): `LW` links voor, `CV` centraal voor, `RW` rechts voor, `LM` links midden, `LCM` links binnen, `CM` midden, `RCM` rechts binnen, `RM` rechts midden, `LBM` links achter, `LCA` links centraal, `CBM` centraal achter, `RCA` rechts centraal, `RBM` rechts achter, `LIB` laatste man, `K` keeper. Codes nooit in de UI tonen, alleen de Nederlandse labels (`POSITIE_LABEL`).
+Posities (van voor naar achter): `LW` links voor, `CV` centraal voor, `RW` rechts voor, `LM` links midden, `LCM` links binnen, `CM` midden, `RCM` rechts binnen, `RM` rechts midden, `LBM` links achter, `LCA` links centraal, `CBM` centraal achter, `RCA` rechts centraal, `RBM` rechts achter, `K` keeper. Codes nooit in de UI tonen, alleen de Nederlandse labels (`POSITIE_LABEL`).
 
-| Spelvorm | Opstellingen (eerste = standaard) |
-|---|---|
-| 11 spelers (10 + keeper) | 3-3-3-1 (met laatste man), 4-3-3 (4 achter), 3-4-3 (4 midden) |
-| 9 spelers (8 + keeper) | 2-3-3, 3-3-2, 3-2-3 |
-| 6 spelers (5 + keeper) | 2-1-2, 2-2-1, 1-2-2 |
+**In beeld altijd hockeytaal: van achter naar voor, zonder keeper** (`opstellingTekst`). Intern (opslag, server, `OPSTELLINGEN`) staan de namen van voor naar achter; die nooit hernoemen, anders verandert de betekenis van bewaarde gegevens.
+
+| Spelvorm | In beeld (eerste = standaard) | Intern |
+|---|---|---|
+| 11 spelers (10 + keeper) | 4-4-2, 4-3-3, 3-4-3 | 2-4-4, 3-3-4, 3-4-3 |
+| 9 spelers (8 + keeper) | 3-3-2, 2-3-3, 3-2-3 | 2-3-3, 3-3-2, 3-2-3 |
+| 6 spelers (5 + keeper) | 2-1-2, 1-2-2, 2-2-1 | 2-1-2, 2-2-1, 1-2-2 |
+
+Een onbekende opgeslagen opstelling wordt vervangen (kort bestaande test-namen 3-3-3-1/4-3-3 → 2-4-4/3-3-4); veldspelers op een plek die niet in de opstelling zit schuiven vanzelf door (`pasOpstellingAan`).
 
 Gedefinieerd in `OPSTELLINGEN` / `OPSTELLINGEN_PER_SPELVORM` in `src/types.ts`.
 

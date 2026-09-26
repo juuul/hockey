@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
-import { GespeeldeWedstrijd } from '../types'
+import { GespeeldeWedstrijd, opstellingTekst } from '../types'
 import { balans, clubNaam, datumTekst, perTegenstander, sorteerWedstrijden, topscorers, uitslag, vindClub } from '../historie'
 import WedstrijdModal from '../components/WedstrijdModal'
 import { tel } from '../statistiek'
@@ -107,7 +107,7 @@ export default function Historie() {
               <div className={`uitslag groot ${uitslag(open)}`}>{open.wij} – {open.zij}</div>
               <p className="detail-regel">{UITSLAG_TEKST[uitslag(open)]}</p>
               {open.doelpunten.length > 0 && <p className="detail-regel">⚽ {scorerRegels(open)}</p>}
-              <p className="detail-regel">{open.spelers.length} speelsters · {open.opstelling}</p>
+              <p className="detail-regel">{open.spelers.length} speelsters · {opstellingTekst(open.opstelling)}</p>
             </div>
             <div className="modal-actions detail-knoppen">
               {magBewerken && <button className="btn btn-gevaar" onClick={() => { setWeg(open); setOpen(null) }}>Verwijderen</button>}

@@ -1,4 +1,4 @@
-export type Position = 'LW' | 'CV' | 'RW' | 'LM' | 'LCM' | 'CM' | 'RCM' | 'RM' | 'LBM' | 'LCA' | 'CBM' | 'RCA' | 'RBM' | 'LIB' | 'K';
+export type Position = 'LW' | 'CV' | 'RW' | 'LM' | 'LCM' | 'CM' | 'RCM' | 'RM' | 'LBM' | 'LCA' | 'CBM' | 'RCA' | 'RBM' | 'K';
 
 export interface Player {
   id: string;
@@ -33,23 +33,23 @@ export const POSITIE_LABEL: Record<Position, string> = {
   CBM: 'centraal achter',
   RCA: 'rechts centraal',
   RBM: 'rechts achter',
-  LIB: 'laatste man',
   K: 'keeper',
 };
 
 // Van voor naar achter; ook de sorteervolgorde voor elke opstelling
-export const VELD_VOLGORDE: Position[] = ['LW', 'CV', 'RW', 'LM', 'LCM', 'CM', 'RCM', 'RM', 'LBM', 'LCA', 'CBM', 'RCA', 'RBM', 'LIB'];
+export const VELD_VOLGORDE: Position[] = ['LW', 'CV', 'RW', 'LM', 'LCM', 'CM', 'RCM', 'RM', 'LBM', 'LCA', 'CBM', 'RCA', 'RBM'];
 
 // Totaal aantal spelers incl. keeper
 export type Spelvorm = 11 | 9 | 6;
 
-export type OpstellingNaam = '3-3-3-1' | '4-3-3' | '3-4-3' | '2-3-3' | '3-3-2' | '3-2-3' | '2-1-2' | '2-2-1' | '1-2-2';
+export type OpstellingNaam = '2-4-4' | '3-3-4' | '3-4-3' | '2-3-3' | '3-3-2' | '3-2-3' | '2-1-2' | '2-2-1' | '1-2-2';
 
 // Rijen van voor naar achter (keeper staat er altijd los onder)
 export const OPSTELLINGEN: Record<OpstellingNaam, Position[][]> = {
-  // 11 spelers: de naam telt van achter naar voor zoals in het hockey gebruikelijk (3-3-3-1 = libero achteraan)
-  '3-3-3-1': [['LW', 'CV', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'CBM', 'RBM'], ['LIB']],
-  '4-3-3': [['LW', 'CV', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'LCA', 'RCA', 'RBM']],
+  // Interne namen tellen van voor naar achter (zo staan ze al in opslag en op de server).
+  // In beeld altijd hockeytaal, van achter naar voor: zie opstellingTekst
+  '2-4-4': [['LW', 'RW'], ['LM', 'LCM', 'RCM', 'RM'], ['LBM', 'LCA', 'RCA', 'RBM']],
+  '3-3-4': [['LW', 'CV', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'LCA', 'RCA', 'RBM']],
   '3-4-3': [['LW', 'CV', 'RW'], ['LM', 'LCM', 'RCM', 'RM'], ['LBM', 'CBM', 'RBM']],
   '2-3-3': [['LW', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'CBM', 'RBM']],
   '3-3-2': [['LW', 'CV', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'RBM']],
@@ -61,7 +61,7 @@ export const OPSTELLINGEN: Record<OpstellingNaam, Position[][]> = {
 
 // De eerste is de standaard bij die spelvorm
 export const OPSTELLINGEN_PER_SPELVORM: Record<Spelvorm, OpstellingNaam[]> = {
-  11: ['3-3-3-1', '4-3-3', '3-4-3'],
+  11: ['2-4-4', '3-3-4', '3-4-3'],
   9: ['2-3-3', '3-3-2', '3-2-3'],
   6: ['2-1-2', '2-2-1', '1-2-2'],
 };
@@ -99,3 +99,8 @@ export interface GespeeldeWedstrijd {
   opstelling: OpstellingNaam;
   opgeslagenOp: number;
 }
+
+// Hockeytaal: van achter naar voor, zonder keeper (intern '2-4-4' = 2 voor, 4 midden, 4 achter → '4-4-2')
+export const opstellingTekst = (naam: string): string => naam.split('-').reverse().join('-');
+
+export const isOpstelling = (naam: unknown): naam is OpstellingNaam => typeof naam === 'string' && naam in OPSTELLINGEN;
