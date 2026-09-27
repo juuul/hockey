@@ -13,6 +13,8 @@ interface AccountContextType {
   kiesTeam: (id: string | null) => void
   magBewerken: boolean
   meekijken: (teamId: string, token: string) => Promise<void>
+  mijnKinderen: string[]
+  zetMijnKinderen: (ids: string[]) => void
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -73,12 +75,30 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     kiesTeam(teamId)
   }
 
+  // 'Mijn kind(eren)' per team: bij een gewoon account op de server (volgt je account), anders op deze telefoon
+  const kindSleutel = `kinderen_${actiefTeamId ?? 'lokaal'}`
+  const [lokaleKinderen, setLokaleKinderen] = useState<string[]>(() => lees(OPSLAG, kindSleutel, []))
+  useEffect(() => { setLokaleKinderen(lees(OPSLAG, kindSleutel, [])) }, [kindSleutel])
+  const opAccount = !!gebruiker && !gebruiker.gast && !!actiefTeamId
+  const mijnKinderen = opAccount ? gebruiker!.kinderen?.[actiefTeamId!] ?? [] : lokaleKinderen
+  const zetMijnKinderen = (ids: string[]) => {
+    if (opAccount) {
+      const kinderen = { ...(gebruiker!.kinderen ?? {}), [actiefTeamId!]: ids }
+      // Meteen tonen; de server bevestigt (de SDK werkt dan ook de inlog-gegevens bij)
+      pb.authStore.save(pb.authStore.token, { ...pb.authStore.record!, kinderen })
+      pb.collection('users').update(gebruiker!.id, { kinderen }).catch(() => {})
+    } else {
+      setLokaleKinderen(ids)
+      schrijf(OPSLAG, kindSleutel, ids)
+    }
+  }
+
   const actiefTeam = teams.find(t => t.id === actiefTeamId) ?? null
   // Zonder team mag je alles (alleen deze telefoon); in een team alleen als beheerder of superadmin
   const magBewerken = !actiefTeamId || !!gebruiker?.superadmin || (actiefTeam ? rolIn(actiefTeam, gebruiker?.id ?? '') === 'beheerder' : true)
 
   return (
-    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken }}>
+    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen }}>
       {children}
     </AccountContext.Provider>
   )

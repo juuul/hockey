@@ -8,18 +8,20 @@ import Dashboard from './screens/Dashboard'
 import Players from './screens/Players'
 import Positions from './screens/Positions'
 import Historie from './screens/Historie'
+import Programma from './screens/Programma'
 import Verversen from './components/Verversen'
 import { OPSLAG } from './opslag'
 import './App.css'
 
-type Scherm = 'dashboard' | 'players' | 'positions' | 'historie' | 'instellingen'
+type Scherm = 'dashboard' | 'players' | 'positions' | 'programma' | 'historie' | 'instellingen'
 
-// Vijf namen passen niet naast elkaar op een smalle telefoon: iconen even breed; alleen het actieve tabblad toont
+// Zes namen passen niet naast elkaar op een smalle telefoon: iconen even breed; alleen het actieve tabblad toont
 // zijn naam eronder (die mag uitlopen onder de lege plek van de buren; aan de randen uitgelijnd met de schermrand)
 const TABS: { id: Scherm; icoon: string; naam: string }[] = [
   { id: 'dashboard', icoon: '🏑', naam: 'Dashboard' },
   { id: 'players', icoon: '👥', naam: 'Spelers' },
   { id: 'positions', icoon: '⭐', naam: 'Voorkeur' },
+  { id: 'programma', icoon: '📅', naam: 'Programma' },
   { id: 'historie', icoon: '📊', naam: 'Historie' },
   { id: 'instellingen', icoon: '⚙️', naam: 'Instellingen' },
 ]
@@ -59,6 +61,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
         {screen === 'dashboard' && <Dashboard naarInstellingen={() => setScreen('instellingen')} />}
         {screen === 'players' && <Players />}
         {screen === 'positions' && <Positions />}
+        {screen === 'programma' && <Programma />}
         {screen === 'historie' && <Historie />}
         {screen === 'instellingen' && <Instellingen start={start} startGebruikt={startGebruikt} naarDashboard={() => setScreen('dashboard')} />}
       </div>

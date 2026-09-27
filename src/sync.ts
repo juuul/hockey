@@ -1,12 +1,15 @@
 import type PocketBase from 'pocketbase'
-import { Club, GespeeldeWedstrijd, Player, Position, Wissel, WedstrijdInfo } from './types'
+import { Club, GespeeldeWedstrijd, Player, Position, ProgrammaItem, Wissel, WedstrijdInfo } from './types'
 
 // Synchronisatie per record (speler, club, wedstrijd) met drie standen:
 // lokaal (wat de app nu heeft), basis (wat de server de vorige keer had) en server (wat de server nu heeft).
 // Lokaal gewijzigd t.o.v. basis → naar de server sturen. Niet lokaal gewijzigd → overnemen van de server.
 
-export type Soort = 'spelers' | 'clubs' | 'wedstrijden'
-export const SOORTEN: Soort[] = ['clubs', 'spelers', 'wedstrijden']
+export type Soort = 'spelers' | 'clubs' | 'wedstrijden' | 'programma'
+export const SOORTEN: Soort[] = ['clubs', 'spelers', 'programma', 'wedstrijden']
+
+// Per soort een waarde (voorkomt overal losse { spelers, clubs, wedstrijden, programma }-objecten)
+export const perSoort = <T>(f: (s: Soort) => T): Record<Soort, T> => Object.fromEntries(SOORTEN.map(s => [s, f(s)])) as Record<Soort, T>
 
 export interface SpelerRecord { id: string; naam: string; voorkeur1: string; voorkeur2: string }
 export type ClubRecord = Club
@@ -20,11 +23,15 @@ const VELDEN: Record<Soort, string[]> = {
   spelers: ['id', 'naam', 'voorkeur1', 'voorkeur2'],
   clubs: ['id', 'naam', 'laatstGebruikt'],
   wedstrijden: ['id', 'datum', 'clubId', 'tegenstander', 'thuis', 'wij', 'zij', 'doelpunten', 'spelers', 'opstelling', 'opgeslagenOp'],
+  programma: ['id', 'datum', 'tot', 'soort', 'clubId', 'tegenstander', 'thuis', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie'],
 }
+
+// Tekstvelden die leeg '' zijn als ze ontbreken (de server geeft '' terug, de app soms undefined)
+const TEKST = new Set(['voorkeur1', 'voorkeur2', 'clubId', 'tegenstander', 'opstelling', 'tot', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie'])
 
 export function schoon(soort: Soort, r: Record<string, unknown>): Record<string, unknown> {
   const uit: Record<string, unknown> = {}
-  for (const v of VELDEN[soort]) uit[v] = r[v] ?? (v === 'voorkeur1' || v === 'voorkeur2' || v === 'clubId' || v === 'tegenstander' || v === 'opstelling' ? '' : null)
+  for (const v of VELDEN[soort]) uit[v] = r[v] ?? (TEKST.has(v) ? '' : v === 'thuis' ? false : null)
   return uit
 }
 
@@ -34,11 +41,12 @@ export const perId = (lijst: Record<string, unknown>[], soort: Soort): Records =
   Object.fromEntries(lijst.map(r => [r.id as string, schoon(soort, r)]))
 
 // Van de app-state naar records
-export function naarRecords(spelers: Player[], vastePosities: Record<string, string[]>, clubs: Club[], wedstrijden: GespeeldeWedstrijd[]): Alles {
+export function naarRecords(spelers: Player[], vastePosities: Record<string, string[]>, clubs: Club[], wedstrijden: GespeeldeWedstrijd[], programma: ProgrammaItem[] = []): Alles {
   return {
     spelers: perId(spelers.map(s => ({ id: s.id, naam: s.naam, voorkeur1: vastePosities[s.id]?.[0] ?? '', voorkeur2: vastePosities[s.id]?.[1] ?? '' })), 'spelers'),
     clubs: perId(clubs as unknown as Record<string, unknown>[], 'clubs'),
     wedstrijden: perId(wedstrijden as unknown as Record<string, unknown>[], 'wedstrijden'),
+    programma: perId(programma as unknown as Record<string, unknown>[], 'programma'),
   }
 }
 
@@ -48,19 +56,19 @@ export interface Actie { soort: Soort; soortActie: 'create' | 'update' | 'delete
 // Expliciet verwijderd op dit toestel (per soort de id's). Alleen deze worden op de server verwijderd:
 // iets dat lokaal (nog) ontbreekt is geen reden om te wissen (zo verdwenen eens nieuwe wedstrijden van de server)
 export type Verwijderd = Record<Soort, string[]>
-export const GEEN_VERWIJDERD: Verwijderd = { spelers: [], clubs: [], wedstrijden: [] }
+export const GEEN_VERWIJDERD: Verwijderd = perSoort(() => [])
 
 export function acties(lokaal: Alles, basis: Alles, verwijderd: Verwijderd = GEEN_VERWIJDERD): Actie[] {
   const maak: Actie[] = []
   const weg: Actie[] = []
   for (const soort of SOORTEN) {
-    const l = lokaal[soort], b = basis[soort]
+    const l = lokaal[soort] ?? {}, b = basis[soort] ?? {}
     for (const id of Object.keys(l)) {
-      if (verwijderd[soort].includes(id)) continue
+      if ((verwijderd[soort] ?? []).includes(id)) continue
       if (!(id in b)) maak.push({ soort, soortActie: 'create', id, data: l[id] })
       else if (!gelijk(l[id], b[id])) maak.push({ soort, soortActie: 'update', id, data: l[id] })
     }
-    for (const id of verwijderd[soort]) weg.push({ soort, soortActie: 'delete', id })
+    for (const id of verwijderd[soort] ?? []) weg.push({ soort, soortActie: 'delete', id })
   }
   return [...maak, ...weg]
 }
@@ -143,8 +151,8 @@ export function nieuweIds(d: Lokaal): Lokaal {
   }
 }
 
-export const LEEG: Alles = { spelers: {}, clubs: {}, wedstrijden: {} }
-const kopie = (a: Alles): Alles => ({ spelers: { ...a.spelers }, clubs: { ...a.clubs }, wedstrijden: { ...a.wedstrijden } })
+export const LEEG: Alles = perSoort(() => ({}))
+const kopie = (a: Alles): Alles => perSoort(s => ({ ...(a[s] ?? {}) }))
 
 export class GeenVerbinding extends Error {}
 
@@ -152,9 +160,9 @@ export class GeenVerbinding extends Error {}
 // 'lokaalNu' wordt na het versturen opnieuw gelezen: wat er intussen lokaal veranderde gaat niet verloren
 export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: () => Alles, basisVoor: Alles, verwijderd: Verwijderd = GEEN_VERWIJDERD) {
   const basis = kopie(basisVoor)
-  const afgewezen: Record<Soort, Set<string>> = { spelers: new Set(), clubs: new Set(), wedstrijden: new Set() }
+  const afgewezen: Record<Soort, Set<string>> = perSoort(() => new Set<string>())
   // Verwijderingen die de server heeft verwerkt (of die er al niet meer waren): mogen uit de lijst
-  const verwerkt: Verwijderd = { spelers: [], clubs: [], wedstrijden: [] }
+  const verwerkt: Verwijderd = perSoort(() => [])
 
   for (const a of acties(lokaalNu(), basis, verwijderd)) {
     try {
@@ -190,13 +198,9 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
 
   const lokaal = lokaalNu()
   // Nog openstaande verwijderingen (niet in deze ronde verwerkt) blijven weg uit het resultaat
-  const open = (soort: Soort) => verwijderd[soort].filter(id => !verwerkt[soort].includes(id))
-  const samengevoegd: Alles = {
-    spelers: samenvoegen(lokaal.spelers, basis.spelers, server.spelers, afgewezen.spelers, open('spelers')),
-    clubs: samenvoegen(lokaal.clubs, basis.clubs, server.clubs, afgewezen.clubs, open('clubs')),
-    wedstrijden: samenvoegen(lokaal.wedstrijden, basis.wedstrijden, server.wedstrijden, afgewezen.wedstrijden, open('wedstrijden')),
-  }
-  const nogOpen: Verwijderd = { spelers: open('spelers'), clubs: open('clubs'), wedstrijden: open('wedstrijden') }
+  const open = (soort: Soort) => (verwijderd[soort] ?? []).filter(id => !verwerkt[soort].includes(id))
+  const samengevoegd: Alles = perSoort(so => samenvoegen(lokaal[so] ?? {}, basis[so] ?? {}, server[so], afgewezen[so], open(so)))
+  const nogOpen: Verwijderd = perSoort(open)
   return {
     samengevoegd,
     basis: server,

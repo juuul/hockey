@@ -104,3 +104,21 @@ export interface GespeeldeWedstrijd {
 export const opstellingTekst = (naam: string): string => naam.split('-').reverse().join('-');
 
 export const isOpstelling = (naam: unknown): naam is OpstellingNaam => typeof naam === 'string' && naam in OPSTELLINGEN;
+
+// Programma (tabblad Programma): per datum een wedstrijd met tijden en taken, of een regel zonder wedstrijd.
+// Lege tekst = nog niet bekend (tegenstander/tijden) of niemand (fruit/begeleiding). Taken verwijzen naar een speler-id
+export interface ProgrammaItem {
+  id: string;
+  datum: string; // 'JJJJ-MM-DD'
+  tot: string; // laatste datum bij een periode (bv. vakantie), anders ''
+  soort: 'wedstrijd' | 'vrij';
+  clubId: string;
+  tegenstander: string;
+  thuis: boolean;
+  verzamelen: string; // 'UU:MM' of ''
+  spelen: string;
+  fruit: string;
+  begeleider1: string;
+  begeleider2: string;
+  notitie: string;
+}

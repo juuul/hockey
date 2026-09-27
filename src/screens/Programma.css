@@ -1,0 +1,242 @@
+.programma {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 8px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.prog-uitleg {
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+  line-height: 1.3;
+}
+
+.prog-uitleg.midden {
+  text-align: center;
+  padding: 12px 4px;
+}
+
+/* Mijn kind */
+.prog-kind {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--vlak-blauw);
+  border: 2px solid var(--rand-blauw);
+  border-radius: 12px;
+}
+
+.prog-kind-kop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.prog-kind-kop .prog-kind-kies {
+  margin-left: auto;
+}
+
+.prog-kind-titel {
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: var(--blauw-donker-tekst);
+}
+
+.prog-kind-kies,
+.prog-filter {
+  min-height: 60px;
+  padding: 0 16px;
+  border: 2px solid var(--rand-blauw);
+  border-radius: 10px;
+  background: var(--vlak);
+  color: var(--blauw-tekst);
+  font-family: inherit;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.prog-filter.actief {
+  background: #1e40af;
+  border-color: #1e40af;
+  color: white;
+}
+
+.prog-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.prog-chip {
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: #1e40af;
+  color: white;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+}
+
+.prog-toevoegen {
+  flex: 0 0 auto;
+}
+
+/* Kaartjes */
+.prog-kaart {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--vlak);
+  border: 2px solid var(--rand);
+  border-left-width: 8px;
+  border-radius: 12px;
+  font-family: inherit;
+  text-align: left;
+  color: var(--tekst);
+}
+
+button.prog-kaart {
+  cursor: pointer;
+}
+
+button.prog-kaart:active {
+  background: var(--vlak-blauw);
+}
+
+.prog-kaart.volgende {
+  border-color: #1e40af;
+}
+
+/* Beurt van mijn kind: opvallende rand en achtergrond */
+.prog-kaart.mijn {
+  border-color: #f59e0b;
+  background: var(--geel-vlak);
+}
+
+.prog-kaart.vrij {
+  background: var(--vlak-zacht);
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.prog-kaart.geweest {
+  opacity: 0.6;
+}
+
+.prog-kop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.prog-datum {
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+}
+
+.prog-waar {
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+}
+
+.prog-tegen {
+  font-size: calc(var(--base-readable-size) * 1.1);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.prog-vrij {
+  font-size: var(--base-readable-size);
+  font-style: italic;
+  color: var(--tekst-zacht);
+}
+
+.prog-regel {
+  display: flex;
+  gap: 8px;
+  font-size: var(--base-readable-size);
+  line-height: 1.3;
+}
+
+.prog-regel.mijn {
+  font-weight: 700;
+}
+
+.prog-regel.notitie {
+  color: var(--tekst-zacht);
+}
+
+.onbekend {
+  color: var(--tekst-vaag);
+  font-style: italic;
+}
+
+.prog-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.prog-label {
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+}
+
+.prog-label.volgende {
+  background: #1e40af;
+  color: white;
+}
+
+.prog-label.mijn {
+  background: #f59e0b;
+  color: #1f2937;
+}
+
+.prog-geweest-titel {
+  margin-top: 10px;
+}
+
+/* Bewerken */
+.prog-velden {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+.prog-velden .modal-input {
+  margin-bottom: 0;
+}
+
+.prog-velden .btn {
+  flex: 0 0 auto;
+}
+
+.prog-veld {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: var(--tekst-2);
+}
+
+.prog-tijden {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}

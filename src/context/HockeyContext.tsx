@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { Club, GespeeldeWedstrijd, isOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
+import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
-import { Alles, GEEN_VERWIJDERD, Lokaal, naarRecords, nieuweIds, pbId, Soort, spelersToepassen, Verwijderd, voorkeurenUit } from '../sync'
+import { Alles, GEEN_VERWIJDERD, Lokaal, naarRecords, nieuweIds, pbId, perSoort, Soort, spelersToepassen, Verwijderd, voorkeurenUit } from '../sync'
 import { SyncStatus, useTeamSync } from './useTeamSync'
 import { LiveStand, LiveStatus, useLiveStand } from './useLiveStand'
 import { Stand, spelersMetStand, spelersStand } from '../live'
@@ -60,6 +60,9 @@ interface HockeyContextType {
   wedstrijd: WedstrijdInfo
   zetWedstrijd: (info: WedstrijdInfo) => void
   wedstrijden: GespeeldeWedstrijd[]
+  programma: ProgrammaItem[]
+  bewaarProgramma: (item: ProgrammaItem) => void
+  verwijderProgramma: (id: string) => void
   wedstrijdAfsluiten: (info: WedstrijdInfo, tegenstander: string) => void
   wijzigWedstrijd: (id: string, info: WedstrijdInfo, tegenstander: string, stand?: OpgeslagenStand) => void
   verwijderWedstrijd: (id: string) => void
@@ -178,10 +181,20 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
   const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => lees(P, 'wedstrijden', []))
   // Wat op dit toestel expliciet is verwijderd en nog naar de server moet (alleen dat wordt daar gewist)
-  const [verwijderd, setVerwijderd] = useState<Verwijderd>(() => lees(P, 'verwijderd', GEEN_VERWIJDERD))
+  const [programma, setProgramma] = useState<ProgrammaItem[]>(() => lees(P, 'programma', []))
+  useEffect(() => { schrijf(P, 'programma', programma) }, [programma])
+  const [verwijderd, setVerwijderd] = useState<Verwijderd>(() => ({ ...GEEN_VERWIJDERD, ...lees<Partial<Verwijderd>>(P, 'verwijderd', {}) }))
   useEffect(() => { schrijf(P, 'verwijderd', verwijderd) }, [verwijderd])
   const markeerVerwijderd = (soort: Soort, id: string) =>
-    setVerwijderd(v => (v[soort].includes(id) ? v : { ...v, [soort]: [...v[soort], id] }))
+    setVerwijderd(v => ((v[soort] ?? []).includes(id) ? v : { ...v, [soort]: [...(v[soort] ?? []), id] }))
+
+  // Programma: toevoegen of bijwerken (zelfde id), en verwijderen
+  const bewaarProgramma = (item: ProgrammaItem) =>
+    setProgramma(huidig => (huidig.some(p => p.id === item.id) ? huidig.map(p => (p.id === item.id ? item : p)) : [...huidig, item]))
+  const verwijderProgramma = (id: string) => {
+    setProgramma(huidig => huidig.filter(p => p.id !== id))
+    markeerVerwijderd('programma', id)
+  }
 
   useEffect(() => {
     localStorage.setItem(`${P}_clubs`, JSON.stringify(clubs))
@@ -422,9 +435,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
 
 
   // ── Synchroniseren met het team op de server ──
-  const records = naarRecords(spelers, vastePosities, clubs, wedstrijden)
+  const records = naarRecords(spelers, vastePosities, clubs, wedstrijden, programma)
   const toepassen = (nieuw: Alles) => {
-    const oud = naarRecords(spelers, vastePosities, clubs, wedstrijden)
+    const oud = naarRecords(spelers, vastePosities, clubs, wedstrijden, programma)
+    if (JSON.stringify(nieuw.programma) !== JSON.stringify(oud.programma)) setProgramma(Object.values(nieuw.programma) as unknown as ProgrammaItem[])
     if (JSON.stringify(nieuw.spelers) !== JSON.stringify(oud.spelers)) {
       zetSpelersRuw(huidig => {
         const bijgewerkt = spelersToepassen(huidig, nieuw.spelers, haalUitVeld)
@@ -440,11 +454,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   const liveRef = useRef<LiveStand | null>(null)
   // Door de server verwerkte verwijderingen uit de lijst halen
   const verwijderdVerwerkt = (verwerkt: Verwijderd) =>
-    setVerwijderd(v => ({
-      spelers: v.spelers.filter(id => !verwerkt.spelers.includes(id)),
-      clubs: v.clubs.filter(id => !verwerkt.clubs.includes(id)),
-      wedstrijden: v.wedstrijden.filter(id => !verwerkt.wedstrijden.includes(id)),
-    }))
+    setVerwijderd(v => perSoort(so => (v[so] ?? []).filter(id => !verwerkt[so].includes(id))))
   const { status: sync, nuSynchroniseren } = useTeamSync({ teamId, prefix: P, records, toepassen, verwijderd, verwijderdVerwerkt })
 
   // ── Lopende wedstrijd live delen met het team ──
@@ -504,7 +514,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, teamId, magBewerken, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )

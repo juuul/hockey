@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { pb } from '../server'
 import { lees, schrijf } from '../opslag'
-import { acties, Alles, GeenVerbinding, LEEG, SOORTEN, synchroniseer, Verwijderd } from '../sync'
+import { acties, Alles, GeenVerbinding, LEEG, perSoort, SOORTEN, synchroniseer, Verwijderd } from '../sync'
 
 export interface SyncStatus {
   geladen: boolean // minstens één keer van de server opgehaald
@@ -54,13 +54,9 @@ export function useTeamSync({ teamId, prefix, records, toepassen, verwijderd, ve
         // De app-state is pas na de volgende render bijgewerkt. Tot die tijd geldt het samengevoegde resultaat als
         // 'lokaal'; anders ziet een volgende ronde (nogEens) de nieuwe serverrecords als lokaal verwijderd en wist ze
         recordsRef.current = uit.samengevoegd
-        if (SOORTEN.some(s => uit.verwerkt[s].length)) {
+        if (SOORTEN.some(so => uit.verwerkt[so].length)) {
           verwerktRef.current(uit.verwerkt)
-          verwijderdRef.current = {
-            spelers: verwijderdRef.current.spelers.filter(id => !uit.verwerkt.spelers.includes(id)),
-            clubs: verwijderdRef.current.clubs.filter(id => !uit.verwerkt.clubs.includes(id)),
-            wedstrijden: verwijderdRef.current.wedstrijden.filter(id => !uit.verwerkt.wedstrijden.includes(id)),
-          }
+          verwijderdRef.current = perSoort(so => (verwijderdRef.current[so] ?? []).filter(id => !uit.verwerkt[so].includes(id)))
         }
         setStatus({ geladen: true, wachtend: uit.wachtend, offline: false, fout: null, serverLeeg: uit.serverLeeg })
       } while (nogEens.current)
