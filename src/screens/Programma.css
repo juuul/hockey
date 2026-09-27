@@ -102,37 +102,19 @@
   color: var(--tekst);
 }
 
-.prog-kaart.bewerkbaar {
-  position: relative;
-  cursor: pointer;
-  /* Ziet eruit als een knop: verhoogde onderrand, pijltje rechts; tikken = wijzigen */
-  padding-right: 40px;
-  box-shadow: 0 3px 0 var(--rand-sterk), 0 4px 10px rgba(0, 0, 0, 0.08);
-  transition: transform 0.08s, box-shadow 0.08s;
+.prog-knoppenrij {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.prog-kaart.bewerkbaar::after {
-  content: '›';
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: calc(var(--base-readable-size) * 1.6);
-  line-height: 1;
-  color: var(--tekst-vaag);
+.prog-knoppenrij .btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 8px;
+  line-height: 1.15;
 }
 
-.prog-kaart.bewerkbaar:active {
-  background: var(--vlak-blauw);
-  transform: translateY(2px);
-  box-shadow: 0 1px 0 var(--rand-sterk);
-}
-
-
-.prog-klaar {
-  flex: 0 0 auto;
-  margin-top: 6px;
-}
 
 .prog-label.klaar {
   background: #16a34a;

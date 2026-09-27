@@ -62,6 +62,16 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
   const volgendeId = komend.find(p => p.soort === 'wedstrijd')?.id
   const zichtbaar = (lijst: ProgrammaItem[]) => (alleenMijn ? lijst.filter(p => beurten(p).length > 0) : lijst)
 
+  // Onderin elk kaartje (beheerders): Wijzigen, en bij komende wedstrijden Op het veld zetten
+  const knoppen = (p: ProgrammaItem, isGeweest: boolean) => (
+    <div className="prog-knoppenrij">
+      <button className="btn btn-secondary" onClick={() => setBewerk(p)}>✏️ Wijzigen</button>
+      {p.soort === 'wedstrijd' && !isGeweest && p.id !== wedstrijd.programmaId && (
+        <button className={`btn ${p.id === volgendeId ? 'btn-primary' : 'btn-secondary'}`} onClick={() => opVeld(p)}>🏑 Op het veld zetten</button>
+      )}
+    </div>
+  )
+
   const kaart = (p: ProgrammaItem, isGeweest = false) => {
     const mijn = beurten(p)
     const datum = p.tot ? `${datumTekst(p.datum)} – ${datumTekst(p.tot)}` : datumTekst(p.datum)
@@ -71,6 +81,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span className="prog-datum">{datum}</span>
         </div>
         <div className="prog-vrij">{p.notitie || 'Geen wedstrijd'}</div>
+        {magBewerken && knoppen(p, isGeweest)}
       </>
     ) : (
       <>
@@ -98,30 +109,11 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         {mijn.length > 0 && (
           <div className="prog-labels">{mijn.map(b => <span key={b} className="prog-label mijn">Jij: {b}</span>)}</div>
         )}
-        {magBewerken && !isGeweest && p.id !== wedstrijd.programmaId && (
-          <button className={`btn ${p.id === volgendeId ? 'btn-primary' : 'btn-secondary'} prog-klaar`} onClick={e => { e.stopPropagation(); opVeld(p) }}>
-            🏑 Op het veld zetten
-          </button>
-        )}
+        {magBewerken && knoppen(p, isGeweest)}
       </>
     )
     const klasse = `prog-kaart ${p.soort} ${mijn.length ? 'mijn' : ''} ${isGeweest ? 'geweest' : ''} ${p.id === volgendeId ? 'volgende' : ''}`
-    // Beheerders: tik op het kaartje = wijzigen (div, want er zit een knop in)
-    return magBewerken
-      ? (
-        <div
-          key={p.id}
-          className={`${klasse} bewerkbaar`}
-          role="button"
-          aria-label={`${datum} wijzigen`}
-          tabIndex={0}
-          onClick={() => setBewerk(p)}
-          onKeyDown={e => { if (e.key === 'Enter') setBewerk(p) }}
-        >
-          {inhoud}
-        </div>
-      )
-      : <div key={p.id} className={klasse}>{inhoud}</div>
+    return <div key={p.id} className={klasse}>{inhoud}</div>
   }
 
   return (
