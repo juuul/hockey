@@ -3,7 +3,7 @@ import { Club, GespeeldeWedstrijd, isOpstelling, OpstellingNaam, OPSTELLINGEN_PE
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
-import { Alles, Lokaal, naarRecords, nieuweIds, pbId, spelersToepassen, voorkeurenUit } from '../sync'
+import { Alles, GEEN_VERWIJDERD, Lokaal, naarRecords, nieuweIds, pbId, Soort, spelersToepassen, Verwijderd, voorkeurenUit } from '../sync'
 import { SyncStatus, useTeamSync } from './useTeamSync'
 import { LiveStand, LiveStatus, useLiveStand } from './useLiveStand'
 import { Stand, spelersMetStand, spelersStand } from '../live'
@@ -177,6 +177,11 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   const [clubs, setClubs] = useState<Club[]>(() => lees(P, 'clubs', []))
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
   const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => lees(P, 'wedstrijden', []))
+  // Wat op dit toestel expliciet is verwijderd en nog naar de server moet (alleen dat wordt daar gewist)
+  const [verwijderd, setVerwijderd] = useState<Verwijderd>(() => lees(P, 'verwijderd', GEEN_VERWIJDERD))
+  useEffect(() => { schrijf(P, 'verwijderd', verwijderd) }, [verwijderd])
+  const markeerVerwijderd = (soort: Soort, id: string) =>
+    setVerwijderd(v => (v[soort].includes(id) ? v : { ...v, [soort]: [...v[soort], id] }))
 
   useEffect(() => {
     localStorage.setItem(`${P}_clubs`, JSON.stringify(clubs))
@@ -244,6 +249,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   const deleteSpeler = (id: string) => {
     remember()
     setSpelers(haalUitVeld(spelers, id).filter(s => s.id !== id))
+    markeerVerwijderd('spelers', id)
   }
 
   const zetMeedoen = (id: string, meedoen: boolean) => {
@@ -334,6 +340,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   // Oude wedstrijden houden de naam die bij het opslaan gold
   const verwijderClub = (id: string) => {
     setClubs(clubs.filter(c => c.id !== id))
+    markeerVerwijderd('clubs', id)
     if (wedstrijd.clubId === id) zetWedstrijd({ ...wedstrijd, clubId: null })
   }
 
@@ -374,7 +381,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
         }
       : w)))
 
-  const verwijderWedstrijd = (id: string) => setWedstrijden(wedstrijden.filter(w => w.id !== id))
+  const verwijderWedstrijd = (id: string) => {
+    setWedstrijden(wedstrijden.filter(w => w.id !== id))
+    markeerVerwijderd('wedstrijden', id)
+  }
 
   const resetScore = () => {
     remember()
@@ -428,7 +438,14 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
     if (JSON.stringify(nieuw.wedstrijden) !== JSON.stringify(oud.wedstrijden)) setWedstrijden(Object.values(nieuw.wedstrijden) as unknown as GespeeldeWedstrijd[])
   }
   const liveRef = useRef<LiveStand | null>(null)
-  const { status: sync, nuSynchroniseren } = useTeamSync({ teamId, prefix: P, records, toepassen })
+  // Door de server verwerkte verwijderingen uit de lijst halen
+  const verwijderdVerwerkt = (verwerkt: Verwijderd) =>
+    setVerwijderd(v => ({
+      spelers: v.spelers.filter(id => !verwerkt.spelers.includes(id)),
+      clubs: v.clubs.filter(id => !verwerkt.clubs.includes(id)),
+      wedstrijden: v.wedstrijden.filter(id => !verwerkt.wedstrijden.includes(id)),
+    }))
+  const { status: sync, nuSynchroniseren } = useTeamSync({ teamId, prefix: P, records, toepassen, verwijderd, verwijderdVerwerkt })
 
   // ── Lopende wedstrijd live delen met het team ──
   const stand: Stand = { spelers: spelersStand(spelers), wisselingen, score, doelpunten, opstelling, timer, wedstrijd }

@@ -45,25 +45,33 @@ export function naarRecords(spelers: Player[], vastePosities: Record<string, str
 export interface Actie { soort: Soort; soortActie: 'create' | 'update' | 'delete'; id: string; data?: Record<string, unknown> }
 
 // Aanmaken van clubs en spelers vóór wedstrijden; verwijderen daarna
-export function acties(lokaal: Alles, basis: Alles): Actie[] {
+// Expliciet verwijderd op dit toestel (per soort de id's). Alleen deze worden op de server verwijderd:
+// iets dat lokaal (nog) ontbreekt is geen reden om te wissen (zo verdwenen eens nieuwe wedstrijden van de server)
+export type Verwijderd = Record<Soort, string[]>
+export const GEEN_VERWIJDERD: Verwijderd = { spelers: [], clubs: [], wedstrijden: [] }
+
+export function acties(lokaal: Alles, basis: Alles, verwijderd: Verwijderd = GEEN_VERWIJDERD): Actie[] {
   const maak: Actie[] = []
   const weg: Actie[] = []
   for (const soort of SOORTEN) {
     const l = lokaal[soort], b = basis[soort]
     for (const id of Object.keys(l)) {
+      if (verwijderd[soort].includes(id)) continue
       if (!(id in b)) maak.push({ soort, soortActie: 'create', id, data: l[id] })
       else if (!gelijk(l[id], b[id])) maak.push({ soort, soortActie: 'update', id, data: l[id] })
     }
-    for (const id of Object.keys(b)) if (!(id in l)) weg.push({ soort, soortActie: 'delete', id })
+    for (const id of verwijderd[soort]) weg.push({ soort, soortActie: 'delete', id })
   }
   return [...maak, ...weg]
 }
 
-// Wat de app na het ophalen moet hebben. 'afgewezen': lokale wijzigingen die de server weigerde → serverstand terug
-export function samenvoegen(lokaal: Records, basis: Records, server: Records, afgewezen: Set<string> = new Set()): Records {
+// Wat de app na het ophalen moet hebben. 'afgewezen': lokale wijzigingen die de server weigerde → serverstand terug.
+// Lokaal ontbrekend (en niet expliciet verwijderd) → serverstand, nooit 'weg'
+export function samenvoegen(lokaal: Records, basis: Records, server: Records, afgewezen: Set<string> = new Set(), verwijderd: string[] = []): Records {
   const uit: Records = {}
   for (const id of new Set([...Object.keys(lokaal), ...Object.keys(basis), ...Object.keys(server)])) {
-    const lokaalGewijzigd = !gelijk(lokaal[id], basis[id]) && !afgewezen.has(id)
+    if (verwijderd.includes(id)) continue
+    const lokaalGewijzigd = lokaal[id] !== undefined && !gelijk(lokaal[id], basis[id]) && !afgewezen.has(id)
     const r = lokaalGewijzigd ? lokaal[id] : server[id]
     if (r !== undefined) uit[id] = r
   }
@@ -142,11 +150,13 @@ export class GeenVerbinding extends Error {}
 
 // Eén ronde: eerst lokale verschillen versturen, dan de serverstand ophalen en samenvoegen.
 // 'lokaalNu' wordt na het versturen opnieuw gelezen: wat er intussen lokaal veranderde gaat niet verloren
-export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: () => Alles, basisVoor: Alles) {
+export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: () => Alles, basisVoor: Alles, verwijderd: Verwijderd = GEEN_VERWIJDERD) {
   const basis = kopie(basisVoor)
   const afgewezen: Record<Soort, Set<string>> = { spelers: new Set(), clubs: new Set(), wedstrijden: new Set() }
+  // Verwijderingen die de server heeft verwerkt (of die er al niet meer waren): mogen uit de lijst
+  const verwerkt: Verwijderd = { spelers: [], clubs: [], wedstrijden: [] }
 
-  for (const a of acties(lokaalNu(), basis)) {
+  for (const a of acties(lokaalNu(), basis, verwijderd)) {
     try {
       const col = pb.collection(a.soort)
       if (a.soortActie === 'create') await col.create({ ...a.data, team: teamId })
@@ -154,11 +164,15 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
         const { id: _id, ...velden } = a.data!
         await col.update(a.id, velden)
       } else await col.delete(a.id)
-      if (a.soortActie === 'delete') delete basis[a.soort][a.id]
-      else basis[a.soort][a.id] = a.data!
+      if (a.soortActie === 'delete') {
+        delete basis[a.soort][a.id]
+        verwerkt[a.soort].push(a.id)
+      } else basis[a.soort][a.id] = a.data!
     } catch (err) {
       // Geen verbinding: later opnieuw. Geweigerd (geen rechten, ongeldig, al weg): terug naar de serverstand
-      if ((err as { status?: number }).status === 0) throw new GeenVerbinding()
+      const status = (err as { status?: number }).status
+      if (status === 0) throw new GeenVerbinding()
+      if (a.soortActie === 'delete') verwerkt[a.soort].push(a.id)
       afgewezen[a.soort].add(a.id)
     }
   }
@@ -175,15 +189,19 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
   }
 
   const lokaal = lokaalNu()
+  // Nog openstaande verwijderingen (niet in deze ronde verwerkt) blijven weg uit het resultaat
+  const open = (soort: Soort) => verwijderd[soort].filter(id => !verwerkt[soort].includes(id))
   const samengevoegd: Alles = {
-    spelers: samenvoegen(lokaal.spelers, basis.spelers, server.spelers, afgewezen.spelers),
-    clubs: samenvoegen(lokaal.clubs, basis.clubs, server.clubs, afgewezen.clubs),
-    wedstrijden: samenvoegen(lokaal.wedstrijden, basis.wedstrijden, server.wedstrijden, afgewezen.wedstrijden),
+    spelers: samenvoegen(lokaal.spelers, basis.spelers, server.spelers, afgewezen.spelers, open('spelers')),
+    clubs: samenvoegen(lokaal.clubs, basis.clubs, server.clubs, afgewezen.clubs, open('clubs')),
+    wedstrijden: samenvoegen(lokaal.wedstrijden, basis.wedstrijden, server.wedstrijden, afgewezen.wedstrijden, open('wedstrijden')),
   }
+  const nogOpen: Verwijderd = { spelers: open('spelers'), clubs: open('clubs'), wedstrijden: open('wedstrijden') }
   return {
     samengevoegd,
     basis: server,
-    wachtend: acties(samengevoegd, server).length,
+    verwerkt,
+    wachtend: acties(samengevoegd, server, nogOpen).length,
     serverLeeg: SOORTEN.every(s => Object.keys(server[s]).length === 0),
   }
 }

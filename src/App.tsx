@@ -9,6 +9,7 @@ import Players from './screens/Players'
 import Positions from './screens/Positions'
 import Historie from './screens/Historie'
 import Verversen from './components/Verversen'
+import { OPSLAG } from './opslag'
 import './App.css'
 
 type Scherm = 'dashboard' | 'players' | 'positions' | 'historie' | 'instellingen'
@@ -94,7 +95,19 @@ function OvernemenVraag() {
 // Het gekozen tabblad staat hierboven, zodat je na inloggen of van team wisselen op dezelfde plek blijft
 function MetTeam() {
   const { actiefTeamId, magBewerken } = useAccount()
-  const [screen, setScreen] = useState<Scherm>('dashboard')
+  // Na verversen op hetzelfde tabblad blijven (per browsertabblad; een nieuwe keer openen begint op het Dashboard)
+  const [screen, zetScreen] = useState<Scherm>(() => {
+    try {
+      const t = sessionStorage.getItem(`${OPSLAG}_tabblad`)
+      return TABS.some(x => x.id === t) ? (t as Scherm) : 'dashboard'
+    } catch {
+      return 'dashboard'
+    }
+  })
+  const setScreen = (s: Scherm) => {
+    zetScreen(s)
+    try { sessionStorage.setItem(`${OPSLAG}_tabblad`, s) } catch { /* geen opslag */ }
+  }
   const [start, setStart] = useState<AccountStart>(null)
 
   // Links uit mail of app: #uitnodiging=…, #wachtwoord=…, #aanmelding=… of #kijk=… (meekijklink). Daarna het # weghalen, zodat verversen het niet opnieuw opent
