@@ -118,7 +118,19 @@ export interface ProgrammaItem {
   verzamelen: string; // 'UU:MM' of ''
   spelen: string;
   fruit: string;
-  begeleider1: string;
+  begeleider1: string; // '' = nog te bepalen, '-' = niet nodig, anders speler-id (ouder van)
   begeleider2: string;
   notitie: string;
+}
+
+export const NIET_NODIG = '-';
+
+// Tekst voor op het kaartje: 'niet nodig', 'ouder Lizzy, ouder Fee', 'ouder Lizzy · nog 1 te bepalen', 'nog te bepalen'
+export function begeleidingTekst(p: ProgrammaItem, naam: (id: string) => string): string {
+  const plekken = [p.begeleider1, p.begeleider2].filter(b => b !== NIET_NODIG)
+  if (plekken.length === 0) return 'niet nodig';
+  const namen = plekken.filter(b => b && naam(b)).map(b => `ouder ${naam(b)}`);
+  const open = plekken.length - namen.length;
+  if (namen.length === 0) return 'nog te bepalen';
+  return open ? `${namen.join(', ')} · nog ${open} te bepalen` : namen.join(', ');
 }

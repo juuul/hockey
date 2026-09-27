@@ -1,24 +1,31 @@
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
-import { ProgrammaItem } from '../types'
+import { begeleidingTekst, NIET_NODIG, ProgrammaItem } from '../types'
+import type { TeamInstellingen } from '../server'
 import { datumTekst, vandaag } from '../historie'
 import { pbId } from '../sync'
 import { tel } from '../statistiek'
 import '../components/Modal.css'
 import '../components/WedstrijdModal.css'
+import './Players.css'
 import './Programma.css'
 
-const LEEG_ITEM = (): ProgrammaItem => ({
+// Standaard voor een begeleidingsplek bij thuis/uit: niet nodig, of nog te bepalen
+const standaardPlek = (thuis: boolean, inst: TeamInstellingen) =>
+  (thuis ? inst.thuisGeenBegeleiding : inst.uitGeenBegeleiding) ? NIET_NODIG : ''
+
+const LEEG_ITEM = (inst: TeamInstellingen): ProgrammaItem => ({
   id: pbId(), datum: vandaag(), tot: '', soort: 'wedstrijd', clubId: '', tegenstander: '', thuis: true,
-  verzamelen: '', spelen: '', fruit: '', begeleider1: '', begeleider2: '', notitie: '',
+  verzamelen: '', spelen: '', fruit: '', begeleider1: standaardPlek(true, inst), begeleider2: standaardPlek(true, inst), notitie: '',
 })
 
 // Tabblad Programma: wedstrijden met tijden, fruit en spelbegeleiding. Beurten van je eigen kind(eren) vallen op
 export default function Programma() {
   const { programma, spelers, clubs, magBewerken } = useHockey()
-  const { mijnKinderen, zetMijnKinderen } = useAccount()
+  const { mijnKinderen, zetMijnKinderen, teamInstellingen } = useAccount()
   const [bewerk, setBewerk] = useState<ProgrammaItem | null>(null)
+  const [standaardOpen, setStandaardOpen] = useState(false)
   const [kiesKind, setKiesKind] = useState(false)
   const [alleenMijn, setAlleenMijn] = useState(false)
 
@@ -66,7 +73,7 @@ export default function Programma() {
         </div>
         <div className={`prog-regel ${mijn.includes('begeleiding') ? 'mijn' : ''}`}>
           <span aria-hidden="true">🚗</span>
-          <span>begeleiding: {[p.begeleider1, p.begeleider2].filter(naam).map(id => `ouder ${naam(id)}`).join(', ') || '–'}</span>
+          <span>begeleiding: {begeleidingTekst(p, naam)}</span>
         </div>
         {p.notitie && <div className="prog-regel notitie">{p.notitie}</div>}
         {mijn.length > 0 && (
@@ -97,7 +104,12 @@ export default function Programma() {
         )}
       </section>
 
-      {magBewerken && <button className="btn btn-primary prog-toevoegen" onClick={() => setBewerk(LEEG_ITEM())}>+ Datum toevoegen</button>}
+      {magBewerken && (
+        <div className="prog-knoppen">
+          <button className="btn btn-primary" onClick={() => setBewerk(LEEG_ITEM(teamInstellingen))}>+ Datum toevoegen</button>
+          <button className="btn btn-secondary" onClick={() => setStandaardOpen(true)}>Standaard begeleiding</button>
+        </div>
+      )}
 
       {programma.length === 0 && <p className="prog-uitleg midden">Nog geen programma.{magBewerken ? ' Voeg de eerste datum toe.' : ''}</p>}
       {zichtbaar(komend).map(p => kaart(p))}
@@ -111,6 +123,7 @@ export default function Programma() {
 
       {kiesKind && <KindKiezen gekozen={mijnKinderen} onKlaar={ids => { zetMijnKinderen(ids); tel('kind-gekozen'); setKiesKind(false) }} onClose={() => setKiesKind(false)} />}
       {bewerk && <ProgrammaModal start={bewerk} onClose={() => setBewerk(null)} />}
+      {standaardOpen && <StandaardBegeleiding onClose={() => setStandaardOpen(false)} />}
     </div>
   )
 }
@@ -145,7 +158,13 @@ const NIEUWE_CLUB = '__nieuw__'
 
 function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () => void }) {
   const { spelers, clubs, programma, clubToevoegen, bewaarProgramma, verwijderProgramma } = useHockey()
+  const { teamInstellingen } = useAccount()
   const [p, setP] = useState<ProgrammaItem>(start)
+  // Thuis/uit omzetten: begeleidingsplekken zonder gekozen ouder volgen de standaard van het team
+  const zetThuis = (thuis: boolean) => {
+    const plek = (b: string) => (b === '' || b === NIET_NODIG ? standaardPlek(thuis, teamInstellingen) : b)
+    setP({ ...p, thuis, begeleider1: plek(p.begeleider1), begeleider2: plek(p.begeleider2) })
+  }
   const [nieuweClub, setNieuweClub] = useState<string | null>(null)
   const [wegVraag, setWegVraag] = useState(false)
   const bestaat = programma.some(x => x.id === start.id)
@@ -168,12 +187,19 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
     onClose()
   }
 
-  const spelerSelect = (label: string, veld: 'fruit' | 'begeleider1' | 'begeleider2', voorvoegsel = '') => (
+  const spelerSelect = (label: string, veld: 'fruit' | 'begeleider1' | 'begeleider2') => (
     <label className="prog-veld">
       {label}
       <select className="modal-input" value={p[veld]} onChange={e => zet({ [veld]: e.target.value })}>
-        <option value="">Niemand / nvt</option>
-        {spelerKeuzes.map(s => <option key={s.id} value={s.id}>{voorvoegsel}{s.naam}</option>)}
+        {veld === 'fruit' ? (
+          <option value="">Nog niemand</option>
+        ) : (
+          <>
+            <option value="">Nog te bepalen</option>
+            <option value={NIET_NODIG}>Niet nodig</option>
+          </>
+        )}
+        {spelerKeuzes.map(s => <option key={s.id} value={s.id}>{veld === 'fruit' ? s.naam : `Ouder van ${s.naam}`}</option>)}
       </select>
     </label>
   )
@@ -225,7 +251,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               )}
               <div className="keuze-knoppen" role="radiogroup" aria-label="Thuis of uit">
                 {[true, false].map(t => (
-                  <button key={String(t)} role="radio" aria-checked={p.thuis === t} className={`keuze-knop ${p.thuis === t ? 'actief' : ''}`} onClick={() => zet({ thuis: t })}>
+                  <button key={String(t)} role="radio" aria-checked={p.thuis === t} className={`keuze-knop ${p.thuis === t ? 'actief' : ''}`} onClick={() => zetThuis(t)}>
                     {t ? 'Thuis' : 'Uit'}
                   </button>
                 ))}
@@ -241,8 +267,8 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
                 </label>
               </div>
               {spelerSelect('🍎 Fruit', 'fruit')}
-              {spelerSelect('🚗 Begeleiding 1', 'begeleider1', 'Ouder ')}
-              {spelerSelect('🚗 Begeleiding 2', 'begeleider2', 'Ouder ')}
+              {spelerSelect('🚗 Spelbegeleiding 1', 'begeleider1')}
+              {spelerSelect('🚗 Spelbegeleiding 2', 'begeleider2')}
               <label className="prog-veld">
                 Opmerking (mag leeg)
                 <input className="modal-input" value={p.notitie} onChange={e => zet({ notitie: e.target.value })} />
@@ -268,6 +294,40 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
             </div>
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+// Per team: bij uit- of thuiswedstrijden standaard geen spelbegeleiding van ons nodig
+function StandaardBegeleiding({ onClose }: { onClose: () => void }) {
+  const { teamInstellingen, zetTeamInstellingen } = useAccount()
+  const schakel = (sleutel: 'uitGeenBegeleiding' | 'thuisGeenBegeleiding', label: string, uitleg: string) => (
+    <button
+      className={`prog-schakel ${teamInstellingen[sleutel] ? 'aan' : ''}`}
+      role="switch"
+      aria-checked={teamInstellingen[sleutel]}
+      onClick={() => { zetTeamInstellingen({ ...teamInstellingen, [sleutel]: !teamInstellingen[sleutel] }); tel(`standaard-${sleutel}`) }}
+    >
+      <span className="prog-schakel-tekst">
+        <span className="prog-schakel-naam">{label}</span>
+        <span className="prog-schakel-uitleg">{uitleg}</span>
+      </span>
+      <span className={`player-toggle ${teamInstellingen[sleutel] ? 'on' : ''}`} aria-hidden="true" />
+    </button>
+  )
+  return (
+    <div className="modal show" onClick={onClose}>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-title">Standaard spelbegeleiding</div>
+        <div className="modal-subtitle">Geldt voor nieuwe datums en als je thuis/uit omzet. Een gekozen ouder blijft staan.</div>
+        <div className="prog-velden">
+          {schakel('uitGeenBegeleiding', 'Uitwedstrijd: geen begeleiding nodig', 'Bij uitwedstrijden regelt de thuisclub de spelbegeleiding.')}
+          {schakel('thuisGeenBegeleiding', 'Thuiswedstrijd: geen begeleiding nodig', 'Staat dit uit, dan zijn bij thuiswedstrijden twee ouders van ons team nodig.')}
+        </div>
+        <div className="modal-actions">
+          <button className="btn btn-primary" onClick={onClose}>Klaar</button>
+        </div>
       </div>
     </div>
   )

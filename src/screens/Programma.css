@@ -240,3 +240,46 @@ button.prog-kaart:active {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
+
+.prog-knoppen {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.prog-knoppen .btn {
+  flex: 0 0 auto;
+}
+
+.prog-schakel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 8px 12px;
+  border: 2px solid var(--rand);
+  border-radius: 12px;
+  background: var(--vlak);
+  color: var(--tekst);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.prog-schakel-tekst {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prog-schakel-naam {
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+}
+
+.prog-schakel-uitleg {
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+  line-height: 1.25;
+}

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { gastEmail, Gebruiker, pb, rolIn, Team } from '../server'
+import { gastEmail, Gebruiker, pb, rolIn, STANDAARD_INSTELLINGEN, Team, TeamInstellingen } from '../server'
 import { lees, OPSLAG, schrijf } from '../opslag'
 
 interface AccountContextType {
@@ -15,6 +15,8 @@ interface AccountContextType {
   meekijken: (teamId: string, token: string) => Promise<void>
   mijnKinderen: string[]
   zetMijnKinderen: (ids: string[]) => void
+  teamInstellingen: TeamInstellingen
+  zetTeamInstellingen: (i: TeamInstellingen) => void
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -94,11 +96,24 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   }
 
   const actiefTeam = teams.find(t => t.id === actiefTeamId) ?? null
+
+  // Team-instellingen (standaard spelbegeleiding): op het team op de server, zonder team op deze telefoon
+  const [lokaleInstellingen, setLokaleInstellingen] = useState<Partial<TeamInstellingen>>(() => lees(OPSLAG, 'instellingen', {}))
+  const teamInstellingen: TeamInstellingen = { ...STANDAARD_INSTELLINGEN, ...(actiefTeam ? actiefTeam.instellingen ?? {} : lokaleInstellingen) }
+  const zetTeamInstellingen = (i: TeamInstellingen) => {
+    if (actiefTeam) {
+      setTeams(ts => ts.map(t => (t.id === actiefTeam.id ? { ...t, instellingen: i } : t)))
+      pb.collection('teams').update(actiefTeam.id, { instellingen: i }).catch(() => teamsLaden().catch(() => {}))
+    } else {
+      setLokaleInstellingen(i)
+      schrijf(OPSLAG, 'instellingen', i)
+    }
+  }
   // Zonder team mag je alles (alleen deze telefoon); in een team alleen als beheerder of superadmin
   const magBewerken = !actiefTeamId || !!gebruiker?.superadmin || (actiefTeam ? rolIn(actiefTeam, gebruiker?.id ?? '') === 'beheerder' : true)
 
   return (
-    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen }}>
+    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen, teamInstellingen, zetTeamInstellingen }}>
       {children}
     </AccountContext.Provider>
   )

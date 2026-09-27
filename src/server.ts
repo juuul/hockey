@@ -19,8 +19,13 @@ export interface Team extends RecordModel {
   beheerders: string[]
   kijkers: string[]
   kijklink?: string
+  instellingen?: Partial<TeamInstellingen> | null
   expand?: { beheerders?: Gebruiker[]; kijkers?: Gebruiker[] }
 }
+// Standaard per team: bij een uit- of thuiswedstrijd is (geen) spelbegeleiding van ons nodig
+export interface TeamInstellingen { uitGeenBegeleiding: boolean; thuisGeenBegeleiding: boolean }
+export const STANDAARD_INSTELLINGEN: TeamInstellingen = { uitGeenBegeleiding: true, thuisGeenBegeleiding: false }
+
 export interface Uitnodiging extends RecordModel { team: string; email: string; rol: Rol }
 
 export const rolIn = (team: Team, userId: string): Rol | null =>
