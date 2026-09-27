@@ -21,11 +21,14 @@ Web-app om langs het veld (op een telefoon) de opstelling, wissels, score en tij
    - Veld met de opstelling en de keeper eronder. Tik op een speler: **Wissel** (met wisselspeler) of **Verplaatsen** (ruilen met veldspeler of wisselspeler). Keeper: alleen verplaatsen. Lege plek (gestippeld, "+"): tik om iemand erin te zetten.
    - Eén regel wisselspelers in beeld (2 naast elkaar), zonder kopje. Meer wissels staan onder de vouw.
    - **Onder de vouw** (alleen bereikbaar door te scrollen, bewust uit het zicht): extra wissels, wedstrijdkaart (tegenstander, thuis/uit, datum; tik om te wijzigen), **Wedstrijd afsluiten**, overzicht doelpunten, knoppen **Alles resetten**, Undo, Nieuwe opstelling, Reset wissels, Score 0 – 0, en de **Timer** (Start/Pauze/Stop).
-2. **Spelers**: bovenaan de knop 👤 Inloggen/account (opent het accountscherm); aantal spelers (11, 9 of 6, met keeper) en opstelling kiezen; lijst van alle spelers met schakelaar "Doet mee / Doet niet mee", doelpunten per speler (⚽ n), speler toevoegen/verwijderen. Geen veld/bank-info hier.
+2. **Spelers**: aantal spelers (11, 9 of 6, met keeper) en opstelling kiezen; lijst van alle spelers met schakelaar "Doet mee / Doet niet mee", doelpunten per speler (⚽ n), speler toevoegen/verwijderen. Geen veld/bank-info hier.
 3. **Voorkeur**: per speler een 1e en 2e voorkeurspositie (alleen posities van de huidige opstelling). Dubbele voorkeuren mogen.
 4. **Historie**: balans (gespeeld/gewonnen/gelijk/verloren, doelpunten), topscorers over alle wedstrijden, lijst wedstrijden (tik: details, wijzigen, verwijderen), tegenstanders met resultaat (tik: hernoemen/verwijderen).
 
-Tabbladen tonen een icoon; alleen het actieve tabblad toont ook zijn naam (vier namen passen niet op 360px).
+5. **Instellingen** (⚙️, `src/screens/Instellingen.tsx`): alles rond inloggen, in kaarten. Niet ingelogd: Inloggen (+ wachtwoord vergeten) en "Nog geen account?" (uitnodiging vragen of team aanmelden). Ingelogd: Account (naam, e-mail, rol, Uitloggen), Werken met (teams met ✓, "Zonder team", sync-status, per beheerd team de knop Leden), en Nieuw team (superadmin) of Ander team aanmelden. Subschermen (Leden, Uitnodiging, Nieuw wachtwoord, Team aanmelden, Teamaanmelding) met een "‹ Terug"-balk. Links uit mails openen hier.
+
+Tabbladen: alleen iconen, alle vijf even breed (naam als aria-label/title); het actieve tabblad heeft een lichtblauwe achtergrond en streep. Bij een sync-probleem staat ⚠ op het tandwiel. Het gekozen tabblad staat buiten de `HockeyProvider` (in `MetTeam`), zodat je na inloggen of van team wisselen op hetzelfde tabblad blijft.
+Dashboard: alleen zonder account bovenaan de knop "👤 Inloggen", die naar Instellingen gaat.
 
 ### Regels
 - **Wisselteller** gaat +1 bij de speler die **uit** het veld gaat (alleen bij Wissel, niet bij Verplaatsen). De invaller neemt de positie over.
@@ -61,15 +64,15 @@ Gedefinieerd in `OPSTELLINGEN` / `OPSTELLINGEN_PER_SPELVORM` in `src/types.ts`.
 ### Team
 Keeper: Julia Arnold. Veld: Lizzy Best, Fee Daan, Sarah Eerdmans, Isa Flierman, Evi Kruft, Aster Meijboom, Floor Oreel, Carice Plantinga, Sara van Tetering, Benthe van der Wijk. (Rosalie de Kroon traint mee, niet in het team.) De app gebruikt voornamen; de startlijst staat in `INITIAL_PLAYERS` in de context.
 
-### Accounts (accountscherm, `src/screens/Account.tsx`)
+### Accounts (tabblad Instellingen, `src/screens/Instellingen.tsx`)
 - Inloggen met e-mail + wachtwoord; **Wachtwoord vergeten** mailt een link `#wachtwoord=<token>` naar de app. Vrij aanmelden kan niet: alleen via een uitnodiging (`#uitnodiging=<token>`, 7 dagen geldig, eenmalig).
 - Rollen per team: **beheerder** (alles in het eigen team: bijhouden, spelers/clubs/wedstrijden ook verwijderen, leden uitnodigen, rollen wijzigen, ook andere beheerders aanwijzen en weghalen) en **kijker** (alleen meekijken). Er is geen aparte bewerker-rol meer (samengevoegd met beheerder). **Superadmin** (alleen de eigenaar; vlag `superadmin` op de gebruiker, alleen via het PocketBase-beheerscherm) maakt en verwijdert teams en mag in elk team alles.
 - De app leest links uit de mail uit `location.hash` (`#uitnodiging=`, `#wachtwoord=`, `#aanmelding=`) en haalt het `#` daarna weg.
 - **Nieuw team aanmelden** (knop op het inlogscherm, en "Nog een team aanmelden" voor ingelogde niet-superadmins): teamnaam, naam, e-mail, bericht → `POST /api/hockey/aanmelding` (max 5 per uur per bezoeker). Alle superadmins krijgen een mail met een link `#aanmelding=<token>` die niet verloopt maar maar één keer te gebruiken is; openen verandert niets, pas de knop Goedkeuren/Afwijzen. Goedkeuren maakt het team (naam nog aan te passen) en mailt de aanvrager een uitnodiging als beheerder; afwijzen mailt een korte afwijzing.
-- **Werken met**: in het accountscherm kies je het actieve team (✓) of "Zonder team". Bij precies één team gaat dat vanzelf. Per team een eigen opslag (`HockeyProvider key={teamId}`). De eerste keer in een leeg team vraagt de app of wat op de telefoon staat mee moet (met nieuwe id's, `nieuweIds`).
+- **Werken met**: in Instellingen kies je het actieve team (✓) of "Zonder team". Bij precies één team gaat dat vanzelf. Per team een eigen opslag (`HockeyProvider key={teamId}`). De eerste keer in een leeg team vraagt de app of wat op de telefoon staat mee moet (met nieuwe id's, `nieuweIds`).
 - **Synchroniseren** (`src/sync.ts` + `src/context/useTeamSync.ts`): offline eerst. Per record drie standen: lokaal, basis (laatste serverstand, bewaard) en server. Lokaal gewijzigd → versturen; anders serverstand overnemen; door de server geweigerd (bv. kijker) → serverstand terug. Triggers: lokale wijziging (0,8 s), realtime (subscribe), online/terug naar de app, elke 60 s. Id's maakt de app zelf (`pbId`, 15 tekens a-z0-9).
 - **Live wedstrijd** (`src/live.ts` + `src/context/useLiveStand.ts`): per team één record in `standen` (id = team-id) met de hele stand als JSON, `versie` en `bron` (toestel-id). Laatste schrijver wint. Eigen wijziging → na 0,25 s versturen; ontvangen stand alleen toepassen als er geen onverzonden eigen wijziging is. Een toestel dat nieuw meedoet verstuurt pas na de eerste keer ophalen en neemt dan de serverstand over. Nieuwe spelers uit de spelerslijst krijgen hun plek uit de bewaarde serverstand. Na ontvangen wordt de undo-geschiedenis gewist. Getest met drie nagebootste toestellen (jsdom + echte HockeyProvider) tegen een test-server.
-- **Kijkers** (`magBewerken` false): alleen meekijken; op het dashboard doen veld, score, timer en knoppen niets, en onder de vouw staat "Je kijkt live mee". Verder: geen speler toevoegen/verwijderen, geen voorkeuren, geen wedstrijd afsluiten of historie wijzigen. Status staat onder "Werken met" en als ⏳/⚠ op de accountknop.
+- **Kijkers** (`magBewerken` false): alleen meekijken; op het dashboard doen veld, score, timer en knoppen niets, en onder de vouw staat "Je kijkt live mee". Verder: geen speler toevoegen/verwijderen, geen voorkeuren, geen wedstrijd afsluiten of historie wijzigen. Status staat onder "Werken met" en als ⚠ op het tandwiel.
 
 ## Mobiel ontwerp (verplicht)
 Bediend op een telefoon van ~10 cm diagonaal (~360px breed):

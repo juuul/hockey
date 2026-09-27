@@ -12,7 +12,7 @@ import { tel } from '../statistiek'
 import { sorteerWissels, veldKleuren } from '../opstelling'
 import './Dashboard.css'
 
-export default function Dashboard({ openAccount }: { openAccount: () => void }) {
+export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
   const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, resetScore, doelpunten, spelvorm, opstelling, allesResetten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, magBewerken } = useHockey()
   const [showSubstituteModal, setShowSubstituteModal] = useState(false)
@@ -106,9 +106,9 @@ export default function Dashboard({ openAccount }: { openAccount: () => void }) 
   return (
     <>
     <div className="dashboard">
-      {/* Alleen zonder account: de weg naar inloggen. Ingelogd staat het account onder Spelers */}
+      {/* Alleen zonder account: de weg naar inloggen (tabblad Instellingen) */}
       {!gebruiker && (
-        <button className="inlog-balk" onClick={openAccount}>
+        <button className="inlog-balk" onClick={naarInstellingen}>
           <span aria-hidden="true">👤</span> Inloggen
         </button>
       )}

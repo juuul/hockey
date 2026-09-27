@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAccount } from '../context/AccountContext'
 import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
 import '../components/Modal.css'
-import './Account.css'
+import './Instellingen.css'
 
 export type AccountStart = { soort: 'uitnodiging' | 'wachtwoord' | 'aanmelding'; token: string } | null
 
@@ -12,28 +12,32 @@ type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'a
 
 const ROLLEN: Rol[] = ['beheerder', 'kijker']
 
-export default function Account({ start, onClose }: { start: AccountStart; onClose: () => void }) {
+// Tabblad Instellingen: account, teams en alles rond inloggen. Links uit mails openen hier een eigen weergave
+export default function Instellingen({ start }: { start: AccountStart }) {
   const { gebruiker } = useAccount()
   const [weergave, setWeergave] = useState<Weergave>(start ?? { soort: 'hoofd' })
   const terug = () => setWeergave({ soort: 'hoofd' })
 
+  // Nieuwe link uit een mail terwijl dit tabblad al open was
+  useEffect(() => { if (start) setWeergave(start) }, [start])
+
   const titel =
     weergave.soort === 'uitnodiging' ? 'Uitnodiging'
     : weergave.soort === 'wachtwoord' ? 'Nieuw wachtwoord'
-    : weergave.soort === 'team' ? 'Team'
-    : weergave.soort === 'aanmelden' ? 'Nieuw team'
+    : weergave.soort === 'team' ? 'Leden'
+    : weergave.soort === 'aanmelden' ? 'Team aanmelden'
     : weergave.soort === 'aanmelding' ? 'Teamaanmelding'
-    : gebruiker ? 'Account' : 'Inloggen'
+    : null
 
   return (
-    <div className="account">
-      <div className="account-kop">
-        {weergave.soort === 'team' || weergave.soort === 'aanmelden'
-          ? <button className="account-kop-knop" onClick={terug}>‹ Terug</button>
-          : <span className="account-kop-titel">{titel}</span>}
-        <button className="account-kop-knop" onClick={onClose}>Sluiten</button>
-      </div>
-      <div className="account-inhoud">
+    <div className="instellingen">
+      {titel && (
+        <div className="instellingen-kop">
+          <button className="instellingen-terug" onClick={terug}>‹ Terug</button>
+          <span className="instellingen-kop-titel">{titel}</span>
+        </div>
+      )}
+      <div className="instellingen-inhoud">
         {weergave.soort === 'uitnodiging' && <UitnodigingAannemen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'wachtwoord' && <WachtwoordKiezen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
@@ -44,6 +48,15 @@ export default function Account({ start, onClose }: { start: AccountStart; onClo
           : <Inloggen aanmelden={() => setWeergave({ soort: 'aanmelden' })} />)}
       </div>
     </div>
+  )
+}
+
+function Kaart({ titel, children }: { titel: string; children: React.ReactNode }) {
+  return (
+    <section className="instellingen-kaart">
+      <h2 className="instellingen-kaart-titel">{titel}</h2>
+      {children}
+    </section>
   )
 }
 
@@ -102,9 +115,8 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
     setBezig(false)
   }
 
-  return (
+  const formulier = (
     <form className="account-form" onSubmit={e => { e.preventDefault(); login() }}>
-      <p className="account-uitleg">Inloggen is nodig om met anderen te delen. Je krijgt toegang via een uitnodiging per e-mail.</p>
       <label className="account-label">
         E-mail
         <input className="modal-input" type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} />
@@ -116,15 +128,22 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
       <Melding tekst={melding?.tekst ?? null} fout={melding?.fout} />
       <button className="btn btn-primary" type="submit" disabled={bezig || !email.trim() || !wachtwoord}>Inloggen</button>
       <button className="btn btn-secondary" type="button" onClick={vergeten} disabled={bezig}>Wachtwoord vergeten</button>
-      {aanmelden && (
-        <div className="account-kaart">
-          <h2 className="account-kaart-titel">Nog geen account?</h2>
-          <p className="account-uitleg"><strong>Zit je team al in de app?</strong> Vraag een beheerder van je team om een uitnodiging. Die komt per mail.</p>
-          <p className="account-uitleg"><strong>Wil je de app voor je eigen team gebruiken?</strong> Meld je team aan. Na goedkeuring krijg je een mail om je account te maken, en word je beheerder van het team.</p>
-          <button className="btn btn-primary" type="button" onClick={aanmelden}>Mijn team aanmelden</button>
-        </div>
-      )}
     </form>
+  )
+  if (!aanmelden) return formulier
+
+  return (
+    <>
+      <Kaart titel="Inloggen">
+        <p className="account-uitleg">Log in om met je team te delen: spelers, wedstrijden en de lopende wedstrijd live.</p>
+        {formulier}
+      </Kaart>
+      <Kaart titel="Nog geen account?">
+        <p className="account-uitleg"><strong>Zit je team al in de app?</strong> Vraag een beheerder van je team om een uitnodiging. Die komt per mail.</p>
+        <p className="account-uitleg"><strong>Wil je de app voor je eigen team gebruiken?</strong> Meld je team aan. Na goedkeuring krijg je een mail om je account te maken, en word je beheerder van het team.</p>
+        <button className="btn btn-primary" type="button" onClick={aanmelden}>Mijn team aanmelden</button>
+      </Kaart>
+    </>
   )
 }
 
@@ -146,57 +165,70 @@ function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; o
     }
   }
 
+  const actief = teams.find(t => t.id === actiefTeamId)
+  const actieveRol = actief ? rolIn(actief, gebruiker.id) : null
+
   return (
-    <div className="account-form">
-      <div className="account-wie">
-        <span className="account-wie-naam">{gebruiker.name || gebruiker.email}</span>
-        {gebruiker.name && <span className="account-wie-sub">{gebruiker.email}</span>}
-        {gebruiker.superadmin && <span className="account-wie-sub">Superadmin</span>}
-      </div>
+    <>
+      <Kaart titel="Account">
+        <div className="account-wie">
+          <span className="account-wie-naam">{gebruiker.name || gebruiker.email}</span>
+          {gebruiker.name && <span className="account-wie-sub">{gebruiker.email}</span>}
+          <span className="account-wie-sub">
+            {gebruiker.superadmin ? 'Superadmin' : actief ? `${actieveRol ? ROL_TEKST[actieveRol] : 'Lid'} van ${actief.naam}` : 'Niet in een team actief'}
+          </span>
+        </div>
+        <button className="btn btn-secondary" onClick={() => { uitloggen(); tel('uitgelogd') }}>Uitloggen</button>
+      </Kaart>
 
-      <h2 className="section-title">Werken met</h2>
-      {teams.length === 0 && <p className="account-uitleg">Je zit nog in geen enkel team.</p>}
-      <div className="account-lijst">
-        {teams.map(t => {
-          const rol = rolIn(t, gebruiker.id)
-          const magBeheren = gebruiker.superadmin || rol === 'beheerder'
-          const actief = t.id === actiefTeamId
-          return (
-            <div key={t.id} className={`account-team ${actief ? 'actief' : ''}`}>
-              <button className="account-team-kies" onClick={() => { kiesTeam(t.id); tel('team-gekozen') }} aria-pressed={actief}>
-                <span className="account-team-vink" aria-hidden="true">{actief ? '✓' : ''}</span>
-                <span className="account-regel-tekst">
-                  <span className="account-regel-naam">{t.naam}</span>
-                  <span className="account-regel-sub">{rol ? ROL_TEKST[rol] : 'Superadmin'}</span>
-                </span>
-              </button>
-              {magBeheren && <button className="account-team-beheer" onClick={() => openTeam(t.id)}>Leden</button>}
-            </div>
-          )
-        })}
-        {teams.length > 0 && (
-          <button className={`account-team-kies los ${actiefTeamId === null ? 'actief' : ''}`} onClick={() => { kiesTeam(null); tel('zonder-team') }} aria-pressed={actiefTeamId === null}>
-            <span className="account-team-vink" aria-hidden="true">{actiefTeamId === null ? '✓' : ''}</span>
-            <span className="account-regel-tekst">
-              <span className="account-regel-naam">Zonder team</span>
-              <span className="account-regel-sub">alleen op deze telefoon</span>
-            </span>
-          </button>
+      <Kaart titel="Werken met">
+        {teams.length === 0 && <p className="account-uitleg">Je zit nog in geen enkel team.</p>}
+        <div className="account-lijst">
+          {teams.map(t => {
+            const rol = rolIn(t, gebruiker.id)
+            const magBeheren = gebruiker.superadmin || rol === 'beheerder'
+            const isActief = t.id === actiefTeamId
+            return (
+              <div key={t.id} className={`account-team ${isActief ? 'actief' : ''}`}>
+                <button className="account-team-kies" onClick={() => { kiesTeam(t.id); tel('team-gekozen') }} aria-pressed={isActief}>
+                  <span className="account-team-vink" aria-hidden="true">{isActief ? '✓' : ''}</span>
+                  <span className="account-regel-tekst">
+                    <span className="account-regel-naam">{t.naam}</span>
+                    <span className="account-regel-sub">{rol ? ROL_TEKST[rol] : 'Superadmin'}</span>
+                  </span>
+                </button>
+                {magBeheren && <button className="account-team-beheer" onClick={() => openTeam(t.id)}>Leden</button>}
+              </div>
+            )
+          })}
+          {teams.length > 0 && (
+            <button className={`account-team-kies los ${actiefTeamId === null ? 'actief' : ''}`} onClick={() => { kiesTeam(null); tel('zonder-team') }} aria-pressed={actiefTeamId === null}>
+              <span className="account-team-vink" aria-hidden="true">{actiefTeamId === null ? '✓' : ''}</span>
+              <span className="account-regel-tekst">
+                <span className="account-regel-naam">Zonder team</span>
+                <span className="account-regel-sub">alleen op deze telefoon</span>
+              </span>
+            </button>
+          )}
+        </div>
+        <SyncRegel />
+      </Kaart>
+
+      <Kaart titel={gebruiker.superadmin ? 'Nieuw team' : 'Ander team'}>
+        {gebruiker.superadmin ? (
+          <form className="account-form" onSubmit={e => { e.preventDefault(); if (nieuwTeam.trim()) maakTeam() }}>
+            <input className="modal-input" placeholder="Naam nieuw team" value={nieuwTeam} onChange={e => setNieuwTeam(e.target.value)} />
+            <button className="btn btn-primary" type="submit" disabled={!nieuwTeam.trim()}>Team maken</button>
+          </form>
+        ) : (
+          <>
+            <p className="account-uitleg">Wil je de app ook voor een ander team gebruiken?</p>
+            <button className="btn btn-secondary" onClick={aanmelden}>Nog een team aanmelden</button>
+          </>
         )}
-      </div>
-      <SyncRegel />
-
-      {gebruiker.superadmin && (
-        <form className="account-rij" onSubmit={e => { e.preventDefault(); if (nieuwTeam.trim()) maakTeam() }}>
-          <input className="modal-input" placeholder="Naam nieuw team" value={nieuwTeam} onChange={e => setNieuwTeam(e.target.value)} />
-          <button className="btn btn-primary account-rij-knop" type="submit" disabled={!nieuwTeam.trim()}>+ Team</button>
-        </form>
-      )}
-      <Melding tekst={fout} fout />
-
-      {!gebruiker.superadmin && <button className="btn btn-secondary" onClick={aanmelden}>Nog een team aanmelden</button>}
-      <button className="btn btn-secondary" onClick={() => { uitloggen(); tel('uitgelogd') }}>Uitloggen</button>
-    </div>
+        <Melding tekst={fout} fout />
+      </Kaart>
+    </>
   )
 }
 

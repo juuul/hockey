@@ -34,7 +34,7 @@
 }
 
 .tab-btn.active {
-  flex: 2.4 1 auto;
+  background: #eef2ff;
   color: #1e40af;
   border-bottom-color: #1e40af;
 }
@@ -51,14 +51,29 @@
 }
 
 .tab-icoon {
-  font-size: calc(var(--base-readable-size) * 1.15);
+  font-size: calc(var(--base-readable-size) * 1.25);
   line-height: 1;
 }
 
 .tab-btn:not(.active) .tab-icoon {
-  opacity: 0.6;
+  opacity: 0.55;
+  filter: grayscale(0.4);
 }
 
 .tab-naam {
   white-space: nowrap;
+}
+
+.tab-btn {
+  position: relative;
+}
+
+/* Geen verbinding met de server: waarschuwing op het tandwiel */
+.tab-waarschuwing {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: var(--base-readable-size);
+  line-height: 1;
+  color: #b45309;
 }

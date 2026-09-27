@@ -3,7 +3,7 @@ import { HockeyProvider } from './context/HockeyContext'
 import { AccountProvider, useAccount } from './context/AccountContext'
 import { useHockey } from './context/HockeyContext'
 import ResetModal from './components/ResetModal'
-import Account, { AccountStart } from './screens/Account'
+import Instellingen, { AccountStart } from './screens/Instellingen'
 import Dashboard from './screens/Dashboard'
 import Players from './screens/Players'
 import Positions from './screens/Positions'
@@ -11,28 +11,27 @@ import Historie from './screens/Historie'
 import Verversen from './components/Verversen'
 import './App.css'
 
-type Scherm = 'dashboard' | 'players' | 'positions' | 'historie'
+type Scherm = 'dashboard' | 'players' | 'positions' | 'historie' | 'instellingen'
 
-// Vier namen passen niet naast elkaar op een smalle telefoon: alleen het actieve tabblad toont zijn naam
+// Vijf namen passen niet naast elkaar op een smalle telefoon: alleen iconen, even breed (naam als aria-label en title)
 const TABS: { id: Scherm; icoon: string; naam: string }[] = [
   { id: 'dashboard', icoon: '🏑', naam: 'Dashboard' },
   { id: 'players', icoon: '👥', naam: 'Spelers' },
   { id: 'positions', icoon: '⭐', naam: 'Voorkeur' },
   { id: 'historie', icoon: '📊', naam: 'Historie' },
+  { id: 'instellingen', icoon: '⚙️', naam: 'Instellingen' },
 ]
 
-function AppContent() {
-  const [screen, setScreen] = useState<Scherm>('dashboard')
-  const scrollVak = useRef<HTMLDivElement>(null)
-  const [account, setAccount] = useState<{ start: AccountStart } | null>(null)
+interface Navigatie {
+  screen: Scherm
+  setScreen: (s: Scherm) => void
+  start: AccountStart
+}
 
-  // Links uit de mail: #uitnodiging=…, #wachtwoord=… of #aanmelding=…. Daarna het # weghalen, zodat verversen het niet opnieuw opent
-  useEffect(() => {
-    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding)=(.+)$/)
-    if (!m) return
-    setAccount({ start: { soort: m[1] as 'uitnodiging' | 'wachtwoord' | 'aanmelding', token: decodeURIComponent(m[2]) } })
-    history.replaceState(null, '', window.location.pathname + window.location.search)
-  }, [])
+function AppContent({ screen, setScreen, start }: Navigatie) {
+  const scrollVak = useRef<HTMLDivElement>(null)
+  const { sync, live } = useHockey()
+  const syncProbleem = !!((sync && (sync.offline || sync.fout)) || (live && !live.verbonden))
 
   return (
     <div className="mobile-frame">
@@ -43,22 +42,23 @@ function AppContent() {
             className={`tab-btn ${screen === tab.id ? 'active' : ''}`}
             onClick={() => setScreen(tab.id)}
             aria-label={tab.naam}
+            title={tab.naam}
             aria-current={screen === tab.id ? 'page' : undefined}
           >
             <span className="tab-icoon" aria-hidden="true">{tab.icoon}</span>
-            {screen === tab.id && <span className="tab-naam">{tab.naam}</span>}
+            {tab.id === 'instellingen' && syncProbleem && <span className="tab-waarschuwing" aria-label="geen verbinding met de server">⚠</span>}
           </button>
         ))}
       </nav>
 
       <div className="content" ref={scrollVak}>
-        {screen === 'dashboard' && <Dashboard openAccount={() => setAccount({ start: null })} />}
-        {screen === 'players' && <Players openAccount={() => setAccount({ start: null })} />}
+        {screen === 'dashboard' && <Dashboard naarInstellingen={() => setScreen('instellingen')} />}
+        {screen === 'players' && <Players />}
         {screen === 'positions' && <Positions />}
         {screen === 'historie' && <Historie />}
+        {screen === 'instellingen' && <Instellingen start={start} />}
       </div>
       <Verversen scrollVak={scrollVak} />
-      {account && <Account start={account.start} onClose={() => setAccount(null)} />}
       <OvernemenVraag />
     </div>
   )
@@ -87,12 +87,25 @@ function OvernemenVraag() {
   )
 }
 
-// Per team een eigen set gegevens: bij een ander team begint de app-state opnieuw (key)
+// Per team een eigen set gegevens: bij een ander team begint de app-state opnieuw (key).
+// Het gekozen tabblad staat hierboven, zodat je na inloggen of van team wisselen op dezelfde plek blijft
 function MetTeam() {
   const { actiefTeamId, magBewerken } = useAccount()
+  const [screen, setScreen] = useState<Scherm>('dashboard')
+  const [start, setStart] = useState<AccountStart>(null)
+
+  // Links uit de mail: #uitnodiging=…, #wachtwoord=… of #aanmelding=…. Daarna het # weghalen, zodat verversen het niet opnieuw opent
+  useEffect(() => {
+    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding)=(.+)$/)
+    if (!m) return
+    setStart({ soort: m[1] as 'uitnodiging' | 'wachtwoord' | 'aanmelding', token: decodeURIComponent(m[2]) })
+    setScreen('instellingen')
+    history.replaceState(null, '', window.location.pathname + window.location.search)
+  }, [])
+
   return (
     <HockeyProvider key={actiefTeamId ?? 'lokaal'} teamId={actiefTeamId} magBewerken={magBewerken}>
-      <AppContent />
+      <AppContent screen={screen} setScreen={setScreen} start={start} />
     </HockeyProvider>
   )
 }

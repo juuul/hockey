@@ -1,32 +1,27 @@
-.account {
-  position: fixed;
-  inset: 0;
-  z-index: 1500;
-  background: white;
+.instellingen {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
 }
 
-.account-kop {
+/* Subscherm (leden, uitnodiging, aanmelden…): terug naar het overzicht */
+.instellingen-kop {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   padding: 6px 8px;
+  background: white;
   border-bottom: 2px solid #e5e7eb;
-  flex-shrink: 0;
 }
 
-.account-kop-titel {
-  font-size: var(--base-readable-size);
-  font-weight: 700;
-  color: #1f2937;
-  padding-left: 6px;
-}
-
-.account-kop-knop {
+.instellingen-terug {
   min-height: 60px;
-  padding: 0 16px;
+  padding: 0 14px;
   border: none;
   border-radius: 10px;
   background: #e5e7eb;
@@ -35,18 +30,47 @@
   font-size: var(--base-readable-size);
   font-weight: 700;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.account-inhoud {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 12px 10px 24px;
-  width: 100%;
-  max-width: 720px;
-  margin: 0 auto;
+.instellingen-kop-titel {
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: #1f2937;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
+.instellingen-inhoud {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 8px 24px;
+}
+
+.instellingen-kaart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.instellingen-kaart-titel {
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+
+
+
+
 
 .account-form {
   display: flex;
@@ -232,43 +256,18 @@ button.account-regel:disabled {
   opacity: 0.85;
 }
 
-.account .btn-gevaar,
-.account .modal .btn-gevaar {
+.instellingen .btn-gevaar,
+.instellingen .modal .btn-gevaar {
   background: #fee2e2;
   color: #b91c1c;
   border: 2px solid #fca5a5;
 }
 
-.account .knop-rood {
+.instellingen .knop-rood {
   background: #dc2626;
 }
 
-.account-knop {
-  font-size: var(--base-readable-size);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 68px;
-  padding: 6px 14px;
-  background: #eef2ff;
-  border: 2px solid #c7d2fe;
-  border-radius: 10px;
-  font-family: inherit;
-  text-align: left;
-  color: #1e3a8a;
-  cursor: pointer;
-  flex-shrink: 0;
-}
 
-.account-knop-tekst {
-  flex: 1;
-  min-width: 0;
-  font-size: var(--base-readable-size);
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 .account-team {
   display: flex;
@@ -367,4 +366,8 @@ button.account-regel:disabled {
   font-size: calc(var(--base-readable-size) * 1.1);
   font-weight: 700;
   color: #1f2937;
+}
+
+.account-team-kies .account-regel-sub {
+  white-space: normal;
 }

@@ -1,17 +1,13 @@
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
-import { useAccount } from '../context/AccountContext'
 import { OPSTELLINGEN_PER_SPELVORM, opstellingTekst, Player } from '../types'
 import AddPlayerModal from '../components/AddPlayerModal'
 import DeletePlayerModal from '../components/DeletePlayerModal'
 import { tel } from '../statistiek'
 import './Players.css'
-import './Account.css'
 
-export default function Players({ openAccount }: { openAccount: () => void }) {
-  const { gebruiker, actiefTeam } = useAccount()
-  const { spelers, addSpeler, deleteSpeler, zetMeedoen, doelpunten, spelvorm, opstelling, kiesOpstelling, magBewerken, sync, live } = useHockey()
-  const syncTeken = (sync && (sync.offline || sync.fout)) || (live && !live.verbonden) ? ' ⚠' : (sync && sync.wachtend) || live?.wachtend ? ' ⏳' : ''
+export default function Players() {
+  const { spelers, addSpeler, deleteSpeler, zetMeedoen, doelpunten, spelvorm, opstelling, kiesOpstelling, magBewerken } = useHockey()
   const [showAddModal, setShowAddModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [playerToDelete, setPlayerToDelete] = useState<{ id: string; naam: string } | null>(null)
@@ -45,13 +41,6 @@ export default function Players({ openAccount }: { openAccount: () => void }) {
 
   return (
     <div className="players-screen">
-      <button className="account-knop" onClick={openAccount}>
-        <span aria-hidden="true">👤</span>
-        <span className="account-knop-tekst">
-          {gebruiker ? `${actiefTeam ? actiefTeam.naam : 'Zonder team'} · ${gebruiker.name || gebruiker.email}${syncTeken}` : 'Inloggen'}
-        </span>
-        <span aria-hidden="true">›</span>
-      </button>
       <div className="spelvorm-kop">Aantal spelers (met keeper)</div>
       <div className="spelvorm" role="radiogroup" aria-label="Aantal spelers">
         {([11, 9, 6] as const).map(v => (
