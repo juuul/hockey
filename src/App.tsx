@@ -26,9 +26,10 @@ interface Navigatie {
   screen: Scherm
   setScreen: (s: Scherm) => void
   start: AccountStart
+  startGebruikt: () => void
 }
 
-function AppContent({ screen, setScreen, start }: Navigatie) {
+function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
   const { sync, live } = useHockey()
   const syncProbleem = !!((sync && (sync.offline || sync.fout)) || (live && !live.verbonden))
@@ -56,7 +57,7 @@ function AppContent({ screen, setScreen, start }: Navigatie) {
         {screen === 'players' && <Players />}
         {screen === 'positions' && <Positions />}
         {screen === 'historie' && <Historie />}
-        {screen === 'instellingen' && <Instellingen start={start} />}
+        {screen === 'instellingen' && <Instellingen start={start} startGebruikt={startGebruikt} naarDashboard={() => setScreen('dashboard')} />}
       </div>
       <Verversen scrollVak={scrollVak} />
       <OvernemenVraag />
@@ -94,18 +95,18 @@ function MetTeam() {
   const [screen, setScreen] = useState<Scherm>('dashboard')
   const [start, setStart] = useState<AccountStart>(null)
 
-  // Links uit de mail: #uitnodiging=…, #wachtwoord=… of #aanmelding=…. Daarna het # weghalen, zodat verversen het niet opnieuw opent
+  // Links uit mail of app: #uitnodiging=…, #wachtwoord=…, #aanmelding=… of #kijk=… (meekijklink). Daarna het # weghalen, zodat verversen het niet opnieuw opent
   useEffect(() => {
-    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding)=(.+)$/)
+    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding|kijk)=(.+)$/)
     if (!m) return
-    setStart({ soort: m[1] as 'uitnodiging' | 'wachtwoord' | 'aanmelding', token: decodeURIComponent(m[2]) })
+    setStart({ soort: m[1] as 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk', token: decodeURIComponent(m[2]) })
     setScreen('instellingen')
     history.replaceState(null, '', window.location.pathname + window.location.search)
   }, [])
 
   return (
     <HockeyProvider key={actiefTeamId ?? 'lokaal'} teamId={actiefTeamId} magBewerken={magBewerken}>
-      <AppContent screen={screen} setScreen={setScreen} start={start} />
+      <AppContent screen={screen} setScreen={setScreen} start={start} startGebruikt={() => setStart(null)} />
     </HockeyProvider>
   )
 }

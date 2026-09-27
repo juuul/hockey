@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { Gebruiker, pb, rolIn, Team } from '../server'
+import { gastEmail, Gebruiker, pb, rolIn, Team } from '../server'
 import { lees, OPSLAG, schrijf } from '../opslag'
 
 interface AccountContextType {
@@ -12,6 +12,7 @@ interface AccountContextType {
   actiefTeamId: string | null
   kiesTeam: (id: string | null) => void
   magBewerken: boolean
+  meekijken: (teamId: string, token: string) => Promise<void>
 }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
@@ -65,12 +66,19 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   const uitloggen = () => pb.authStore.clear()
 
+  // Via een meekijklink: inloggen als de gast van dat team en dat team kiezen
+  const meekijken = async (teamId: string, token: string) => {
+    await pb.collection('users').authWithPassword(gastEmail(teamId), token)
+    await teamsLaden()
+    kiesTeam(teamId)
+  }
+
   const actiefTeam = teams.find(t => t.id === actiefTeamId) ?? null
   // Zonder team mag je alles (alleen deze telefoon); in een team alleen als beheerder of superadmin
   const magBewerken = !actiefTeamId || !!gebruiker?.superadmin || (actiefTeam ? rolIn(actiefTeam, gebruiker?.id ?? '') === 'beheerder' : true)
 
   return (
-    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken }}>
+    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken }}>
       {children}
     </AccountContext.Provider>
   )

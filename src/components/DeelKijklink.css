@@ -1,0 +1,32 @@
+.kijklink {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kijklink .btn {
+  flex: 0 0 auto;
+}
+
+.kijklink-uitleg,
+.kijklink-melding {
+  font-size: var(--base-readable-size);
+  line-height: 1.3;
+  color: var(--tekst-zacht);
+}
+
+.kijklink-melding {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--groen-vlak);
+  color: var(--groen-tekst);
+}
+
+.kijklink-melding.fout {
+  background: var(--rood-vlak);
+  color: var(--rood-tekst);
+}
+
+.kijklink-adres {
+  margin-bottom: 0;
+}

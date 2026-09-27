@@ -6,9 +6,75 @@
 
 :root {
   --base-readable-size: 24px;
+
+  /* Kleuren: licht (standaard) en donker (nachtmodus volgens de systeeminstelling van de telefoon) */
+  color-scheme: light dark;
+  --achtergrond: #ffffff;
+  --vlak: #ffffff;
+  --vlak-zacht: #f9fafb;
+  --vlak-grijs: #f3f4f6;
+  --knop-grijs: #e5e7eb;
+  --knop-grijs-actief: #d1d5db;
+  --vlak-blauw: #eef2ff;
+  --vlak-blauw-actief: #e0e7ff;
+  --rand: #e5e7eb;
+  --rand-sterk: #d1d5db;
+  --rand-blauw: #c7d2fe;
+  --tekst: #1f2937;
+  --tekst-2: #374151;
+  --tekst-zacht: #4b5563;
+  --tekst-vaag: #9ca3af;
+  --blauw-tekst: #1e40af;
+  --blauw-donker-tekst: #1e3a8a;
+  --rood-vlak: #fee2e2;
+  --rood-vlak-actief: #fecaca;
+  --rood-rand: #fca5a5;
+  --rood-tekst: #b91c1c;
+  --rood-tel: #dc2626;
+  --groen-vlak: #ecfdf5;
+  --groen-tekst: #065f46;
+  --geel-vlak: #fef3c7;
+  --geel-tekst: #92400e;
+  --veld-boven: #2d5016;
+  --veld-onder: #3d6b1f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --achtergrond: #0f172a;
+    --vlak: #1e293b;
+    --vlak-zacht: #172234;
+    --vlak-grijs: #1e293b;
+    --knop-grijs: #334155;
+    --knop-grijs-actief: #475569;
+    --vlak-blauw: #1e2b4d;
+    --vlak-blauw-actief: #26386a;
+    --rand: #334155;
+    --rand-sterk: #475569;
+    --rand-blauw: #3b5190;
+    --tekst: #f1f5f9;
+    --tekst-2: #e2e8f0;
+    --tekst-zacht: #a3b1c6;
+    --tekst-vaag: #7c8aa0;
+    --blauw-tekst: #a5c8ff;
+    --blauw-donker-tekst: #c7dbff;
+    --rood-vlak: #3b1a1d;
+    --rood-vlak-actief: #52212a;
+    --rood-rand: #7f2a2a;
+    --rood-tekst: #fca5a5;
+    --rood-tel: #f87171;
+    --groen-vlak: #0f2e24;
+    --groen-tekst: #86efac;
+    --geel-vlak: #3a2d0c;
+    --geel-tekst: #fcd34d;
+    --veld-boven: #1d3510;
+    --veld-onder: #284a15;
+  }
 }
 
 html {
+  background: var(--achtergrond);
+  color: var(--tekst);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   width: 100%;
   height: 100%;
@@ -16,6 +82,8 @@ html {
 }
 
 body {
+  background: var(--achtergrond);
+  color: var(--tekst);
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -27,4 +95,11 @@ body {
   width: 100%;
   height: 100dvh;
   display: flex;
+}
+
+input,
+select,
+textarea {
+  background: var(--vlak);
+  color: var(--tekst);
 }

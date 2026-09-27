@@ -191,3 +191,45 @@ routerAdd("POST", "/api/hockey/fout", (e) => {
   } catch (_) {}
   return e.json(200, { ok: true })
 })
+
+// ── Meekijklink: maken (elk lid, als er nog geen is) of vernieuwen (beheerder/superadmin) ──
+routerAdd("POST", "/api/hockey/kijklink/{team}", (e) => {
+  if (!e.auth || e.auth.collection().name !== "users") throw new UnauthorizedError("Log eerst in")
+  const b = e.requestInfo().body
+  const team = e.app.findRecordById("teams", e.request.pathValue("team"))
+  const id = e.auth.id
+  const beheert = e.auth.getBool("superadmin") || team.getStringSlice("beheerders").includes(id)
+  const lid = beheert || team.getStringSlice("kijkers").includes(id)
+  if (!lid) throw new ForbiddenError("Je zit niet in dit team")
+
+  const email = "kijk-" + team.id + "@meekijken.invalid"
+  // Een link werkt alleen zolang de gast nog kijker is (een beheerder kan hem bij Leden uit het team halen)
+  let werkt = false
+  try {
+    werkt = !!team.getString("kijklink") && team.getStringSlice("kijkers").includes(e.app.findAuthRecordByEmail("users", email).id)
+  } catch (_) {}
+  if (werkt && !b.vernieuw) return e.json(200, { token: team.getString("kijklink") })
+  if (werkt && !beheert) throw new ForbiddenError("Alleen een beheerder kan een nieuwe link maken")
+
+  const token = $security.randomString(32)
+  e.app.runInTransaction((tx) => {
+    let gast
+    try {
+      gast = tx.findAuthRecordByEmail("users", email)
+    } catch (_) {
+      gast = new Record(tx.findCollectionByNameOrId("users"))
+      gast.setEmail(email)
+      gast.setVerified(true)
+      gast.set("gast", true)
+      gast.set("name", "Meekijklink")
+    }
+    // Nieuw wachtwoord: oude links en ingelogde meekijkers vervallen
+    gast.setPassword(token)
+    tx.save(gast)
+    const t = tx.findRecordById("teams", team.id)
+    if (!t.getStringSlice("kijkers").includes(gast.id)) t.set("kijkers", [...t.getStringSlice("kijkers"), gast.id])
+    t.set("kijklink", token)
+    tx.save(t)
+  })
+  return e.json(200, { token })
+})

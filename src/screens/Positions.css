@@ -14,7 +14,7 @@
 
 .help-text {
   font-size: var(--base-readable-size);
-  color: #666;
+  color: var(--tekst-zacht);
   margin: 0;
 }
 
@@ -30,7 +30,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px;
-  background: #f5f5f5;
+  background: var(--vlak-grijs);
   border-radius: 8px;
   min-height: 60px;
 }
@@ -56,27 +56,27 @@
   align-items: center;
   justify-content: center;
   padding: 6px 10px;
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--rand-sterk);
   border-radius: 10px;
-  background: white;
+  background: var(--vlak);
   text-align: center;
   cursor: pointer;
 }
 
 .keuze.gekozen {
   border-color: #1e40af;
-  background: #eff6ff;
+  background: var(--vlak-blauw);
 }
 
 .keuze-tekst {
   font-size: var(--base-readable-size);
   line-height: 1.15;
-  color: #6b7280;
+  color: var(--tekst-zacht);
   overflow-wrap: anywhere;
 }
 
 .keuze.gekozen .keuze-tekst {
-  color: #1e40af;
+  color: var(--blauw-tekst);
   font-weight: 700;
 }
 

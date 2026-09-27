@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
+import DeelKijklink from '../components/DeelKijklink'
 import { OPSTELLINGEN, Position, POSITIE_LABEL } from '../types'
 import SubstituteModal from '../components/SubstituteModal'
 import ResetModal from '../components/ResetModal'
@@ -157,6 +158,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
 
     <div className="dashboard-knoppen">
       {!magBewerken && <p className="kijker-melding">Je kijkt live mee. Alleen beheerders kunnen de wedstrijd bijhouden.</p>}
+      <DeelKijklink />
       <button className="wedstrijd-kaart" onClick={() => setWedstrijdVraag('gegevens')} disabled={!magBewerken}>
         <span className="wedstrijd-kaart-club">{tegenstander ? `Tegen ${tegenstander}` : 'Kies tegenstander'}</span>
         <span className="wedstrijd-kaart-info">{wedstrijd.thuis ? 'Thuis' : 'Uit'} · {wedstrijd.datum ? datumTekst(wedstrijd.datum) : 'vandaag'}</span>

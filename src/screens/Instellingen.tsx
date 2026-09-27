@@ -3,23 +3,28 @@ import { useAccount } from '../context/AccountContext'
 import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
+import DeelKijklink from '../components/DeelKijklink'
 import '../components/Modal.css'
 import './Instellingen.css'
 
-export type AccountStart = { soort: 'uitnodiging' | 'wachtwoord' | 'aanmelding'; token: string } | null
+export type AccountStart = { soort: 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk'; token: string } | null
 
-type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden' } | { soort: 'uitnodiging' | 'wachtwoord' | 'aanmelding'; token: string }
+type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden' } | { soort: 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk'; token: string }
 
 const ROLLEN: Rol[] = ['beheerder', 'kijker']
 
 // Tabblad Instellingen: account, teams en alles rond inloggen. Links uit mails openen hier een eigen weergave
-export default function Instellingen({ start }: { start: AccountStart }) {
+export default function Instellingen({ start, startGebruikt, naarDashboard }: { start: AccountStart; startGebruikt: () => void; naarDashboard: () => void }) {
   const { gebruiker } = useAccount()
   const [weergave, setWeergave] = useState<Weergave>(start ?? { soort: 'hoofd' })
   const terug = () => setWeergave({ soort: 'hoofd' })
 
-  // Nieuwe link uit een mail terwijl dit tabblad al open was
-  useEffect(() => { if (start) setWeergave(start) }, [start])
+  // Een link uit een mail wordt één keer geopend (niet opnieuw bij de volgende keer dit tabblad)
+  useEffect(() => {
+    if (!start) return
+    setWeergave(start)
+    startGebruikt()
+  }, [start])
 
   const titel =
     weergave.soort === 'uitnodiging' ? 'Uitnodiging'
@@ -27,6 +32,7 @@ export default function Instellingen({ start }: { start: AccountStart }) {
     : weergave.soort === 'team' ? 'Leden'
     : weergave.soort === 'aanmelden' ? 'Team aanmelden'
     : weergave.soort === 'aanmelding' ? 'Teamaanmelding'
+    : weergave.soort === 'kijk' ? 'Meekijken'
     : null
 
   return (
@@ -43,6 +49,7 @@ export default function Instellingen({ start }: { start: AccountStart }) {
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
         {weergave.soort === 'aanmelden' && <TeamAanmelden />}
         {weergave.soort === 'aanmelding' && <AanmeldingBeoordelen token={weergave.token} />}
+        {weergave.soort === 'kijk' && <MeekijkenStart waarde={weergave.token} klaar={() => { terug(); naarDashboard() }} annuleer={terug} />}
         {weergave.soort === 'hoofd' && (gebruiker
           ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={() => setWeergave({ soort: 'aanmelden' })} />
           : <Inloggen aanmelden={() => setWeergave({ soort: 'aanmelden' })} />)}
@@ -170,6 +177,18 @@ function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; o
 
   return (
     <>
+      {gebruiker.gast ? (
+        <Kaart titel="Meekijken">
+          <div className="account-wie">
+            <span className="account-wie-naam">{actief?.naam ?? 'Team'}</span>
+            <span className="account-wie-sub">Je kijkt live mee via een link. Wijzigen kan niet.</span>
+          </div>
+          <DeelKijklink />
+          <button className="btn btn-secondary" onClick={() => { uitloggen(); tel('meekijken-gestopt') }}>Stoppen met meekijken</button>
+          <p className="account-uitleg">Heb je zelf een account? Stop dan met meekijken en log in.</p>
+        </Kaart>
+      ) : (
+      <>
       <Kaart titel="Account">
         <div className="account-wie">
           <span className="account-wie-naam">{gebruiker.name || gebruiker.email}</span>
@@ -212,6 +231,7 @@ function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; o
           )}
         </div>
         <SyncRegel />
+        <DeelKijklink />
       </Kaart>
 
       <Kaart titel={gebruiker.superadmin ? 'Nieuw team' : 'Ander team'}>
@@ -228,6 +248,8 @@ function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; o
         )}
         <Melding tekst={fout} fout />
       </Kaart>
+      </>
+      )}
     </>
   )
 }
@@ -304,8 +326,8 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
             disabled={g.id === gebruiker.id}
           >
             <span className="account-regel-tekst">
-              <span className="account-regel-naam">{g.name || g.email}</span>
-              {g.name && <span className="account-regel-sub">{g.email}</span>}
+              <span className="account-regel-naam">{g.gast ? '🔗 Meekijklink' : g.name || g.email}</span>
+              <span className="account-regel-sub">{g.gast ? 'iedereen met de link' : g.name ? g.email : ''}</span>
             </span>
             <span className="account-regel-sub">{ROL_TEKST[r]}</span>
           </button>
@@ -625,4 +647,46 @@ function AanmeldingBeoordelen({ token }: { token: string }) {
       )}
     </div>
   )
+}
+
+// Geopend via een meekijklink (#kijk=<team>.<token>)
+function MeekijkenStart({ waarde, klaar, annuleer }: { waarde: string; klaar: () => void; annuleer: () => void }) {
+  const { gebruiker, teams, kiesTeam, meekijken, uitloggen } = useAccount()
+  const [teamId, token] = [waarde.slice(0, waarde.indexOf('.')), waarde.slice(waarde.indexOf('.') + 1)]
+  const [fout, setFout] = useState<string | null>(null)
+  const [bezig, setBezig] = useState(false)
+  const eigenLid = !!gebruiker && !gebruiker.gast && teams.some(t => t.id === teamId)
+  const ander = !!gebruiker && !gebruiker.gast && !eigenLid
+
+  const start = async () => {
+    setBezig(true)
+    setFout(null)
+    try {
+      if (gebruiker) uitloggen()
+      await meekijken(teamId, token)
+      tel('meekijken-gestart')
+      klaar()
+    } catch (err) {
+      setFout((err as { status?: number }).status === 400 ? 'Deze link werkt niet meer. Vraag om een nieuwe.' : foutTekst(err))
+    }
+    setBezig(false)
+  }
+
+  useEffect(() => {
+    // Zelf al lid van dit team: gewoon dat team openen
+    if (eigenLid) { kiesTeam(teamId); klaar(); return }
+    if (!ander) start()
+  }, [])
+
+  if (ander) {
+    return (
+      <div className="account-form">
+        <p className="account-uitleg">Je bent ingelogd als <strong>{gebruiker!.name || gebruiker!.email}</strong>. Om via deze link mee te kijken, word je uitgelogd.</p>
+        <Melding tekst={fout} fout />
+        <button className="btn btn-primary" onClick={start} disabled={bezig}>Uitloggen en meekijken</button>
+        <button className="btn btn-secondary" onClick={annuleer}>Annuleren</button>
+      </div>
+    )
+  }
+  return fout ? <Melding tekst={fout} fout /> : <p className="account-uitleg">Meekijken starten…</p>
 }

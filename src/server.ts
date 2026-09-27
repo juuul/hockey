@@ -13,11 +13,12 @@ export const ROL_UITLEG: Record<Rol, string> = {
   kijker: 'kijkt alleen mee',
 }
 
-export interface Gebruiker extends RecordModel { email: string; name: string; superadmin: boolean }
+export interface Gebruiker extends RecordModel { email: string; name: string; superadmin: boolean; gast?: boolean }
 export interface Team extends RecordModel {
   naam: string
   beheerders: string[]
   kijkers: string[]
+  kijklink?: string
   expand?: { beheerders?: Gebruiker[]; kijkers?: Gebruiker[] }
 }
 export interface Uitnodiging extends RecordModel { team: string; email: string; rol: Rol }
@@ -35,4 +36,13 @@ export function foutTekst(fout: unknown): string {
     return fout.response?.message && !velden.length ? fout.response.message : velden[0]?.message ?? fout.message
   }
   return String(fout)
+}
+
+// Meekijklink: een gast-account per team (zie pb_hooks). In de link staan team-id en het geheime wachtwoord
+export const gastEmail = (teamId: string) => `kijk-${teamId}@meekijken.invalid`
+export const kijkLink = (teamId: string, token: string) => `${appAdres()}#kijk=${teamId}.${token}`
+
+export async function haalKijkLink(teamId: string, vernieuw = false): Promise<string> {
+  const r = await pb.send<{ token: string }>(`/api/hockey/kijklink/${teamId}`, { method: 'POST', body: { vernieuw } })
+  return kijkLink(teamId, r.token)
 }

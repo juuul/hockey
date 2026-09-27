@@ -18,7 +18,7 @@
 .historie-uitleg,
 .doelsaldo {
   font-size: var(--base-readable-size);
-  color: #4b5563;
+  color: var(--tekst-zacht);
   line-height: 1.3;
 }
 
@@ -42,25 +42,25 @@
   flex-direction: column;
   align-items: center;
   padding: 8px;
-  background: #f9fafb;
-  border: 2px solid #e5e7eb;
+  background: var(--vlak-zacht);
+  border: 2px solid var(--rand);
   border-radius: 10px;
 }
 
 .balans-vak.W { border-color: #16a34a; }
-.balans-vak.G { border-color: #9ca3af; }
+.balans-vak.G { border-color: var(--rand-sterk); }
 .balans-vak.V { border-color: #dc2626; }
 
 .balans-getal {
   font-size: calc(var(--base-readable-size) * 1.5);
   font-weight: 700;
-  color: #1f2937;
+  color: var(--tekst);
   line-height: 1.1;
 }
 
 .balans-naam {
   font-size: var(--base-readable-size);
-  color: #4b5563;
+  color: var(--tekst-zacht);
 }
 
 .historie-lijst {
@@ -77,12 +77,12 @@
   gap: 12px;
   min-height: 60px;
   padding: 8px 14px;
-  background: white;
-  border: 2px solid #e5e7eb;
+  background: var(--vlak);
+  border: 2px solid var(--rand);
   border-radius: 10px;
   font-family: inherit;
   text-align: left;
-  color: #1f2937;
+  color: var(--tekst);
 }
 
 .wedstrijd-regel {
@@ -91,12 +91,12 @@
 }
 
 .wedstrijd-regel:active:not(:disabled) {
-  background: #eef2ff;
+  background: var(--vlak-blauw);
 }
 
 .wedstrijd-regel:disabled {
   cursor: default;
-  background: #f9fafb;
+  background: var(--vlak-zacht);
 }
 
 .regel-tekst {
@@ -117,13 +117,13 @@
 .regel-sub,
 .regel-waarde {
   font-size: var(--base-readable-size);
-  color: #4b5563;
+  color: var(--tekst-zacht);
   white-space: nowrap;
 }
 
 .regel-waarde {
   font-weight: 700;
-  color: #1f2937;
+  color: var(--tekst);
 }
 
 .uitslag {
@@ -159,7 +159,7 @@
 
 .detail-regel {
   font-size: var(--base-readable-size);
-  color: #1f2937;
+  color: var(--tekst);
   line-height: 1.3;
   text-align: center;
 }
@@ -174,9 +174,9 @@
 
 .historie .btn-gevaar,
 .detail-knoppen .btn-gevaar {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 2px solid #fca5a5;
+  background: var(--rood-vlak);
+  color: var(--rood-tekst);
+  border: 2px solid var(--rood-rand);
 }
 
 .knop-rood {

@@ -3,14 +3,14 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--vlak);
   position: relative;
 }
 
 .tabs {
   display: flex;
-  border-bottom: 2px solid #e5e7eb;
-  background: white;
+  border-bottom: 2px solid var(--rand);
+  background: var(--vlak);
   flex-shrink: 0;
 }
 
@@ -28,14 +28,14 @@
   cursor: pointer;
   font-size: var(--base-readable-size);
   font-weight: 600;
-  color: #666;
+  color: var(--tekst-zacht);
   border-bottom: 3px solid transparent;
   transition: all 0.3s;
 }
 
 .tab-btn.active {
-  background: #eef2ff;
-  color: #1e40af;
+  background: var(--vlak-blauw);
+  color: var(--blauw-tekst);
   border-bottom-color: #1e40af;
 }
 
@@ -43,7 +43,7 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: white;
+  background: var(--vlak);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -75,5 +75,5 @@
   right: 4px;
   font-size: var(--base-readable-size);
   line-height: 1;
-  color: #b45309;
+  color: var(--geel-tekst);
 }
