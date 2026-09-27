@@ -116,9 +116,13 @@
 }
 
 
-.prog-label.klaar {
+.prog-klaar {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 8px;
   background: #16a34a;
   color: white;
+  font-weight: 700;
 }
 
 .prog-kaart.volgende {
