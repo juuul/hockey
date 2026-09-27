@@ -28,6 +28,8 @@ export default function Programma() {
   const [standaardOpen, setStandaardOpen] = useState(false)
   const [kiesKind, setKiesKind] = useState(false)
   const [alleenMijn, setAlleenMijn] = useState(false)
+  // Standaard alleen wat nog komt; voorbije datums pas op verzoek
+  const [toonGeweest, setToonGeweest] = useState(false)
 
   const naam = (id: string) => spelers.find(s => s.id === id)?.naam ?? ''
   const clubNaam = (p: ProgrammaItem) => clubs.find(c => c.id === p.clubId)?.naam ?? p.tegenstander
@@ -116,8 +118,10 @@ export default function Programma() {
       {alleenMijn && komend.length > 0 && zichtbaar(komend).length === 0 && <p className="prog-uitleg midden">Geen beurten meer voor jouw kind.</p>}
       {zichtbaar(geweest).length > 0 && (
         <>
-          <h2 className="section-title prog-geweest-titel">Geweest</h2>
-          {zichtbaar(geweest).map(p => kaart(p, true))}
+          <button className="btn btn-secondary prog-geweest-knop" onClick={() => setToonGeweest(!toonGeweest)} aria-expanded={toonGeweest}>
+            {toonGeweest ? '▴ Geweest verbergen' : `▾ Geweest bekijken (${zichtbaar(geweest).length})`}
+          </button>
+          {toonGeweest && zichtbaar(geweest).map(p => kaart(p, true))}
         </>
       )}
 
