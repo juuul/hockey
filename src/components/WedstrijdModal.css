@@ -109,3 +109,44 @@
   border-color: #1e40af;
   color: var(--blauw-tekst);
 }
+
+.stand-rij {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.stand-naam {
+  flex: 1;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: var(--tekst);
+}
+
+.stand-knop {
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--rand-sterk);
+  border-radius: 10px;
+  background: var(--vlak-zacht);
+  color: var(--tekst);
+  font-family: inherit;
+  font-size: calc(var(--base-readable-size) * 1.3);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stand-knop:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.stand-getal {
+  min-width: 48px;
+  text-align: center;
+  font-size: calc(var(--base-readable-size) * 1.4);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--tekst);
+}

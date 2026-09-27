@@ -123,11 +123,12 @@ export default function Historie() {
 
       {wijzig && (
         <WedstrijdModal
-          titel={`Wijzigen: ${wijzig.wij} – ${wijzig.zij}`}
+          titel="Wedstrijd wijzigen"
           start={{ datum: wijzig.datum, clubId: wijzig.clubId, thuis: wijzig.thuis }}
           bevestig="Opslaan"
           clubVerplicht
-          onOpslaan={(info, naam) => { wijzigWedstrijd(wijzig.id, info, naam); tel('wedstrijd-gewijzigd'); setWijzig(null) }}
+          stand={{ wij: wijzig.wij, zij: wijzig.zij }}
+          onOpslaan={(info, naam, stand) => { wijzigWedstrijd(wijzig.id, info, naam, stand); tel('wedstrijd-gewijzigd'); setWijzig(null) }}
           onClose={() => setWijzig(null)}
         />
       )}

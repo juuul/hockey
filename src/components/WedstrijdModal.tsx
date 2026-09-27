@@ -11,18 +11,21 @@ interface Props {
   bevestig: string
   clubVerplicht?: boolean
   uitleg?: string
-  onOpslaan: (info: WedstrijdInfo, tegenstander: string) => void
+  // Alleen bij een opgeslagen wedstrijd: de stand is dan ook aan te passen
+  stand?: { wij: number; zij: number }
+  onOpslaan: (info: WedstrijdInfo, tegenstander: string, stand?: { wij: number; zij: number }) => void
   onClose: () => void
 }
 
 // Een nieuwe club wordt pas bij Opslaan echt toegevoegd, zodat je geen losse clubs overhoudt na Annuleren
-export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, uitleg, onOpslaan, onClose }: Props) {
+export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, uitleg, stand: startStand, onOpslaan, onClose }: Props) {
   const { clubs, clubToevoegen } = useHockey()
   const [datum, setDatum] = useState(start.datum ?? vandaag())
   const [thuis, setThuis] = useState(start.thuis)
   const [clubId, setClubId] = useState<string | null>(start.clubId)
   const [nieuweClub, setNieuweClub] = useState<string | null>(null)
   const [zoek, setZoek] = useState('')
+  const [stand, setStand] = useState(startStand)
   // Toetsenbord pas openen na 'Wijzig', niet meteen bij het openen van de pop-up
   const [wijzigt, setWijzigt] = useState(false)
 
@@ -49,7 +52,7 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
     const id = getypt ? clubToevoegen(getypt) : nieuweClub ? clubToevoegen(nieuweClub) : clubId
     // Datum van vandaag niet vastzetten: een wedstrijd die je morgen afsluit krijgt dan ook de juiste datum
     const vasteDatum = !start.datum && datum === vandaag() ? null : datum
-    onOpslaan({ datum: vasteDatum, clubId: id, thuis }, eindNaam ?? '')
+    onOpslaan({ datum: vasteDatum, clubId: id, thuis }, eindNaam ?? '', stand)
   }
 
   const kiesGetypt = () => {
@@ -77,6 +80,21 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
               </button>
             ))}
           </div>
+
+          {stand && (
+            <>
+              <div className="wedstrijd-label">Stand</div>
+              {(['wij', 'zij'] as const).map(kant => (
+                <div key={kant} className="stand-rij">
+                  <span className="stand-naam">{kant === 'wij' ? 'Wij' : 'Zij'}</span>
+                  <button className="stand-knop" aria-label={`${kant === 'wij' ? 'Wij' : 'Zij'} een eraf`} disabled={stand[kant] === 0} onClick={() => setStand({ ...stand, [kant]: stand[kant] - 1 })}>−</button>
+                  <span className="stand-getal">{stand[kant]}</span>
+                  <button className="stand-knop" aria-label={`${kant === 'wij' ? 'Wij' : 'Zij'} een erbij`} onClick={() => setStand({ ...stand, [kant]: stand[kant] + 1 })}>+</button>
+                </div>
+              ))}
+              {stand.wij > (startStand?.wij ?? 0) && <p className="wedstrijd-uitleg">Extra doelpunten tellen mee als "Onbekend" bij de scorers.</p>}
+            </>
+          )}
 
           <div className="wedstrijd-label">Tegenstander</div>
           {/* Eén van de twee: de gekozen club, of zoeken/typen. Zo is altijd duidelijk wat er wordt opgeslagen */}
