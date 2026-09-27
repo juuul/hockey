@@ -67,7 +67,10 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
     const datum = p.tot ? `${datumTekst(p.datum)} – ${datumTekst(p.tot)}` : datumTekst(p.datum)
     const inhoud = p.soort === 'vrij' ? (
       <>
-        <div className="prog-kop"><span className="prog-datum">{datum}</span></div>
+        <div className="prog-kop">
+          <span className="prog-datum">{datum}</span>
+          {magBewerken && <span className="prog-wijzig" aria-hidden="true">✏️ Wijzig</span>}
+        </div>
         <div className="prog-vrij">{p.notitie || 'Geen wedstrijd'}</div>
       </>
     ) : (
@@ -75,8 +78,9 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         <div className="prog-kop">
           <span className="prog-datum">{datum}</span>
           {clubNaam(p) && <span className="prog-waar">{p.thuis ? 'Thuis' : 'Uit'}</span>}
-          {p.id === volgendeId && !magBewerken && <span className="prog-label volgende">Volgende</span>}
+          {p.id === volgendeId && <span className="prog-label volgende">Volgende</span>}
           {p.id === wedstrijd.programmaId && <span className="prog-label klaar">Staat op het veld</span>}
+          {magBewerken && <span className="prog-wijzig" aria-hidden="true">✏️ Wijzig</span>}
         </div>
         <div className={`prog-tegen ${clubNaam(p) ? '' : 'onbekend'}`}>{clubNaam(p) || 'Tegenstander nog niet bekend'}</div>
         <div className="prog-regel">
@@ -97,15 +101,9 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <div className="prog-labels">{mijn.map(b => <span key={b} className="prog-label mijn">Jij: {b}</span>)}</div>
         )}
         {magBewerken && !isGeweest && p.id !== wedstrijd.programmaId && (
-          p.id === volgendeId ? (
-            <div className="prog-veld-blok">
-              <span className="prog-veld-titel">Volgende wedstrijd</span>
-              <span className="prog-veld-uitleg">Zet hem op het veld: tegenstander, datum en thuis/uit staan dan klaar op het Dashboard, en jij maakt de opstelling.</span>
-              <button className="btn btn-primary prog-klaar" onClick={e => { e.stopPropagation(); opVeld(p) }}>🏑 Op het veld zetten</button>
-            </div>
-          ) : (
-            <button className="btn btn-secondary prog-klaar" onClick={e => { e.stopPropagation(); opVeld(p) }}>🏑 Op het veld zetten</button>
-          )
+          <button className={`btn ${p.id === volgendeId ? 'btn-primary' : 'btn-secondary'} prog-klaar`} onClick={e => { e.stopPropagation(); opVeld(p) }}>
+            🏑 Op het veld zetten
+          </button>
         )}
       </>
     )
@@ -117,6 +115,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           key={p.id}
           className={`${klasse} bewerkbaar`}
           role="button"
+          aria-label={`${datum} wijzigen`}
           tabIndex={0}
           onClick={() => setBewerk(p)}
           onKeyDown={e => { if (e.key === 'Enter') setBewerk(p) }}
