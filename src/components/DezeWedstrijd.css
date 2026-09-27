@@ -1,0 +1,77 @@
+.wedstrijd-kaart {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 76px;
+  padding: 8px 14px;
+  background: var(--vlak-zacht);
+  border: 2px solid var(--rand);
+  border-radius: 10px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wedstrijd-kaart:active {
+  background: var(--vlak-blauw);
+}
+
+.wedstrijd-kaart-club {
+  max-width: 100%;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: var(--tekst);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wedstrijd-kaart-info {
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+}
+
+.doelpunten {
+  padding: 8px;
+  background: var(--vlak-zacht);
+  border: 1px solid var(--rand);
+  border-radius: 8px;
+}
+
+.doelpunten-lijst {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: var(--base-readable-size);
+  color: var(--tekst);
+}
+
+.deze-wedstrijd {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 2px solid var(--rand);
+  border-radius: 12px;
+  background: var(--vlak);
+}
+
+.deze-wedstrijd .btn {
+  flex: 0 0 auto;
+}
+
+.deze-wedstrijd-stand {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 14px;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: var(--tekst);
+}
+
+.deze-wedstrijd-getal {
+  font-size: calc(var(--base-readable-size) * 1.6);
+  font-variant-numeric: tabular-nums;
+}

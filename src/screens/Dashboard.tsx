@@ -6,32 +6,22 @@ import SubstituteModal from '../components/SubstituteModal'
 import ResetModal from '../components/ResetModal'
 import Timer from '../components/Timer'
 import ScorerModal from '../components/ScorerModal'
-import WedstrijdModal from '../components/WedstrijdModal'
-import { datumTekst } from '../historie'
 import { tel } from '../statistiek'
 import { sorteerWissels, veldKleuren } from '../opstelling'
 import './Dashboard.css'
 
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
-  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, resetScore, doelpunten, spelvorm, opstelling, allesResetten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, magBewerken } = useHockey()
+  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken } = useHockey()
   const [showSubstituteModal, setShowSubstituteModal] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState<Position>('LW')
   const [selectedPlayerName, setSelectedPlayerName] = useState('')
   const [vraag, setVraag] = useState<'wissels' | 'opstelling' | 'alles' | null>(null)
   const [kiesScorer, setKiesScorer] = useState(false)
-  const [wedstrijdVraag, setWedstrijdVraag] = useState<'gegevens' | 'afsluiten' | null>(null)
-  const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
 
   const fieldPlayers = spelers.filter(s => s.inVeld && !s.isKeeper)
   const keeper = spelers.find(s => s.isKeeper)
   const kleuren = veldKleuren(fieldPlayers, spelvorm === 6 ? 1 : 2)
-  const scorerOverzicht = Object.entries(
-    doelpunten.reduce<Record<string, number>>((perNaam, id) => {
-      const naam = spelers.find(s => s.id === id)?.naam ?? 'Onbekend'
-      return { ...perNaam, [naam]: (perNaam[naam] ?? 0) + 1 }
-    }, {})
-  ).map(([naam, aantal]) => ({ naam, aantal })).sort((a, b) => b.aantal - a.aantal)
   const substitutes = sorteerWissels(spelers.filter(s => !s.inVeld && s.meedoen), wisselingen)
   // Eén regel wissels past in beeld; de rest staat onder de vouw, bereikbaar door de pagina te scrollen
   const wisselsInBeeld = substitutes.slice(0, 2)
@@ -157,22 +147,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
 
     <div className="dashboard-knoppen">
       {!magBewerken && <p className="kijker-melding">Je kijkt live mee. Alleen beheerders kunnen de wedstrijd bijhouden.</p>}
-      <button className="wedstrijd-kaart" onClick={() => setWedstrijdVraag('gegevens')} disabled={!magBewerken}>
-        <span className="wedstrijd-kaart-club">{tegenstander ? `Tegen ${tegenstander}` : 'Kies tegenstander'}</span>
-        <span className="wedstrijd-kaart-info">{wedstrijd.thuis ? 'Thuis' : 'Uit'} · {wedstrijd.datum ? datumTekst(wedstrijd.datum) : 'vandaag'}</span>
-      </button>
-      {magBewerken && <button className="btn btn-primary" onClick={() => setWedstrijdVraag('afsluiten')}>Wedstrijd afsluiten</button>}
       {magBewerken && <button className="btn btn-gevaar" onClick={() => setVraag('alles')}>Alles resetten</button>}
-      {doelpunten.length > 0 && (
-        <div className="doelpunten">
-          <div className="section-title">Doelpunten</div>
-          <div className="doelpunten-lijst">
-            {scorerOverzicht.map(({ naam, aantal }) => (
-              <span key={naam} className="doelpunt-scorer">{naam} <strong>{aantal}</strong></span>
-            ))}
-          </div>
-        </div>
-      )}
       {magBewerken && (
         <>
           <button className="btn btn-secondary" onClick={() => { undo(); tel('undo') }} disabled={!canUndo}>Undo</button>
@@ -203,28 +178,6 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           doelpunten={doelpunten}
           onKies={id => { scoor('wij', 1, id); tel(id ? 'score-wij' : 'score-wij-onbekend'); setKiesScorer(false) }}
           onClose={() => setKiesScorer(false)}
-        />
-      )}
-
-      {wedstrijdVraag === 'gegevens' && (
-        <WedstrijdModal
-          titel="Wedstrijd"
-          start={wedstrijd}
-          bevestig="Opslaan"
-          onOpslaan={info => { zetWedstrijd(info); tel('wedstrijd-gegevens'); setWedstrijdVraag(null) }}
-          onClose={() => setWedstrijdVraag(null)}
-        />
-      )}
-
-      {wedstrijdVraag === 'afsluiten' && (
-        <WedstrijdModal
-          titel={`Afsluiten: ${score.wij} – ${score.zij}`}
-          start={wedstrijd}
-          bevestig="Opslaan"
-          clubVerplicht
-          uitleg="Daarna begint een nieuwe wedstrijd: nieuwe opstelling, wissels en score op 0, timer 0:00."
-          onOpslaan={(info, naam) => { wedstrijdAfsluiten(info, naam); tel('wedstrijd-afgesloten'); setWedstrijdVraag(null) }}
-          onClose={() => setWedstrijdVraag(null)}
         />
       )}
 

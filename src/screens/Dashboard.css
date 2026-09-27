@@ -18,20 +18,7 @@
   border-radius: 8px;
 }
 
-.doelpunten {
-  padding: 8px;
-  background: var(--vlak-zacht);
-  border: 1px solid var(--rand);
-  border-radius: 8px;
-}
 
-.doelpunten-lijst {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  font-size: var(--base-readable-size);
-  color: var(--tekst);
-}
 
 .dashboard-knoppen {
   display: flex;
@@ -335,39 +322,9 @@
   transform: scale(0.98);
 }
 
-.wedstrijd-kaart {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  min-height: 76px;
-  padding: 8px 14px;
-  background: var(--vlak-zacht);
-  border: 2px solid var(--rand);
-  border-radius: 10px;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
 
-.wedstrijd-kaart:active {
-  background: var(--vlak-blauw);
-}
 
-.wedstrijd-kaart-club {
-  max-width: 100%;
-  font-size: var(--base-readable-size);
-  font-weight: 700;
-  color: var(--tekst);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
-.wedstrijd-kaart-info {
-  font-size: var(--base-readable-size);
-  color: var(--tekst-zacht);
-}
 
 /* Kijkers: knoppen doen niets, maar het veld en de score zien er gewoon uit */
 .player-slot:disabled,

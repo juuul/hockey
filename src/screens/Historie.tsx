@@ -3,6 +3,7 @@ import { useHockey } from '../context/HockeyContext'
 import { GespeeldeWedstrijd, opstellingTekst } from '../types'
 import { balans, clubNaam, datumTekst, perTegenstander, sorteerWedstrijden, topscorers, uitslag, vindClub } from '../historie'
 import WedstrijdModal from '../components/WedstrijdModal'
+import DezeWedstrijd from '../components/DezeWedstrijd'
 import { tel } from '../statistiek'
 import '../components/Modal.css'
 import './Historie.css'
@@ -28,13 +29,15 @@ export default function Historie() {
   if (wedstrijden.length === 0 && clubs.length === 0) {
     return (
       <div className="historie">
-        <p className="historie-leeg">Nog geen wedstrijden. Sluit een wedstrijd af onderaan het Dashboard (scroll omlaag).</p>
+        <DezeWedstrijd />
+        <p className="historie-leeg">Nog geen afgesloten wedstrijden. Kies hierboven de tegenstander en sluit de wedstrijd na afloop af.</p>
       </div>
     )
   }
 
   return (
     <div className="historie">
+      <DezeWedstrijd />
       <div className="balans" aria-label="Balans">
         <div className="balans-vak"><span className="balans-getal">{totaal.gespeeld}</span><span className="balans-naam">gespeeld</span></div>
         <div className="balans-vak W"><span className="balans-getal">{totaal.W}</span><span className="balans-naam">gewonnen</span></div>

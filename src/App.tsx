@@ -13,7 +13,8 @@ import './App.css'
 
 type Scherm = 'dashboard' | 'players' | 'positions' | 'historie' | 'instellingen'
 
-// Vijf namen passen niet naast elkaar op een smalle telefoon: alleen iconen, even breed (naam als aria-label en title)
+// Vijf namen passen niet naast elkaar op een smalle telefoon: iconen even breed; alleen het actieve tabblad toont
+// zijn naam eronder (die mag uitlopen onder de lege plek van de buren; aan de randen uitgelijnd met de schermrand)
 const TABS: { id: Scherm; icoon: string; naam: string }[] = [
   { id: 'dashboard', icoon: '🏑', naam: 'Dashboard' },
   { id: 'players', icoon: '👥', naam: 'Spelers' },
@@ -47,6 +48,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
             aria-current={screen === tab.id ? 'page' : undefined}
           >
             <span className="tab-icoon" aria-hidden="true">{tab.icoon}</span>
+            {screen === tab.id && <span className="tab-naam" aria-hidden="true">{tab.naam}</span>}
             {tab.id === 'instellingen' && syncProbleem && <span className="tab-waarschuwing" aria-label="geen verbinding met de server">⚠</span>}
           </button>
         ))}
