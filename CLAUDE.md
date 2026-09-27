@@ -63,6 +63,8 @@ Een onbekende opgeslagen opstelling wordt vervangen (kort bestaande test-namen 3
 Gedefinieerd in `OPSTELLINGEN` / `OPSTELLINGEN_PER_SPELVORM` in `src/types.ts`.
 
 ### Team
+**Spelersnamen: alleen de voornaam, geen tweede veld.** Namen zijn uniek per team (hoofdletters/spaties tellen niet mee, `naamBezet` in `src/opstelling.ts`); bij twee dezelfde voornamen maakt de beheerder de naam zelf uniek (bv. "Sarah E."). De app meldt dit bij toevoegen; de server heeft een unieke index (`spelers`: team + naam, NOCASE) als vangrail.
+
 Keeper: Julia Arnold. Veld: Lizzy Best, Fee Daan, Sarah Eerdmans, Isa Flierman, Evi Kruft, Aster Meijboom, Floor Oreel, Carice Plantinga, Sara van Tetering, Benthe van der Wijk. (Rosalie de Kroon traint mee, niet in het team.) De app gebruikt voornamen; de startlijst staat in `INITIAL_PLAYERS` in de context.
 
 ### Accounts (tabblad Instellingen, `src/screens/Instellingen.tsx`)

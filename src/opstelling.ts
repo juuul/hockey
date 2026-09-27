@@ -111,3 +111,7 @@ export function pasOpstellingAan(spelers: Player[], posities: Position[]): Playe
   })
   return spelers.map(s => nieuw.has(s.id) ? { ...s, ...nieuw.get(s.id) } : s)
 }
+
+// Spelersnamen zijn uniek binnen een team (hoofdletters en spaties tellen niet mee)
+export const naamSleutel = (naam: string) => naam.trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl')
+export const naamBezet = (bestaand: string[], naam: string) => bestaand.some(b => naamSleutel(b) === naamSleutel(naam))

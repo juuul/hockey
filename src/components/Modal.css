@@ -175,3 +175,7 @@
   background: var(--knop-grijs-actief);
   transform: scale(0.98);
 }
+
+.modal-fout {
+  color: var(--rood-tekst);
+}

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
-import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan } from '../opstelling'
+import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, naamBezet } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
 import { Alles, GEEN_VERWIJDERD, Lokaal, naarRecords, nieuweIds, pbId, perSoort, Soort, spelersToepassen, Verwijderd, voorkeurenUit } from '../sync'
@@ -245,11 +245,13 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   }, [vastePosities])
 
   const addSpeler = (naam: string) => {
+    // Dubbele naam in het team: niet toevoegen (het venster meldt dit al; dit is de vangrail)
+    if (naamBezet(spelers.map(s => s.naam), naam)) return
     remember()
     const newId = pbId()
     const newSpeler: Player = {
       id: newId,
-      naam,
+      naam: naam.trim().replace(/\s+/g, ' '),
       positie: 'LW',
       inVeld: false,
       meedoen: true,

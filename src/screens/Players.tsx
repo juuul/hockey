@@ -126,6 +126,7 @@ export default function Players() {
 
       {showAddModal && (
         <AddPlayerModal
+          bestaandeNamen={spelers.map(s => s.naam)}
           onAdd={handleAddPlayer}
           onClose={() => setShowAddModal(false)}
         />
