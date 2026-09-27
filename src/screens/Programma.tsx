@@ -69,7 +69,6 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
       <>
         <div className="prog-kop">
           <span className="prog-datum">{datum}</span>
-          {magBewerken && <span className="prog-wijzig" aria-hidden="true">✏️ Wijzig</span>}
         </div>
         <div className="prog-vrij">{p.notitie || 'Geen wedstrijd'}</div>
       </>
@@ -80,7 +79,6 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           {clubNaam(p) && <span className="prog-waar">{p.thuis ? 'Thuis' : 'Uit'}</span>}
           {p.id === volgendeId && <span className="prog-label volgende">Volgende</span>}
           {p.id === wedstrijd.programmaId && <span className="prog-label klaar">Staat op het veld</span>}
-          {magBewerken && <span className="prog-wijzig" aria-hidden="true">✏️ Wijzig</span>}
         </div>
         <div className={`prog-tegen ${clubNaam(p) ? '' : 'onbekend'}`}>{clubNaam(p) || 'Tegenstander nog niet bekend'}</div>
         <div className="prog-regel">
