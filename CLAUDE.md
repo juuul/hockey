@@ -17,7 +17,7 @@ Web-app om langs het veld (op een telefoon) de opstelling, wissels, score en tij
 
 ### Tabbladen
 1. **Dashboard**
-   - Bovenaan de scoreregel: `[−] [Wij n] [Zij n] [−]`. Tik op **Wij** opent "Wie scoorde?" (veld van voor naar achter, dan keeper, dan wissels, of "Weet ik niet"). **Zij** telt direct +1. `−` haalt het laatste doelpunt (en bij Wij de scorer) weg.
+   - Bovenaan de scoreregel: `[−] [Wij n] [Zij n] [−]`. Tik op **Wij** opent "Wie scoorde?" (veld van voor naar achter, dan keeper, dan wissels, of "Weet ik niet"). **Zij** telt direct +1. `−` bij Zij haalt er één af; `−` bij Wij vraagt "Welk doelpunt weghalen?" (scorers met aantal, `KiesDoelpuntWeg`), behalve als er maar één scorer is: dan meteen weg.
    - Veld met de opstelling en de keeper eronder. Tik op een speler: **Wissel** (met wisselspeler) of **Verplaatsen** (ruilen met veldspeler of wisselspeler). Keeper: alleen verplaatsen. Lege plek (gestippeld, "+"): tik om iemand erin te zetten.
    - Eén regel wisselspelers in beeld (2 naast elkaar), zonder kopje. Meer wissels staan onder de vouw.
    - **Onder de vouw** (alleen bereikbaar door te scrollen, bewust uit het zicht): extra wissels, knoppen **Alles resetten**, Undo, Nieuwe opstelling, Reset wissels, Score 0 – 0, en de **Timer** (Start/Pauze/Stop).

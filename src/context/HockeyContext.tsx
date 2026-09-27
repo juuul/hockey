@@ -41,6 +41,7 @@ interface HockeyContextType {
   canUndo: boolean
   score: Score
   scoor: (team: keyof Score, verschil: 1 | -1, scorerId?: string | null) => void
+  haalDoelpuntWeg: (scorerId: string | null) => void
   doelpunten: (string | null)[]
   spelvorm: Spelvorm
   timer: TimerStand
@@ -381,6 +382,15 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
     setDoelpunten([])
   }
 
+  // Eén doelpunt van ons weg bij deze scorer (de laatste van hem/haar); onbekend in de lijst → het laatste doelpunt
+  const haalDoelpuntWeg = (scorerId: string | null) => {
+    if (score.wij === 0) return
+    remember()
+    setScore({ ...score, wij: score.wij - 1 })
+    const i = doelpunten.lastIndexOf(scorerId)
+    setDoelpunten(doelpunten.filter((_, j) => j !== (i >= 0 ? i : doelpunten.length - 1)))
+  }
+
   const scoor = (team: keyof Score, verschil: 1 | -1, scorerId: string | null = null) => {
     if (score[team] + verschil < 0) return
     remember()
@@ -477,7 +487,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, teamId, magBewerken, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, teamId, magBewerken, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )

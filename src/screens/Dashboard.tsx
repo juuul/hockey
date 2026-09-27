@@ -6,18 +6,27 @@ import SubstituteModal from '../components/SubstituteModal'
 import ResetModal from '../components/ResetModal'
 import Timer from '../components/Timer'
 import ScorerModal from '../components/ScorerModal'
+import KiesDoelpuntWeg, { scorersVan } from '../components/KiesDoelpuntWeg'
 import { tel } from '../statistiek'
 import { sorteerWissels, veldKleuren } from '../opstelling'
 import './Dashboard.css'
 
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
-  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken } = useHockey()
+  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken } = useHockey()
   const [showSubstituteModal, setShowSubstituteModal] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState<Position>('LW')
   const [selectedPlayerName, setSelectedPlayerName] = useState('')
   const [vraag, setVraag] = useState<'wissels' | 'opstelling' | 'alles' | null>(null)
   const [kiesScorer, setKiesScorer] = useState(false)
+  const [kiesWeg, setKiesWeg] = useState(false)
+  const huidigeScorers = scorersVan(doelpunten.map(id => ({ spelerId: id, naam: spelers.find(s => s.id === id)?.naam ?? 'Onbekend' })))
+  // − bij Wij: bij één scorer meteen weg, anders kiezen bij wie
+  const wijEraf = () => {
+    if (huidigeScorers.length > 1) return setKiesWeg(true)
+    haalDoelpuntWeg(huidigeScorers[0]?.id ?? null)
+    tel('score-wij-min')
+  }
 
   const fieldPlayers = spelers.filter(s => s.inVeld && !s.isKeeper)
   const keeper = spelers.find(s => s.isKeeper)
@@ -103,7 +112,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </button>
       )}
       <div className="score-regel">
-        <button className="score-min" onClick={() => { scoor('wij', -1); tel('score-wij-min') }} disabled={!magBewerken || score.wij === 0} aria-label="Doelpunt wij eraf">−</button>
+        <button className="score-min" onClick={wijEraf} disabled={!magBewerken || score.wij === 0} aria-label="Doelpunt wij eraf">−</button>
         <button className="score-team wij" onClick={() => setKiesScorer(true)} disabled={!magBewerken} aria-label={`Wij ${score.wij}, doelpunt erbij`}>
           <span className="score-naam">Wij</span>
           <span className="score-getal">{score.wij}</span>
@@ -169,6 +178,14 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           onClose={() => setShowSubstituteModal(false)}
           leegPlek={!getPlayerByPosition(selectedPosition)}
           alleenVerplaatsen={selectedPosition === 'K'}
+        />
+      )}
+
+      {kiesWeg && (
+        <KiesDoelpuntWeg
+          scorers={huidigeScorers}
+          onKies={id => { haalDoelpuntWeg(id); tel('score-wij-min-gekozen'); setKiesWeg(false) }}
+          onClose={() => setKiesWeg(false)}
         />
       )}
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { WedstrijdInfo } from '../types'
 import type { OpgeslagenStand } from '../context/HockeyContext'
+import KiesDoelpuntWeg, { scorersVan } from './KiesDoelpuntWeg'
 import { vandaag, vindClub, zoekClubs } from '../historie'
 import './Modal.css'
 import './WedstrijdModal.css'
@@ -30,10 +31,7 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
   const [stand, setStand] = useState(startStand)
   const [kiesDoelpunt, setKiesDoelpunt] = useState<'erbij' | 'eraf' | null>(null)
   const aantalVan = (id: string | null) => stand?.doelpunten.filter(d => d.spelerId === id).length ?? 0
-  // Scorers van deze wedstrijd, voor 'weghalen': per speler (of Onbekend) met aantal
-  const scorers = stand
-    ? [...new Map(stand.doelpunten.map(d => [d.spelerId, d.spelerId === null ? 'Onbekend' : d.naam])).entries()].map(([id, naam]) => ({ id, naam, aantal: aantalVan(id) }))
-    : []
+  const scorers = stand ? scorersVan(stand.doelpunten) : []
   const doelpuntErbij = (id: string | null, naam: string) => {
     if (stand) setStand({ ...stand, doelpunten: [...stand.doelpunten, { spelerId: id, naam }] })
     setKiesDoelpunt(null)
@@ -155,28 +153,22 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
             </>
           )}
         </div>
-        {kiesDoelpunt && (
+        {kiesDoelpunt === 'eraf' && <KiesDoelpuntWeg scorers={scorers} onKies={doelpuntEraf} onClose={() => setKiesDoelpunt(null)} />}
+        {kiesDoelpunt === 'erbij' && (
           <div className="modal show" onClick={() => setKiesDoelpunt(null)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
-              <div className="modal-title">{kiesDoelpunt === 'erbij' ? 'Wie scoorde?' : 'Welk doelpunt weghalen?'}</div>
+              <div className="modal-title">Wie scoorde?</div>
               <div className="modal-options">
-                {kiesDoelpunt === 'erbij'
-                  ? kandidaten.map(k => (
-                      <button key={k.id} className="modal-option" onClick={() => doelpuntErbij(k.id, k.naam)}>
-                        <span className="modal-option-name">{k.naam}</span>
-                        {aantalVan(k.id) > 0 && <span className="modal-option-place">⚽ {aantalVan(k.id)}</span>}
-                      </button>
-                    ))
-                  : scorers.map(sc => (
-                      <button key={sc.id ?? 'onbekend'} className="modal-option" onClick={() => doelpuntEraf(sc.id)}>
-                        <span className="modal-option-name">{sc.naam}</span>
-                        <span className="modal-option-place">⚽ {sc.aantal}</span>
-                      </button>
-                    ))}
+                {kandidaten.map(k => (
+                  <button key={k.id} className="modal-option" onClick={() => doelpuntErbij(k.id, k.naam)}>
+                    <span className="modal-option-name">{k.naam}</span>
+                    {aantalVan(k.id) > 0 && <span className="modal-option-place">⚽ {aantalVan(k.id)}</span>}
+                  </button>
+                ))}
               </div>
               <div className="modal-actions">
                 <button className="btn btn-secondary" onClick={() => setKiesDoelpunt(null)}>Annuleren</button>
-                {kiesDoelpunt === 'erbij' && <button className="btn btn-primary" onClick={() => doelpuntErbij(null, 'Onbekend')}>Weet ik niet</button>}
+                <button className="btn btn-primary" onClick={() => doelpuntErbij(null, 'Onbekend')}>Weet ik niet</button>
               </div>
             </div>
           </div>
