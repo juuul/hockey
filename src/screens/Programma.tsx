@@ -189,22 +189,37 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
     onClose()
   }
 
-  const spelerSelect = (label: string, veld: 'fruit' | 'begeleider1' | 'begeleider2') => (
-    <label className="prog-veld">
-      {label}
-      <select className="modal-input" value={p[veld]} onChange={e => zet({ [veld]: e.target.value })}>
-        {veld === 'fruit' ? (
-          <option value="">Nog niemand</option>
-        ) : (
-          <>
-            <option value="">Nog te bepalen</option>
-            <option value={NIET_NODIG}>Niet nodig</option>
-          </>
-        )}
-        {spelerKeuzes.map(s => <option key={s.id} value={s.id}>{veld === 'fruit' ? s.naam : `Ouder van ${s.naam}`}</option>)}
-      </select>
-    </label>
-  )
+  // Hoe vaak iemand dit seizoen al fruit heeft / begeleidt (geweest en gepland, zonder deze datum)
+  const anderen = programma.filter(x => x.id !== p.id && x.soort === 'wedstrijd')
+  const telFruit = (id: string) => anderen.filter(x => x.fruit === id).length
+  const telBegeleiding = (id: string) => anderen.filter(x => x.begeleider1 === id || x.begeleider2 === id).length
+
+  const spelerSelect = (label: string, veld: 'fruit' | 'begeleider1' | 'begeleider2') => {
+    const fruit = veld === 'fruit'
+    const tel = fruit ? telFruit : telBegeleiding
+    // Wie het minst aan de beurt was bovenaan
+    const keuzes = [...spelerKeuzes].sort((a, b) => tel(a.id) - tel(b.id) || a.naam.localeCompare(b.naam))
+    return (
+      <label className="prog-veld">
+        {label}
+        <select className="modal-input" value={p[veld]} onChange={e => zet({ [veld]: e.target.value })}>
+          {fruit ? (
+            <option value="">Nog niemand</option>
+          ) : (
+            <>
+              <option value="">Nog te bepalen</option>
+              <option value={NIET_NODIG}>Niet nodig</option>
+            </>
+          )}
+          {keuzes.map(s => (
+            <option key={s.id} value={s.id}>
+              {fruit ? s.naam : `Ouder van ${s.naam}`} · {fruit ? '🍎' : '🚗'} {tel(s.id)}×
+            </option>
+          ))}
+        </select>
+      </label>
+    )
+  }
 
   return (
     <div className="modal show" onClick={onClose}>
