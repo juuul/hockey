@@ -203,9 +203,16 @@ button.prog-kaart:active {
   color: #1f2937;
 }
 
-.prog-geweest-knop {
-  flex: 0 0 auto;
-  margin-top: 6px;
+.prog-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.prog-filters .prog-filter {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 8px;
+  line-height: 1.15;
 }
 
 /* Bewerken */

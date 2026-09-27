@@ -106,23 +106,21 @@ export default function Programma() {
         )}
       </section>
 
-      {magBewerken && (
-        <div className="prog-knoppen">
-          <button className="btn btn-primary" onClick={() => setBewerk(LEEG_ITEM(teamInstellingen))}>+ Datum toevoegen</button>
-          <button className="btn btn-secondary" onClick={() => setStandaardOpen(true)}>Standaard begeleiding</button>
-        </div>
-      )}
+      <div className="prog-filters">
+        <button className={`prog-filter ${toonGeweest ? 'actief' : ''}`} onClick={() => setToonGeweest(!toonGeweest)} aria-pressed={toonGeweest}>
+          ⇄ {toonGeweest ? 'Geweest' : 'Nog te spelen'}
+        </button>
+        {magBewerken && <button className="prog-filter" onClick={() => setStandaardOpen(true)}>Begeleiding</button>}
+      </div>
+      {magBewerken && <button className="btn btn-primary prog-toevoegen" onClick={() => setBewerk(LEEG_ITEM(teamInstellingen))}>+ Datum toevoegen</button>}
 
       {programma.length === 0 && <p className="prog-uitleg midden">Nog geen programma.{magBewerken ? ' Voeg de eerste datum toe.' : ''}</p>}
-      {zichtbaar(komend).map(p => kaart(p))}
-      {alleenMijn && komend.length > 0 && zichtbaar(komend).length === 0 && <p className="prog-uitleg midden">Geen beurten meer voor jouw kind.</p>}
-      {zichtbaar(geweest).length > 0 && (
-        <>
-          <button className="btn btn-secondary prog-geweest-knop" onClick={() => setToonGeweest(!toonGeweest)} aria-expanded={toonGeweest}>
-            {toonGeweest ? '▴ Geweest verbergen' : `▾ Geweest bekijken (${zichtbaar(geweest).length})`}
-          </button>
-          {toonGeweest && zichtbaar(geweest).map(p => kaart(p, true))}
-        </>
+      {programma.length > 0 && <h2 className="section-title">{toonGeweest ? 'Geweest (nieuwste eerst)' : 'Nog te spelen'}</h2>}
+      {(toonGeweest ? zichtbaar(geweest) : zichtbaar(komend)).map(p => kaart(p, toonGeweest))}
+      {programma.length > 0 && (toonGeweest ? zichtbaar(geweest) : zichtbaar(komend)).length === 0 && (
+        <p className="prog-uitleg midden">
+          {alleenMijn ? (toonGeweest ? 'Geen eerdere beurten van jouw kind.' : 'Geen beurten meer voor jouw kind.') : toonGeweest ? 'Nog niets geweest.' : 'Alles is gespeeld.'}
+        </p>
       )}
 
       {kiesKind && <KindKiezen gekozen={mijnKinderen} onKlaar={ids => { zetMijnKinderen(ids); tel('kind-gekozen'); setKiesKind(false) }} onClose={() => setKiesKind(false)} />}
