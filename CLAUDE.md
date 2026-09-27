@@ -2,8 +2,9 @@
 
 Web-app om langs het veld (op een telefoon) de opstelling, wissels, score en tijd bij te houden voor een meidenteam. Zonder team staat alles alleen op de telefoon (localStorage). Ingelogd met een team worden spelers (naam + voorkeuren), clubs en afgesloten wedstrijden gedeeld via een eigen PocketBase-server (zie **Server**), en de lopende wedstrijd (opstelling, wissels, score, scorers, timer, aanwezigheid, wedstrijdgegevens) live.
 
-- Live: https://juliaan.eu/hockey/ (branch `main`)
-- Test: https://juliaan.eu/hockey/test/ (branch `test`)
+- Live: https://hockey.juliaan.eu/ (branch `main`)
+- Test: https://hockey.juliaan.eu/test/ (branch `test`)
+- Oude adressen https://juliaan.eu/hockey/ en /hockey/test/ sturen (GitHub, 301) door naar het nieuwe adres; het deel na `#` blijft bewaard, dus oude links in mails werken.
 - Repo: github.com/juuul/hockey
 
 ## Werkwijze (belangrijk)
@@ -114,6 +115,7 @@ Sleutels `hockey_<naam>` op live en `hockey_test_<naam>` op test (zelfde domein,
 
 ## Server (PocketBase)
 - Map `server/`: `Dockerfile` + `docker-compose.yml` (container `hockey-pocketbase`, alleen `127.0.0.1:8090`), `pb_migrations/` (collecties + rechten), `pb_hooks/` (uitnodigingen mailen/aannemen). Data in `server/pb_data/` (niet in git).
+- CORS (`--origins` in de Dockerfile) en `TOEGESTAAN` (hooks) kennen zowel hockey.juliaan.eu als het oude juliaan.eu/hockey.
 - Openbaar alleen `/api` via **Tailscale Funnel** (adres in `src/server.ts`, overschrijfbaar met `VITE_SERVER`). Beheerscherm `/_/` alleen via tailnet (poort 8443) of een SSH-tunnel naar `127.0.0.1:8090`.
 - Mail via Gmail SMTP met een app-wachtwoord; ingesteld in het beheerscherm, niet in git.
 - **De repo is openbaar**: geen e-mailadressen, wachtwoorden, tokens of andere persoonlijke gegevens committen.
@@ -122,13 +124,13 @@ Sleutels `hockey_<naam>` op live en `hockey_test_<naam>` op test (zelfde domein,
 - Een migratie die al op de server gedraaid heeft **nooit aanpassen**: altijd een nieuwe migratie toevoegen.
 - Hooks altijd eerst `node --check server/pb_hooks/*.js` (een syntaxfout laat PocketBase alle hooks overslaan).
 - Wijzigingen eerst testen op een losse container met eigen datamap in de scratchpad (poort 8099, nep-SMTP, migraties/hooks daar wél gemount), nooit op de echte data. Voor problemen met echte data: een kopie maken met sqlite `backup()` (alleen-lezen bron) en daarop testen.
-- Test en live gebruiken dezelfde server (zelfde accounts en teams). `appURL` (voor de wachtwoordlinks) staat op de live-URL; uitnodigingen en aanmeldingen gaan terug naar de app waar ze vandaan kwamen (`terug`, alleen adressen uit `TOEGESTAAN` in `pb_hooks/hockey.js`).
+- Test en live gebruiken dezelfde server (zelfde accounts en teams). `appURL` (voor de wachtwoordlinks) staat op https://hockey.juliaan.eu/; uitnodigingen en aanmeldingen gaan terug naar de app waar ze vandaan kwamen (`terug`, alleen adressen uit `TOEGESTAAN` in `pb_hooks/hockey.js`).
 - Echte bezoekers-IP via `X-Forwarded-For` (Tailscale zet die), zodat de limieten per bezoeker gelden. Limieten staan aan (PocketBase-standaard + aanmelding).
 
 ## Deploy
 - GitHub Actions (`.github/workflows/deploy.yml`) bouwt bij elke push naar `main` of `test` **beide** branches en publiceert ze samen als één Pages-site: `main` in de root, `test` in `/test/` (test met `vite build --mode test`).
 - Asset-paden zijn relatief (`base: './'`), dus de build werkt op elk pad/domein.
-- Domein `juliaan.eu` hoort bij de repo `juuul/juuul.github.io` (startpagina met knoppen naar /hockey/ en financeplannerapp.com, lokaal in `/home/metime/projects/juuul.github.io`); deze repo verschijnt daardoor op `/hockey/`. Paden zijn hoofdlettergevoelig: repo heet `hockey`.
-- DNS bij zxcs/Vimexx (A + AAAA naar GitHub Pages). De lokale resolver op deze machine cachet soms nog een oud parkeeradres; controleer live dan met `curl --resolve juliaan.eu:443:185.199.108.153 ...`.
+- Eigen adres: GitHub Pages van deze repo heeft custom domain **hockey.juliaan.eu** (CNAME `hockey` → `juuul.github.io` bij Vimexx, https afgedwongen). Het domein `juliaan.eu` zelf hoort bij de repo `juuul/juuul.github.io` (startpagina, lokaal in `/home/metime/projects/juuul.github.io`).
+- DNS bij zxcs/Vimexx (A + AAAA naar GitHub Pages). De lokale resolver op deze machine cachet soms nog een oud parkeeradres; controleer live dan met `curl --resolve hockey.juliaan.eu:443:185.199.108.153 ...`.
 - GitHub Pages cachet pagina's tot 10 minuten; de gebruiker ververst door de pagina omlaag te trekken.
 - Bij elke publicatie verdwijnen de oude `assets/index-*.js/css`. Een telefoon met de oude `index.html` in de cache kreeg daardoor een leeg scherm; het inline script in `index.html` laadt dan één keer opnieuw met `?v=…` (buiten de cache), `main.tsx` ruimt dat weer op. Alleen reageren op eigen `/assets/`-bestanden: een geblokkeerde GoatCounter gaf eerst een eindeloze herlaad-lus.
