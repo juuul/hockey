@@ -83,6 +83,7 @@ export interface WedstrijdInfo {
   datum: string | null; // 'JJJJ-MM-DD'; null = vandaag
   clubId: string | null;
   thuis: boolean;
+  programmaId?: string; // klaargezet vanuit het programma (voor tijden en het label 'Klaargezet')
 }
 
 // Afgesloten wedstrijd. Namen worden meebewaard zodat de historie klopt als een speler of club later weg is

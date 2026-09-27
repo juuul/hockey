@@ -6,6 +6,7 @@ import type { TeamInstellingen } from '../server'
 import { datumTekst, vandaag } from '../historie'
 import { pbId } from '../sync'
 import { tel } from '../statistiek'
+import ResetModal from '../components/ResetModal'
 import '../components/Modal.css'
 import '../components/WedstrijdModal.css'
 import './Players.css'
@@ -21,11 +22,23 @@ const LEEG_ITEM = (inst: TeamInstellingen): ProgrammaItem => ({
 })
 
 // Tabblad Programma: wedstrijden met tijden, fruit en spelbegeleiding. Beurten van je eigen kind(eren) vallen op
-export default function Programma() {
-  const { programma, spelers, clubs, magBewerken } = useHockey()
+export default function Programma({ naarDashboard }: { naarDashboard: () => void }) {
+  const { programma, spelers, clubs, magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer } = useHockey()
   const { mijnKinderen, zetMijnKinderen, teamInstellingen } = useAccount()
   const [bewerk, setBewerk] = useState<ProgrammaItem | null>(null)
   const [standaardOpen, setStandaardOpen] = useState(false)
+  const [klaarVraag, setKlaarVraag] = useState<ProgrammaItem | null>(null)
+
+  // Klaarzetten: de gegevens van deze datum worden 'Deze wedstrijd', daarna naar het Dashboard voor de opstelling.
+  // Staat er nog een wedstrijd open (stand of timer), dan eerst vragen: klaarzetten begint dan een nieuwe
+  const openWedstrijd = score.wij + score.zij > 0 || timer.opgebouwd > 0 || timer.gestartOp !== null
+  const klaarzetten = (p: ProgrammaItem, nieuw: boolean) => {
+    if (nieuw) allesResetten()
+    zetWedstrijd({ datum: p.datum, clubId: p.clubId || null, thuis: p.thuis, programmaId: p.id })
+    tel('wedstrijd-klaargezet')
+    setKlaarVraag(null)
+    naarDashboard()
+  }
   const [kiesKind, setKiesKind] = useState(false)
   const [alleenMijn, setAlleenMijn] = useState(false)
   // Standaard alleen wat nog komt; voorbije datums pas op verzoek
@@ -62,6 +75,7 @@ export default function Programma() {
           <span className="prog-datum">{datum}</span>
           {clubNaam(p) && <span className="prog-waar">{p.thuis ? 'Thuis' : 'Uit'}</span>}
           {p.id === volgendeId && <span className="prog-label volgende">Volgende</span>}
+          {p.id === wedstrijd.programmaId && <span className="prog-label klaar">Klaargezet</span>}
         </div>
         <div className={`prog-tegen ${clubNaam(p) ? '' : 'onbekend'}`}>{clubNaam(p) || 'Tegenstander nog niet bekend'}</div>
         <div className="prog-regel">
@@ -81,11 +95,31 @@ export default function Programma() {
         {mijn.length > 0 && (
           <div className="prog-labels">{mijn.map(b => <span key={b} className="prog-label mijn">Jij: {b}</span>)}</div>
         )}
+        {magBewerken && !isGeweest && (
+          <button
+            className="btn btn-primary prog-klaar"
+            onClick={e => { e.stopPropagation(); if (openWedstrijd && p.id !== wedstrijd.programmaId) setKlaarVraag(p); else klaarzetten(p, false) }}
+          >
+            ▶ Klaarzetten
+          </button>
+        )}
       </>
     )
     const klasse = `prog-kaart ${p.soort} ${mijn.length ? 'mijn' : ''} ${isGeweest ? 'geweest' : ''} ${p.id === volgendeId ? 'volgende' : ''}`
+    // Beheerders: tik op het kaartje = wijzigen (div, want er zit een knop in)
     return magBewerken
-      ? <button key={p.id} className={klasse} onClick={() => setBewerk(p)}>{inhoud}</button>
+      ? (
+        <div
+          key={p.id}
+          className={`${klasse} bewerkbaar`}
+          role="button"
+          tabIndex={0}
+          onClick={() => setBewerk(p)}
+          onKeyDown={e => { if (e.key === 'Enter') setBewerk(p) }}
+        >
+          {inhoud}
+        </div>
+      )
       : <div key={p.id} className={klasse}>{inhoud}</div>
   }
 
@@ -126,6 +160,18 @@ export default function Programma() {
       {kiesKind && <KindKiezen gekozen={mijnKinderen} onKlaar={ids => { zetMijnKinderen(ids); tel('kind-gekozen'); setKiesKind(false) }} onClose={() => setKiesKind(false)} />}
       {bewerk && <ProgrammaModal start={bewerk} onClose={() => setBewerk(null)} />}
       {standaardOpen && <StandaardBegeleiding onClose={() => setStandaardOpen(false)} />}
+      {klaarVraag && (
+        <ResetModal
+          titel="Nieuwe wedstrijd klaarzetten?"
+          regels={[
+            { icoon: '⚽', tekst: `Er staat nog een wedstrijd open (${score.wij} – ${score.zij}). Sluit die eerst af in Historie als je hem wilt bewaren.` },
+            { icoon: '🔀', tekst: 'Klaarzetten begint een nieuwe: opstelling geloot, wissels, score en timer op 0' },
+          ]}
+          bevestig="Nieuwe wedstrijd klaarzetten"
+          onConfirm={() => klaarzetten(klaarVraag, true)}
+          onCancel={() => setKlaarVraag(null)}
+        />
+      )}
     </div>
   )
 }

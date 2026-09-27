@@ -102,12 +102,22 @@
   color: var(--tekst);
 }
 
-button.prog-kaart {
+.prog-kaart.bewerkbaar {
   cursor: pointer;
 }
 
-button.prog-kaart:active {
+.prog-kaart.bewerkbaar:active {
   background: var(--vlak-blauw);
+}
+
+.prog-klaar {
+  flex: 0 0 auto;
+  margin-top: 6px;
+}
+
+.prog-label.klaar {
+  background: #16a34a;
+  color: white;
 }
 
 .prog-kaart.volgende {

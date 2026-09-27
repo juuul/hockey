@@ -1,5 +1,6 @@
 .reset-modal-overlay {
   position: fixed;
+  overscroll-behavior: contain;
   top: 0;
   left: 0;
   right: 0;
@@ -9,7 +10,7 @@
   align-items: center;
   justify-content: center;
   z-index: 999;
-  padding: 20px;
+  padding: 12px;
 }
 
 .reset-modal {
@@ -18,6 +19,10 @@
   padding: 24px;
   max-width: 480px;
   width: 100%;
+  /* Nooit hoger dan het scherm: bij lange tekst scrollt het venster zelf */
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   animation: modalSlideIn 0.3s ease-out;
 }

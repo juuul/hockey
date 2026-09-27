@@ -35,7 +35,7 @@ export function maakStand(d: Stand): Stand {
     doelpunten: [...d.doelpunten],
     opstelling: d.opstelling,
     timer: { gestartOp: d.timer.gestartOp, opgebouwd: d.timer.opgebouwd },
-    wedstrijd: { datum: d.wedstrijd.datum, clubId: d.wedstrijd.clubId, thuis: d.wedstrijd.thuis },
+    wedstrijd: { datum: d.wedstrijd.datum, clubId: d.wedstrijd.clubId, thuis: d.wedstrijd.thuis, programmaId: d.wedstrijd.programmaId ?? '' },
   }
 }
 

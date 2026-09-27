@@ -7,7 +7,8 @@ import './DezeWedstrijd.css'
 
 // De lopende wedstrijd (tabblad Historie): tegenstander, stand, scorers en afsluiten
 export default function DezeWedstrijd() {
-  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, magBewerken } = useHockey()
+  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, magBewerken, programma } = useHockey()
+  const uitProgramma = programma.find(p => p.id === wedstrijd.programmaId)
   const [vraag, setVraag] = useState<'gegevens' | 'afsluiten' | null>(null)
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
 
@@ -24,6 +25,11 @@ export default function DezeWedstrijd() {
       <button className="wedstrijd-kaart" onClick={() => setVraag('gegevens')} disabled={!magBewerken}>
         <span className="wedstrijd-kaart-club">{tegenstander ? `Tegen ${tegenstander}` : magBewerken ? 'Kies tegenstander' : 'Tegenstander nog niet gekozen'}</span>
         <span className="wedstrijd-kaart-info">{wedstrijd.thuis ? 'Thuis' : 'Uit'} · {wedstrijd.datum ? datumTekst(wedstrijd.datum) : 'vandaag'}</span>
+        {uitProgramma && (uitProgramma.verzamelen || uitProgramma.spelen) && (
+          <span className="wedstrijd-kaart-info">
+            ⏰ {uitProgramma.verzamelen ? `verzamelen ${uitProgramma.verzamelen}` : ''}{uitProgramma.verzamelen && uitProgramma.spelen ? ' · ' : ''}{uitProgramma.spelen ? `aanvang ${uitProgramma.spelen}` : ''}
+          </span>
+        )}
       </button>
       <div className="deze-wedstrijd-stand" aria-label={`Stand ${score.wij} tegen ${score.zij}`}>
         <span>Wij</span>
@@ -44,7 +50,7 @@ export default function DezeWedstrijd() {
           titel="Wedstrijd"
           start={wedstrijd}
           bevestig="Opslaan"
-          onOpslaan={info => { zetWedstrijd(info); tel('wedstrijd-gegevens'); setVraag(null) }}
+          onOpslaan={info => { zetWedstrijd({ ...info, programmaId: wedstrijd.programmaId }); tel('wedstrijd-gegevens'); setVraag(null) }}
           onClose={() => setVraag(null)}
         />
       )}

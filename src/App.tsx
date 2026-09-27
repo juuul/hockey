@@ -61,7 +61,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
         {screen === 'dashboard' && <Dashboard naarInstellingen={() => setScreen('instellingen')} />}
         {screen === 'players' && <Players />}
         {screen === 'positions' && <Positions />}
-        {screen === 'programma' && <Programma />}
+        {screen === 'programma' && <Programma naarDashboard={() => setScreen('dashboard')} />}
         {screen === 'historie' && <Historie />}
         {screen === 'instellingen' && <Instellingen start={start} startGebruikt={startGebruikt} naarDashboard={() => setScreen('dashboard')} />}
       </div>
