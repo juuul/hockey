@@ -27,7 +27,7 @@ routerAdd("GET", "/api/hockey/uitnodiging/{token}", (e) => {
   } catch (_) {
     bestaat = false
   }
-  return e.json(200, { team: team.getString("naam"), email: inv.getString("email"), rol: inv.getString("rol"), bestaat })
+  return e.json(200, { team: team.getString("naam"), email: inv.getString("email"), rol: inv.getString("rol"), naam: inv.getString("naam"), bestaat })
 })
 
 // Uitnodiging aannemen: nieuw account (met wachtwoord) of bestaand account aan het team toevoegen.
@@ -53,7 +53,19 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
       user.setVerified(true)
       // Beheerders van hetzelfde team moeten het adres zien; wie het verder ziet bepaalt de listRule
       user.set("emailVisibility", true)
-      user.set("name", String(body.naam || "").trim().slice(0, 60))
+      user.set("name", String(body.naam || inv.getString("naam") || "").trim().slice(0, 60))
+      tx.save(user)
+    }
+    // Kind(eren) uit een toegangsaanvraag: meteen als 'mijn kind' in dit team
+    const leesJson = (r, veld, standaard) => {
+      try { return JSON.parse(r.getString(veld) || "null") || standaard } catch (_) { return standaard }
+    }
+    const kinderen = leesJson(inv, "kinderen", [])
+    if (Array.isArray(kinderen) && kinderen.length && !user.getBool("gast")) {
+      const alle = leesJson(user, "kinderen", {})
+      const teamId = inv.getString("team")
+      alle[teamId] = [...new Set([...(alle[teamId] || []), ...kinderen])]
+      user.set("kinderen", alle)
       tx.save(user)
     }
     const team = tx.findRecordById("teams", inv.getString("team"))
@@ -232,4 +244,106 @@ routerAdd("POST", "/api/hockey/kijklink/{team}", (e) => {
     tx.save(t)
   })
   return e.json(200, { token })
+})
+
+// ── Toegang aanvragen door ouders via de aanmeldlink van het team ──
+
+// Aanmeldlink maken of vernieuwen (beheerders)
+routerAdd("POST", "/api/hockey/aanvraaglink/{team}", (e) => {
+  if (!e.auth || e.auth.collection().name !== "users") throw new UnauthorizedError("Log eerst in")
+  const b = e.requestInfo().body
+  const team = e.app.findRecordById("teams", e.request.pathValue("team"))
+  if (!e.auth.getBool("superadmin") && !team.getStringSlice("beheerders").includes(e.auth.id)) throw new ForbiddenError("Alleen beheerders")
+  if (team.getString("aanvraaglink") && !b.vernieuw) return e.json(200, { token: team.getString("aanvraaglink") })
+  const token = $security.randomString(24)
+  team.set("aanvraaglink", token)
+  e.app.save(team)
+  return e.json(200, { token })
+})
+
+// Formulier openen: teamnaam en de spelers (voornamen) om je kind te kiezen
+routerAdd("GET", "/api/hockey/aanvraag/{waarde}", (e) => {
+  const h = require(`${__hooks}/hockey.js`)
+  const team = h.vindTeamMetAanvraaglink(e.app, e.request.pathValue("waarde"))
+  const spelers = e.app.findRecordsByFilter("spelers", "team = {:team}", "naam", 0, 0, { team: team.id }).map((s) => ({ id: s.id, naam: s.getString("naam") }))
+  return e.json(200, { team: team.getString("naam"), spelers })
+})
+
+// Aanvraag versturen: bewaren en alle beheerders mailen
+routerAdd("POST", "/api/hockey/aanvraag/{waarde}", (e) => {
+  const h = require(`${__hooks}/hockey.js`)
+  const team = h.vindTeamMetAanvraaglink(e.app, e.request.pathValue("waarde"))
+  const b = e.requestInfo().body
+  const tekst = (v, max) => String(v || "").trim().replace(/\s+/g, " ").slice(0, max)
+  const naam = tekst(b.naam, 60)
+  const email = tekst(b.email, 200).toLowerCase()
+  const terug = String(b.terug || "")
+  if (!naam) throw new BadRequestError("Vul je voornaam in")
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new BadRequestError("Vul een geldig e-mailadres in")
+  if (!h.TOEGESTAAN.includes(terug)) throw new BadRequestError("Onbekend terugadres")
+  let kindId = "", kindNaam = tekst(b.kindNaam, 60)
+  if (b.kindId) {
+    try {
+      const s = e.app.findRecordById("spelers", String(b.kindId))
+      if (s.getString("team") === team.id) { kindId = s.id; kindNaam = s.getString("naam") }
+    } catch (_) {}
+  }
+  if (!kindNaam) throw new BadRequestError("Kies of vul de naam van je kind in")
+
+  // Nogmaals verstuurd: geen tweede mail
+  try {
+    e.app.findFirstRecordByFilter("toegangsaanvragen", "team = {:team} && email = {:email} && status = 'nieuw'", { team: team.id, email })
+    return e.json(200, { ok: true })
+  } catch (_) {}
+
+  const a = new Record(e.app.findCollectionByNameOrId("toegangsaanvragen"))
+  a.set("team", team.id)
+  a.set("naam", naam)
+  a.set("email", email)
+  a.set("kindId", kindId)
+  a.set("kindNaam", kindNaam)
+  a.set("terug", terug)
+  a.set("token", $security.randomString(40))
+  a.set("status", "nieuw")
+  e.app.save(a)
+
+  const link = terug + "#toegang=" + a.getString("token")
+  try {
+    h.mail(e.app, h.beheerderEmails(e.app, team), "Toegang gevraagd voor " + team.getString("naam") + ": " + naam,
+      "<p><strong>" + h.escape(naam) + "</strong> (ouder van <strong>" + h.escape(kindNaam) + "</strong>) vraagt toegang tot <strong>" +
+      h.escape(team.getString("naam")) + "</strong> in de Hockey Wissel-app.</p><p>E-mail: " + h.escape(email) + "</p>" +
+      "<p><a href=\"" + h.escape(link) + "\">Aanvraag bekijken en toelaten of afwijzen</a></p>" +
+      "<p>Je vindt open aanvragen ook in de app bij Instellingen → Leden.</p>")
+  } catch (err) {
+    e.app.delete(a)
+    throw new BadRequestError("De aanvraag kon niet worden gemaild. Probeer het later nog eens.")
+  }
+  return e.json(200, { ok: true })
+})
+
+// Beheerder opent de link uit de mail (de link zelf geeft het recht om te beslissen)
+routerAdd("GET", "/api/hockey/toegang/{token}", (e) => {
+  const h = require(`${__hooks}/hockey.js`)
+  let a
+  try { a = e.app.findFirstRecordByData("toegangsaanvragen", "token", e.request.pathValue("token")) } catch (_) { throw new NotFoundError("Aanvraag niet gevonden") }
+  return e.json(200, h.aanvraagInfo(e.app, a))
+})
+
+routerAdd("POST", "/api/hockey/toegang/{token}", (e) => {
+  const h = require(`${__hooks}/hockey.js`)
+  let a
+  try { a = e.app.findFirstRecordByData("toegangsaanvragen", "token", e.request.pathValue("token")) } catch (_) { throw new NotFoundError("Aanvraag niet gevonden") }
+  const status = h.beslisAanvraag(e.app, a, e.requestInfo().body.besluit, e.auth ? e.auth.id : "")
+  return e.json(200, { status })
+})
+
+// Vanuit de app (Leden): alleen beheerders van dat team
+routerAdd("POST", "/api/hockey/toegang-id/{id}", (e) => {
+  const h = require(`${__hooks}/hockey.js`)
+  if (!e.auth || e.auth.collection().name !== "users") throw new UnauthorizedError("Log eerst in")
+  const a = e.app.findRecordById("toegangsaanvragen", e.request.pathValue("id"))
+  const team = e.app.findRecordById("teams", a.getString("team"))
+  if (!e.auth.getBool("superadmin") && !team.getStringSlice("beheerders").includes(e.auth.id)) throw new ForbiddenError("Alleen beheerders")
+  const status = h.beslisAanvraag(e.app, a, e.requestInfo().body.besluit, e.auth.id)
+  return e.json(200, { status })
 })

@@ -51,3 +51,9 @@ export async function haalKijkLink(teamId: string, vernieuw = false): Promise<st
   const r = await pb.send<{ token: string }>(`/api/hockey/kijklink/${teamId}`, { method: 'POST', body: { vernieuw } })
   return kijkLink(teamId, r.token)
 }
+
+// Aanmeldlink voor ouders: '<teamId>.<token>'. Alleen beheerders maken of vernieuwen hem
+export async function haalAanvraagLink(teamId: string, vernieuw = false): Promise<string> {
+  const r = await pb.send<{ token: string }>(`/api/hockey/aanvraaglink/${teamId}`, { method: 'POST', body: { vernieuw } })
+  return `${appAdres()}#aanvraag=${teamId}.${r.token}`
+}

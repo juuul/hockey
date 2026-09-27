@@ -3,7 +3,7 @@ import { HockeyProvider } from './context/HockeyContext'
 import { AccountProvider, useAccount } from './context/AccountContext'
 import { useHockey } from './context/HockeyContext'
 import ResetModal from './components/ResetModal'
-import Instellingen, { AccountStart } from './screens/Instellingen'
+import Instellingen, { AccountStart, LinkSoort } from './screens/Instellingen'
 import Dashboard from './screens/Dashboard'
 import Players from './screens/Players'
 import Positions from './screens/Positions'
@@ -115,9 +115,9 @@ function MetTeam() {
 
   // Links uit mail of app: #uitnodiging=…, #wachtwoord=…, #aanmelding=… of #kijk=… (meekijklink). Daarna het # weghalen, zodat verversen het niet opnieuw opent
   useEffect(() => {
-    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding|kijk)=(.+)$/)
+    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding|kijk|aanvraag|toegang)=(.+)$/)
     if (!m) return
-    setStart({ soort: m[1] as 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk', token: decodeURIComponent(m[2]) })
+    setStart({ soort: m[1] as LinkSoort, token: decodeURIComponent(m[2]) })
     setScreen('instellingen')
     history.replaceState(null, '', window.location.pathname + window.location.search)
   }, [])
