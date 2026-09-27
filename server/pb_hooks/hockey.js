@@ -4,6 +4,8 @@ const ROL_VELD = { beheerder: "beheerders", kijker: "kijkers" }
 
 // Alleen links terug naar onze eigen app
 const TOEGESTAAN = [
+  "https://hockey.juliaan.eu/",
+  "https://hockey.juliaan.eu/test/",
   "https://juliaan.eu/hockey/",
   "https://juliaan.eu/hockey/test/",
   "http://192.168.2.50:5173/",

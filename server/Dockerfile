@@ -10,4 +10,4 @@ COPY pb_hooks /pb/pb_hooks
 USER pb
 WORKDIR /pb
 EXPOSE 8090
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--origins=https://juliaan.eu,http://192.168.2.50:5173,http://localhost:5173"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--origins=https://hockey.juliaan.eu,https://juliaan.eu,http://192.168.2.50:5173,http://localhost:5173"]
