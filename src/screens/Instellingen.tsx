@@ -4,6 +4,7 @@ import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
 import DeelKijklink from '../components/DeelKijklink'
+import { leesThema, Thema, zetThema } from '../thema'
 import '../components/Modal.css'
 import './Instellingen.css'
 
@@ -53,6 +54,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'hoofd' && (gebruiker
           ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={() => setWeergave({ soort: 'aanmelden' })} />
           : <Inloggen aanmelden={() => setWeergave({ soort: 'aanmelden' })} />)}
+        {weergave.soort === 'hoofd' && <Weergave />}
       </div>
     </div>
   )
@@ -689,4 +691,34 @@ function MeekijkenStart({ waarde, klaar, annuleer }: { waarde: string; klaar: ()
     )
   }
   return fout ? <Melding tekst={fout} fout /> : <p className="account-uitleg">Meekijken starten…</p>
+}
+
+const THEMAS: { id: Thema; naam: string }[] = [
+  { id: 'auto', naam: 'Automatisch' },
+  { id: 'licht', naam: 'Licht' },
+  { id: 'donker', naam: 'Donker' },
+]
+
+// Licht/donker: volgens de telefoon, of vast gekozen (geldt alleen op deze telefoon)
+function Weergave() {
+  const [thema, setThema] = useState<Thema>(leesThema)
+  const kies = (t: Thema) => {
+    zetThema(t)
+    setThema(t)
+    tel(`thema-${t}`)
+  }
+  return (
+    <Kaart titel="Weergave">
+      <div className="thema-keuze" role="radiogroup" aria-label="Weergave">
+        {THEMAS.map(t => (
+          <button key={t.id} role="radio" aria-checked={thema === t.id} className={`thema-knop ${thema === t.id ? 'actief' : ''}`} onClick={() => kies(t.id)}>
+            {t.naam}
+          </button>
+        ))}
+      </div>
+      <p className="account-uitleg">
+        {thema === 'auto' ? 'Licht of donker volgens de instelling van je telefoon.' : `Altijd ${thema}, wat je telefoon ook doet.`} Geldt alleen op deze telefoon.
+      </p>
+    </Kaart>
+  )
 }

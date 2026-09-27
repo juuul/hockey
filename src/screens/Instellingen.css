@@ -371,3 +371,29 @@ button.account-regel:disabled {
 .account-team-kies .account-regel-sub {
   white-space: normal;
 }
+
+.thema-keuze {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.thema-knop {
+  min-height: 60px;
+  padding: 8px 14px;
+  border: 2px solid var(--rand);
+  border-radius: 10px;
+  background: var(--vlak);
+  color: var(--tekst);
+  font-family: inherit;
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.thema-knop.actief {
+  border-color: #1e40af;
+  background: #1e40af;
+  color: white;
+}

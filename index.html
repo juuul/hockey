@@ -9,6 +9,12 @@
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
     <title>Hockey App - Substitutie Manager</title>
     <script>
+      // Gekozen weergave (Instellingen → Weergave) meteen toepassen, zodat het scherm niet eerst verkeerd oplicht
+      try {
+        var thema = localStorage.getItem('hockey_thema')
+        if (thema === 'licht' || thema === 'donker') document.documentElement.dataset.thema = thema
+      } catch (_) {}
+
       // Na een nieuwe publicatie bestaan de oude JS/CSS-bestanden niet meer. Staat deze pagina nog in de cache,
       // dan blijft het scherm leeg: dan één keer opnieuw laden met een nieuw adres (buiten de cache om)
       window.addEventListener('error', function (e) {

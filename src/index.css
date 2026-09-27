@@ -39,8 +39,9 @@
   --veld-onder: #3d6b1f;
 }
 
+/* Donker: automatisch volgens de telefoon, tenzij in Instellingen 'Licht' is gekozen; of altijd bij 'Donker' */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-thema='licht']) {
     --achtergrond: #0f172a;
     --vlak: #1e293b;
     --vlak-zacht: #172234;
@@ -70,6 +71,45 @@
     --veld-boven: #1d3510;
     --veld-onder: #284a15;
   }
+}
+
+:root[data-thema='donker'] {
+  --achtergrond: #0f172a;
+  --vlak: #1e293b;
+  --vlak-zacht: #172234;
+  --vlak-grijs: #1e293b;
+  --knop-grijs: #334155;
+  --knop-grijs-actief: #475569;
+  --vlak-blauw: #1e2b4d;
+  --vlak-blauw-actief: #26386a;
+  --rand: #334155;
+  --rand-sterk: #475569;
+  --rand-blauw: #3b5190;
+  --tekst: #f1f5f9;
+  --tekst-2: #e2e8f0;
+  --tekst-zacht: #a3b1c6;
+  --tekst-vaag: #7c8aa0;
+  --blauw-tekst: #a5c8ff;
+  --blauw-donker-tekst: #c7dbff;
+  --rood-vlak: #3b1a1d;
+  --rood-vlak-actief: #52212a;
+  --rood-rand: #7f2a2a;
+  --rood-tekst: #fca5a5;
+  --rood-tel: #f87171;
+  --groen-vlak: #0f2e24;
+  --groen-tekst: #86efac;
+  --geel-vlak: #3a2d0c;
+  --geel-tekst: #fcd34d;
+  --veld-boven: #1d3510;
+  --veld-onder: #284a15;
+}
+
+:root[data-thema='licht'] {
+  color-scheme: light;
+}
+
+:root[data-thema='donker'] {
+  color-scheme: dark;
 }
 
 html {
