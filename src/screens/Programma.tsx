@@ -29,8 +29,8 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
   const [standaardOpen, setStandaardOpen] = useState(false)
   const [klaarVraag, setKlaarVraag] = useState<ProgrammaItem | null>(null)
 
-  // Klaarzetten: de gegevens van deze datum worden 'Deze wedstrijd', daarna naar het Dashboard voor de opstelling.
-  // Staat er nog een wedstrijd open (stand of timer), dan eerst vragen: klaarzetten begint dan een nieuwe
+  // 'Op het veld zetten': de gegevens van deze datum worden 'Deze wedstrijd', daarna naar het Dashboard voor de opstelling.
+  // Staat er nog een wedstrijd open (stand of timer), dan eerst vragen: dan begint er een nieuwe
   const openWedstrijd = score.wij + score.zij > 0 || timer.opgebouwd > 0 || timer.gestartOp !== null
   const klaarzetten = (p: ProgrammaItem, nieuw: boolean) => {
     if (nieuw) allesResetten()
@@ -39,6 +39,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
     setKlaarVraag(null)
     naarDashboard()
   }
+  const opVeld = (p: ProgrammaItem) => (openWedstrijd ? setKlaarVraag(p) : klaarzetten(p, false))
   const [kiesKind, setKiesKind] = useState(false)
   const [alleenMijn, setAlleenMijn] = useState(false)
   // Standaard alleen wat nog komt; voorbije datums pas op verzoek
@@ -74,8 +75,8 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         <div className="prog-kop">
           <span className="prog-datum">{datum}</span>
           {clubNaam(p) && <span className="prog-waar">{p.thuis ? 'Thuis' : 'Uit'}</span>}
-          {p.id === volgendeId && <span className="prog-label volgende">Volgende</span>}
-          {p.id === wedstrijd.programmaId && <span className="prog-label klaar">Klaargezet</span>}
+          {p.id === volgendeId && !magBewerken && <span className="prog-label volgende">Volgende</span>}
+          {p.id === wedstrijd.programmaId && <span className="prog-label klaar">Staat op het veld</span>}
         </div>
         <div className={`prog-tegen ${clubNaam(p) ? '' : 'onbekend'}`}>{clubNaam(p) || 'Tegenstander nog niet bekend'}</div>
         <div className="prog-regel">
@@ -95,13 +96,16 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         {mijn.length > 0 && (
           <div className="prog-labels">{mijn.map(b => <span key={b} className="prog-label mijn">Jij: {b}</span>)}</div>
         )}
-        {magBewerken && !isGeweest && (
-          <button
-            className="btn btn-primary prog-klaar"
-            onClick={e => { e.stopPropagation(); if (openWedstrijd && p.id !== wedstrijd.programmaId) setKlaarVraag(p); else klaarzetten(p, false) }}
-          >
-            ▶ Klaarzetten
-          </button>
+        {magBewerken && !isGeweest && p.id !== wedstrijd.programmaId && (
+          p.id === volgendeId ? (
+            <div className="prog-veld-blok">
+              <span className="prog-veld-titel">Volgende wedstrijd</span>
+              <span className="prog-veld-uitleg">Zet hem op het veld: tegenstander, datum en thuis/uit staan dan klaar op het Dashboard, en jij maakt de opstelling.</span>
+              <button className="btn btn-primary prog-klaar" onClick={e => { e.stopPropagation(); opVeld(p) }}>🏑 Op het veld zetten</button>
+            </div>
+          ) : (
+            <button className="btn btn-secondary prog-klaar" onClick={e => { e.stopPropagation(); opVeld(p) }}>🏑 Op het veld zetten</button>
+          )
         )}
       </>
     )
@@ -162,12 +166,12 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
       {standaardOpen && <StandaardBegeleiding onClose={() => setStandaardOpen(false)} />}
       {klaarVraag && (
         <ResetModal
-          titel="Nieuwe wedstrijd klaarzetten?"
+          titel="Nieuwe wedstrijd op het veld zetten?"
           regels={[
-            { icoon: '⚽', tekst: `Er staat nog een wedstrijd open (${score.wij} – ${score.zij}). Sluit die eerst af in Historie als je hem wilt bewaren.` },
-            { icoon: '🔀', tekst: 'Klaarzetten begint een nieuwe: opstelling geloot, wissels, score en timer op 0' },
+            { icoon: '⚽', tekst: `Er staat nog een wedstrijd op het veld (${score.wij} – ${score.zij}). Sluit die eerst af in Historie als je hem wilt bewaren.` },
+            { icoon: '🔀', tekst: 'De nieuwe wedstrijd begint met een geloote opstelling; wissels, score en timer op 0' },
           ]}
-          bevestig="Nieuwe wedstrijd klaarzetten"
+          bevestig="Ja, op het veld zetten"
           onConfirm={() => klaarzetten(klaarVraag, true)}
           onCancel={() => setKlaarVraag(null)}
         />
