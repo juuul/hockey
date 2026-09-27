@@ -23,6 +23,12 @@ export default function Historie() {
   const tegenstanders = perTegenstander(wedstrijden, clubs)
   const naamBezet = club && nieuweNaam.trim() !== '' && vindClub(clubs, nieuweNaam)?.id !== undefined && vindClub(clubs, nieuweNaam)?.id !== club.id
 
+  // Wie kan er gescoord hebben: wie toen meedeed (met de huidige naam als die speler nog bestaat), anders het hele team
+  const kandidatenVoor = (w: GespeeldeWedstrijd) =>
+    (w.spelers.length ? w.spelers : spelers)
+      .map(sp => ({ id: sp.id, naam: spelers.find(x => x.id === sp.id)?.naam ?? sp.naam }))
+      .sort((a, b) => a.naam.localeCompare(b.naam))
+
   const scorerRegels = (w: GespeeldeWedstrijd) =>
     topscorers([w], spelers).map(s => `${s.naam}${s.aantal > 1 ? ` ${s.aantal}×` : ''}`).join(', ')
 
@@ -127,7 +133,8 @@ export default function Historie() {
           start={{ datum: wijzig.datum, clubId: wijzig.clubId, thuis: wijzig.thuis }}
           bevestig="Opslaan"
           clubVerplicht
-          stand={{ wij: wijzig.wij, zij: wijzig.zij }}
+          stand={{ zij: wijzig.zij, doelpunten: wijzig.doelpunten }}
+          kandidaten={kandidatenVoor(wijzig)}
           onOpslaan={(info, naam, stand) => { wijzigWedstrijd(wijzig.id, info, naam, stand); tel('wedstrijd-gewijzigd'); setWijzig(null) }}
           onClose={() => setWijzig(null)}
         />

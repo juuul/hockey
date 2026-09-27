@@ -67,14 +67,3 @@ export function zoekClubs(clubs: Club[], zoek: string): Club[] {
 }
 
 export const vindClub = (clubs: Club[], naam: string) => clubs.find(c => c.naam.trim().toLowerCase() === naam.trim().toLowerCase())
-
-// Andere stand bij een opgeslagen wedstrijd: extra doelpunten zijn "Onbekend"; minder = eerst een onbekende weg, anders de laatste
-export function doelpuntenBijStand(doelpunten: GespeeldeWedstrijd['doelpunten'], wij: number): GespeeldeWedstrijd['doelpunten'] {
-  const uit = [...doelpunten]
-  while (uit.length < wij) uit.push({ spelerId: null, naam: 'Onbekend' })
-  while (uit.length > wij) {
-    const onbekend = uit.map(d => d.spelerId).lastIndexOf(null)
-    uit.splice(onbekend >= 0 ? onbekend : uit.length - 1, 1)
-  }
-  return uit
-}

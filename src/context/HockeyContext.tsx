@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { Club, GespeeldeWedstrijd, isOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan } from '../opstelling'
-import { doelpuntenBijStand, vandaag, vindClub } from '../historie'
+import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
 import { Alles, Lokaal, naarRecords, nieuweIds, pbId, spelersToepassen, voorkeurenUit } from '../sync'
 import { SyncStatus, useTeamSync } from './useTeamSync'
@@ -17,6 +17,12 @@ export interface TimerStand {
 export interface Score {
   wij: number
   zij: number
+}
+
+// Aangepaste stand van een opgeslagen wedstrijd: 'wij' volgt uit het aantal doelpunten
+export interface OpgeslagenStand {
+  zij: number
+  doelpunten: GespeeldeWedstrijd['doelpunten']
 }
 
 interface HockeyContextType {
@@ -54,7 +60,7 @@ interface HockeyContextType {
   zetWedstrijd: (info: WedstrijdInfo) => void
   wedstrijden: GespeeldeWedstrijd[]
   wedstrijdAfsluiten: (info: WedstrijdInfo, tegenstander: string) => void
-  wijzigWedstrijd: (id: string, info: WedstrijdInfo, tegenstander: string, stand?: Score) => void
+  wijzigWedstrijd: (id: string, info: WedstrijdInfo, tegenstander: string, stand?: OpgeslagenStand) => void
   verwijderWedstrijd: (id: string) => void
   teamId: string | null
   magBewerken: boolean
@@ -355,7 +361,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
     setHistory([])
   }
 
-  const wijzigWedstrijd = (id: string, info: WedstrijdInfo, tegenstander: string, stand?: Score) =>
+  const wijzigWedstrijd = (id: string, info: WedstrijdInfo, tegenstander: string, stand?: OpgeslagenStand) =>
     setWedstrijden(wedstrijden.map(w => (w.id === id && info.clubId
       ? {
           ...w,
@@ -363,7 +369,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
           clubId: info.clubId,
           tegenstander,
           thuis: info.thuis,
-          ...(stand ? { wij: stand.wij, zij: stand.zij, doelpunten: doelpuntenBijStand(w.doelpunten, stand.wij) } : {}),
+          ...(stand ? { wij: stand.doelpunten.length, zij: stand.zij, doelpunten: stand.doelpunten } : {}),
         }
       : w)))
 
