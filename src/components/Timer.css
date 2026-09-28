@@ -132,6 +132,28 @@
   overflow: hidden;
 }
 
+.klok-regel-tekst {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Met startknop: tekst links, knop rechts (knop minstens 60px hoog) */
+.klok-regel.met-knop {
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0 0 8px;
+}
+
+.klok-regel .klok-regel-knop {
+  flex: 0 0 auto;
+  min-height: 60px;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
 .klok-regel.loopt {
   background: var(--groen-vlak);
   color: var(--groen-tekst);
@@ -146,4 +168,34 @@
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: 0.85;
+}
+
+/* Onder de vouw: bijstellen en een deel nu laten beginnen */
+.timer-bijstellen .btn {
+  white-space: nowrap;
+  padding: 10px 2px;
+}
+
+.timer-uitleg {
+  font-size: var(--base-readable-size);
+  font-weight: 700;
+  color: var(--tekst-zacht);
+}
+
+.timer-begin {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.timer-begin .btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+}
+
+.timer-begin-duur {
+  font-weight: 600;
+  opacity: 0.8;
 }

@@ -51,6 +51,10 @@ export function faseVan(verstreken: number, schema: Deel[] = SCHEMA): Fase {
   return { index: schema.length, deel: null, inDeel: verstreken - begin, nog: 0 }
 }
 
+// Tijd (ms) waarop een deel begint
+export const beginVan = (index: number, schema: Deel[] = SCHEMA) =>
+  schema.slice(0, index).reduce((som, d) => som + d.lengte, 0)
+
 // Hoe ver elk deel is (0–1), voor de balk
 export function voortgang(verstreken: number, schema: Deel[] = SCHEMA): number[] {
   let begin = 0

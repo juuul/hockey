@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import ResetModal from './ResetModal'
 import { tel } from '../statistiek'
-import { deelNaam, faseVan, schemaVoor, speelNaam, voortgang } from '../speelduur'
+import { beginVan, deelNaam, faseVan, schemaVoor, speelNaam, voortgang } from '../speelduur'
 import './Timer.css'
 
 function formatteer(ms: number) {
@@ -33,25 +33,36 @@ export function useKlok() {
   const naam = deelNaam(fase.deel, schema)
   const groot = !fase.deel ? formatteer(verstreken) : inPauze ? formatteer(fase.nog + 999) : formatteer(fase.inDeel)
   const rechts = !fase.deel ? 'totaal' : inPauze ? `daarna ${speelNaam(fase.deel.kwart, schema)}` : `nog ${formatteer(fase.nog + 999)}`
-  return { loopt, verstreken, schema, inPauze, naam, groot, rechts, delen: voortgang(verstreken, schema) }
+  return { loopt, verstreken, schema, fase, inPauze, naam, groot, rechts, delen: voortgang(verstreken, schema) }
 }
 
-// Onder de score: altijd in beeld, zonder te scrollen
+// Onder de score: altijd in beeld, zonder te scrollen. Met een startknop als de klok stilstaat,
+// en in een pauze of de rust om het volgende deel meteen te laten beginnen (als de scheidsrechter fluit)
 export function KlokRegel() {
-  const { loopt, inPauze, naam, groot, rechts } = useKlok()
+  const { startTimer, zetKlok, magBewerken } = useHockey()
+  const { loopt, verstreken, schema, fase, inPauze, naam, groot, rechts } = useKlok()
+  const knop = !magBewerken || !fase.deel ? null
+    : !loopt ? { tekst: verstreken === 0 ? '▶ Start' : '▶ Verder', doe: () => { startTimer(); tel('timer-start-boven') } }
+    : inPauze ? { tekst: `▶ ${speelNaam(fase.deel.kwart, schema)}`, doe: () => { zetKlok(beginVan(fase.index + 1, schema), true); tel('timer-volgende-boven') } }
+    : null
   return (
-    <div className={`klok-regel ${loopt ? 'loopt' : ''} ${inPauze ? 'in-pauze' : ''}`}>
-      <span aria-hidden="true">{inPauze ? '☕' : '⏱'}</span>
-      <strong>{naam} {groot}</strong>
-      <span className="klok-regel-nog">· {rechts}</span>
+    <div className={`klok-regel ${loopt ? 'loopt' : ''} ${inPauze ? 'in-pauze' : ''} ${knop ? 'met-knop' : ''}`}>
+      <span className="klok-regel-tekst">
+        <span aria-hidden="true">{inPauze ? '☕' : '⏱'}</span>
+        <strong>{naam} {groot}</strong>
+        {!knop && <span className="klok-regel-nog">· {rechts}</span>}
+      </span>
+      {knop && <button className="btn timer-start klok-regel-knop" onClick={knop.doe}>{knop.tekst}</button>}
     </div>
   )
 }
 
 export default function Timer() {
-  const { startTimer, pauzeTimer, stopTimer, magBewerken } = useHockey()
+  const { startTimer, pauzeTimer, stopTimer, zetKlok, magBewerken } = useHockey()
   const [stopVraag, setStopVraag] = useState(false)
-  const { loopt, verstreken, schema, inPauze, naam, groot, rechts, delen } = useKlok()
+  const { loopt, verstreken, schema, fase, inPauze, naam, groot, rechts, delen } = useKlok()
+  // 'Begin nu': dit deel opnieuw of een van de volgende twee (de klok loopt dan vanaf het begin daarvan)
+  const beginNu = fase.deel ? [fase.index, fase.index + 1, fase.index + 2].filter(i => i < schema.length) : []
 
   const start = () => {
     startTimer()
@@ -89,6 +100,26 @@ export default function Timer() {
         <button className="btn btn-secondary" onClick={pauze} disabled={!loopt}>Pauze</button>
         <button className="btn btn-secondary" onClick={() => setStopVraag(true)} disabled={!loopt && verstreken === 0}>Stop</button>
       </div>}
+      {magBewerken && <>
+        <div className="timer-knoppen timer-bijstellen">
+          {[-60, -10, 10, 60].map(sec => (
+            <button key={sec} className="btn btn-secondary" onClick={() => { zetKlok(verstreken + sec * 1000); tel('timer-bijstellen') }}>
+              {sec < 0 ? '−' : '+'}{formatteer(Math.abs(sec) * 1000)}
+            </button>
+          ))}
+        </div>
+        {beginNu.length > 0 && <>
+          <div className="timer-uitleg">Fluit de scheidsrechter? Begin nu:</div>
+          <div className="timer-begin">
+            {beginNu.map(i => (
+              <button key={i} className={`btn ${i === fase.index + 1 ? 'timer-start' : 'btn-secondary'}`} onClick={() => { zetKlok(beginVan(i, schema), true); tel('timer-begin-nu') }}>
+                <span>{i === fase.index ? `${deelNaam(schema[i], schema)} opnieuw` : `▶ ${deelNaam(schema[i], schema)}`}</span>
+                <span className="timer-begin-duur">{formatteer(schema[i].lengte)}</span>
+              </button>
+            ))}
+          </div>
+        </>}
+      </>}
 
       {stopVraag && (
         <ResetModal

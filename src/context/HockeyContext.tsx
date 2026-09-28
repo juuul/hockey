@@ -49,6 +49,7 @@ interface HockeyContextType {
   startTimer: () => void
   pauzeTimer: () => void
   stopTimer: () => void
+  zetKlok: (ms: number, starten?: boolean) => void
   allesResetten: () => void
   opstelling: OpstellingNaam
   kiesOpstelling: (opstelling: OpstellingNaam) => void
@@ -170,6 +171,9 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const startTimer = () => setTimer({ ...timer, gestartOp: Date.now() })
   const pauzeTimer = () => setTimer({ gestartOp: null, opgebouwd: timer.opgebouwd + (timer.gestartOp !== null ? Date.now() - timer.gestartOp : 0) })
   const stopTimer = () => setTimer({ gestartOp: null, opgebouwd: 0 })
+  // Tijd bijstellen of een deel 'nu' laten beginnen; loopt de klok (of starten), dan telt hij vanaf nu verder
+  const zetKlok = (ms: number, starten = false) =>
+    setTimer(t => ({ gestartOp: starten || t.gestartOp !== null ? Date.now() : null, opgebouwd: Math.max(0, ms) }))
 
   const [clubs, setClubs] = useState<Club[]>(() => (demo ? DEMO_CLUBS : lees(P, 'clubs', [])))
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
@@ -514,7 +518,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, magBeheren: magBewerken && !demo, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, magBeheren: magBewerken && !demo, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )
