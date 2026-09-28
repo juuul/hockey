@@ -8,7 +8,7 @@ interface Props {
   onClose: () => void
 }
 
-// Alleen een voornaam. Twee dezelfde voornamen? Dan maakt de beheerder de naam zelf uniek (bv. 'Sarah E.')
+// Alleen een voornaam. Twee dezelfde voornamen? Dan maakt de beheerder de naam zelf uniek (bv. 'Emma B.')
 export default function AddPlayerModal({ bestaandeNamen, onAdd, onClose }: Props) {
   const [naam, setNaam] = useState('')
   const [fout, setFout] = useState<string | null>(null)

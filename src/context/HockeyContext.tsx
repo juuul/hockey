@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
+import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, naamBezet } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
@@ -82,19 +82,42 @@ const HockeyContext = createContext<HockeyContextType | undefined>(undefined)
 // Zonder team (niet ingelogd): de namen van het testteam, 11 spelers met keeper en twee wissels
 const INITIAL_PLAYERS: Player[] = [
   { id: '1', naam: 'Yara', positie: 'LW', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '2', naam: 'Roos', positie: 'RW', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '3', naam: 'Nina', positie: 'LM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '4', naam: 'Tess', positie: 'LCM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '5', naam: 'Emma', positie: 'RCM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '6', naam: 'Lotte', positie: 'RM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '7', naam: 'Fleur', positie: 'LBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '8', naam: 'Mila', positie: 'LCA', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '9', naam: 'Lieke', positie: 'RCA', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '2', naam: 'Roos', positie: 'CV', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '3', naam: 'Nina', positie: 'RW', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '4', naam: 'Tess', positie: 'LM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '5', naam: 'Emma', positie: 'LCM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '6', naam: 'Lotte', positie: 'RCM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '7', naam: 'Fleur', positie: 'RM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '8', naam: 'Mila', positie: 'LBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '9', naam: 'Lieke', positie: 'CBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
   { id: '10', naam: 'Noor', positie: 'RBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
   { id: '11', naam: 'Saar', positie: 'K', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: true },
   { id: '12', naam: 'Etter', positie: 'LW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
   { id: '13', naam: 'Bakje', positie: 'RW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
 ]
+
+// Vroeger begon de app zonder team met de echte namen. Die (herkend aan id 1–11 en een hash van de naam,
+// zodat de namen zelf niet in de openbare code staan) worden de namen van het testteam; de rest blijft staan.
+const OUDE_NAAM: Record<string, string> = { '4egcjr': 'Yara', '377705': 'Roos', '4j7ws4': 'Nina', '3779vm': 'Tess', '3776ll': 'Emma', '46wakk': 'Lotte', '4a9vtz': 'Fleur', '1w8c9gs': 'Mila', '4daeyi': 'Saar', 'ykraoc': 'Lieke', '1vnsb3v': 'Noor' }
+const naamHash = (naam: string) => {
+  let x = 5381
+  for (const c of naam.trim().toLowerCase()) x = (x * 33 + c.charCodeAt(0)) >>> 0
+  return x.toString(36)
+}
+const nieuweNaam = (id: string | null, naam: string) =>
+  id && /^([1-9]|1[01])$/.test(id) ? OUDE_NAAM[naamHash(naam)] ?? naam : naam
+const vervangOudeNamen = <T extends { id: string; naam: string }>(lijst: T[]): T[] => {
+  const bezet = new Set(lijst.map(s => s.naam.trim().toLowerCase()))
+  return lijst.map(s => {
+    const nieuw = nieuweNaam(s.id, s.naam)
+    return nieuw !== s.naam && !bezet.has(nieuw.toLowerCase()) ? { ...s, naam: nieuw } : s
+  })
+}
+const vervangOudeNamenWedstrijd = (w: GespeeldeWedstrijd): GespeeldeWedstrijd => ({
+  ...w,
+  spelers: vervangOudeNamen(w.spelers),
+  doelpunten: w.doelpunten.map(d => ({ ...d, naam: nieuweNaam(d.spelerId, d.naam) })),
+})
 
 interface ProviderProps {
   children: React.ReactNode
@@ -109,7 +132,9 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   const [spelers, zetSpelersRuw] = useState<Player[]>(() => {
     const saved = localStorage.getItem(`${P}_spelers`)
     // Oudere versies kenden 'meedoen' nog niet
-    return saved ? JSON.parse(saved).map((sp: Player) => ({ ...sp, meedoen: sp.meedoen ?? true })) : teamId ? [] : INITIAL_PLAYERS
+    if (!saved) return teamId ? [] : INITIAL_PLAYERS
+    const lijst: Player[] = JSON.parse(saved).map((sp: Player) => ({ ...sp, meedoen: sp.meedoen ?? true }))
+    return teamId ? lijst : vervangOudeNamen(lijst)
   })
 
   const [wisselingen, setWisselingen] = useState<Wissel[]>(() => {
@@ -139,10 +164,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
 
   const [opstelling, setOpstelling] = useState<OpstellingNaam>(() => {
     const saved = lees<unknown>(P, 'opstelling', null)
-    if (isOpstelling(saved)) return saved
-    // Kort op test bestaande 11-tallen onder hun oude naam
-    if (saved === '3-3-3-1') return '2-4-4'
-    if (saved === '4-3-3') return '3-3-4'
+    const bekend = leesOpstelling(saved)
+    if (bekend) return bekend
     // Vorige versie bewaarde alleen de spelvorm (9 of 6)
     const oudeSpelvorm = localStorage.getItem(`${P}_spelvorm`)
     return OPSTELLINGEN_PER_SPELVORM[oudeSpelvorm ? (JSON.parse(oudeSpelvorm) as Spelvorm) : 11][0]
@@ -182,7 +205,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
 
   const [clubs, setClubs] = useState<Club[]>(() => lees(P, 'clubs', []))
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
-  const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => lees(P, 'wedstrijden', []))
+  const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => {
+    const lijst = lees<GespeeldeWedstrijd[]>(P, 'wedstrijden', [])
+    return teamId ? lijst : lijst.map(vervangOudeNamenWedstrijd)
+  })
   // Wat op dit toestel expliciet is verwijderd en nog naar de server moet (alleen dat wordt daar gewist)
   const [programma, setProgramma] = useState<ProgrammaItem[]>(() => lees(P, 'programma', []))
   useEffect(() => { schrijf(P, 'programma', programma) }, [programma])
@@ -469,7 +495,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
     setWisselingen(st.wisselingen)
     setScore(st.score)
     setDoelpunten(st.doelpunten)
-    if (isOpstelling(st.opstelling)) setOpstelling(st.opstelling)
+    const ontvangen = leesOpstelling(st.opstelling)
+    if (ontvangen) setOpstelling(ontvangen)
     setTimer(st.timer)
     zetWedstrijd(st.wedstrijd)
     // Undo van een ander toestel terugdraaien zou verwarrend zijn
