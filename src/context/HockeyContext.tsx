@@ -129,12 +129,16 @@ interface ProviderProps {
 export function HockeyProvider({ children, teamId = null, magBewerken = true }: ProviderProps) {
   const P = teamOpslag(teamId)
 
+  // Oude startnamen maar één keer vervangen: daarna mag iemand namen gewoon zelf aanpassen
+  const [namenVervangen] = useState(() => !teamId && !localStorage.getItem(`${P}_namen_vervangen`))
+  useEffect(() => { if (namenVervangen) localStorage.setItem(`${P}_namen_vervangen`, '1') }, [])
+
   const [spelers, zetSpelersRuw] = useState<Player[]>(() => {
     const saved = localStorage.getItem(`${P}_spelers`)
     // Oudere versies kenden 'meedoen' nog niet
     if (!saved) return teamId ? [] : INITIAL_PLAYERS
     const lijst: Player[] = JSON.parse(saved).map((sp: Player) => ({ ...sp, meedoen: sp.meedoen ?? true }))
-    return teamId ? lijst : vervangOudeNamen(lijst)
+    return namenVervangen ? vervangOudeNamen(lijst) : lijst
   })
 
   const [wisselingen, setWisselingen] = useState<Wissel[]>(() => {
@@ -207,7 +211,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
   const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => {
     const lijst = lees<GespeeldeWedstrijd[]>(P, 'wedstrijden', [])
-    return teamId ? lijst : lijst.map(vervangOudeNamenWedstrijd)
+    return namenVervangen ? lijst.map(vervangOudeNamenWedstrijd) : lijst
   })
   // Wat op dit toestel expliciet is verwijderd en nog naar de server moet (alleen dat wordt daar gewist)
   const [programma, setProgramma] = useState<ProgrammaItem[]>(() => lees(P, 'programma', []))
