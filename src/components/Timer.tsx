@@ -119,6 +119,14 @@ export default function Timer() {
             : <button className="btn timer-start" onClick={start}>Verder</button>}
           <button className="btn btn-secondary" onClick={() => setStopVraag(true)} disabled={nietBegonnen}>Stop</button>
         </div>
+        {/* Helemaal onderaan: de tijd een beetje bijstellen */}
+        <div className="timer-knoppen timer-bijstellen">
+          {[-60, -10, 10, 60].map(sec => (
+            <button key={sec} className="btn btn-secondary" onClick={() => { zetKlok(verstreken + sec * 1000); tel('timer-bijstellen') }}>
+              {sec < 0 ? '−' : '+'}{formatteer(Math.abs(sec) * 1000)}
+            </button>
+          ))}
+        </div>
       </>}
 
       {stopVraag && (
