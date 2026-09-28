@@ -35,7 +35,7 @@ interface Navigatie {
 
 function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
-  const { sync, live } = useHockey()
+  const { sync, live, demo } = useHockey()
   const syncProbleem = !!((sync && (sync.offline || sync.fout)) || (live && !live.verbonden))
 
   return (
@@ -58,6 +58,15 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
       </nav>
 
       <div className="content" ref={scrollVak}>
+        {/* Niet ingelogd: alleen het Dashboard werkt; de rest is een voorbeeld met de weg naar inloggen */}
+        {demo && screen !== 'dashboard' && screen !== 'instellingen' && (
+          <div className="demo-kop">
+            <button className="inlog-balk" onClick={() => setScreen('instellingen')}>
+              <span aria-hidden="true">👤</span> Inloggen
+            </button>
+            <p className="demo-uitleg">Dit is een voorbeeld. Log in om dit voor je eigen team bij te houden.</p>
+          </div>
+        )}
         {screen === 'dashboard' && <Dashboard naarInstellingen={() => setScreen('instellingen')} />}
         {screen === 'players' && <Players />}
         {screen === 'positions' && <Positions />}
@@ -97,7 +106,8 @@ function OvernemenVraag() {
 // Per team een eigen set gegevens: bij een ander team begint de app-state opnieuw (key).
 // Het gekozen tabblad staat hierboven, zodat je na inloggen of van team wisselen op dezelfde plek blijft
 function MetTeam() {
-  const { actiefTeamId, magBewerken } = useAccount()
+  const { gebruiker, actiefTeamId, magBewerken } = useAccount()
+  const demo = !gebruiker
   // Na verversen op hetzelfde tabblad blijven (per browsertabblad; een nieuwe keer openen begint op het Dashboard)
   const [screen, zetScreen] = useState<Scherm>(() => {
     try {
@@ -123,7 +133,7 @@ function MetTeam() {
   }, [])
 
   return (
-    <HockeyProvider key={actiefTeamId ?? 'lokaal'} teamId={actiefTeamId} magBewerken={magBewerken}>
+    <HockeyProvider key={demo ? 'demo' : actiefTeamId ?? 'lokaal'} teamId={demo ? null : actiefTeamId} magBewerken={magBewerken} demo={demo}>
       <AppContent screen={screen} setScreen={setScreen} start={start} startGebruikt={() => setStart(null)} />
     </HockeyProvider>
   )

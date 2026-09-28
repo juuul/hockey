@@ -11,7 +11,7 @@ import './Historie.css'
 const UITSLAG_TEKST = { W: 'gewonnen', G: 'gelijk', V: 'verloren' }
 
 export default function Historie() {
-  const { spelers, clubs, wedstrijden, wijzigWedstrijd, verwijderWedstrijd, hernoemClub, verwijderClub, magBewerken } = useHockey()
+  const { spelers, clubs, wedstrijden, wijzigWedstrijd, verwijderWedstrijd, hernoemClub, verwijderClub, magBeheren: magBewerken } = useHockey()
   const [open, setOpen] = useState<GespeeldeWedstrijd | null>(null)
   const [wijzig, setWijzig] = useState<GespeeldeWedstrijd | null>(null)
   const [weg, setWeg] = useState<GespeeldeWedstrijd | null>(null)

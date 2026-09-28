@@ -6,7 +6,7 @@ import './Positions.css'
 const KEUZE_NAAM = ['1e keuze', '2e keuze']
 
 export default function Positions() {
-  const { spelers, vastePosities, setVastePositie, opstelling, magBewerken } = useHockey()
+  const { spelers, vastePosities, setVastePositie, opstelling, magBeheren: magBewerken } = useHockey()
   const fieldPlayers = spelers.filter(s => !s.isKeeper)
 
   const handleSetPosition = (spelerId: string, keuze: number, positie: Position | null) => {

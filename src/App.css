@@ -98,3 +98,18 @@
   line-height: 1;
   color: var(--geel-tekst);
 }
+
+/* Niet ingelogd: boven de voorbeeld-tabbladen */
+.demo-kop {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px 0;
+}
+
+.demo-uitleg {
+  margin: 0;
+  color: var(--tekst-zacht);
+  font-size: var(--base-readable-size);
+  line-height: 1.25;
+}

@@ -7,7 +7,7 @@ import './DezeWedstrijd.css'
 
 // De lopende wedstrijd (tabblad Historie): tegenstander, stand, scorers en afsluiten
 export default function DezeWedstrijd() {
-  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, magBewerken, programma } = useHockey()
+  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, magBeheren: magBewerken, programma } = useHockey()
   const uitProgramma = programma.find(p => p.id === wedstrijd.programmaId)
   const [vraag, setVraag] = useState<'gegevens' | 'afsluiten' | null>(null)
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam

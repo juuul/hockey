@@ -32,6 +32,8 @@ Web-app om langs het veld (op een telefoon) de opstelling, wissels, score en tij
 Tabbladen: iconen, alle zes even breed (60px); alleen het actieve tabblad toont zijn naam eronder (24px). Die naam loopt uit onder de lege plek van de buren (aan de randen uitgelijnd met de schermrand) en heeft `pointer-events: none`, zodat tikken op de buurknop blijft werken. Tabbalk ~75px hoog. Bij een sync-probleem staat ⚠ op het tandwiel. Het gekozen tabblad staat buiten de `HockeyProvider` (in `MetTeam`), zodat je na inloggen of van team wisselen op hetzelfde tabblad blijft, en in `sessionStorage` (`<opslag>_tabblad`), zodat je na verversen op hetzelfde tabblad blijft; een nieuw browsertabblad begint op het Dashboard.
 Dashboard: alleen zonder account bovenaan de knop "👤 Inloggen", die naar Instellingen gaat.
 
+**Niet ingelogd = voorbeeld** (`demo` in de `HockeyProvider`, `src/demo.ts`): alleen het Dashboard werkt echt, in een eigen opslag (`<opslag>_demo`, los van "Zonder team"). Spelers, Voorkeur, Programma en Historie tonen vaste voorbeeldgegevens (testnamen, verzonnen clubs, datums rond vandaag, 'mijn kind' Emma) en zijn niet te wijzigen (`magBeheren` false; `magBewerken` blijft voor het Dashboard). Bovenaan die tabbladen "👤 Inloggen" + "Dit is een voorbeeld". Ingelogd "Zonder team" werkt zoals altijd met de eigen gegevens op de telefoon.
+
 ### Regels
 - **Wisselteller** gaat +1 bij de speler die **uit** het veld gaat (alleen bij Wissel, niet bij Verplaatsen). De invaller neemt de positie over.
 - **Wisselspelers sorteren**: minste wissels eerst; bij gelijke stand komt wie het laatst uit het veld ging onderaan. Zelfde volgorde in de wissel-pop-up.
@@ -66,7 +68,7 @@ Gedefinieerd in `OPSTELLINGEN` / `OPSTELLINGEN_PER_SPELVORM` in `src/types.ts`.
 ### Team
 **Spelersnamen: alleen de voornaam, geen tweede veld.** Namen zijn uniek per team (hoofdletters/spaties tellen niet mee, `naamBezet` in `src/opstelling.ts`); bij twee dezelfde voornamen maakt de beheerder de naam zelf uniek (bv. "Emma B."). De app meldt dit bij toevoegen; de server heeft een unieke index (`spelers`: team + naam, NOCASE) als vangrail.
 
-**Geen namen van echte speelsters in de repo** (die is openbaar); de echte spelers staan alleen op de server. Zonder team (niet ingelogd) begint de app met de namen van het testteam (`INITIAL_PLAYERS` in de context: 11 spelers, keeper Saar, twee wissels) in spelvorm 11 (3-4-3). Telefoons die zonder team nog de oude startlijst hadden, krijgen die namen één keer vervangen (`vervangOudeNamen`, herkend aan id 1–11 + hash van de naam, ook in de historie; daarna vlag `namen_vervangen`), zodat namen daarna gewoon zelf aan te passen zijn.
+**Geen namen van echte speelsters in de repo** (die is openbaar); de echte spelers staan alleen op de server. Niet ingelogd en zonder team begint de app met de namen van het testteam (`DEMO_SPELERS` in `src/demo.ts`: 11 spelers, keeper Saar, twee wissels) in spelvorm 11 (3-4-3). Telefoons die zonder team nog de oude startlijst hadden, krijgen die namen één keer vervangen (`vervangOudeNamen`, herkend aan id 1–11 + hash van de naam, ook in de historie; daarna vlag `namen_vervangen`), zodat namen daarna gewoon zelf aan te passen zijn.
 
 ### Accounts (tabblad Instellingen, `src/screens/Instellingen.tsx`)
 - Inloggen met e-mail + wachtwoord; **Wachtwoord vergeten** mailt een link `#wachtwoord=<token>` naar de app. Vrij aanmelden kan niet: alleen via een uitnodiging (`#uitnodiging=<token>`, 7 dagen geldig, eenmalig).

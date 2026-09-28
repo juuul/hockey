@@ -7,7 +7,7 @@ import { tel } from '../statistiek'
 import './Players.css'
 
 export default function Players() {
-  const { spelers, addSpeler, deleteSpeler, zetMeedoen, doelpunten, spelvorm, opstelling, kiesOpstelling, magBewerken } = useHockey()
+  const { spelers, addSpeler, deleteSpeler, zetMeedoen, doelpunten, spelvorm, opstelling, kiesOpstelling, magBeheren: magBewerken, demo } = useHockey()
   const [showAddModal, setShowAddModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [playerToDelete, setPlayerToDelete] = useState<{ id: string; naam: string } | null>(null)
@@ -75,9 +75,9 @@ export default function Players() {
         <div className="section-title">Wie doet mee?</div>
         {magBewerken && <button className="btn-icon" onClick={() => setShowAddModal(true)}>+ Speler</button>}
       </div>
-      <p className="players-uitleg">{magBewerken
+      {!demo && <p className="players-uitleg">{magBewerken
         ? 'Tik op een speler om aan of af te melden. Wie niet meedoet, komt niet in de opstelling en niet bij de wissels.'
-        : 'Alleen beheerders kunnen aan- en afmelden.'}</p>
+        : 'Alleen beheerders kunnen aan- en afmelden.'}</p>}
 
       <div className="players-list">
         {spelers.map(player => (
