@@ -66,7 +66,7 @@ Gedefinieerd in `OPSTELLINGEN` / `OPSTELLINGEN_PER_SPELVORM` in `src/types.ts`.
 ### Team
 **Spelersnamen: alleen de voornaam, geen tweede veld.** Namen zijn uniek per team (hoofdletters/spaties tellen niet mee, `naamBezet` in `src/opstelling.ts`); bij twee dezelfde voornamen maakt de beheerder de naam zelf uniek (bv. "Sarah E."). De app meldt dit bij toevoegen; de server heeft een unieke index (`spelers`: team + naam, NOCASE) als vangrail.
 
-Keeper: Julia Arnold. Veld: Lizzy Best, Fee Daan, Sarah Eerdmans, Isa Flierman, Evi Kruft, Aster Meijboom, Floor Oreel, Carice Plantinga, Sara van Tetering, Benthe van der Wijk. (Rosalie de Kroon traint mee, niet in het team.) De app gebruikt voornamen; de startlijst staat in `INITIAL_PLAYERS` in de context.
+Keeper: Julia Arnold. Veld: Lizzy Best, Fee Daan, Sarah Eerdmans, Isa Flierman, Evi Kruft, Aster Meijboom, Floor Oreel, Carice Plantinga, Sara van Tetering, Benthe van der Wijk. (Rosalie de Kroon traint mee, niet in het team.) De app gebruikt voornamen. Zonder team (niet ingelogd) begint de app met de namen van het testteam (`INITIAL_PLAYERS` in de context: 11 spelers, keeper Saar, twee wissels) in spelvorm 11 (4-4-2).
 
 ### Accounts (tabblad Instellingen, `src/screens/Instellingen.tsx`)
 - Inloggen met e-mail + wachtwoord; **Wachtwoord vergeten** mailt een link `#wachtwoord=<token>` naar de app. Vrij aanmelden kan niet: alleen via een uitnodiging (`#uitnodiging=<token>`, 7 dagen geldig, eenmalig).

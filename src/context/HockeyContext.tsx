@@ -79,18 +79,21 @@ const LEGE_WEDSTRIJD: WedstrijdInfo = { datum: null, clubId: null, thuis: true }
 
 const HockeyContext = createContext<HockeyContextType | undefined>(undefined)
 
+// Zonder team (niet ingelogd): de namen van het testteam, 11 spelers met keeper en twee wissels
 const INITIAL_PLAYERS: Player[] = [
-  { id: '1', naam: 'Lizzy', positie: 'LW', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '2', naam: 'Fee', positie: 'RW', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '3', naam: 'Sarah', positie: 'LM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '4', naam: 'Isa', positie: 'CM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '5', naam: 'Evi', positie: 'RM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '6', naam: 'Aster', positie: 'LBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '7', naam: 'Floor', positie: 'CBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '8', naam: 'Carice', positie: 'RBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '9', naam: 'Julia', positie: 'K', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: true },
-  { id: '10', naam: 'Sara', positie: 'LW', inVeld: false, meedoen: true, wisselCount: 0, isKeeper: false },
-  { id: '11', naam: 'Benthe', positie: 'RW', inVeld: false, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '1', naam: 'Yara', positie: 'LW', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '2', naam: 'Roos', positie: 'RW', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '3', naam: 'Nina', positie: 'LM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '4', naam: 'Tess', positie: 'LCM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '5', naam: 'Emma', positie: 'RCM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '6', naam: 'Lotte', positie: 'RM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '7', naam: 'Fleur', positie: 'LBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '8', naam: 'Mila', positie: 'LCA', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '9', naam: 'Lieke', positie: 'RCA', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '10', naam: 'Noor', positie: 'RBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
+  { id: '11', naam: 'Saar', positie: 'K', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: true },
+  { id: '12', naam: 'Etter', positie: 'LW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
+  { id: '13', naam: 'Bakje', positie: 'RW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
 ]
 
 interface ProviderProps {
@@ -142,7 +145,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true }: 
     if (saved === '4-3-3') return '3-3-4'
     // Vorige versie bewaarde alleen de spelvorm (9 of 6)
     const oudeSpelvorm = localStorage.getItem(`${P}_spelvorm`)
-    return OPSTELLINGEN_PER_SPELVORM[oudeSpelvorm ? (JSON.parse(oudeSpelvorm) as Spelvorm) : 9][0]
+    return OPSTELLINGEN_PER_SPELVORM[oudeSpelvorm ? (JSON.parse(oudeSpelvorm) as Spelvorm) : 11][0]
   })
   const spelvorm = spelvormVan(opstelling)
   const posities = veldPosities(opstelling)
