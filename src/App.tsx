@@ -18,7 +18,7 @@ type Scherm = 'dashboard' | 'players' | 'positions' | 'programma' | 'historie' |
 // Zes namen passen niet naast elkaar op een smalle telefoon: iconen even breed; alleen het actieve tabblad toont
 // zijn naam eronder (die mag uitlopen onder de lege plek van de buren; aan de randen uitgelijnd met de schermrand)
 const TABS: { id: Scherm; icoon: string; naam: string }[] = [
-  { id: 'dashboard', icoon: '🏑', naam: 'Dashboard' },
+  { id: 'dashboard', icoon: '🏑', naam: 'Wedstrijd' },
   { id: 'players', icoon: '👥', naam: 'Spelers' },
   { id: 'positions', icoon: '⭐', naam: 'Voorkeur' },
   { id: 'programma', icoon: '📅', naam: 'Programma' },
@@ -35,7 +35,10 @@ interface Navigatie {
 
 function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
-  const { sync, live, demo } = useHockey()
+  const { sync, live, demo, clubs, wedstrijd } = useHockey()
+  // Het eerste tabblad heet naar de wedstrijd die klaarstaat: 'Wedstrijd: <tegenstander>'
+  const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
+  const tabNaam = (tab: { id: Scherm; naam: string }) => (tab.id === 'dashboard' && tegenstander ? `${tab.naam}: ${tegenstander}` : tab.naam)
   const syncProbleem = !!((sync && (sync.offline || sync.fout)) || (live && !live.verbonden))
 
   return (
@@ -46,12 +49,12 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
             key={tab.id}
             className={`tab-btn ${screen === tab.id ? 'active' : ''}`}
             onClick={() => setScreen(tab.id)}
-            aria-label={tab.naam}
-            title={tab.naam}
+            aria-label={tabNaam(tab)}
+            title={tabNaam(tab)}
             aria-current={screen === tab.id ? 'page' : undefined}
           >
             <span className="tab-icoon" aria-hidden="true">{tab.icoon}</span>
-            {screen === tab.id && <span className="tab-naam" aria-hidden="true">{tab.naam}</span>}
+            {screen === tab.id && <span className="tab-naam" aria-hidden="true">{tabNaam(tab)}</span>}
             {tab.id === 'instellingen' && syncProbleem && <span className="tab-waarschuwing" aria-label="geen verbinding met de server">⚠</span>}
           </button>
         ))}

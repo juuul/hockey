@@ -94,7 +94,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           {clubNaam(p) && <span className="prog-waar">{p.thuis ? 'Thuis' : 'Uit'}</span>}
           {p.id === volgendeId && <span className="prog-label volgende">Volgende</span>}
         </div>
-        {p.id === wedstrijd.programmaId && <div className="prog-klaar">✅ Staat nu klaar op het Dashboard</div>}
+        {p.id === wedstrijd.programmaId && <div className="prog-klaar">✅ Staat nu klaar bij Wedstrijd</div>}
         <div className={`prog-tegen ${clubNaam(p) ? '' : 'onbekend'}`}>{clubNaam(p) || 'Tegenstander nog niet bekend'}</div>
         <div className="prog-regel">
           <span aria-hidden="true">⏰</span>

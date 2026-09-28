@@ -67,6 +67,10 @@
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
+  /* Lange tegenstander bij 'Wedstrijd: …': afkappen op de schermbreedte */
+  max-width: calc(100vw - 12px);
+  overflow: hidden;
+  text-overflow: ellipsis;
   line-height: 1.15;
   z-index: 1;
   /* De naam loopt uit onder de buren: tikken moet daar bij de buurknop terechtkomen */
