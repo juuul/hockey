@@ -14,8 +14,8 @@ export const DEMO_SPELERS: Player[] = [
   { id: '9', naam: 'Lieke', positie: 'CBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
   { id: '10', naam: 'Noor', positie: 'RBM', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: false },
   { id: '11', naam: 'Saar', positie: 'K', inVeld: true, meedoen: true, wisselCount: 0, isKeeper: true },
-  { id: '12', naam: 'Etter', positie: 'LW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
-  { id: '13', naam: 'Bakje', positie: 'RW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
+  { id: '12', naam: 'Sophie', positie: 'LW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
+  { id: '13', naam: 'Anna', positie: 'RW', inVeld: false, meedoen: true, wisselCount: 1, isKeeper: false },
 ]
 
 // 'Mijn kind' in het voorbeeld: heeft fruit bij de volgende wedstrijd en begeleidt later
