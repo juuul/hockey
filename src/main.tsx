@@ -5,9 +5,11 @@ import './index.css'
 import { startStatistiek } from './statistiek'
 import { startFoutmelder } from './foutmelder'
 import Foutvanger from './components/Foutvanger'
+import { vervangOudeNamenOpTelefoon } from './oudeNamen'
 
 startStatistiek()
 startFoutmelder()
+vervangOudeNamenOpTelefoon()
 
 // Geladen: de herlaad-beveiliging uit index.html mag weer, en het ?v=… uit het adres weg
 try {

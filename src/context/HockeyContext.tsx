@@ -83,29 +83,6 @@ const LEGE_WEDSTRIJD: WedstrijdInfo = { datum: null, clubId: null, thuis: true }
 const HockeyContext = createContext<HockeyContextType | undefined>(undefined)
 
 
-// Vroeger begon de app zonder team met de echte namen. Die (herkend aan id 1–11 en een hash van de naam,
-// zodat de namen zelf niet in de openbare code staan) worden de namen van het testteam; de rest blijft staan.
-const OUDE_NAAM: Record<string, string> = { '4egcjr': 'Yara', '377705': 'Roos', '4j7ws4': 'Nina', '3779vm': 'Tess', '3776ll': 'Emma', '46wakk': 'Lotte', '4a9vtz': 'Fleur', '1w8c9gs': 'Mila', '4daeyi': 'Saar', 'ykraoc': 'Lieke', '1vnsb3v': 'Noor' }
-const naamHash = (naam: string) => {
-  let x = 5381
-  for (const c of naam.trim().toLowerCase()) x = (x * 33 + c.charCodeAt(0)) >>> 0
-  return x.toString(36)
-}
-const nieuweNaam = (id: string | null, naam: string) =>
-  id && /^([1-9]|1[01])$/.test(id) ? OUDE_NAAM[naamHash(naam)] ?? naam : naam
-const vervangOudeNamen = <T extends { id: string; naam: string }>(lijst: T[]): T[] => {
-  const bezet = new Set(lijst.map(s => s.naam.trim().toLowerCase()))
-  return lijst.map(s => {
-    const nieuw = nieuweNaam(s.id, s.naam)
-    return nieuw !== s.naam && !bezet.has(nieuw.toLowerCase()) ? { ...s, naam: nieuw } : s
-  })
-}
-const vervangOudeNamenWedstrijd = (w: GespeeldeWedstrijd): GespeeldeWedstrijd => ({
-  ...w,
-  spelers: vervangOudeNamen(w.spelers),
-  doelpunten: w.doelpunten.map(d => ({ ...d, naam: nieuweNaam(d.spelerId, d.naam) })),
-})
-
 interface ProviderProps {
   children: React.ReactNode
   teamId?: string | null
@@ -117,10 +94,6 @@ interface ProviderProps {
 export function HockeyProvider({ children, teamId = null, magBewerken = true, demo = false }: ProviderProps) {
   const P = demo ? `${OPSLAG}_demo` : teamOpslag(teamId)
 
-  // Oude startnamen maar één keer vervangen: daarna mag iemand namen gewoon zelf aanpassen
-  const [namenVervangen] = useState(() => !teamId && !demo && !localStorage.getItem(`${P}_namen_vervangen`))
-  useEffect(() => { if (namenVervangen) localStorage.setItem(`${P}_namen_vervangen`, '1') }, [])
-
   const [spelers, zetSpelersRuw] = useState<Player[]>(() => {
     const saved = localStorage.getItem(`${P}_spelers`)
     // Oudere versies kenden 'meedoen' nog niet
@@ -128,7 +101,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     const lijst: Player[] = JSON.parse(saved).map((sp: Player) => ({ ...sp, meedoen: sp.meedoen ?? true }))
     // Voorbeeld: namen zijn daar niet te wijzigen, dus altijd die uit de vaste lijst (ook na een nieuwe versie)
     if (demo) return lijst.map(sp => ({ ...sp, naam: DEMO_SPELERS.find(d => d.id === sp.id)?.naam ?? sp.naam }))
-    return namenVervangen ? vervangOudeNamen(lijst) : lijst
+    return lijst
   })
 
   const [wisselingen, setWisselingen] = useState<Wissel[]>(() => {
@@ -202,8 +175,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
   const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => {
     if (demo) return demoWedstrijden()
-    const lijst = lees<GespeeldeWedstrijd[]>(P, 'wedstrijden', [])
-    return namenVervangen ? lijst.map(vervangOudeNamenWedstrijd) : lijst
+    return lees<GespeeldeWedstrijd[]>(P, 'wedstrijden', [])
   })
   // Wat op dit toestel expliciet is verwijderd en nog naar de server moet (alleen dat wordt daar gewist)
   const [programma, setProgramma] = useState<ProgrammaItem[]>(() => (demo ? demoProgramma() : lees(P, 'programma', [])))
