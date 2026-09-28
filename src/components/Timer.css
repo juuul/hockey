@@ -170,32 +170,35 @@
   opacity: 0.85;
 }
 
-/* Onder de vouw: bijstellen en een deel nu laten beginnen */
-.timer-bijstellen .btn {
-  white-space: nowrap;
-  padding: 10px 2px;
-}
-
+/* Onder de vouw: per kwart een knop 'begint nu' */
 .timer-uitleg {
   font-size: var(--base-readable-size);
   font-weight: 700;
   color: var(--tekst-zacht);
 }
 
-.timer-begin {
+.timer-kwarten {
   display: flex;
-  flex-direction: column;
   gap: 6px;
 }
 
-.timer-begin .btn {
+.timer-kwarten .btn {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 10px 14px;
+  justify-content: center;
+  padding: 6px 0;
+  line-height: 1.05;
 }
 
-.timer-begin-duur {
+.timer-kwarten .btn small {
+  font-size: var(--base-readable-size);
   font-weight: 600;
-  opacity: 0.8;
+}
+
+.timer-kwarten .btn.gespeeld {
+  background: var(--knop-grijs);
+  color: var(--tekst-vaag);
 }

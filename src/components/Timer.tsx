@@ -61,8 +61,11 @@ export default function Timer() {
   const { startTimer, pauzeTimer, stopTimer, zetKlok, magBewerken } = useHockey()
   const [stopVraag, setStopVraag] = useState(false)
   const { loopt, verstreken, schema, fase, inPauze, naam, groot, rechts, delen } = useKlok()
-  // 'Begin nu': dit deel opnieuw of een van de volgende twee (de klok loopt dan vanaf het begin daarvan)
-  const beginNu = fase.deel ? [fase.index, fase.index + 1, fase.index + 2].filter(i => i < schema.length) : []
+  // Per kwart (of helft) een knop: tikken = dat kwart begint nu op 0:00 (op het fluitsignaal).
+  // Grijs = al gespeeld, groen = het volgende
+  const kwarten = schema.map((d, i) => ({ d, i })).filter(({ d }) => d.soort === 'kwart')
+  const nietBegonnen = !loopt && verstreken === 0
+  const volgende = nietBegonnen ? kwarten[0]?.i : kwarten.find(({ i }) => i > fase.index)?.i
 
   const start = () => {
     startTimer()
@@ -95,30 +98,26 @@ export default function Timer() {
       <div className="timer-labels" aria-hidden="true">
         {schema.map((d, i) => <span key={i} style={{ flexGrow: d.lengte }}>{d.soort === 'kwart' ? d.kwart : d.soort === 'rust' ? 'rust' : ''}</span>)}
       </div>
-      {magBewerken && <div className="timer-knoppen">
-        <button className="btn timer-start" onClick={start} disabled={loopt}>Start</button>
-        <button className="btn btn-secondary" onClick={pauze} disabled={!loopt}>Pauze</button>
-        <button className="btn btn-secondary" onClick={() => setStopVraag(true)} disabled={!loopt && verstreken === 0}>Stop</button>
-      </div>}
       {magBewerken && <>
-        <div className="timer-knoppen timer-bijstellen">
-          {[-60, -10, 10, 60].map(sec => (
-            <button key={sec} className="btn btn-secondary" onClick={() => { zetKlok(verstreken + sec * 1000); tel('timer-bijstellen') }}>
-              {sec < 0 ? '−' : '+'}{formatteer(Math.abs(sec) * 1000)}
+        <div className="timer-uitleg">{kwarten.length === 2 ? 'Helft' : 'Kwart'} begint nu:</div>
+        <div className="timer-kwarten">
+          {kwarten.map(({ d, i }) => (
+            <button
+              key={i}
+              className={`btn ${i === volgende ? 'timer-start' : i < fase.index ? 'gespeeld' : 'btn-secondary'}`}
+              onClick={() => { zetKlok(beginVan(i, schema), true); tel('timer-kwart') }}
+            >
+              {i === volgende && <span aria-hidden="true">▶ </span>}{d.kwart}e
+              <small>{kwarten.length === 2 ? 'helft' : 'kwart'}</small>
             </button>
           ))}
         </div>
-        {beginNu.length > 0 && <>
-          <div className="timer-uitleg">Fluit de scheidsrechter? Begin nu:</div>
-          <div className="timer-begin">
-            {beginNu.map(i => (
-              <button key={i} className={`btn ${i === fase.index + 1 ? 'timer-start' : 'btn-secondary'}`} onClick={() => { zetKlok(beginVan(i, schema), true); tel('timer-begin-nu') }}>
-                <span>{i === fase.index ? `${deelNaam(schema[i], schema)} opnieuw` : `▶ ${deelNaam(schema[i], schema)}`}</span>
-                <span className="timer-begin-duur">{formatteer(schema[i].lengte)}</span>
-              </button>
-            ))}
-          </div>
-        </>}
+        <div className="timer-knoppen">
+          {loopt || nietBegonnen
+            ? <button className="btn btn-secondary" onClick={pauze} disabled={!loopt}>Pauze</button>
+            : <button className="btn timer-start" onClick={start}>Verder</button>}
+          <button className="btn btn-secondary" onClick={() => setStopVraag(true)} disabled={nietBegonnen}>Stop</button>
+        </div>
       </>}
 
       {stopVraag && (
