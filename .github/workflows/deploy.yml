@@ -1,6 +1,6 @@
 name: Deploy to GitHub Pages
 
-# main -> juliaan.eu/hockey/ (live), test -> juliaan.eu/hockey/test/. Het domein hoort bij de juuul.github.io-repo; deze projectsite volgt de reponaam. Pages heeft één site per repo, dus beide branches worden altijd samen gebouwd.
+# main -> hockey.juliaan.eu/ (live), test -> hockey.juliaan.eu/test/. Eigen domein via de CNAME van deze repo; juliaan.eu/hockey/ stuurt door. Pages heeft één site per repo, dus beide branches worden altijd samen gebouwd.
 on:
   push:
     branches: [main, test]
