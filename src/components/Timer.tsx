@@ -62,10 +62,11 @@ export default function Timer() {
   const [stopVraag, setStopVraag] = useState(false)
   const { loopt, verstreken, schema, fase, inPauze, naam, groot, rechts, delen } = useKlok()
   // Per kwart (of helft) een knop: tikken = dat kwart begint nu op 0:00 (op het fluitsignaal).
-  // Grijs = al gespeeld, groen = het volgende
+  // Groen = het kwart waarin je zit; in een pauze of voor de start het kwart dat eraan komt (met ▶). Grijs = gespeeld
   const kwarten = schema.map((d, i) => ({ d, i })).filter(({ d }) => d.soort === 'kwart')
   const nietBegonnen = !loopt && verstreken === 0
-  const volgende = nietBegonnen ? kwarten[0]?.i : kwarten.find(({ i }) => i > fase.index)?.i
+  const volgende = nietBegonnen ? kwarten[0]?.i : inPauze ? fase.index + 1 : undefined
+  const groen = fase.deel?.soort === 'kwart' && !nietBegonnen ? fase.index : volgende
 
   const start = () => {
     startTimer()
@@ -104,7 +105,7 @@ export default function Timer() {
           {kwarten.map(({ d, i }) => (
             <button
               key={i}
-              className={`btn ${i === volgende ? 'timer-start' : i < fase.index ? 'gespeeld' : 'btn-secondary'}`}
+              className={`btn ${i === groen ? 'timer-start' : i < fase.index ? 'gespeeld' : 'btn-secondary'}`}
               onClick={() => { zetKlok(beginVan(i, schema), true); tel('timer-kwart') }}
             >
               {i === volgende && <span aria-hidden="true">▶ </span>}{d.kwart}e
