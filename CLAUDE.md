@@ -47,6 +47,7 @@ Dashboard: alleen zonder account bovenaan de knop "👤 Inloggen", die naar Inst
 - **Clubs** worden automatisch onthouden zodra je er een kiest/typt en opslaat (pas bij Opslaan, niet bij Annuleren); keuzelijst laatst gebruikt bovenaan, dubbele namen (hoofdletterongevoelig) worden hergebruikt. Club verwijderen haalt hem alleen uit de keuzelijst; oude wedstrijden houden hun opgeslagen naam.
 - **Undo** draait spelers, wissels, score en scorers terug (niet de timer).
 - **Timer** bewaart starttijdstip + opgebouwde tijd, zodat hij klopt na verversen of een vergrendeld scherm. Stop vraagt bevestiging.
+- **Speelduur** (`src/speelduur.ts`, KNHB O11 en ouder): 4 kwarten van 17:30 met 2 min pauze, 5 min rust, 2 min pauze. De timer loopt gewoon door; uit de verstreken tijd volgt het deel (`faseVan`). Boven de tijd "2e kwart · nog 9:18" of "Rust · daarna 3e kwart" (pauze/rust geel en aftellend), eronder een balk met de delen naar verhouding en de labels 1, 2, rust, 3, 4. Na het 4e kwart "Afgelopen" met de totale tijd.
 - **Trek omlaag om te verversen** (eigen implementatie, `Verversen.tsx`): nodig omdat html/body niet scrollen (alleen `.content`). Rond draaiend icoon, niet in pop-ups.
 - Geen meldingen (toasts) na een bevestiging. Bevestigingsvragen alleen bij resets en timer-stop.
 

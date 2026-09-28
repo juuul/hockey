@@ -18,8 +18,81 @@
   font-variant-numeric: tabular-nums;
 }
 
-.timer.loopt .timer-tijd {
+.timer.loopt .timer-tijd,
+.timer.loopt .timer-deel {
   color: var(--groen-tekst);
+}
+
+.timer.in-pauze .timer-tijd,
+.timer.in-pauze .timer-deel {
+  color: var(--geel-tekst);
+}
+
+/* Kwart/pauze/rust en de tijd tot het volgende deel */
+.timer-kop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  font-size: var(--base-readable-size);
+}
+
+.timer-deel {
+  font-weight: 700;
+  color: var(--tekst-2);
+}
+
+.timer-nog {
+  color: var(--tekst-zacht);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Balk: kwarten en pauzes naar verhouding van hun lengte */
+.timer-balk,
+.timer-labels {
+  display: flex;
+  gap: 3px;
+}
+
+.timer-seg {
+  flex-basis: 0;
+  height: 26px;
+  border-radius: 5px;
+  background: var(--knop-grijs);
+  overflow: hidden;
+}
+
+.timer-seg.pauze,
+.timer-seg.rust {
+  background: var(--geel-vlak);
+}
+
+.timer-seg i {
+  display: block;
+  height: 100%;
+  background: #10b981;
+}
+
+.timer-seg.pauze i,
+.timer-seg.rust i {
+  background: #f59e0b;
+}
+
+.timer-seg,
+.timer-labels span {
+  min-width: 0;
+}
+
+/* 'rust' is breder dan zijn stukje balk: gecentreerd laten uitlopen */
+.timer-labels span {
+  flex-basis: 0;
+  display: flex;
+  justify-content: center;
+  white-space: nowrap;
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+  line-height: 1.1;
 }
 
 .timer-knoppen {
