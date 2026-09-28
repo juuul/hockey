@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import ResetModal from './ResetModal'
 import { tel } from '../statistiek'
-import { deelNaam, faseVan, SCHEMA, voortgang } from '../speelduur'
+import { deelNaam, faseVan, schemaVoor, speelNaam, voortgang } from '../speelduur'
 import './Timer.css'
 
 function formatteer(ms: number) {
@@ -13,7 +13,7 @@ function formatteer(ms: number) {
 }
 
 export default function Timer() {
-  const { timer: stand, startTimer, pauzeTimer, stopTimer, magBewerken } = useHockey()
+  const { timer: stand, startTimer, pauzeTimer, stopTimer, magBewerken, spelvorm } = useHockey()
   const [nu, setNu] = useState(Date.now())
   const [stopVraag, setStopVraag] = useState(false)
   const loopt = stand.gestartOp !== null
@@ -27,11 +27,12 @@ export default function Timer() {
 
   const verstreken = stand.opgebouwd + (loopt ? nu - stand.gestartOp! : 0)
   // Kwart, pauze of rust volgt vanzelf uit de verstreken tijd. Pauze/rust telt af (naar boven afgerond)
-  const fase = faseVan(verstreken)
+  const schema = schemaVoor(spelvorm)
+  const fase = faseVan(verstreken, schema)
   const inPauze = !!fase.deel && fase.deel.soort !== 'kwart'
   const groot = !fase.deel ? formatteer(verstreken) : inPauze ? formatteer(fase.nog + 999) : formatteer(fase.inDeel)
-  const rechts = !fase.deel ? 'totaal' : inPauze ? `daarna ${fase.deel.kwart}e kwart` : `nog ${formatteer(fase.nog + 999)}`
-  const delen = voortgang(verstreken)
+  const rechts = !fase.deel ? 'totaal' : inPauze ? `daarna ${speelNaam(fase.deel.kwart, schema)}` : `nog ${formatteer(fase.nog + 999)}`
+  const delen = voortgang(verstreken, schema)
 
   const start = () => {
     startTimer()
@@ -50,19 +51,19 @@ export default function Timer() {
   return (
     <div className={`timer ${loopt ? 'loopt' : ''} ${inPauze ? 'in-pauze' : ''}`}>
       <div className="timer-kop">
-        <span className="timer-deel">{deelNaam(fase.deel)}</span>
+        <span className="timer-deel">{deelNaam(fase.deel, schema)}</span>
         <span className="timer-nog">{rechts}</span>
       </div>
       <div className="timer-tijd" aria-live="off">{groot}</div>
       <div className="timer-balk" aria-hidden="true">
-        {SCHEMA.map((d, i) => (
+        {schema.map((d, i) => (
           <div key={i} className={`timer-seg ${d.soort}`} style={{ flexGrow: d.lengte }}>
             <i style={{ width: `${delen[i] * 100}%` }} />
           </div>
         ))}
       </div>
       <div className="timer-labels" aria-hidden="true">
-        {SCHEMA.map((d, i) => <span key={i} style={{ flexGrow: d.lengte }}>{d.soort === 'kwart' ? d.kwart : d.soort === 'rust' ? 'rust' : ''}</span>)}
+        {schema.map((d, i) => <span key={i} style={{ flexGrow: d.lengte }}>{d.soort === 'kwart' ? d.kwart : d.soort === 'rust' ? 'rust' : ''}</span>)}
       </div>
       {magBewerken && <div className="timer-knoppen">
         <button className="btn timer-start" onClick={start} disabled={loopt}>Start</button>

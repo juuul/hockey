@@ -1,11 +1,14 @@
-// Speelduur van een wedstrijd (KNHB, O11 en ouder): 4 kwarten van 17:30, daartussen 2 min pauze, 5 min rust, 2 min pauze.
+// Speelduur van een wedstrijd (KNHB): 11- en 9-tal (O11 en ouder) 4 kwarten van 17:30, daartussen 2 min pauze,
+// 5 min rust, 2 min pauze; 6-tal (O9) 2 helften van 25 min met 5 min rust.
 // De timer loopt gewoon door; uit de verstreken tijd volgt vanzelf in welk deel van de wedstrijd je zit.
+
+import { Spelvorm } from './types'
 
 export type DeelSoort = 'kwart' | 'pauze' | 'rust'
 
 export interface Deel {
   soort: DeelSoort
-  kwart: number // bij een kwart het nummer (1–4), bij een pauze het kwart dat erna komt
+  kwart: number // bij een kwart/helft het nummer, bij een pauze het nummer dat erna komt
   lengte: number // ms
 }
 
@@ -21,6 +24,16 @@ export const SCHEMA: Deel[] = [
   { soort: 'pauze', kwart: 4, lengte: 2 * MIN },
   { soort: 'kwart', kwart: 4, lengte: KWART },
 ]
+
+const HELFT = 25 * MIN
+const HELFTEN: Deel[] = [
+  { soort: 'kwart', kwart: 1, lengte: HELFT },
+  { soort: 'rust', kwart: 2, lengte: 5 * MIN },
+  { soort: 'kwart', kwart: 2, lengte: HELFT },
+]
+
+export const schemaVoor = (spelvorm: Spelvorm): Deel[] => (spelvorm === 6 ? HELFTEN : SCHEMA)
+const isHelften = (schema: Deel[]) => schema.filter(d => d.soort === 'kwart').length === 2
 
 export interface Fase {
   index: number // plek in SCHEMA; SCHEMA.length = afgelopen
@@ -49,5 +62,8 @@ export function voortgang(verstreken: number, schema: Deel[] = SCHEMA): number[]
   })
 }
 
-export const deelNaam = (d: Deel | null) =>
-  !d ? 'Afgelopen' : d.soort === 'kwart' ? `${d.kwart}e kwart` : d.soort === 'rust' ? 'Rust' : 'Pauze'
+// '2e kwart' of bij helften '2e helft'
+export const speelNaam = (nummer: number, schema: Deel[]) => `${nummer}e ${isHelften(schema) ? 'helft' : 'kwart'}`
+
+export const deelNaam = (d: Deel | null, schema: Deel[] = SCHEMA) =>
+  !d ? 'Afgelopen' : d.soort === 'kwart' ? speelNaam(d.kwart, schema) : d.soort === 'rust' ? 'Rust' : 'Pauze'
