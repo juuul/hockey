@@ -69,6 +69,9 @@ export const OPSTELLINGEN_PER_SPELVORM: Record<Spelvorm, OpstellingNaam[]> = {
   6: ['2-1-2', '2-2-1', '1-2-2'],
 };
 
+// In beeld: de KNHB-categorie bij de spelvorm (11-tal vanaf O12, 9-tal O11, 8-tal O10, 6-tal O9)
+export const CATEGORIE: Record<Spelvorm, string> = { 11: 'O12+', 9: 'O11', 8: 'O10', 6: 'O9' };
+
 export const spelvormVan = (opstelling: OpstellingNaam): Spelvorm =>
   ([11, 9, 8, 6] as const).find(v => OPSTELLINGEN_PER_SPELVORM[v].includes(opstelling)) ?? 9;
 

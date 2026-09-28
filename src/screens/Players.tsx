@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
-import { OPSTELLINGEN_PER_SPELVORM, opstellingTekst, Player } from '../types'
+import { speelduurTekst } from '../speelduur'
+import { CATEGORIE, OPSTELLINGEN_PER_SPELVORM, opstellingTekst, Player } from '../types'
 import AddPlayerModal from '../components/AddPlayerModal'
 import DeletePlayerModal from '../components/DeletePlayerModal'
 import { tel } from '../statistiek'
@@ -41,8 +42,8 @@ export default function Players() {
 
   return (
     <div className="players-screen">
-      <div className="spelvorm-kop">Aantal spelers (met keeper)</div>
-      <div className="spelvorm" role="radiogroup" aria-label="Aantal spelers">
+      <div className="spelvorm-kop">Categorie</div>
+      <div className="spelvorm" role="radiogroup" aria-label="Categorie">
         {([11, 9, 8, 6] as const).map(v => (
           <button
             key={v}
@@ -52,10 +53,11 @@ export default function Players() {
             onClick={() => { if (v !== spelvorm) { kiesOpstelling(OPSTELLINGEN_PER_SPELVORM[v][0]); tel(`spelvorm-${v}`) } }}
             disabled={!magBewerken}
           >
-            {v}
+            {CATEGORIE[v]}
           </button>
         ))}
       </div>
+      <div className="spelvorm-uitleg">{spelvorm} spelers met keeper · {speelduurTekst(spelvorm)}</div>
       <div className="spelvorm" role="radiogroup" aria-label="Opstelling">
         {OPSTELLINGEN_PER_SPELVORM[spelvorm].map(naam => (
           <button

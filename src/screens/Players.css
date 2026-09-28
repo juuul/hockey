@@ -17,6 +17,12 @@
   color: var(--tekst-2);
 }
 
+.spelvorm-uitleg {
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+  margin-top: -4px;
+}
+
 .spelvorm {
   display: flex;
   gap: 0;

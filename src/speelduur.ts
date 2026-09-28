@@ -66,3 +66,7 @@ export const speelNaam = (nummer: number, schema: Deel[]) => `${nummer}e ${isHel
 
 export const deelNaam = (d: Deel | null, schema: Deel[] = SCHEMA) =>
   !d ? 'Afgelopen' : d.soort === 'kwart' ? speelNaam(d.kwart, schema) : d.soort === 'rust' ? 'Rust' : 'Pauze'
+
+// Kort voor onder de keuze van de categorie
+export const speelduurTekst = (spelvorm: Spelvorm) =>
+  spelvorm === 8 ? '2 × 30 min' : spelvorm === 6 ? '2 × 25 min' : '4 × 17:30'
