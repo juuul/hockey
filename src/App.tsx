@@ -36,9 +36,9 @@ interface Navigatie {
 function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
   const { sync, live, demo, clubs, wedstrijd } = useHockey()
-  // Het eerste tabblad heet naar de wedstrijd die klaarstaat: 'Wedstrijd: <tegenstander>'
+  // Het eerste tabblad heet naar de tegenstander van de wedstrijd die klaarstaat (anders 'Wedstrijd')
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
-  const tabNaam = (tab: { id: Scherm; naam: string }) => (tab.id === 'dashboard' && tegenstander ? `${tab.naam}: ${tegenstander}` : tab.naam)
+  const tabNaam = (tab: { id: Scherm; naam: string }) => (tab.id === 'dashboard' && tegenstander ? tegenstander : tab.naam)
   const syncProbleem = !!((sync && (sync.offline || sync.fout)) || (live && !live.verbonden))
 
   return (

@@ -67,7 +67,7 @@
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
-  /* Lange tegenstander bij 'Wedstrijd: …': afkappen op de schermbreedte */
+  /* Lange tegenstander als naam van het eerste tabblad: afkappen op de schermbreedte */
   max-width: calc(100vw - 12px);
   overflow: hidden;
   text-overflow: ellipsis;
