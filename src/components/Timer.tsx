@@ -12,10 +12,10 @@ function formatteer(ms: number) {
   return `${min}:${sec.toString().padStart(2, '0')}`
 }
 
-export default function Timer() {
-  const { timer: stand, startTimer, pauzeTimer, stopTimer, magBewerken, spelvorm } = useHockey()
+// Stand van de wedstrijdklok, voor de timer onder de vouw en de regel onder de score
+export function useKlok() {
+  const { timer: stand, spelvorm } = useHockey()
   const [nu, setNu] = useState(Date.now())
-  const [stopVraag, setStopVraag] = useState(false)
   const loopt = stand.gestartOp !== null
 
   useEffect(() => {
@@ -30,9 +30,28 @@ export default function Timer() {
   const schema = schemaVoor(spelvorm)
   const fase = faseVan(verstreken, schema)
   const inPauze = !!fase.deel && fase.deel.soort !== 'kwart'
+  const naam = deelNaam(fase.deel, schema)
   const groot = !fase.deel ? formatteer(verstreken) : inPauze ? formatteer(fase.nog + 999) : formatteer(fase.inDeel)
   const rechts = !fase.deel ? 'totaal' : inPauze ? `daarna ${speelNaam(fase.deel.kwart, schema)}` : `nog ${formatteer(fase.nog + 999)}`
-  const delen = voortgang(verstreken, schema)
+  return { loopt, verstreken, schema, inPauze, naam, groot, rechts, delen: voortgang(verstreken, schema) }
+}
+
+// Onder de score: altijd in beeld, zonder te scrollen
+export function KlokRegel() {
+  const { loopt, inPauze, naam, groot, rechts } = useKlok()
+  return (
+    <div className={`klok-regel ${loopt ? 'loopt' : ''} ${inPauze ? 'in-pauze' : ''}`}>
+      <span aria-hidden="true">{inPauze ? '☕' : '⏱'}</span>
+      <strong>{naam} {groot}</strong>
+      <span className="klok-regel-nog">· {rechts}</span>
+    </div>
+  )
+}
+
+export default function Timer() {
+  const { startTimer, pauzeTimer, stopTimer, magBewerken } = useHockey()
+  const [stopVraag, setStopVraag] = useState(false)
+  const { loopt, verstreken, schema, inPauze, naam, groot, rechts, delen } = useKlok()
 
   const start = () => {
     startTimer()
@@ -51,7 +70,7 @@ export default function Timer() {
   return (
     <div className={`timer ${loopt ? 'loopt' : ''} ${inPauze ? 'in-pauze' : ''}`}>
       <div className="timer-kop">
-        <span className="timer-deel">{deelNaam(fase.deel, schema)}</span>
+        <span className="timer-deel">{naam}</span>
         <span className="timer-nog">{rechts}</span>
       </div>
       <div className="timer-tijd" aria-live="off">{groot}</div>

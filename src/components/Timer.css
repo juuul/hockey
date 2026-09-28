@@ -114,3 +114,36 @@
 .timer-start:active {
   background: #065f46;
 }
+
+/* Regel onder de score op het Dashboard (alleen tekst, geen knop) */
+.klok-regel {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--vlak-grijs);
+  color: var(--tekst-2);
+  font-size: var(--base-readable-size);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.klok-regel.loopt {
+  background: var(--groen-vlak);
+  color: var(--groen-tekst);
+}
+
+.klok-regel.in-pauze {
+  background: var(--geel-vlak);
+  color: var(--geel-tekst);
+}
+
+.klok-regel-nog {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+}

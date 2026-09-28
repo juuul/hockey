@@ -4,7 +4,7 @@ import { useAccount } from '../context/AccountContext'
 import { OPSTELLINGEN, Position, POSITIE_LABEL } from '../types'
 import SubstituteModal from '../components/SubstituteModal'
 import ResetModal from '../components/ResetModal'
-import Timer from '../components/Timer'
+import Timer, { KlokRegel } from '../components/Timer'
 import ScorerModal from '../components/ScorerModal'
 import KiesDoelpuntWeg, { scorersVan } from '../components/KiesDoelpuntWeg'
 import { tel } from '../statistiek'
@@ -123,6 +123,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </button>
         <button className="score-min" onClick={() => { scoor('zij', -1); tel('score-zij-min') }} disabled={!magBewerken || score.zij === 0} aria-label="Doelpunt zij eraf">−</button>
       </div>
+      <KlokRegel />
 
       <div className="field-container">
         {/* Rondjes schalen mee met de breedste rij en het aantal rijen (11 spelers: rijen van 4 en een laatste man) */}
