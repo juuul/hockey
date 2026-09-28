@@ -1,5 +1,5 @@
 // Speelduur van een wedstrijd (KNHB): 11- en 9-tal (O11 en ouder) 4 kwarten van 17:30, daartussen 2 min pauze,
-// 5 min rust, 2 min pauze; 6-tal (O9) 2 helften van 25 min met 5 min rust.
+// 5 min rust, 2 min pauze; 8-tal (O10) 2 helften van 30 min, 6-tal (O9) 2 helften van 25 min, beide met 5 min rust.
 // De timer loopt gewoon door; uit de verstreken tijd volgt vanzelf in welk deel van de wedstrijd je zit.
 
 import { Spelvorm } from './types'
@@ -25,14 +25,13 @@ export const SCHEMA: Deel[] = [
   { soort: 'kwart', kwart: 4, lengte: KWART },
 ]
 
-const HELFT = 25 * MIN
-const HELFTEN: Deel[] = [
-  { soort: 'kwart', kwart: 1, lengte: HELFT },
+const helften = (minuten: number): Deel[] => [
+  { soort: 'kwart', kwart: 1, lengte: minuten * MIN },
   { soort: 'rust', kwart: 2, lengte: 5 * MIN },
-  { soort: 'kwart', kwart: 2, lengte: HELFT },
+  { soort: 'kwart', kwart: 2, lengte: minuten * MIN },
 ]
 
-export const schemaVoor = (spelvorm: Spelvorm): Deel[] => (spelvorm === 6 ? HELFTEN : SCHEMA)
+export const schemaVoor = (spelvorm: Spelvorm): Deel[] => (spelvorm === 8 ? helften(30) : spelvorm === 6 ? helften(25) : SCHEMA)
 const isHelften = (schema: Deel[]) => schema.filter(d => d.soort === 'kwart').length === 2
 
 export interface Fase {

@@ -43,7 +43,7 @@ export default function Players() {
     <div className="players-screen">
       <div className="spelvorm-kop">Aantal spelers (met keeper)</div>
       <div className="spelvorm" role="radiogroup" aria-label="Aantal spelers">
-        {([11, 9, 6] as const).map(v => (
+        {([11, 9, 8, 6] as const).map(v => (
           <button
             key={v}
             role="radio"

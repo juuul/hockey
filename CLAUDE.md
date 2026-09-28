@@ -22,7 +22,7 @@ Web-app om langs het veld (op een telefoon) de opstelling, wissels, score en tij
    - Veld met de opstelling en de keeper eronder. Tik op een speler: **Wissel** (met wisselspeler) of **Verplaatsen** (ruilen met veldspeler of wisselspeler). Keeper: alleen verplaatsen. Lege plek (gestippeld, "+"): tik om iemand erin te zetten.
    - Eén regel wisselspelers in beeld (2 naast elkaar), zonder kopje. Meer wissels staan onder de vouw.
    - **Onder de vouw** (alleen bereikbaar door te scrollen, bewust uit het zicht): extra wissels, knoppen **Alles resetten**, Undo, Nieuwe opstelling, Reset wissels, Score 0 – 0, en de **Timer** (Start/Pauze/Stop).
-2. **Spelers**: aantal spelers (11, 9 of 6, met keeper) en opstelling kiezen; lijst van alle spelers met schakelaar "Doet mee / Doet niet mee", doelpunten per speler (⚽ n), speler toevoegen/verwijderen. Geen veld/bank-info hier.
+2. **Spelers**: aantal spelers (11, 9, 8 of 6, met keeper) en opstelling kiezen; lijst van alle spelers met schakelaar "Doet mee / Doet niet mee", doelpunten per speler (⚽ n), speler toevoegen/verwijderen. Geen veld/bank-info hier.
 3. **Voorkeur**: per speler een 1e en 2e voorkeurspositie (alleen posities van de huidige opstelling). Dubbele voorkeuren mogen.
 4. **Historie**: bovenaan de kaart **Deze wedstrijd** (`src/components/DezeWedstrijd.tsx`): tegenstander/thuis-uit/datum (tik om te wijzigen), stand, scorers van deze wedstrijd en **Wedstrijd afsluiten** (alleen beheerders). Daaronder: balans (gespeeld/gewonnen/gelijk/verloren, doelpunten), topscorers over alle wedstrijden, lijst wedstrijden (tik: details, wijzigen — ook de stand: Wij + vraagt "Wie scoorde?" (wie toen meedeed, of Weet ik niet), Wij − vraagt welk doelpunt weg moet (per scorer), Zij gewoon −/+ — verwijderen), tegenstanders met resultaat (tik: hernoemen/verwijderen).
 
@@ -37,7 +37,7 @@ Dashboard: alleen zonder account bovenaan de knop "👤 Inloggen", die naar Inst
 ### Regels
 - **Wisselteller** gaat +1 bij de speler die **uit** het veld gaat (alleen bij Wissel, niet bij Verplaatsen). De invaller neemt de positie over.
 - **Wisselspelers sorteren**: minste wissels eerst; bij gelijke stand komt wie het laatst uit het veld ging onderaan. Zelfde volgorde in de wissel-pop-up.
-- **Kleuren in het veld** (alleen informatief, blokkeert niets), op volgorde van invallen (`inVolgorde`), niet op tijd: bij 11 en 9 spelers de laatste 2 invallers rood, 2 daarvoor oranje, de rest (ook de basis) groen; bij 6 spelers 1 rood, 1 oranje. Keeper geen kleur.
+- **Kleuren in het veld** (alleen informatief, blokkeert niets), op volgorde van invallen (`inVolgorde`), niet op tijd: bij 11, 9 en 8 spelers de laatste 2 invallers rood, 2 daarvoor oranje, de rest (ook de basis) groen; bij 6 spelers 1 rood, 1 oranje. Keeper geen kleur.
 - **Nieuwe opstelling**: eerst eerlijk loten wie begint (iedereen gelijke kans op de bank), dan per basisspeler de 1e voorkeur, daarna de 2e (beide in gelote volgorde, bij dubbele keuze wint een willekeurige), rest willekeurig. Tellers blijven staan; `inVolgorde` terug naar 0.
 - **Reset wissels**: alleen tellers — veldspelers 0, wisselspelers 1 (die staan al één keer "uit"). Opstelling en score blijven.
 - **Alles resetten**: nieuwe opstelling + reset wissels + score 0-0 en scorers weg + timer 0:00 gestopt. Spelers, aanwezigheid, voorkeuren en gekozen opstelling blijven.
@@ -47,7 +47,7 @@ Dashboard: alleen zonder account bovenaan de knop "👤 Inloggen", die naar Inst
 - **Clubs** worden automatisch onthouden zodra je er een kiest/typt en opslaat (pas bij Opslaan, niet bij Annuleren); keuzelijst laatst gebruikt bovenaan, dubbele namen (hoofdletterongevoelig) worden hergebruikt. Club verwijderen haalt hem alleen uit de keuzelijst; oude wedstrijden houden hun opgeslagen naam.
 - **Undo** draait spelers, wissels, score en scorers terug (niet de timer).
 - **Timer** bewaart starttijdstip + opgebouwde tijd, zodat hij klopt na verversen of een vergrendeld scherm. Stop vraagt bevestiging.
-- **Speelduur** (`src/speelduur.ts`, KNHB, per spelvorm via `schemaVoor`): 11- en 9-tal (O11 en ouder) 4 kwarten van 17:30 met 2 min pauze, 5 min rust, 2 min pauze; 6-tal (O9) 2 helften van 25 min met 5 min rust ("1e helft"). De timer loopt gewoon door; uit de verstreken tijd volgt het deel (`faseVan`). Boven de tijd "2e kwart · nog 9:18" of "Rust · daarna 3e kwart" (pauze/rust geel en aftellend), eronder een balk met de delen naar verhouding en de labels 1, 2, rust, 3, 4. Na het 4e kwart "Afgelopen" met de totale tijd.
+- **Speelduur** (`src/speelduur.ts`, KNHB, per spelvorm via `schemaVoor`): 11- en 9-tal (O11 en ouder) 4 kwarten van 17:30 met 2 min pauze, 5 min rust, 2 min pauze; 8-tal (O10) 2 helften van 30 min, 6-tal (O9) 2 helften van 25 min, beide met 5 min rust ("1e helft"). De timer loopt gewoon door; uit de verstreken tijd volgt het deel (`faseVan`). Boven de tijd "2e kwart · nog 9:18" of "Rust · daarna 3e kwart" (pauze/rust geel en aftellend), eronder een balk met de delen naar verhouding en de labels 1, 2, rust, 3, 4. Na het 4e kwart "Afgelopen" met de totale tijd.
 - **Trek omlaag om te verversen** (eigen implementatie, `Verversen.tsx`): nodig omdat html/body niet scrollen (alleen `.content`). Rond draaiend icoon, niet in pop-ups.
 - Geen meldingen (toasts) na een bevestiging. Bevestigingsvragen alleen bij resets en timer-stop.
 
@@ -60,6 +60,7 @@ Posities (van voor naar achter): `LW` links voor, `CV` centraal voor, `RW` recht
 |---|---|---|
 | 11 spelers (10 + keeper) | 3-4-3, 4-3-3 | 3-4-3, 3-3-4 |
 | 9 spelers (8 + keeper) | 3-3-2, 2-3-3, 3-2-3 | 2-3-3, 3-3-2, 3-2-3 |
+| 8 spelers (7 + keeper, O10) | 2-3-2, 3-3-1, 3-2-2 | 2-3-2, 1-3-3, 2-2-3 |
 | 6 spelers (5 + keeper) | 2-1-2, 1-2-2, 2-2-1 | 2-1-2, 2-2-1, 1-2-2 |
 
 Een onbekende opgeslagen opstelling wordt vervangen (`leesOpstelling`: het vervallen 4-4-2 (intern 2-4-4) → 3-4-3, oude test-namen 3-3-3-1/4-3-3 → 3-4-3/3-3-4); veldspelers op een plek die niet in de opstelling zit schuiven vanzelf door (`pasOpstellingAan`).
