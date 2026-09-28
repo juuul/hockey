@@ -126,6 +126,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     // Oudere versies kenden 'meedoen' nog niet
     if (!saved) return teamId ? [] : DEMO_SPELERS
     const lijst: Player[] = JSON.parse(saved).map((sp: Player) => ({ ...sp, meedoen: sp.meedoen ?? true }))
+    // Voorbeeld: namen zijn daar niet te wijzigen, dus altijd die uit de vaste lijst (ook na een nieuwe versie)
+    if (demo) return lijst.map(sp => ({ ...sp, naam: DEMO_SPELERS.find(d => d.id === sp.id)?.naam ?? sp.naam }))
     return namenVervangen ? vervangOudeNamen(lijst) : lijst
   })
 
