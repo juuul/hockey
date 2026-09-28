@@ -111,6 +111,25 @@
   color: white;
 }
 
+/* Pauze oranje, Stop rood (vaste merk-kleuren, ook in de nachtmodus) */
+.timer-pauze {
+  background: #d97706;
+  color: white;
+}
+
+.timer-pauze:active {
+  background: #b45309;
+}
+
+.timer-stop {
+  background: #b91c1c;
+  color: white;
+}
+
+.timer-stop:active {
+  background: #991b1b;
+}
+
 .timer-start:active {
   background: #065f46;
 }

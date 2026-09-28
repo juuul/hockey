@@ -115,9 +115,9 @@ export default function Timer() {
         </div>
         <div className="timer-knoppen">
           {loopt || nietBegonnen
-            ? <button className="btn btn-secondary" onClick={pauze} disabled={!loopt}>Pauze</button>
+            ? <button className="btn timer-pauze" onClick={pauze} disabled={!loopt}>Pauze</button>
             : <button className="btn timer-start" onClick={start}>Verder</button>}
-          <button className="btn btn-secondary" onClick={() => setStopVraag(true)} disabled={nietBegonnen}>Stop</button>
+          <button className="btn timer-stop" onClick={() => setStopVraag(true)} disabled={nietBegonnen}>Stop</button>
         </div>
         {/* Helemaal onderaan: de tijd een beetje bijstellen */}
         <div className="timer-knoppen timer-bijstellen">
