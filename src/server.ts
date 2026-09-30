@@ -13,7 +13,7 @@ export const ROL_UITLEG: Record<Rol, string> = {
   kijker: 'kijkt alleen mee',
 }
 
-export interface Gebruiker extends RecordModel { email: string; name: string; superadmin: boolean; gast?: boolean; kinderen?: Record<string, string[]> | null }
+export interface Gebruiker extends RecordModel { email: string; name: string; superadmin: boolean; teamaanmeldingen?: boolean; gast?: boolean; kinderen?: Record<string, string[]> | null }
 export interface Team extends RecordModel {
   naam: string
   beheerders: string[]

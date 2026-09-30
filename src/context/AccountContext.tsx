@@ -118,14 +118,14 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     }
   }
   // Open aanvragen: bij inloggen, elke minuut en als de app weer in beeld komt. De server laat alleen zien
-  // wat jij mag behandelen (beheerders: hun teams; superadmin: alles, plus nieuwe teams)
+  // wat jij mag behandelen (beheerders: hun teams; superadmin: alles; nieuwe teams: superadmin en vlag 'teamaanmeldingen')
   const [aanvragen, setAanvragen] = useState<OpenAanvragen>(GEEN_AANVRAGEN)
   const aanvragenLaden = useCallback(async () => {
     const wie = pb.authStore.record as Gebruiker | null
     if (!pb.authStore.isValid || !wie || wie.gast) return setAanvragen(GEEN_AANVRAGEN)
     const [toegang, teams] = await Promise.all([
       pb.collection('toegangsaanvragen').getFullList<ToegangAanvraag>({ filter: "status = 'nieuw'", sort: 'created', expand: 'team' }),
-      wie.superadmin ? pb.collection('aanmeldingen').getFullList<TeamAanmelding>({ filter: "status = 'nieuw'", sort: 'created' }) : Promise.resolve([]),
+      wie.superadmin || wie.teamaanmeldingen ? pb.collection('aanmeldingen').getFullList<TeamAanmelding>({ filter: "status = 'nieuw'", sort: 'created' }) : Promise.resolve([]),
     ])
     setAanvragen({ toegang, teams })
   }, [])

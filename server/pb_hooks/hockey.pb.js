@@ -102,7 +102,8 @@ routerAdd("POST", "/api/hockey/aanmelding", (e) => {
     return e.json(200, { ok: true })
   } catch (_) {}
 
-  const superadmins = e.app.findRecordsByFilter("users", "superadmin = true", "", 0, 0).map((u) => u.email())
+  // Superadmins en wie de vlag 'teamaanmeldingen' heeft
+  const superadmins = e.app.findRecordsByFilter("users", "superadmin = true || teamaanmeldingen = true", "", 0, 0).map((u) => u.email())
   if (!superadmins.length) throw new BadRequestError("Aanmelden kan nu niet")
 
   const a = new Record(e.app.findCollectionByNameOrId("aanmeldingen"))
@@ -157,10 +158,10 @@ routerAdd("POST", "/api/hockey/aanmelding/{token}", (e) => {
   return e.json(200, { status: h.beslisAanmelding(e.app, a, b.besluit, b.teamnaam) })
 })
 
-// Hetzelfde vanuit de app (Instellingen → Aanvragen): alleen voor een ingelogde superadmin
+// Hetzelfde vanuit de app (Instellingen → Aanvragen): alleen voor een ingelogde superadmin of wie de vlag 'teamaanmeldingen' heeft
 routerAdd("POST", "/api/hockey/aanmelding-id/{id}", (e) => {
   const h = require(`${__hooks}/hockey.js`)
-  if (!e.auth || e.auth.collection().name !== "users" || !e.auth.getBool("superadmin")) throw new ForbiddenError("Alleen superadmins")
+  if (!e.auth || e.auth.collection().name !== "users" || !(e.auth.getBool("superadmin") || e.auth.getBool("teamaanmeldingen"))) throw new ForbiddenError("Alleen superadmins")
   const b = e.requestInfo().body
   const a = e.app.findRecordById("aanmeldingen", e.request.pathValue("id"))
   if (a.getString("status") !== "nieuw") throw new BadRequestError("Deze aanmelding is al behandeld")
