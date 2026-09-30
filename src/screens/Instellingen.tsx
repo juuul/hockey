@@ -339,6 +339,7 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
   const [verwijderVraag, setVerwijderVraag] = useState(false)
   // Iemand uit het team halen: eerst bevestigen
   const [eruitVraag, setEruitVraag] = useState<Gebruiker | null>(null)
+  const [intrekVraag, setIntrekVraag] = useState<Uitnodiging | null>(null)
   const [melding, setMelding] = useState<{ tekst: string; fout: boolean } | null>(null)
   const [bezig, setBezig] = useState(false)
   const sa = gebruiker.superadmin
@@ -438,7 +439,7 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
                 <button
                   className="account-weg"
                   aria-label={`Uitnodiging voor ${u.email} intrekken`}
-                  onClick={() => doe(async () => { await pb.collection('uitnodigingen').delete(u.id); await uitnodigingenLaden() })}
+                  onClick={() => setIntrekVraag(u)}
                 >
                   ✕
                 </button>
@@ -517,6 +518,20 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
           gevaar
           onConfirm={() => { zetRol(eruitVraag.id, null); setEruitVraag(null) }}
           onCancel={() => setEruitVraag(null)}
+        />
+      )}
+
+      {intrekVraag && (
+        <ResetModal
+          titel="Uitnodiging intrekken?"
+          regels={[
+            { icoon: '✉️', tekst: `De link in de mail aan ${intrekVraag.email} werkt dan niet meer` },
+            { icoon: '↩', tekst: 'Opnieuw uitnodigen kan altijd' },
+          ]}
+          bevestig="Ja, intrekken"
+          gevaar
+          onConfirm={() => { const u = intrekVraag; setIntrekVraag(null); doe(async () => { await pb.collection('uitnodigingen').delete(u.id); tel('uitnodiging-ingetrokken'); await uitnodigingenLaden() }) }}
+          onCancel={() => setIntrekVraag(null)}
         />
       )}
 
