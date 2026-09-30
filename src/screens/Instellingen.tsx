@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useAccount } from '../context/AccountContext'
+import { TeamAanmelding, useAccount } from '../context/AccountContext'
 import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
@@ -196,6 +196,7 @@ function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; o
         </Kaart>
       ) : (
       <>
+      <AanvragenKaart />
       <Kaart titel="Account">
         <div className="account-wie">
           <span className="account-wie-naam">{gebruiker.name || gebruiker.email}</span>
@@ -262,8 +263,73 @@ function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; o
   )
 }
 
+// Bovenaan Instellingen, alleen als er iets te beslissen is: ouders die toegang vragen (beheerders van dat team)
+// en nieuwe teams (superadmin). Toelaten = als kijker; beheerder maken kan daarna bij Leden
+function AanvragenKaart() {
+  const { aanvragen, aanvragenLaden, teamsLaden } = useAccount()
+  const [bezig, setBezig] = useState(false)
+  const [melding, setMelding] = useState<{ tekst: string; fout: boolean } | null>(null)
+  const [teamnamen, setTeamnamen] = useState<Record<string, string>>({})
+  const { toegang, teams } = aanvragen
+  if (toegang.length + teams.length === 0 && !melding) return null
+
+  const doe = async (actie: () => Promise<unknown>, gelukt: string) => {
+    setBezig(true)
+    setMelding(null)
+    try {
+      await actie()
+      setMelding({ tekst: gelukt, fout: false })
+      await Promise.all([aanvragenLaden(), teamsLaden()])
+    } catch (err) {
+      setMelding({ tekst: foutTekst(err), fout: true })
+    } finally {
+      setBezig(false)
+    }
+  }
+  const beslisToegang = (id: string, besluit: 'kijker' | 'af', wie: string) =>
+    doe(() => pb.send(`/api/hockey/toegang-id/${id}`, { method: 'POST', body: { besluit } }).then(() => tel(`toegang-${besluit}`)),
+      besluit === 'af' ? `Aanvraag van ${wie} afgewezen.` : `${wie} is toegelaten en krijgt een mail om een wachtwoord te kiezen.`)
+  const beslisTeam = (a: TeamAanmelding, besluit: 'goed' | 'af') => {
+    const teamnaam = (teamnamen[a.id] ?? a.teamnaam).trim() || a.teamnaam
+    return doe(() => pb.send(`/api/hockey/aanmelding-id/${a.id}`, { method: 'POST', body: { besluit, teamnaam } }).then(() => tel(besluit === 'goed' ? 'aanmelding-goedgekeurd' : 'aanmelding-afgewezen')),
+      besluit === 'goed' ? `${teamnaam} is aangemaakt en ${a.email} krijgt een uitnodiging als beheerder.` : `Aanmelding van ${teamnaam} afgewezen.`)
+  }
+
+  return (
+    <Kaart titel={`Aanvragen (${toegang.length + teams.length})`}>
+      <div className="account-lijst">
+        {toegang.map(a => (
+          <div key={a.id} className="account-aanvraag">
+            <span className="account-regel-naam">{a.naam}</span>
+            <span className="account-regel-sub">wil meekijken bij {a.expand?.team?.naam ?? 'het team'} · ouder van {a.kindNaam}</span>
+            <span className="account-regel-sub">{a.email}</span>
+            <div className="account-aanvraag-knoppen">
+              <button className="btn btn-primary" disabled={bezig} onClick={() => beslisToegang(a.id, 'kijker', a.naam)}>Toelaten</button>
+              <button className="btn btn-gevaar" disabled={bezig} onClick={() => beslisToegang(a.id, 'af', a.naam)}>Afwijzen</button>
+            </div>
+          </div>
+        ))}
+        {teams.map(a => (
+          <div key={a.id} className="account-aanvraag">
+            <span className="account-regel-sub">Nieuw team</span>
+            <input className="modal-input" aria-label="Teamnaam" value={teamnamen[a.id] ?? a.teamnaam} onChange={e => setTeamnamen(t => ({ ...t, [a.id]: e.target.value }))} />
+            <span className="account-regel-sub">{a.naam ? `${a.naam} · ` : ''}{a.email}</span>
+            {a.bericht && <span className="account-regel-sub">“{a.bericht}”</span>}
+            <div className="account-aanvraag-knoppen">
+              <button className="btn btn-primary" disabled={bezig} onClick={() => beslisTeam(a, 'goed')}>Goedkeuren</button>
+              <button className="btn btn-gevaar" disabled={bezig} onClick={() => beslisTeam(a, 'af')}>Afwijzen</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {toegang.length > 0 && <p className="account-uitleg">Toelaten = als kijker. Beheerder maken kan daarna bij Leden.</p>}
+      <Melding tekst={melding?.tekst ?? null} fout={melding?.fout} />
+    </Kaart>
+  )
+}
+
 function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; weg: () => void }) {
-  const { teams, teamsLaden } = useAccount()
+  const { teams, teamsLaden, aanvragenLaden } = useAccount()
   const team = teams.find(t => t.id === id)
   const [uitnodigingen, setUitnodigingen] = useState<Uitnodiging[]>([])
   const [email, setEmail] = useState('')
@@ -281,14 +347,16 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
 
   // Open toegangsaanvragen van ouders (via de aanmeldlink)
   const [aanvragen, setAanvragen] = useState<{ id: string; naam: string; email: string; kindNaam: string }[]>([])
-  const aanvragenLaden = () =>
+  const ververs = () => aanvragenLaden().catch(() => {})
+  const lijstLaden = () =>
     pb.collection('toegangsaanvragen').getFullList<{ id: string; naam: string; email: string; kindNaam: string }>({ filter: pb.filter("team = {:id} && status = 'nieuw'", { id }), sort: 'created' }).then(setAanvragen)
-  useEffect(() => { aanvragenLaden().catch(() => {}) }, [id])
+  useEffect(() => { lijstLaden().catch(() => {}) }, [id])
   const beslis = (aanvraagId: string, besluit: 'kijker' | 'beheerder' | 'af', wie: string) => doe(async () => {
     await pb.send(`/api/hockey/toegang-id/${aanvraagId}`, { method: 'POST', body: { besluit } })
     tel(`toegang-${besluit}`)
-    await aanvragenLaden()
+    await lijstLaden()
     await uitnodigingenLaden()
+    await ververs()
   }, besluit === 'af' ? `Aanvraag van ${wie} afgewezen.` : `${wie} is toegelaten en krijgt een mail om een wachtwoord te kiezen.`)
 
   if (!team) return <p className="account-uitleg">Team niet gevonden.</p>

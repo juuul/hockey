@@ -17,7 +17,15 @@ interface AccountContextType {
   zetMijnKinderen: (ids: string[]) => void
   teamInstellingen: TeamInstellingen
   zetTeamInstellingen: (i: TeamInstellingen) => void
+  aanvragen: OpenAanvragen
+  aanvragenLaden: () => Promise<void>
 }
+
+// Wat een beheerder (toegang tot een team) of superadmin (nieuw team) nog moet goedkeuren
+export interface ToegangAanvraag { id: string; naam: string; email: string; kindNaam: string; team: string; expand?: { team?: { naam: string } } }
+export interface TeamAanmelding { id: string; teamnaam: string; naam: string; email: string; bericht: string }
+export interface OpenAanvragen { toegang: ToegangAanvraag[]; teams: TeamAanmelding[] }
+const GEEN_AANVRAGEN: OpenAanvragen = { toegang: [], teams: [] }
 
 const AccountContext = createContext<AccountContextType | undefined>(undefined)
 
@@ -109,11 +117,33 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       schrijf(OPSLAG, 'instellingen', i)
     }
   }
+  // Open aanvragen: bij inloggen, elke minuut en als de app weer in beeld komt. De server laat alleen zien
+  // wat jij mag behandelen (beheerders: hun teams; superadmin: alles, plus nieuwe teams)
+  const [aanvragen, setAanvragen] = useState<OpenAanvragen>(GEEN_AANVRAGEN)
+  const aanvragenLaden = useCallback(async () => {
+    const wie = pb.authStore.record as Gebruiker | null
+    if (!pb.authStore.isValid || !wie || wie.gast) return setAanvragen(GEEN_AANVRAGEN)
+    const [toegang, teams] = await Promise.all([
+      pb.collection('toegangsaanvragen').getFullList<ToegangAanvraag>({ filter: "status = 'nieuw'", sort: 'created', expand: 'team' }),
+      wie.superadmin ? pb.collection('aanmeldingen').getFullList<TeamAanmelding>({ filter: "status = 'nieuw'", sort: 'created' }) : Promise.resolve([]),
+    ])
+    setAanvragen({ toegang, teams })
+  }, [])
+  useEffect(() => {
+    if (!gebruiker || gebruiker.gast) return setAanvragen(GEEN_AANVRAGEN)
+    const laad = () => { aanvragenLaden().catch(() => {}) }
+    laad()
+    const id = setInterval(laad, 60_000)
+    const zichtbaar = () => { if (document.visibilityState === 'visible') laad() }
+    document.addEventListener('visibilitychange', zichtbaar)
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', zichtbaar) }
+  }, [gebruiker?.id, aanvragenLaden])
+
   // Zonder team mag je alles (alleen deze telefoon); in een team alleen als beheerder of superadmin
   const magBewerken = !actiefTeamId || !!gebruiker?.superadmin || (actiefTeam ? rolIn(actiefTeam, gebruiker?.id ?? '') === 'beheerder' : true)
 
   return (
-    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen, teamInstellingen, zetTeamInstellingen }}>
+    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen, teamInstellingen, zetTeamInstellingen, aanvragen, aanvragenLaden }}>
       {children}
     </AccountContext.Provider>
   )

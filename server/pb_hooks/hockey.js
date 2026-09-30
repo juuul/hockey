@@ -139,4 +139,34 @@ function vindAanmelding(app, token) {
   }
 }
 
-module.exports = { ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }
+// Teamaanmelding goedkeuren (team maken + aanvrager uitnodigen als beheerder) of afwijzen (mail naar de aanvrager)
+function beslisAanmelding(app, a, besluit, teamnaamIn) {
+  const email = a.getString("email")
+  const teamnaam = String(teamnaamIn || a.getString("teamnaam")).trim().slice(0, 60)
+
+  if (besluit === "goed") {
+    app.runInTransaction((tx) => {
+      const team = new Record(tx.findCollectionByNameOrId("teams"))
+      team.set("naam", teamnaam)
+      tx.save(team)
+      a.set("status", "goedgekeurd")
+      a.set("teamnaam", teamnaam)
+      a.set("team", team.id)
+      tx.save(a)
+    })
+    nodigUit(app, a.getString("team"), email, "beheerder", a.getString("terug"), "")
+    return "goedgekeurd"
+  }
+  if (besluit === "af") {
+    a.set("status", "afgewezen")
+    app.save(a)
+    try {
+      mail(app, [email], "Aanmelding " + a.getString("teamnaam"),
+        "<p>Hallo,</p><p>Je aanmelding voor <strong>" + escape(a.getString("teamnaam")) + "</strong> is helaas niet goedgekeurd.</p>")
+    } catch (_) {}
+    return "afgewezen"
+  }
+  throw new BadRequestError("Kies goedkeuren of afwijzen")
+}
+
+module.exports = { beslisAanmelding, ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }

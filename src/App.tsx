@@ -40,6 +40,9 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
   const tabNaam = (tab: { id: Scherm; naam: string }) => (tab.id === 'dashboard' && tegenstander ? tegenstander : tab.naam)
   const syncProbleem = !!((sync && (sync.offline || sync.fout)) || (live && !live.verbonden))
+  // Open aanvragen (toegang tot een team, nieuwe teams): aantal op het tandwiel
+  const { aanvragen } = useAccount()
+  const aantalAanvragen = aanvragen.toegang.length + aanvragen.teams.length
 
   return (
     <div className="mobile-frame">
@@ -56,6 +59,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
             <span className="tab-icoon" aria-hidden="true">{tab.icoon}</span>
             {screen === tab.id && <span className="tab-naam" aria-hidden="true">{tabNaam(tab)}</span>}
             {tab.id === 'instellingen' && syncProbleem && <span className="tab-waarschuwing" aria-label="geen verbinding met de server">⚠</span>}
+            {tab.id === 'instellingen' && !syncProbleem && aantalAanvragen > 0 && <span className="tab-teller" aria-label={`${aantalAanvragen} aanvragen`}>{aantalAanvragen}</span>}
           </button>
         ))}
       </nav>

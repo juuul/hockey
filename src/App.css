@@ -103,6 +103,23 @@
   color: var(--geel-tekst);
 }
 
+/* Open aanvragen: rood bolletje met het aantal op het tandwiel */
+.tab-teller {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 14px;
+  background: #dc2626;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  text-align: center;
+}
+
 /* Niet ingelogd: boven de voorbeeld-tabbladen */
 .demo-kop {
   display: flex;

@@ -154,32 +154,17 @@ routerAdd("POST", "/api/hockey/aanmelding/{token}", (e) => {
   const b = e.requestInfo().body
   const a = h.vindAanmelding(e.app, e.request.pathValue("token"))
   if (a.getString("status") !== "nieuw") throw new BadRequestError("Deze aanmelding is al behandeld")
-  const email = a.getString("email")
-  const teamnaam = String(b.teamnaam || a.getString("teamnaam")).trim().slice(0, 60)
+  return e.json(200, { status: h.beslisAanmelding(e.app, a, b.besluit, b.teamnaam) })
+})
 
-  if (b.besluit === "goed") {
-    e.app.runInTransaction((tx) => {
-      const team = new Record(tx.findCollectionByNameOrId("teams"))
-      team.set("naam", teamnaam)
-      tx.save(team)
-      a.set("status", "goedgekeurd")
-      a.set("teamnaam", teamnaam)
-      a.set("team", team.id)
-      tx.save(a)
-    })
-    h.nodigUit(e.app, a.getString("team"), email, "beheerder", a.getString("terug"), "")
-    return e.json(200, { status: "goedgekeurd" })
-  }
-  if (b.besluit === "af") {
-    a.set("status", "afgewezen")
-    e.app.save(a)
-    try {
-      h.mail(e.app, [email], "Aanmelding " + a.getString("teamnaam"),
-        "<p>Hallo,</p><p>Je aanmelding voor <strong>" + h.escape(a.getString("teamnaam")) + "</strong> is helaas niet goedgekeurd.</p>")
-    } catch (_) {}
-    return e.json(200, { status: "afgewezen" })
-  }
-  throw new BadRequestError("Kies goedkeuren of afwijzen")
+// Hetzelfde vanuit de app (Instellingen → Aanvragen): alleen voor een ingelogde superadmin
+routerAdd("POST", "/api/hockey/aanmelding-id/{id}", (e) => {
+  const h = require(`${__hooks}/hockey.js`)
+  if (!e.auth || e.auth.collection().name !== "users" || !e.auth.getBool("superadmin")) throw new ForbiddenError("Alleen superadmins")
+  const b = e.requestInfo().body
+  const a = e.app.findRecordById("aanmeldingen", e.request.pathValue("id"))
+  if (a.getString("status") !== "nieuw") throw new BadRequestError("Deze aanmelding is al behandeld")
+  return e.json(200, { status: h.beslisAanmelding(e.app, a, b.besluit, b.teamnaam) })
 })
 
 // ── Foutmeldingen uit de app ──
