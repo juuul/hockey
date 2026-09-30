@@ -51,6 +51,9 @@ export function faseVan(verstreken: number, schema: Deel[] = SCHEMA): Fase {
   return { index: schema.length, deel: null, inDeel: verstreken - begin, nog: 0 }
 }
 
+// Hele wedstrijd incl. pauzes en rust (ms): daarna stopt de klok
+export const wedstrijdDuur = (schema: Deel[] = SCHEMA) => schema.reduce((som, d) => som + d.lengte, 0)
+
 // Tijd (ms) waarop een deel begint
 export const beginVan = (index: number, schema: Deel[] = SCHEMA) =>
   schema.slice(0, index).reduce((som, d) => som + d.lengte, 0)

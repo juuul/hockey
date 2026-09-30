@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import ResetModal from './ResetModal'
 import { tel } from '../statistiek'
-import { beginVan, deelNaam, faseVan, schemaVoor, speelNaam, voortgang } from '../speelduur'
+import { beginVan, deelNaam, faseVan, wedstrijdDuur, schemaVoor, speelNaam, voortgang } from '../speelduur'
 import './Timer.css'
 
 function formatteer(ms: number) {
@@ -25,9 +25,10 @@ export function useKlok() {
     return () => clearInterval(id)
   }, [loopt])
 
-  const verstreken = stand.opgebouwd + (loopt ? nu - stand.gestartOp! : 0)
-  // Kwart, pauze of rust volgt vanzelf uit de verstreken tijd. Pauze/rust telt af (naar boven afgerond)
   const schema = schemaVoor(spelvorm)
+  // Nooit verder dan het einde van de wedstrijd (de context zet de klok daar ook stil)
+  const verstreken = Math.min(wedstrijdDuur(schema), stand.opgebouwd + (loopt ? nu - stand.gestartOp! : 0))
+  // Kwart, pauze of rust volgt vanzelf uit de verstreken tijd. Pauze/rust telt af (naar boven afgerond)
   const fase = faseVan(verstreken, schema)
   const inPauze = !!fase.deel && fase.deel.soort !== 'kwart'
   const naam = deelNaam(fase.deel, schema)
@@ -114,7 +115,7 @@ export default function Timer() {
           ))}
         </div>
         <div className="timer-knoppen">
-          {loopt || nietBegonnen
+          {loopt || nietBegonnen || !fase.deel
             ? <button className="btn timer-pauze" onClick={pauze} disabled={!loopt}>Pauze</button>
             : <button className="btn timer-start" onClick={start}>Verder</button>}
           <button className="btn timer-stop" onClick={() => setStopVraag(true)} disabled={nietBegonnen}>Stop</button>

@@ -7,6 +7,7 @@ import { Alles, GEEN_VERWIJDERD, Lokaal, naarRecords, nieuweIds, pbId, perSoort,
 import { SyncStatus, useTeamSync } from './useTeamSync'
 import { LiveStand, LiveStatus, useLiveStand } from './useLiveStand'
 import { Stand, spelersMetStand, spelersStand } from '../live'
+import { schemaVoor, wedstrijdDuur } from '../speelduur'
 import { DEMO_CLUBS, DEMO_SPELERS, DEMO_VOORKEUR, demoProgramma, demoWedstrijden } from '../demo'
 
 // Starttijdstip + opgebouwde tijd i.p.v. een teller: zo klopt de tijd ook na verversen of een vergrendeld scherm
@@ -174,6 +175,17 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   // Tijd bijstellen of een deel 'nu' laten beginnen; loopt de klok (of starten), dan telt hij vanaf nu verder
   const zetKlok = (ms: number, starten = false) =>
     setTimer(t => ({ gestartOp: starten || t.gestartOp !== null ? Date.now() : null, opgebouwd: Math.max(0, ms) }))
+
+  // Na afloop (einde van het laatste kwart of de laatste helft, per categorie) stopt de klok vanzelf op de eindtijd
+  useEffect(() => {
+    if (timer.gestartOp === null || !magBewerken) return
+    const eind = wedstrijdDuur(schemaVoor(spelvorm))
+    const stop = () => setTimer(t => (t.gestartOp === null ? t : { gestartOp: null, opgebouwd: eind }))
+    const rest = eind - (timer.opgebouwd + Date.now() - timer.gestartOp)
+    if (rest <= 0) return stop()
+    const id = setTimeout(stop, rest)
+    return () => clearTimeout(id)
+  }, [timer, spelvorm, magBewerken])
 
   const [clubs, setClubs] = useState<Club[]>(() => (demo ? DEMO_CLUBS : lees(P, 'clubs', [])))
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
