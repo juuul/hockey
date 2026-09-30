@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { gastEmail, Gebruiker, pb, rolIn, STANDAARD_INSTELLINGEN, Team, TeamInstellingen } from '../server'
 import { lees, OPSLAG, schrijf } from '../opslag'
+import { DEMO_KIND } from '../demo'
 
 interface AccountContextType {
   gebruiker: Gebruiker | null
@@ -87,8 +88,10 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   // 'Mijn kind(eren)' per team: bij een gewoon account op de server (volgt je account), anders op deze telefoon
   const kindSleutel = `kinderen_${actiefTeamId ?? 'lokaal'}`
-  const [lokaleKinderen, setLokaleKinderen] = useState<string[]>(() => lees(OPSLAG, kindSleutel, []))
-  useEffect(() => { setLokaleKinderen(lees(OPSLAG, kindSleutel, [])) }, [kindSleutel])
+  // Niet ingelogd en nog geen keuze: het voorbeeldkind (past bij de voorbeeldgegevens)
+  const kindStandaard = gebruiker ? [] : DEMO_KIND
+  const [lokaleKinderen, setLokaleKinderen] = useState<string[]>(() => lees(OPSLAG, kindSleutel, kindStandaard))
+  useEffect(() => { setLokaleKinderen(lees(OPSLAG, kindSleutel, kindStandaard)) }, [kindSleutel, !!gebruiker])
   const opAccount = !!gebruiker && !gebruiker.gast && !!actiefTeamId
   const mijnKinderen = opAccount ? gebruiker!.kinderen?.[actiefTeamId!] ?? [] : lokaleKinderen
   const zetMijnKinderen = (ids: string[]) => {

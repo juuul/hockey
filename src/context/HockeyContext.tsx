@@ -71,7 +71,7 @@ interface HockeyContextType {
   verwijderWedstrijd: (id: string) => void
   teamId: string | null
   magBewerken: boolean // de lopende wedstrijd bijhouden (Dashboard)
-  magBeheren: boolean // spelers, voorkeuren, programma en historie wijzigen (niet in het voorbeeld)
+  magBeheren: boolean // spelers, voorkeuren, programma en historie wijzigen
   demo: boolean
   sync: SyncStatus | null
   live: LiveStatus | null
@@ -89,12 +89,15 @@ interface ProviderProps {
   children: React.ReactNode
   teamId?: string | null
   magBewerken?: boolean
-  demo?: boolean // niet ingelogd: Dashboard werkt (eigen opslag), de rest is een vast voorbeeld
+  demo?: boolean // niet ingelogd: alles werkt, alleen op deze telefoon; een lege telefoon begint met voorbeeldgegevens
 }
 
 // Met een team: eigen opslag per team en synchroniseren met de server. Zonder team: alleen deze telefoon
 export function HockeyProvider({ children, teamId = null, magBewerken = true, demo = false }: ProviderProps) {
-  const P = demo ? `${OPSLAG}_demo` : teamOpslag(teamId)
+  const P = teamOpslag(teamId)
+  // Niet ingelogd en nog niets op deze telefoon: beginnen met de voorbeeldgegevens (daarna gewoon zelf aan te passen)
+  const leesOfVoorbeeld = <T,>(sleutel: string, voorbeeld: () => T, leeg: T): T =>
+    demo && localStorage.getItem(`${P}_${sleutel}`) === null ? voorbeeld() : lees(P, sleutel, leeg)
 
   const [spelers, zetSpelersRuw] = useState<Player[]>(() => {
     const saved = localStorage.getItem(`${P}_spelers`)
@@ -102,7 +105,6 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     if (!saved) return teamId ? [] : DEMO_SPELERS
     const lijst: Player[] = JSON.parse(saved).map((sp: Player) => ({ ...sp, meedoen: sp.meedoen ?? true }))
     // Voorbeeld: namen zijn daar niet te wijzigen, dus altijd die uit de vaste lijst (ook na een nieuwe versie)
-    if (demo) return lijst.map(sp => ({ ...sp, naam: DEMO_SPELERS.find(d => d.id === sp.id)?.naam ?? sp.naam }))
     return lijst
   })
 
@@ -112,8 +114,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   })
 
   const [vastePosities, setVastePositiesState] = useState<Record<string, string[]>>(() => {
-    if (demo) return DEMO_VOORKEUR
     const saved = localStorage.getItem(`${P}_vaste_posities`)
+    if (demo && saved === null) return DEMO_VOORKEUR
     const parsed: Record<string, string | string[]> = saved ? JSON.parse(saved) : {}
     // Oudere versie bewaarde één positie per speler als string
     return Object.fromEntries(Object.entries(parsed).map(([id, v]) => [id, typeof v === 'string' ? [v, ''] : v]))
@@ -187,14 +189,11 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     return () => clearTimeout(id)
   }, [timer, spelvorm, magBewerken])
 
-  const [clubs, setClubs] = useState<Club[]>(() => (demo ? DEMO_CLUBS : lees(P, 'clubs', [])))
+  const [clubs, setClubs] = useState<Club[]>(() => leesOfVoorbeeld('clubs', () => DEMO_CLUBS, []))
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
-  const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => {
-    if (demo) return demoWedstrijden()
-    return lees<GespeeldeWedstrijd[]>(P, 'wedstrijden', [])
-  })
+  const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => leesOfVoorbeeld<GespeeldeWedstrijd[]>('wedstrijden', demoWedstrijden, []))
   // Wat op dit toestel expliciet is verwijderd en nog naar de server moet (alleen dat wordt daar gewist)
-  const [programma, setProgramma] = useState<ProgrammaItem[]>(() => (demo ? demoProgramma() : lees(P, 'programma', [])))
+  const [programma, setProgramma] = useState<ProgrammaItem[]>(() => leesOfVoorbeeld('programma', demoProgramma, []))
   useEffect(() => { schrijf(P, 'programma', programma) }, [programma])
   const [verwijderd, setVerwijderd] = useState<Verwijderd>(() => ({ ...GEEN_VERWIJDERD, ...lees<Partial<Verwijderd>>(P, 'verwijderd', {}) }))
   useEffect(() => { schrijf(P, 'verwijderd', verwijderd) }, [verwijderd])
@@ -530,7 +529,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, magBeheren: magBewerken && !demo, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )

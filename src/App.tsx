@@ -65,13 +65,13 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
       </nav>
 
       <div className="content" ref={scrollVak}>
-        {/* Niet ingelogd: alleen het Dashboard werkt; de rest is een voorbeeld met de weg naar inloggen */}
+        {/* Niet ingelogd: alles werkt, maar alleen op deze telefoon; de weg naar inloggen */}
         {demo && screen !== 'dashboard' && screen !== 'instellingen' && (
           <div className="demo-kop">
             <button className="inlog-balk" onClick={() => setScreen('instellingen')}>
               <span aria-hidden="true">👤</span> Inloggen
             </button>
-            <p className="demo-uitleg">Dit is een voorbeeld. Log in om dit voor je eigen team bij te houden.</p>
+            <p className="demo-uitleg">Zonder account staat alles alleen op deze telefoon. Log in om het met je team te delen.</p>
           </div>
         )}
         {screen === 'dashboard' && <Dashboard naarInstellingen={() => setScreen('instellingen')} />}

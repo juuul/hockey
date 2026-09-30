@@ -5,7 +5,6 @@ import { begeleidingTekst, NIET_NODIG, ProgrammaItem } from '../types'
 import type { TeamInstellingen } from '../server'
 import { datumTekst, vandaag } from '../historie'
 import { pbId } from '../sync'
-import { DEMO_KIND } from '../demo'
 import { tel } from '../statistiek'
 import ResetModal from '../components/ResetModal'
 import '../components/Modal.css'
@@ -24,11 +23,8 @@ const LEEG_ITEM = (inst: TeamInstellingen): ProgrammaItem => ({
 
 // Tabblad Programma: wedstrijden met tijden, fruit en spelbegeleiding. Beurten van je eigen kind(eren) vallen op
 export default function Programma({ naarDashboard }: { naarDashboard: () => void }) {
-  const { programma, spelers, clubs, magBeheren: magBewerken, demo, wedstrijd, zetWedstrijd, allesResetten, score, timer } = useHockey()
-  const account = useAccount()
-  const { zetMijnKinderen, teamInstellingen } = account
-  // In het voorbeeld (niet ingelogd) is Emma 'mijn kind', zodat je ziet hoe je eigen beurten opvallen
-  const mijnKinderen = demo ? DEMO_KIND : account.mijnKinderen
+  const { programma, spelers, clubs, magBeheren: magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer } = useHockey()
+  const { mijnKinderen, zetMijnKinderen, teamInstellingen } = useAccount()
   const [bewerk, setBewerk] = useState<ProgrammaItem | null>(null)
   const [standaardOpen, setStandaardOpen] = useState(false)
   const [klaarVraag, setKlaarVraag] = useState<ProgrammaItem | null>(null)
@@ -126,7 +122,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         <div className="prog-kind-kop">
           <span className="prog-kind-titel">Mijn kind</span>
           {mijnKinderen.filter(naam).map(id => <span key={id} className="prog-chip">{naam(id)}</span>)}
-          {!demo && <button className="prog-kind-kies" onClick={() => setKiesKind(true)}>{mijnKinderen.length ? 'Wijzig' : 'Kies'}</button>}
+          <button className="prog-kind-kies" onClick={() => setKiesKind(true)}>{mijnKinderen.length ? 'Wijzig' : 'Kies'}</button>
         </div>
         {mijnKinderen.length > 0 ? (
           <button className={`prog-filter ${alleenMijn ? 'actief' : ''}`} onClick={() => setAlleenMijn(!alleenMijn)} aria-pressed={alleenMijn}>
