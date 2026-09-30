@@ -121,3 +121,12 @@
     padding: 18px;
   }
 }
+
+/* Iets weghalen (bv. iemand uit het team): rode bevestigknop */
+.btn-confirm.gevaar {
+  background: #dc2626;
+}
+
+.btn-confirm.gevaar:active {
+  background: #b91c1c;
+}

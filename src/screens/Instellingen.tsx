@@ -4,6 +4,7 @@ import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
 import DeelKijklink from '../components/DeelKijklink'
+import ResetModal from '../components/ResetModal'
 import { leesThema, Thema, zetThema } from '../thema'
 import '../components/Modal.css'
 import './Instellingen.css'
@@ -336,6 +337,8 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
   const [rol, setRol] = useState<Rol>('kijker')
   const [lid, setLid] = useState<Gebruiker | null>(null)
   const [verwijderVraag, setVerwijderVraag] = useState(false)
+  // Iemand uit het team halen: eerst bevestigen
+  const [eruitVraag, setEruitVraag] = useState<Gebruiker | null>(null)
   const [melding, setMelding] = useState<{ tekst: string; fout: boolean } | null>(null)
   const [bezig, setBezig] = useState(false)
   const sa = gebruiker.superadmin
@@ -494,10 +497,27 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
             </div>
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setLid(null)}>Annuleren</button>
-              <button className="btn btn-gevaar" disabled={bezig} onClick={() => zetRol(lid.id, null)}>Uit team</button>
+              <button className="btn btn-gevaar" disabled={bezig} onClick={() => { setEruitVraag(lid); setLid(null) }}>Uit team</button>
             </div>
           </div>
         </div>
+      )}
+
+      {eruitVraag && (
+        <ResetModal
+          titel={eruitVraag.gast ? 'Meekijklink uitzetten?' : `${eruitVraag.name || eruitVraag.email} uit het team halen?`}
+          regels={eruitVraag.gast ? [
+            { icoon: '🔗', tekst: `Wie de meekijklink heeft, kan ${team.naam} niet meer zien` },
+            { icoon: '↩', tekst: 'Een nieuwe meekijklink maken kan altijd weer' },
+          ] : [
+            { icoon: '👤', tekst: `${eruitVraag.name || eruitVraag.email} kan ${team.naam} niet meer zien of bijhouden` },
+            { icoon: '↩', tekst: 'Terugzetten kan alleen met een nieuwe uitnodiging' },
+          ]}
+          bevestig={eruitVraag.gast ? 'Ja, link uitzetten' : 'Ja, uit het team'}
+          gevaar
+          onConfirm={() => { zetRol(eruitVraag.id, null); setEruitVraag(null) }}
+          onCancel={() => setEruitVraag(null)}
+        />
       )}
 
       {verwijderVraag && (
