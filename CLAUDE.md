@@ -36,7 +36,8 @@ Dashboard: alleen zonder account bovenaan de knop "👤 Inloggen", die naar Inst
 **Niet ingelogd** (`demo` in de `HockeyProvider`, voorbeeldgegevens in `src/demo.ts`): alles werkt en wordt alleen op deze telefoon bewaard (dezelfde opslag als "Zonder team", `<opslag>_…`). Een lege telefoon begint met voorbeeldgegevens (testnamen, voorkeuren, verzonnen clubs, wedstrijden en een programma rond vandaag, 'mijn kind' Emma); per onderdeel alleen zolang daar nog niets van bewaard is (`leesOfVoorbeeld`). Bovenaan Spelers, Voorkeur, Programma en Historie "👤 Inloggen" + "Zonder account staat alles alleen op deze telefoon".
 
 ### Regels
-- **Wisselteller** gaat +1 bij de speler die **uit** het veld gaat (alleen bij Wissel, niet bij Verplaatsen). De invaller neemt de positie over.
+- **Wisselteller** gaat +1 bij de speler die **uit** het veld gaat (bij Wissel). De invaller neemt de positie over.
+- **Verplaatsen met een wisselspeler** (correctie, `verplaatsSpelers`): wie erin komt krijgt −1 (niet onder 0) en de kleur/invalvolgorde van wie eruit gaat (wordt dus niet rood), wie op de bank komt +1. Twee veldspelers ruilen: tellers en kleuren blijven.
 - **Wisselspelers sorteren**: minste wissels eerst; bij gelijke stand komt wie het laatst uit het veld ging onderaan. Zelfde volgorde in de wissel-pop-up.
 - **Kleuren in het veld** (alleen informatief, blokkeert niets), op volgorde van invallen (`inVolgorde`), niet op tijd: bij 11, 9 en 8 spelers de laatste 2 invallers rood, 2 daarvoor oranje, de rest (ook de basis) groen; bij 6 spelers 1 rood, 1 oranje. Keeper geen kleur.
 - **Nieuwe opstelling**: eerst eerlijk loten wie begint (iedereen gelijke kans op de bank), dan per basisspeler de 1e voorkeur, daarna de 2e (beide in gelote volgorde, bij dubbele keuze wint een willekeurige), rest willekeurig. Tellers blijven staan; `inVolgorde` terug naar 0.

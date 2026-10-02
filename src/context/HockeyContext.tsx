@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Shootout, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
-import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, naamBezet } from '../opstelling'
+import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, naamBezet, verplaatsSpelers } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
 import { Alles, GEEN_VERWIJDERD, Lokaal, naarRecords, nieuweIds, pbId, perSoort, Soort, spelersToepassen, Verwijderd, voorkeurenUit } from '../sync'
@@ -321,15 +321,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   const verplaats = (idA: string, idB: string) => {
-    const a = spelers.find(s => s.id === idA)
-    const b = spelers.find(s => s.id === idB)
-    if (!a || !b) return
+    if (!spelers.some(s => s.id === idA) || !spelers.some(s => s.id === idB)) return
     remember()
-    setSpelers(spelers.map(s => {
-      if (s.id === idA) return { ...s, positie: b.positie, isKeeper: b.isKeeper, inVeld: b.inVeld }
-      if (s.id === idB) return { ...s, positie: a.positie, isKeeper: a.isKeeper, inVeld: a.inVeld }
-      return s
-    }))
+    // Niet via setSpelers: een verplaatste invaller is geen nieuwe invaller (geen rood)
+    zetSpelersRuw(verplaatsSpelers(spelers, idA, idB))
   }
 
   const resetWissels = () => {

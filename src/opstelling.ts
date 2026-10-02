@@ -83,6 +83,24 @@ export function stempelInkomers(oud: Player[], nieuw: Player[]): Player[] {
   })
 }
 
+// Verplaatsen: twee spelers ruilen van plek. Ruilt een veldspeler met een wisselspeler, dan is dat een correctie,
+// geen echte wissel: de invaller krijgt de plek in de invalvolgorde (dus de kleur) van wie eruit gaat en een wissel
+// minder, wie op de bank komt een wissel meer
+export function verplaatsSpelers(spelers: Player[], idA: string, idB: string): Player[] {
+  const a = spelers.find(s => s.id === idA)
+  const b = spelers.find(s => s.id === idB)
+  if (!a || !b) return spelers
+  const metBank = a.inVeld !== b.inVeld
+  const ruil = (s: Player, ander: Player): Player => {
+    const nieuw = { ...s, positie: ander.positie, isKeeper: ander.isKeeper, inVeld: ander.inVeld }
+    if (!metBank) return nieuw
+    return s.inVeld
+      ? { ...nieuw, wisselCount: s.wisselCount + 1 }
+      : { ...nieuw, wisselCount: Math.max(0, s.wisselCount - 1), inVolgorde: ander.inVolgorde ?? 0 }
+  }
+  return spelers.map(s => (s.id === idA ? ruil(a, b) : s.id === idB ? ruil(b, a) : s))
+}
+
 export type VeldKleur = 'groen' | 'oranje' | 'rood'
 
 // Op volgorde van invallen: laatste invallers rood, die daarvoor oranje, de rest (ook de basis) groen
