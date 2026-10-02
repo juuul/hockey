@@ -7,7 +7,8 @@ const KEUZE_NAAM = ['1e keuze', '2e keuze']
 
 export default function Positions() {
   const { spelers, vastePosities, setVastePositie, opstelling, magBeheren: magBewerken } = useHockey()
-  const fieldPlayers = spelers.filter(s => !s.isKeeper)
+  // Ook de keeper: haal je haar uit het doel, dan is haar voorkeur er nog
+  const fieldPlayers = spelers
 
   const handleSetPosition = (spelerId: string, keuze: number, positie: Position | null) => {
     setVastePositie(spelerId, keuze, positie)
@@ -26,6 +27,7 @@ export default function Positions() {
             <div className="player-name">
               {player.naam}
               {!player.meedoen && <div className="niet-mee">Doet niet mee, wordt niet opgesteld</div>}
+              {player.meedoen && player.isKeeper && <div className="niet-mee">Staat nu op doel</div>}
             </div>
             <div className="position-buttons">
               {[0, 1].map(keuze => {
