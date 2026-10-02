@@ -26,7 +26,7 @@ export default function Positions() {
           <div key={player.id} className={`position-item ${player.meedoen ? '' : 'doet-niet-mee'}`}>
             <div className="player-name">
               {player.naam}
-              {!player.meedoen && <div className="niet-mee">Doet niet mee, wordt niet opgesteld</div>}
+              {!player.meedoen && <div className="niet-mee">Speelt niet mee</div>}
               {player.meedoen && player.isKeeper && <div className="niet-mee">Staat nu op doel</div>}
             </div>
             <div className="position-buttons">
