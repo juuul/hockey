@@ -81,7 +81,7 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
   return e.json(200, { email, bestaat })
 })
 
-// ── Nieuwe teams aanmelden (openbaar) en goedkeuren door een superadmin via de link in de mail ──
+// ── Nieuwe teams aanmelden (openbaar): meteen team + uitnodiging als beheerder; superadmins krijgen alleen bericht ──
 
 routerAdd("POST", "/api/hockey/aanmelding", (e) => {
   const h = require(`${__hooks}/hockey.js`)
@@ -96,15 +96,15 @@ routerAdd("POST", "/api/hockey/aanmelding", (e) => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new BadRequestError("Vul een geldig e-mailadres in")
   if (!h.TOEGESTAAN.includes(terug)) throw new BadRequestError("Onbekend terugadres")
 
-  // Nogmaals op de knop gedrukt: niet opnieuw mailen
+  // Nogmaals op de knop gedrukt (zelfde adres en team, afgelopen week): niet opnieuw mailen
+  const weekGeleden = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().replace("T", " ")
   try {
-    e.app.findFirstRecordByFilter("aanmeldingen", "email = {:email} && teamnaam = {:teamnaam} && status = 'nieuw'", { email, teamnaam })
+    e.app.findFirstRecordByFilter("aanmeldingen", "email = {:email} && teamnaam = {:teamnaam} && created > {:sinds}", { email, teamnaam, sinds: weekGeleden })
     return e.json(200, { ok: true })
   } catch (_) {}
 
-  // Superadmins en wie de vlag 'teamaanmeldingen' heeft
+  // Superadmins en wie de vlag 'teamaanmeldingen' heeft (alleen ter informatie)
   const superadmins = e.app.findRecordsByFilter("users", "superadmin = true || teamaanmeldingen = true", "", 0, 0).map((u) => u.email())
-  if (!superadmins.length) throw new BadRequestError("Aanmelden kan nu niet")
 
   const a = new Record(e.app.findCollectionByNameOrId("aanmeldingen"))
   a.set("teamnaam", teamnaam)
@@ -116,23 +116,22 @@ routerAdd("POST", "/api/hockey/aanmelding", (e) => {
   a.set("status", "nieuw")
   e.app.save(a)
 
-  const link = terug + "#aanmelding=" + a.getString("token")
+  // Meteen goedkeuren: team maken en de aanvrager als beheerder uitnodigen. Pas met de link uit die mail
+  // kan een account worden gemaakt, dus daarmee is het e-mailadres bevestigd
   try {
-    h.mail(e.app, superadmins, "Nieuwe teamaanmelding: " + teamnaam,
-      "<p>Er is een nieuw team aangemeld voor de Hockey Wissel-app.</p>" +
-      "<p><strong>Team:</strong> " + h.escape(teamnaam) + "<br><strong>Naam:</strong> " + h.escape(naam || "-") +
-      "<br><strong>E-mail:</strong> " + h.escape(email) + "</p>" +
-      (bericht ? "<p><strong>Bericht:</strong><br>" + h.escape(bericht).replace(/\n/g, "<br>") + "</p>" : "") +
-      "<p><a href=\"" + h.escape(link) + "\">Aanmelding bekijken en goedkeuren of afwijzen</a></p>" +
-      "<p>Deze link blijft geldig tot de aanmelding is behandeld.</p>")
-    h.mail(e.app, [email], "Aanmelding ontvangen: " + teamnaam,
-      "<p>Hallo" + (naam ? " " + h.escape(naam) : "") + ",</p>" +
-      "<p>We hebben je aanmelding voor <strong>" + h.escape(teamnaam) + "</strong> ontvangen. " +
-      "Zodra die is goedgekeurd, krijg je een mail met een link om je account te maken.</p>")
+    h.beslisAanmelding(e.app, a, "goed")
   } catch (err) {
-    e.app.delete(a)
+    try { if (a.getString("team")) e.app.delete(e.app.findRecordById("teams", a.getString("team"))) } catch (_) {}
+    try { e.app.delete(a) } catch (_) {}
     throw new BadRequestError("De aanmelding kon niet worden gemaild. Probeer het later nog eens.")
   }
+  try {
+    if (superadmins.length) h.mail(e.app, superadmins, "Nieuw team: " + teamnaam,
+      "<p>Er is een nieuw team aangemaakt in de Hockey Wissel-app. De aanvrager heeft een uitnodiging als beheerder gekregen.</p>" +
+      "<p><strong>Team:</strong> " + h.escape(teamnaam) + "<br><strong>Naam:</strong> " + h.escape(naam || "-") +
+      "<br><strong>E-mail:</strong> " + h.escape(email) + "</p>" +
+      (bericht ? "<p><strong>Bericht:</strong><br>" + h.escape(bericht).replace(/\n/g, "<br>") + "</p>" : ""))
+  } catch (_) {}
   return e.json(200, { ok: true })
 })
 
@@ -255,7 +254,7 @@ routerAdd("GET", "/api/hockey/aanvraag/{waarde}", (e) => {
   return e.json(200, { team: team.getString("naam"), spelers })
 })
 
-// Aanvraag versturen: bewaren en alle beheerders mailen
+// Aanvraag versturen: meteen als kijker uitnodigen, beheerders krijgen bericht
 routerAdd("POST", "/api/hockey/aanvraag/{waarde}", (e) => {
   const h = require(`${__hooks}/hockey.js`)
   const team = h.vindTeamMetAanvraaglink(e.app, e.request.pathValue("waarde"))
@@ -276,9 +275,10 @@ routerAdd("POST", "/api/hockey/aanvraag/{waarde}", (e) => {
   }
   if (!kindNaam) throw new BadRequestError("Kies of vul de naam van je kind in")
 
-  // Nogmaals verstuurd: geen tweede mail
+  // Nogmaals verstuurd (afgelopen week): geen tweede mail
+  const weekGeleden = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().replace("T", " ")
   try {
-    e.app.findFirstRecordByFilter("toegangsaanvragen", "team = {:team} && email = {:email} && status = 'nieuw'", { team: team.id, email })
+    e.app.findFirstRecordByFilter("toegangsaanvragen", "team = {:team} && email = {:email} && created > {:sinds}", { team: team.id, email, sinds: weekGeleden })
     return e.json(200, { ok: true })
   } catch (_) {}
 
@@ -293,17 +293,20 @@ routerAdd("POST", "/api/hockey/aanvraag/{waarde}", (e) => {
   a.set("status", "nieuw")
   e.app.save(a)
 
-  const link = terug + "#toegang=" + a.getString("token")
+  // Meteen toelaten als kijker: de uitnodiging gaat naar het opgegeven adres, dus wie een account maakt heeft
+  // dat adres bevestigd. Beheerder maken kan alleen een beheerder (Leden)
   try {
-    h.mail(e.app, h.beheerderEmails(e.app, team), "Toegang gevraagd voor " + team.getString("naam") + ": " + naam,
-      "<p><strong>" + h.escape(naam) + "</strong> (ouder van <strong>" + h.escape(kindNaam) + "</strong>) vraagt toegang tot <strong>" +
-      h.escape(team.getString("naam")) + "</strong> in de Hockey Wissel-app.</p><p>E-mail: " + h.escape(email) + "</p>" +
-      "<p><a href=\"" + h.escape(link) + "\">Aanvraag bekijken en toelaten of afwijzen</a></p>" +
-      "<p>Je vindt open aanvragen ook in de app bij Instellingen → Leden.</p>")
+    h.beslisAanvraag(e.app, a, "kijker", "")
   } catch (err) {
-    e.app.delete(a)
+    try { e.app.delete(a) } catch (_) {}
     throw new BadRequestError("De aanvraag kon niet worden gemaild. Probeer het later nog eens.")
   }
+  try {
+    h.mail(e.app, h.beheerderEmails(e.app, team), "Nieuwe kijker bij " + team.getString("naam") + ": " + naam,
+      "<p><strong>" + h.escape(naam) + "</strong> (ouder van <strong>" + h.escape(kindNaam) + "</strong>) heeft zich aangemeld voor <strong>" +
+      h.escape(team.getString("naam")) + "</strong> en krijgt een uitnodiging als kijker.</p><p>E-mail: " + h.escape(email) + "</p>" +
+      "<p>Klopt dit niet, haal deze persoon dan weg in de app bij Instellingen → Leden. Daar kun je iemand ook beheerder maken.</p>")
+  } catch (_) {}
   return e.json(200, { ok: true })
 })
 

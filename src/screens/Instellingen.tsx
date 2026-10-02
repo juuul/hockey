@@ -703,12 +703,12 @@ function TeamAanmelden() {
   }
 
   if (verstuurd) {
-    return <p className="account-melding">Aanmelding verstuurd. Je krijgt een mail op {email.trim()} zodra je team is goedgekeurd.</p>
+    return <p className="account-melding">Je team is aangemaakt. Je krijgt een mail op {email.trim()} met een link om je account te maken; daarmee word je beheerder van het team.</p>
   }
 
   return (
     <form className="account-form" onSubmit={e => { e.preventDefault(); versturen() }}>
-      <p className="account-uitleg">Meld je team aan. Na goedkeuring krijg je een mail om je account te maken; je wordt dan beheerder van het team.</p>
+      <p className="account-uitleg">Meld je team aan. Je krijgt meteen een mail om je account te maken; je wordt dan beheerder van het team.</p>
       <label className="account-label">
         Naam van het team
         <input className="modal-input" placeholder="bijv. MO11-3 HC Voorbeeld" value={teamnaam} onChange={e => setTeamnaam(e.target.value)} />
@@ -897,13 +897,13 @@ function ToegangAanvragen({ waarde }: { waarde: string }) {
 
   if (!form) return fout ? <Melding tekst={fout} fout /> : <p className="account-uitleg">Even laden…</p>
   if (verstuurd) {
-    return <p className="account-melding">Je aanvraag is verstuurd naar de beheerders van {form.team}. Na goedkeuring krijg je een mail op {email.trim()} om je account te maken.</p>
+    return <p className="account-melding">Je krijgt een mail op {email.trim()} met een link om je account te maken. Daarna kijk je mee met {form.team}.</p>
   }
   const kindGekozen = kind && (kind !== ANDERS || kindNaam.trim())
   return (
     <form className="account-form" onSubmit={e => { e.preventDefault(); versturen() }}>
       <div className="account-wie"><span className="account-wie-naam">{form.team}</span></div>
-      <p className="account-uitleg">Vraag een account aan. De beheerders van het team krijgen je aanvraag en laten je toe.</p>
+      <p className="account-uitleg">Vraag een account aan. Je krijgt meteen een mail met een link om je account te maken; daarna kijk je mee.</p>
       <label className="account-label">
         Jouw voornaam
         <input className="modal-input" autoComplete="given-name" value={naam} onChange={e => setNaam(e.target.value)} />
