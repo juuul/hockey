@@ -31,7 +31,7 @@ function escape(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]))
 }
 
-function stuurUitnodiging(app, inv) {
+function stuurUitnodiging(app, inv, herinnering) {
   const team = app.findRecordById("teams", inv.getString("team"))
   const link = inv.getString("terug") + "#uitnodiging=" + inv.getString("token")
   const rolTekst = { beheerder: "beheerder (mag alles bijhouden en regelen)", kijker: "kijker (kijkt mee)" }[inv.getString("rol")]
@@ -39,12 +39,13 @@ function stuurUitnodiging(app, inv) {
   const msg = new MailerMessage({
     from: { address: meta.senderAddress, name: meta.senderName },
     to: [{ address: inv.getString("email") }],
-    subject: "Uitnodiging voor " + team.getString("naam") + " in de Hockey Wissel-app",
+    subject: (herinnering ? "Herinnering: uitnodiging voor " : "Uitnodiging voor ") + team.getString("naam") + " in de Hockey Wissel-app",
     html:
       "<p>Hallo,</p>" +
+      (herinnering ? "<p>Je hebt je uitnodiging nog niet aangenomen.</p>" : "") +
       "<p>Je bent uitgenodigd voor <strong>" + escape(team.getString("naam")) + "</strong> als " + escape(rolTekst) + ".</p>" +
       "<p><a href=\"" + escape(link) + "\">Uitnodiging openen</a></p>" +
-      "<p>De link is " + GELDIG_DAGEN + " dagen geldig.</p>",
+      (herinnering ? "<p>De link werkt nog een paar dagen; daarna vervalt de uitnodiging" + (inv.getString("rol") === "beheerder" ? " en wordt een nieuw, leeg team verwijderd" : "") + ".</p>" : "<p>De link is " + GELDIG_DAGEN + " dagen geldig.</p>"),
   })
   app.newMailClient().send(msg)
 }
@@ -169,4 +170,39 @@ function beslisAanmelding(app, a, besluit, teamnaamIn) {
   throw new BadRequestError("Kies goedkeuren of afwijzen")
 }
 
-module.exports = { beslisAanmelding, ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }
+// Dagelijks: na 3 dagen een herinnering, na 7 dagen de uitnodiging weg. Een team uit een teamaanmelding dat dan
+// nog helemaal leeg is (geen leden, spelers, wedstrijden, programma) wordt ook verwijderd
+const HERINNER_DAGEN = 3
+
+function ruimUitnodigingenOp(app) {
+  const dag = 24 * 3600 * 1000
+  const leeftijd = (r) => Date.now() - new Date(r.getDateTime("created").string().replace(" ", "T")).getTime()
+  const teVerwijderen = new Set()
+  for (const inv of app.findRecordsByFilter("uitnodigingen", "id != ''", "", 0, 0)) {
+    const oud = leeftijd(inv)
+    if (oud > GELDIG_DAGEN * dag) {
+      teVerwijderen.add(inv.getString("team"))
+      app.delete(inv)
+    } else if (oud > HERINNER_DAGEN * dag && !inv.getBool("herinnerd")) {
+      try {
+        stuurUitnodiging(app, inv, true)
+        inv.set("herinnerd", true)
+        app.save(inv)
+      } catch (err) {
+        console.log("herinnering mislukt", inv.id, err)
+      }
+    }
+  }
+  for (const teamId of teVerwijderen) {
+    try {
+      const team = app.findRecordById("teams", teamId)
+      const telt = (col) => app.findRecordsByFilter(col, "team = {:t}", "", 1, 0, { t: teamId }).length
+      const uitAanmelding = app.findRecordsByFilter("aanmeldingen", "team = {:t}", "", 1, 0, { t: teamId }).length > 0
+      const leeg = !team.getStringSlice("beheerders").length && !team.getStringSlice("kijkers").length &&
+        !telt("uitnodigingen") && !telt("spelers") && !telt("wedstrijden") && !telt("programma")
+      if (uitAanmelding && leeg) app.delete(team)
+    } catch (_) {}
+  }
+}
+
+module.exports = { ruimUitnodigingenOp, beslisAanmelding, ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }

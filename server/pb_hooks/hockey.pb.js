@@ -16,6 +16,11 @@ onRecordCreateRequest((e) => {
   }
 }, "uitnodigingen")
 
+// Elke dag om 10:00 (NL-zomertijd): herinneringen en verlopen uitnodigingen/lege teams opruimen
+cronAdd("uitnodigingen", "0 8 * * *", () => {
+  require(`${__hooks}/hockey.js`).ruimUitnodigingenOp($app)
+})
+
 // Wat staat er in de uitnodiging (voor het welkomstscherm in de app)
 routerAdd("GET", "/api/hockey/uitnodiging/{token}", (e) => {
   const h = require(`${__hooks}/hockey.js`)
