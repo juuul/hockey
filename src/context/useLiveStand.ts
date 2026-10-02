@@ -44,7 +44,8 @@ export function useLiveStand({ teamId, prefix, stand, toepassen, magBewerken }: 
   const bezig = useRef(false)
   // Pas versturen na de eerste keer ophalen: een toestel dat nieuw meedoet neemt eerst de lopende wedstrijd over
   const opgehaald = useRef(false)
-  const [status, setStatus] = useState<LiveStatus>({ verbonden: false, wachtend: false })
+  // Bij het starten uitgaan van verbinding: anders staat er kort ⚠ op het tandwiel tot de eerste keer ophalen
+  const [status, setStatus] = useState<LiveStatus>({ verbonden: true, wachtend: false })
 
   const bewaar = () => {
     schrijf(prefix, 'live_laatst', laatst.current)
