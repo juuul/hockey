@@ -1,6 +1,7 @@
 import { useHockey } from '../context/HockeyContext'
 import { POSITIE_LABEL, Position, veldPosities } from '../types'
 import { tel } from '../statistiek'
+import { opAlfabet } from '../opstelling'
 import './Positions.css'
 
 const KEUZE_NAAM = ['1e keuze', '2e keuze']
@@ -8,7 +9,7 @@ const KEUZE_NAAM = ['1e keuze', '2e keuze']
 export default function Positions() {
   const { spelers, vastePosities, setVastePositie, opstelling, magBeheren: magBewerken } = useHockey()
   // Ook de keeper: haal je haar uit het doel, dan is haar voorkeur er nog
-  const fieldPlayers = spelers
+  const fieldPlayers = opAlfabet(spelers)
 
   const handleSetPosition = (spelerId: string, keuze: number, positie: Position | null) => {
     setVastePositie(spelerId, keuze, positie)

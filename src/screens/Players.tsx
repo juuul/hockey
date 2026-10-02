@@ -5,6 +5,7 @@ import { CATEGORIE, OPSTELLINGEN_PER_SPELVORM, opstellingTekst, Player } from '.
 import AddPlayerModal from '../components/AddPlayerModal'
 import DeletePlayerModal from '../components/DeletePlayerModal'
 import { tel } from '../statistiek'
+import { opAlfabet } from '../opstelling'
 import './Players.css'
 
 export default function Players() {
@@ -82,7 +83,7 @@ export default function Players() {
         : 'Alleen beheerders kunnen aan- en afmelden.'}</p>
 
       <div className="players-list">
-        {spelers.map(player => (
+        {opAlfabet(spelers).map(player => (
           <div key={player.id} className={`player-card ${player.meedoen ? 'doet-mee' : 'doet-niet-mee'}`}>
             <button
               className="meedoen-knop"

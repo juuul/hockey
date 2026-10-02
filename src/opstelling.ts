@@ -132,5 +132,8 @@ export function pasOpstellingAan(spelers: Player[], posities: Position[]): Playe
 }
 
 // Spelersnamen zijn uniek binnen een team (hoofdletters en spaties tellen niet mee)
+// Lijsten met spelers (Spelers, Voorkeur): op alfabet, hoofdletters maken niet uit
+export const opAlfabet = <T extends { naam: string }>(lijst: T[]): T[] => [...lijst].sort((a, b) => a.naam.localeCompare(b.naam, 'nl', { sensitivity: 'base' }))
+
 export const naamSleutel = (naam: string) => naam.trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl')
 export const naamBezet = (bestaand: string[], naam: string) => bestaand.some(b => naamSleutel(b) === naamSleutel(naam))
