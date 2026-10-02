@@ -11,6 +11,7 @@ import '../components/Modal.css'
 import '../components/WedstrijdModal.css'
 import './Players.css'
 import './Programma.css'
+import { useTerug } from '../terug'
 
 // Standaard voor een begeleidingsplek bij thuis/uit: niet nodig, of nog te bepalen
 const standaardPlek = (thuis: boolean, inst: TeamInstellingen) =>
@@ -170,6 +171,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
 }
 
 function KindKiezen({ gekozen, onKlaar, onClose }: { gekozen: string[]; onKlaar: (ids: string[]) => void; onClose: () => void }) {
+  useTerug(true, onClose)
   const { spelers } = useHockey()
   const [ids, setIds] = useState(gekozen)
   const wissel = (id: string) => setIds(ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id])
@@ -198,6 +200,7 @@ function KindKiezen({ gekozen, onKlaar, onClose }: { gekozen: string[]; onKlaar:
 const NIEUWE_CLUB = '__nieuw__'
 
 function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () => void }) {
+  useTerug(true, onClose)
   const { spelers, clubs, programma, clubToevoegen, bewaarProgramma, verwijderProgramma } = useHockey()
   const { teamInstellingen } = useAccount()
   const [p, setP] = useState<ProgrammaItem>(start)
@@ -208,6 +211,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   }
   const [nieuweClub, setNieuweClub] = useState<string | null>(null)
   const [wegVraag, setWegVraag] = useState(false)
+  useTerug(wegVraag, () => setWegVraag(false))
   const bestaat = programma.some(x => x.id === start.id)
   const zet = (velden: Partial<ProgrammaItem>) => setP({ ...p, ...velden })
   const spelerKeuzes = [...spelers].sort((a, b) => a.naam.localeCompare(b.naam))
@@ -357,6 +361,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
 
 // Per team: bij uit- of thuiswedstrijden standaard geen spelbegeleiding van ons nodig
 function StandaardBegeleiding({ onClose }: { onClose: () => void }) {
+  useTerug(true, onClose)
   const { teamInstellingen, zetTeamInstellingen } = useAccount()
   const schakel = (sleutel: 'uitGeenBegeleiding' | 'thuisGeenBegeleiding', label: string, uitleg: string) => (
     <button

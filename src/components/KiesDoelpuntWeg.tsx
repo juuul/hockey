@@ -1,4 +1,5 @@
 import './Modal.css'
+import { useTerug } from '../terug'
 
 export interface Scorer { id: string | null; naam: string; aantal: number }
 
@@ -15,6 +16,7 @@ export function scorersVan(doelpunten: { spelerId: string | null; naam: string }
 
 // "Welk doelpunt weghalen?" — op het Dashboard (−) en bij Wedstrijd wijzigen
 export default function KiesDoelpuntWeg({ scorers, onKies, onClose }: { scorers: Scorer[]; onKies: (id: string | null) => void; onClose: () => void }) {
+  useTerug(true, onClose)
   return (
     <div className="modal show" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>

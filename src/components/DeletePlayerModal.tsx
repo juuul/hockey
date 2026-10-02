@@ -1,4 +1,5 @@
 import './Modal.css'
+import { useTerug } from '../terug'
 
 interface Props {
   playerName: string
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function DeletePlayerModal({ playerName, onConfirm, onCancel }: Props) {
+  useTerug(true, onCancel)
   return (
     <div className="modal show">
       <div className="modal-content">

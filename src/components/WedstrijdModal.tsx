@@ -6,6 +6,7 @@ import KiesDoelpuntWeg, { scorersVan } from './KiesDoelpuntWeg'
 import { vandaag, vindClub, zoekClubs } from '../historie'
 import './Modal.css'
 import './WedstrijdModal.css'
+import { useTerug } from '../terug'
 
 interface Props {
   titel: string
@@ -22,6 +23,7 @@ interface Props {
 
 // Een nieuwe club wordt pas bij Opslaan echt toegevoegd, zodat je geen losse clubs overhoudt na Annuleren
 export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, uitleg, stand: startStand, kandidaten = [], onOpslaan, onClose }: Props) {
+  useTerug(true, onClose)
   const { clubs, clubToevoegen } = useHockey()
   const [datum, setDatum] = useState(start.datum ?? vandaag())
   const [thuis, setThuis] = useState(start.thuis)
@@ -30,6 +32,7 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
   const [zoek, setZoek] = useState('')
   const [stand, setStand] = useState(startStand)
   const [kiesDoelpunt, setKiesDoelpunt] = useState<'erbij' | 'eraf' | null>(null)
+  useTerug(kiesDoelpunt === 'erbij', () => setKiesDoelpunt(null))
   const aantalVan = (id: string | null) => stand?.doelpunten.filter(d => d.spelerId === id).length ?? 0
   const scorers = stand ? scorersVan(stand.doelpunten) : []
   const doelpuntErbij = (id: string | null, naam: string) => {

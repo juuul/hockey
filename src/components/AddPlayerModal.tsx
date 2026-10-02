@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { naamBezet } from '../opstelling'
 import './Modal.css'
+import { useTerug } from '../terug'
 
 interface Props {
   bestaandeNamen: string[]
@@ -10,6 +11,7 @@ interface Props {
 
 // Alleen een voornaam. Twee dezelfde voornamen? Dan maakt de beheerder de naam zelf uniek (bv. 'Emma B.')
 export default function AddPlayerModal({ bestaandeNamen, onAdd, onClose }: Props) {
+  useTerug(true, onClose)
   const [naam, setNaam] = useState('')
   const [fout, setFout] = useState<string | null>(null)
 

@@ -3,6 +3,7 @@ import { TeamAanmelding, useAccount } from '../context/AccountContext'
 import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
+import { useTerug } from '../terug'
 import DeelKijklink from '../components/DeelKijklink'
 import ResetModal from '../components/ResetModal'
 import { leesThema, Thema, zetThema } from '../thema'
@@ -21,6 +22,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
   const { gebruiker } = useAccount()
   const [weergave, setWeergave] = useState<Weergave>(start ?? { soort: 'hoofd' })
   const terug = () => setWeergave({ soort: 'hoofd' })
+  useTerug(weergave.soort !== 'hoofd', terug)
 
   // Een link uit een mail wordt één keer geopend (niet opnieuw bij de volgende keer dit tabblad)
   useEffect(() => {
@@ -343,7 +345,9 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
   const [email, setEmail] = useState('')
   const [rol, setRol] = useState<Rol>('kijker')
   const [lid, setLid] = useState<Gebruiker | null>(null)
+  useTerug(!!lid, () => setLid(null))
   const [verwijderVraag, setVerwijderVraag] = useState(false)
+  useTerug(verwijderVraag, () => setVerwijderVraag(false))
   // Iemand uit het team halen: eerst bevestigen
   const [eruitVraag, setEruitVraag] = useState<Gebruiker | null>(null)
   const [intrekVraag, setIntrekVraag] = useState<Uitnodiging | null>(null)

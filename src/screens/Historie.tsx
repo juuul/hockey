@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTerug } from '../terug'
 import { useHockey } from '../context/HockeyContext'
 import { GespeeldeWedstrijd, opstellingTekst } from '../types'
 import { balans, clubNaam, datumTekst, perTegenstander, sorteerWedstrijden, topscorers, uitslag, vindClub } from '../historie'
@@ -17,6 +18,10 @@ export default function Historie() {
   const [weg, setWeg] = useState<GespeeldeWedstrijd | null>(null)
   const [club, setClub] = useState<{ id: string; naam: string } | null>(null)
   const [nieuweNaam, setNieuweNaam] = useState('')
+  // Terugknop van de telefoon sluit de open pop-up (wijzigen heeft een eigen WedstrijdModal)
+  useTerug(!!open, () => setOpen(null))
+  useTerug(!!weg, () => setWeg(null))
+  useTerug(!!club, () => setClub(null))
 
   const totaal = balans(wedstrijden)
   const scorers = topscorers(wedstrijden, spelers)

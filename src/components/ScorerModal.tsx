@@ -1,5 +1,6 @@
 import { Player, POSITIE_LABEL, VELD_VOLGORDE } from '../types'
 import './Modal.css'
+import { useTerug } from '../terug'
 
 interface Props {
   spelers: Player[]
@@ -10,6 +11,7 @@ interface Props {
 
 // Van spits naar achter: veld op positievolgorde, dan keeper, dan wissels
 export default function ScorerModal({ spelers, doelpunten, onKies, onClose }: Props) {
+  useTerug(true, onClose)
   const veld = spelers
     .filter(s => s.inVeld && !s.isKeeper)
     .sort((a, b) => VELD_VOLGORDE.indexOf(a.positie) - VELD_VOLGORDE.indexOf(b.positie))

@@ -12,6 +12,7 @@ import Programma from './screens/Programma'
 import Shootout from './screens/Shootout'
 import Verversen from './components/Verversen'
 import { OPSLAG } from './opslag'
+import { useTerug } from './terug'
 import { heeftShootouts } from './types'
 import './App.css'
 
@@ -42,6 +43,8 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   // Shoot-out alleen bij O10 en O9; bij een andere categorie terug naar het Dashboard
   const tabs = TABS.filter(t => t.id !== 'shootout' || heeftShootouts(spelvorm))
   if (!tabs.some(t => t.id === screen)) screen = 'dashboard'
+  // Terugknop van de telefoon: van een ander tabblad naar het Dashboard
+  useTerug(screen !== 'dashboard', () => setScreen('dashboard'))
   // Het eerste tabblad heet naar de tegenstander van de wedstrijd die klaarstaat (anders 'Wedstrijd')
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
   const tabNaam = (tab: { id: Scherm; naam: string }) => (tab.id === 'dashboard' && tegenstander ? tegenstander : tab.naam)
@@ -113,6 +116,7 @@ function OvernemenVraag() {
       annuleer="Nee, leeg beginnen"
       onConfirm={() => overnemen(true)}
       onCancel={() => overnemen(false)}
+      terugSluit={false}
     />
   )
 }

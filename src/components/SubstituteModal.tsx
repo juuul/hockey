@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Player, Position, POSITIE_LABEL, VELD_VOLGORDE } from '../types'
 import './Modal.css'
+import { useTerug } from '../terug'
 
 interface Props {
   playerName: string
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function SubstituteModal({ playerName, position, substitutes, fieldPlayers, onSubstitute, onMove, onClose, alleenVerplaatsen = false, leegPlek = false }: Props) {
+  useTerug(true, onClose)
   const sortedSubs = substitutes
   const sortedField = [...fieldPlayers].sort(
     (a, b) => VELD_VOLGORDE.indexOf(a.positie) - VELD_VOLGORDE.indexOf(b.positie)
