@@ -38,7 +38,8 @@ export function nieuweOpstelling(spelers: Player[], vastePosities: Record<string
 
 // Wie op de bank zit, staat al één keer 'uit' en begint daarom op 1
 export function resetTellers(spelers: Player[]): Player[] {
-  return spelers.map(s => ({ ...s, wisselCount: s.meedoen && !s.inVeld ? 1 : 0 }))
+  // Ook de kleuren terug naar groen: niemand telt nog als invaller
+  return spelers.map(s => ({ ...s, wisselCount: s.meedoen && !s.inVeld ? 1 : 0, inVolgorde: 0 }))
 }
 
 // Een vrijgekomen veldplek wordt gevuld door de meedoende wisselspeler met de minste wissels; het doel blijft leeg (keeper kies je bewust)

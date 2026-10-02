@@ -40,7 +40,7 @@ Dashboard: alleen zonder account bovenaan de knop "👤 Inloggen", die naar Inst
 - **Wisselspelers sorteren**: minste wissels eerst; bij gelijke stand komt wie het laatst uit het veld ging onderaan. Zelfde volgorde in de wissel-pop-up.
 - **Kleuren in het veld** (alleen informatief, blokkeert niets), op volgorde van invallen (`inVolgorde`), niet op tijd: bij 11, 9 en 8 spelers de laatste 2 invallers rood, 2 daarvoor oranje, de rest (ook de basis) groen; bij 6 spelers 1 rood, 1 oranje. Keeper geen kleur.
 - **Nieuwe opstelling**: eerst eerlijk loten wie begint (iedereen gelijke kans op de bank), dan per basisspeler de 1e voorkeur, daarna de 2e (beide in gelote volgorde, bij dubbele keuze wint een willekeurige), rest willekeurig. Tellers blijven staan; `inVolgorde` terug naar 0.
-- **Reset wissels**: alleen tellers — veldspelers 0, wisselspelers 1 (die staan al één keer "uit"). Opstelling en score blijven.
+- **Reset wissels**: alleen tellers — veldspelers 0, wisselspelers 1 (die staan al één keer "uit"), en `inVolgorde` 0 (alle kleuren weer groen). Opstelling en score blijven.
 - **Alles resetten**: nieuwe opstelling + reset wissels + score 0-0 en scorers weg + timer 0:00 gestopt. Spelers, aanwezigheid, voorkeuren en gekozen opstelling blijven.
 - **Afmelden** van een veldspeler: wisselspeler met de minste wissels neemt de plek over (teller ongewijzigd). Keeper afmelden laat het doel leeg. Aanmelden: naar een lege veldplek als die er is, anders de bank. Afgemelden doen niet mee in opstelling, wissels of loting.
 - **Andere opstelling kiezen**: wie op een positie staat die ook in de nieuwe opstelling zit blijft staan; spelers van weggevallen posities schuiven naar vrije plekken; te veel → bank, te weinig → aanvullen met minste wissels. Tellers blijven.
