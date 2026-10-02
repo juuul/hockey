@@ -22,7 +22,7 @@ export type Alles = Record<Soort, Records>
 const VELDEN: Record<Soort, string[]> = {
   spelers: ['id', 'naam', 'voorkeur1', 'voorkeur2'],
   clubs: ['id', 'naam', 'laatstGebruikt'],
-  wedstrijden: ['id', 'datum', 'clubId', 'tegenstander', 'thuis', 'wij', 'zij', 'doelpunten', 'spelers', 'opstelling', 'opgeslagenOp'],
+  wedstrijden: ['id', 'datum', 'clubId', 'tegenstander', 'thuis', 'wij', 'zij', 'doelpunten', 'spelers', 'opstelling', 'opgeslagenOp', 'shootouts'],
   programma: ['id', 'datum', 'tot', 'soort', 'clubId', 'tegenstander', 'thuis', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie'],
 }
 
@@ -147,6 +147,7 @@ export function nieuweIds(d: Lokaal): Lokaal {
       clubId: c(w.clubId)!,
       doelpunten: w.doelpunten.map(dp => ({ ...dp, spelerId: s(dp.spelerId) })),
       spelers: w.spelers.map(x => ({ ...x, id: s(x.id)! })),
+      ...(w.shootouts ? { shootouts: w.shootouts.map(x => ({ ...x, spelerId: s(x.spelerId)! })) } : {}),
     })),
   }
 }

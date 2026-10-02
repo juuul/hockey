@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
+import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Shootout, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, naamBezet } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
@@ -45,6 +45,9 @@ interface HockeyContextType {
   scoor: (team: keyof Score, verschil: 1 | -1, scorerId?: string | null) => void
   haalDoelpuntWeg: (scorerId: string | null) => void
   doelpunten: (string | null)[]
+  shootouts: Shootout[]
+  neemShootout: (spelerId: string, raak: boolean) => void
+  haalShootoutWeg: () => void
   spelvorm: Spelvorm
   timer: TimerStand
   startTimer: () => void
@@ -134,6 +137,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     return saved ? JSON.parse(saved) : []
   })
 
+  // Shoot-outs na de wedstrijd (O10 en O9), in volgorde
+  const [shootouts, setShootouts] = useState<Shootout[]>(() => lees(P, 'shootouts', []))
+  useEffect(() => { schrijf(P, 'shootouts', shootouts) }, [shootouts])
+
   const [opstelling, setOpstelling] = useState<OpstellingNaam>(() => {
     const saved = lees<unknown>(P, 'opstelling', null)
     const bekend = leesOpstelling(saved)
@@ -220,10 +227,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     localStorage.setItem(`${P}_wedstrijden`, JSON.stringify(wedstrijden))
   }, [wedstrijden])
 
-  const [history, setHistory] = useState<{ spelers: Player[]; wisselingen: Wissel[]; score: Score; doelpunten: (string | null)[] }[]>([])
+  const [history, setHistory] = useState<{ spelers: Player[]; wisselingen: Wissel[]; score: Score; doelpunten: (string | null)[]; shootouts: Shootout[] }[]>([])
 
   const remember = () => {
-    setHistory(h => [...h, { spelers, wisselingen, score, doelpunten }])
+    setHistory(h => [...h, { spelers, wisselingen, score, doelpunten, shootouts }])
   }
 
   const undo = () => {
@@ -233,6 +240,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     setWisselingen(last.wisselingen)
     setScore(last.score)
     setDoelpunten(last.doelpunten)
+    setShootouts(last.shootouts)
     setHistory(history.slice(0, -1))
   }
 
@@ -349,6 +357,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     setWisselingen([])
     setScore({ wij: 0, zij: 0 })
     setDoelpunten([])
+    setShootouts([])
     stopTimer()
   }
 
@@ -388,6 +397,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
       spelers: spelers.filter(s => s.meedoen).map(s => ({ id: s.id, naam: s.naam, wissels: s.wisselCount })),
       opstelling,
       opgeslagenOp: Date.now(),
+      ...(shootouts.length ? { shootouts: shootouts.map(s => ({ ...s, naam: spelers.find(x => x.id === s.spelerId)?.naam ?? 'Onbekend' })) } : {}),
     }
     setWedstrijden(w => [...w, gespeeld])
     setClubs(c => c.map(club => (club.id === clubId ? { ...club, laatstGebruikt: Date.now() } : club)))
@@ -426,6 +436,17 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     setScore({ ...score, wij: score.wij - 1 })
     const i = doelpunten.lastIndexOf(scorerId)
     setDoelpunten(doelpunten.filter((_, j) => j !== (i >= 0 ? i : doelpunten.length - 1)))
+  }
+
+  const neemShootout = (spelerId: string, raak: boolean) => {
+    remember()
+    setShootouts([...shootouts, { spelerId, raak }])
+  }
+
+  const haalShootoutWeg = () => {
+    if (!shootouts.length) return
+    remember()
+    setShootouts(shootouts.slice(0, -1))
   }
 
   const scoor = (team: keyof Score, verschil: 1 | -1, scorerId: string | null = null) => {
@@ -472,12 +493,13 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const { status: sync, nuSynchroniseren } = useTeamSync({ teamId, prefix: P, records, toepassen, verwijderd, verwijderdVerwerkt })
 
   // ── Lopende wedstrijd live delen met het team ──
-  const stand: Stand = { spelers: spelersStand(spelers), wisselingen, score, doelpunten, opstelling, timer, wedstrijd }
+  const stand: Stand = { spelers: spelersStand(spelers), wisselingen, score, doelpunten, opstelling, timer, wedstrijd, shootouts }
   const standToepassen = (st: Stand) => {
     zetSpelersRuw(huidig => spelersMetStand(huidig, st.spelers))
     setWisselingen(st.wisselingen)
     setScore(st.score)
     setDoelpunten(st.doelpunten)
+    setShootouts(st.shootouts ?? [])
     const ontvangen = leesOpstelling(st.opstelling)
     if (ontvangen) setOpstelling(ontvangen)
     setTimer(st.timer)
@@ -529,7 +551,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )

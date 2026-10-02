@@ -9,16 +9,19 @@ import Players from './screens/Players'
 import Positions from './screens/Positions'
 import Historie from './screens/Historie'
 import Programma from './screens/Programma'
+import Shootout from './screens/Shootout'
 import Verversen from './components/Verversen'
 import { OPSLAG } from './opslag'
+import { heeftShootouts } from './types'
 import './App.css'
 
-type Scherm = 'dashboard' | 'players' | 'positions' | 'programma' | 'historie' | 'instellingen'
+type Scherm = 'dashboard' | 'shootout' | 'players' | 'positions' | 'programma' | 'historie' | 'instellingen'
 
 // Zes namen passen niet naast elkaar op een smalle telefoon: iconen even breed; alleen het actieve tabblad toont
 // zijn naam eronder (die mag uitlopen onder de lege plek van de buren; aan de randen uitgelijnd met de schermrand)
 const TABS: { id: Scherm; icoon: string; naam: string }[] = [
   { id: 'dashboard', icoon: '🏑', naam: 'Wedstrijd' },
+  { id: 'shootout', icoon: '🎯', naam: 'Shoot-out' }, // alleen bij O10 en O9
   { id: 'players', icoon: '👥', naam: 'Spelers' },
   { id: 'positions', icoon: '⭐', naam: 'Voorkeur' },
   { id: 'programma', icoon: '📅', naam: 'Programma' },
@@ -35,7 +38,10 @@ interface Navigatie {
 
 function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
-  const { sync, live, demo, clubs, wedstrijd } = useHockey()
+  const { sync, live, demo, clubs, wedstrijd, spelvorm } = useHockey()
+  // Shoot-out alleen bij O10 en O9; bij een andere categorie terug naar het Dashboard
+  const tabs = TABS.filter(t => t.id !== 'shootout' || heeftShootouts(spelvorm))
+  if (!tabs.some(t => t.id === screen)) screen = 'dashboard'
   // Het eerste tabblad heet naar de tegenstander van de wedstrijd die klaarstaat (anders 'Wedstrijd')
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
   const tabNaam = (tab: { id: Scherm; naam: string }) => (tab.id === 'dashboard' && tegenstander ? tegenstander : tab.naam)
@@ -47,7 +53,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   return (
     <div className="mobile-frame">
       <nav className="tabs">
-        {TABS.map(tab => (
+        {tabs.map(tab => (
           <button
             key={tab.id}
             className={`tab-btn ${screen === tab.id ? 'active' : ''}`}
@@ -75,6 +81,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
           </div>
         )}
         {screen === 'dashboard' && <Dashboard naarInstellingen={() => setScreen('instellingen')} />}
+        {screen === 'shootout' && <Shootout />}
         {screen === 'players' && <Players />}
         {screen === 'positions' && <Positions />}
         {screen === 'programma' && <Programma naarDashboard={() => setScreen('dashboard')} />}

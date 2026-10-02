@@ -1,4 +1,4 @@
-import { OpstellingNaam, Player, Wissel, WedstrijdInfo } from './types'
+import { OpstellingNaam, Player, Shootout, Wissel, WedstrijdInfo } from './types'
 
 // De lopende wedstrijd zoals die live gedeeld wordt. Wie in het team zit (naam) komt uit de spelerslijst (stap 4);
 // hier alleen de wedstrijdstand per speler.
@@ -19,6 +19,7 @@ export interface Stand {
   opstelling: OpstellingNaam
   timer: { gestartOp: number | null; opgebouwd: number }
   wedstrijd: WedstrijdInfo
+  shootouts?: Shootout[] // ontbreekt in standen van oudere versies
 }
 
 // Vaste volgorde van velden, zodat twee toestellen met dezelfde stand ook dezelfde JSON hebben
@@ -36,6 +37,7 @@ export function maakStand(d: Stand): Stand {
     opstelling: d.opstelling,
     timer: { gestartOp: d.timer.gestartOp, opgebouwd: d.timer.opgebouwd },
     wedstrijd: { datum: d.wedstrijd.datum, clubId: d.wedstrijd.clubId, thuis: d.wedstrijd.thuis, programmaId: d.wedstrijd.programmaId ?? '' },
+    shootouts: (d.shootouts ?? []).map(s => ({ spelerId: s.spelerId, raak: s.raak })),
   }
 }
 
