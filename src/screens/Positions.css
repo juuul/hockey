@@ -41,6 +41,17 @@
   min-width: 120px;
 }
 
+/* Doet niet mee: blijft in de lijst, maar wordt niet opgesteld */
+.position-item.doet-niet-mee {
+  opacity: 0.6;
+}
+
+.niet-mee {
+  font-size: 22px;
+  font-weight: normal;
+  color: var(--tekst-zacht);
+}
+
 .position-buttons {
   flex: 1;
   display: flex;

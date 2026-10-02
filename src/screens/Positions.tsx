@@ -21,8 +21,12 @@ export default function Positions() {
 
       <div className="positions-list">
         {fieldPlayers.map(player => (
-          <div key={player.id} className="position-item">
-            <div className="player-name">{player.naam}</div>
+          // Wie niet meedoet blijft staan (voorkeur blijft bewaard), maar wordt niet opgesteld
+          <div key={player.id} className={`position-item ${player.meedoen ? '' : 'doet-niet-mee'}`}>
+            <div className="player-name">
+              {player.naam}
+              {!player.meedoen && <div className="niet-mee">Doet niet mee, wordt niet opgesteld</div>}
+            </div>
             <div className="position-buttons">
               {[0, 1].map(keuze => {
                 const waarde = (vastePosities[player.id]?.[keuze] ?? '') as Position | ''
