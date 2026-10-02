@@ -16,6 +16,62 @@ onRecordCreateRequest((e) => {
   }
 }, "uitnodigingen")
 
+// Inloggen of de app openen (inlog verversen): bijhouden voor 'Gebruik per team' (superadmin).
+// Binnen 10 minuten nog eens telt niet opnieuw
+onRecordAuthRequest((e) => {
+  e.next()
+  try {
+    const sinds = new Date(Date.now() - 10 * 60 * 1000).toISOString().replace("T", " ")
+    if (e.app.findRecordsByFilter("bezoeken", "user = {:u} && created > {:s}", "", 1, 0, { u: e.record.id, s: sinds }).length) return
+    const b = new Record(e.app.findCollectionByNameOrId("bezoeken"))
+    b.set("user", e.record.id)
+    e.app.save(b)
+  } catch (err) {
+    console.log("bezoek bijhouden mislukt", err)
+  }
+}, "users")
+
+// Superadmin: per team hoe vaak de leden inlogden/de app openden en wanneer het laatst
+routerAdd("GET", "/api/hockey/gebruik", (e) => {
+  if (!e.auth || e.auth.collection().name !== "users" || !e.auth.getBool("superadmin")) throw new ForbiddenError("Alleen superadmins")
+  const nu = Date.now(), dag = 24 * 3600 * 1000
+  const tijd = (r) => new Date(r.getDateTime("created").string().replace(" ", "T")).getTime()
+  const sinds = new Date(nu - 30 * dag).toISOString().replace("T", " ")
+  const perUser = {}
+  for (const b of e.app.findRecordsByFilter("bezoeken", "created > {:s}", "", 0, 0, { s: sinds })) {
+    (perUser[b.getString("user")] = perUser[b.getString("user")] || []).push(tijd(b))
+  }
+  // Laatste ooit (ook ouder dan 30 dagen)
+  const laatsteOoit = (id) => {
+    const r = e.app.findRecordsByFilter("bezoeken", "user = {:u}", "-created", 1, 0, { u: id })
+    return r.length ? tijd(r[0]) : 0
+  }
+  const naamVan = {}
+  const teams = e.app.findRecordsByFilter("teams", "id != ''", "naam", 0, 0).map((t) => {
+    const leden = [...new Set([...t.getStringSlice("beheerders"), ...t.getStringSlice("kijkers")])]
+    let week = 0, maand = 0, laatst = 0, wie = ""
+    for (const id of leden) {
+      const ts = perUser[id] || []
+      week += ts.filter((x) => x > nu - 7 * dag).length
+      maand += ts.length
+      const l = ts.length ? Math.max(...ts) : laatsteOoit(id)
+      if (l > laatst) {
+        laatst = l
+        if (!(id in naamVan)) {
+          try {
+            const u = e.app.findRecordById("users", id)
+            naamVan[id] = u.getBool("gast") ? "meekijklink" : (u.getString("name") || u.email())
+          } catch (_) { naamVan[id] = "" }
+        }
+        wie = naamVan[id]
+      }
+    }
+    return { id: t.id, naam: t.getString("naam"), leden: leden.length, week, maand, laatst: laatst ? new Date(laatst).toISOString() : null, wie }
+  })
+  teams.sort((a, b) => (b.laatst || "").localeCompare(a.laatst || ""))
+  return e.json(200, { teams })
+})
+
 // Elke dag om 10:00 (NL-zomertijd): herinneringen en verlopen uitnodigingen/lege teams opruimen
 cronAdd("uitnodigingen", "0 8 * * *", () => {
   require(`${__hooks}/hockey.js`).ruimUitnodigingenOp($app)

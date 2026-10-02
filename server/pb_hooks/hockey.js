@@ -176,6 +176,11 @@ const HERINNER_DAGEN = 3
 
 function ruimUitnodigingenOp(app) {
   const dag = 24 * 3600 * 1000
+  // Bezoeken ouder dan 180 dagen
+  try {
+    const grens = new Date(Date.now() - 180 * dag).toISOString().replace("T", " ")
+    for (const b of app.findRecordsByFilter("bezoeken", "created < {:g}", "", 0, 0, { g: grens })) app.delete(b)
+  } catch (_) {}
   const leeftijd = (r) => Date.now() - new Date(r.getDateTime("created").string().replace(" ", "T")).getTime()
   const teVerwijderen = new Set()
   for (const inv of app.findRecordsByFilter("uitnodigingen", "id != ''", "", 0, 0)) {

@@ -12,7 +12,7 @@ import './Instellingen.css'
 export type LinkSoort = 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk' | 'aanvraag' | 'toegang'
 export type AccountStart = { soort: LinkSoort; token: string } | null
 
-type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden' } | { soort: LinkSoort; token: string }
+type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden' } | { soort: 'gebruik' } | { soort: LinkSoort; token: string }
 
 const ROLLEN: Rol[] = ['beheerder', 'kijker']
 
@@ -34,6 +34,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
     : weergave.soort === 'wachtwoord' ? 'Nieuw wachtwoord'
     : weergave.soort === 'team' ? 'Leden'
     : weergave.soort === 'aanmelden' ? 'Team aanmelden'
+    : weergave.soort === 'gebruik' ? 'Gebruik per team'
     : weergave.soort === 'aanmelding' ? 'Teamaanmelding'
     : weergave.soort === 'kijk' ? 'Meekijken'
     : weergave.soort === 'aanvraag' ? 'Account aanvragen'
@@ -53,12 +54,13 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'wachtwoord' && <WachtwoordKiezen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
         {weergave.soort === 'aanmelden' && <TeamAanmelden />}
+        {weergave.soort === 'gebruik' && <Gebruik />}
         {weergave.soort === 'aanmelding' && <AanmeldingBeoordelen token={weergave.token} />}
         {weergave.soort === 'aanvraag' && <ToegangAanvragen waarde={weergave.token} />}
         {weergave.soort === 'toegang' && <ToegangBeoordelen token={weergave.token} />}
         {weergave.soort === 'kijk' && <MeekijkenStart waarde={weergave.token} klaar={() => { terug(); naarDashboard() }} annuleer={terug} />}
         {weergave.soort === 'hoofd' && (gebruiker
-          ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={() => setWeergave({ soort: 'aanmelden' })} />
+          ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={() => setWeergave({ soort: 'aanmelden' })} gebruik={() => setWeergave({ soort: 'gebruik' })} />
           : <Inloggen aanmelden={() => setWeergave({ soort: 'aanmelden' })} />)}
         {weergave.soort === 'hoofd' && <Weergave />}
       </div>
@@ -162,7 +164,7 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
   )
 }
 
-function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; openTeam: (id: string) => void; aanmelden: () => void }) {
+function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Gebruiker; openTeam: (id: string) => void; aanmelden: () => void; gebruik: () => void }) {
   const { teams, teamsLaden, uitloggen, actiefTeamId, kiesTeam } = useAccount()
   const [nieuwTeam, setNieuwTeam] = useState('')
   const [fout, setFout] = useState<string | null>(null)
@@ -258,6 +260,11 @@ function Overzicht({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; o
         )}
         <Melding tekst={fout} fout />
       </Kaart>
+      {gebruiker.superadmin && (
+        <Kaart titel="Gebruik">
+          <button className="btn btn-secondary" onClick={gebruik}>📊 Gebruik per team</button>
+        </Kaart>
+      )}
       </>
       )}
     </>
@@ -676,6 +683,47 @@ function WachtwoordKiezen({ token, klaar }: { token: string; klaar: () => void }
       <Melding tekst={fout} fout />
       <button className="btn btn-primary" type="submit" disabled={bezig || wachtwoord.length < 8}>Opslaan</button>
     </form>
+  )
+}
+
+interface TeamGebruik { id: string; naam: string; leden: number; week: number; maand: number; laatst: string | null; wie: string }
+
+// 'Vandaag 21:14', 'gisteren 9:05', 'za 27 sep 14:00'
+function wanneer(iso: string) {
+  const d = new Date(iso)
+  const tijd = d.toLocaleTimeString('nl-NL', { hour: 'numeric', minute: '2-digit' })
+  const dagen = Math.round((new Date().setHours(0, 0, 0, 0) - new Date(d).setHours(0, 0, 0, 0)) / 86400000)
+  if (dagen === 0) return `vandaag ${tijd}`
+  if (dagen === 1) return `gisteren ${tijd}`
+  return `${d.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })} ${tijd}`
+}
+
+// Superadmin: per team hoe vaak de leden inlogden of de app openden, en wanneer het laatst
+function Gebruik() {
+  const [teams, setTeams] = useState<TeamGebruik[] | null>(null)
+  const [fout, setFout] = useState<string | null>(null)
+
+  useEffect(() => {
+    pb.send('/api/hockey/gebruik', {}).then(r => setTeams(r.teams)).catch(err => setFout(foutTekst(err)))
+  }, [])
+
+  return (
+    <Kaart titel="Gebruik per team">
+      <p className="account-uitleg">Keer ingelogd of de app geopend door de leden (binnen 10 minuten telt één keer). Bijgehouden vanaf 2 oktober 2026.</p>
+      <Melding tekst={fout} fout />
+      {!teams && !fout && <p className="account-uitleg">Laden…</p>}
+      <div className="account-lijst">
+        {teams?.map(t => (
+          <div key={t.id} className="account-regel account-gebruik">
+            <span className="account-regel-tekst">
+              <span className="account-regel-naam">{t.naam}</span>
+              <span className="account-regel-sub">{t.week}× deze week · {t.maand}× in 30 dagen · {t.leden} {t.leden === 1 ? 'lid' : 'leden'}</span>
+              <span className="account-regel-sub">{t.laatst ? `Laatst: ${wanneer(t.laatst)}${t.wie ? ` (${t.wie})` : ''}` : 'Nog niet gebruikt'}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </Kaart>
   )
 }
 

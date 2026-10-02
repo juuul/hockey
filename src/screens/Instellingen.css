@@ -418,3 +418,14 @@ button.account-regel:disabled {
   gap: 8px;
   margin-top: 4px;
 }
+
+/* Gebruik per team (superadmin): regels mogen afbreken */
+.account-gebruik {
+  cursor: default;
+  padding: 10px 14px;
+}
+
+.account-gebruik .account-regel-naam,
+.account-gebruik .account-regel-sub {
+  white-space: normal;
+}
