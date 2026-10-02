@@ -37,7 +37,7 @@ export function maakStand(d: Stand): Stand {
     opstelling: d.opstelling,
     timer: { gestartOp: d.timer.gestartOp, opgebouwd: d.timer.opgebouwd },
     wedstrijd: { datum: d.wedstrijd.datum, clubId: d.wedstrijd.clubId, thuis: d.wedstrijd.thuis, programmaId: d.wedstrijd.programmaId ?? '' },
-    shootouts: (d.shootouts ?? []).map(s => ({ spelerId: s.spelerId, raak: s.raak })),
+    shootouts: (d.shootouts ?? []).map(s => ({ spelerId: s.spelerId })),
   }
 }
 

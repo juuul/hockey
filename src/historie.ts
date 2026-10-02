@@ -69,11 +69,8 @@ export function zoekClubs(clubs: Club[], zoek: string): Club[] {
 export const vindClub = (clubs: Club[], naam: string) => clubs.find(c => c.naam.trim().toLowerCase() === naam.trim().toLowerCase())
 
 // Shoot-outs per speler-id over alle afgesloten wedstrijden plus de lopende
-export function shootoutTelling(wedstrijden: GespeeldeWedstrijd[], lopend: { spelerId: string; raak: boolean }[]): Map<string, { genomen: number; raak: number }> {
-  const telling = new Map<string, { genomen: number; raak: number }>()
-  for (const s of [...wedstrijden.flatMap(w => w.shootouts ?? []), ...lopend]) {
-    const t = telling.get(s.spelerId) ?? { genomen: 0, raak: 0 }
-    telling.set(s.spelerId, { genomen: t.genomen + 1, raak: t.raak + (s.raak ? 1 : 0) })
-  }
+export function shootoutTelling(wedstrijden: GespeeldeWedstrijd[], lopend: { spelerId: string }[]): Map<string, number> {
+  const telling = new Map<string, number>()
+  for (const s of [...wedstrijden.flatMap(w => w.shootouts ?? []), ...lopend]) telling.set(s.spelerId, (telling.get(s.spelerId) ?? 0) + 1)
   return telling
 }

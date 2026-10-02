@@ -105,11 +105,11 @@ export interface GespeeldeWedstrijd {
   spelers: { id: string; naam: string; wissels: number }[]; // wie meedeed
   opstelling: OpstellingNaam;
   opgeslagenOp: number;
-  shootouts?: { spelerId: string; naam: string; raak: boolean }[]; // na de wedstrijd (O10 en O9); ontbreekt bij oudere wedstrijden
+  shootouts?: { spelerId: string; naam: string }[]; // wie na de wedstrijd een shoot-out nam (O10 en O9); ontbreekt bij oudere wedstrijden
 }
 
-// Shoot-out in de lopende wedstrijd
-export interface Shootout { spelerId: string; raak: boolean }
+// Shoot-out in de lopende wedstrijd: alleen wie nam (of hij raak was doet er niet toe; de score staat op het Dashboard)
+export interface Shootout { spelerId: string }
 
 // Na afloop van elke wedstrijd shoot-outs: alleen bij 8-tal (O10) en 6-tal (O9)
 export const heeftShootouts = (spelvorm: Spelvorm) => spelvorm === 8 || spelvorm === 6;

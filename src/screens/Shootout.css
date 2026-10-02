@@ -91,11 +91,3 @@
   font-size: calc(var(--base-readable-size) * 1.2);
   font-weight: 700;
 }
-
-.shootout-vraag {
-  min-height: 0;
-}
-
-.modal-option.shootout-raak {
-  border-color: #10b981;
-}

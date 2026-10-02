@@ -46,7 +46,7 @@ interface HockeyContextType {
   haalDoelpuntWeg: (scorerId: string | null) => void
   doelpunten: (string | null)[]
   shootouts: Shootout[]
-  neemShootout: (spelerId: string, raak: boolean) => void
+  neemShootout: (spelerId: string) => void
   haalShootoutWeg: () => void
   spelvorm: Spelvorm
   timer: TimerStand
@@ -397,7 +397,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
       spelers: spelers.filter(s => s.meedoen).map(s => ({ id: s.id, naam: s.naam, wissels: s.wisselCount })),
       opstelling,
       opgeslagenOp: Date.now(),
-      ...(shootouts.length ? { shootouts: shootouts.map(s => ({ ...s, naam: spelers.find(x => x.id === s.spelerId)?.naam ?? 'Onbekend' })) } : {}),
+      ...(shootouts.length ? { shootouts: shootouts.map(s => ({ spelerId: s.spelerId, naam: spelers.find(x => x.id === s.spelerId)?.naam ?? 'Onbekend' })) } : {}),
     }
     setWedstrijden(w => [...w, gespeeld])
     setClubs(c => c.map(club => (club.id === clubId ? { ...club, laatstGebruikt: Date.now() } : club)))
@@ -438,9 +438,9 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     setDoelpunten(doelpunten.filter((_, j) => j !== (i >= 0 ? i : doelpunten.length - 1)))
   }
 
-  const neemShootout = (spelerId: string, raak: boolean) => {
+  const neemShootout = (spelerId: string) => {
     remember()
-    setShootouts([...shootouts, { spelerId, raak }])
+    setShootouts([...shootouts, { spelerId }])
   }
 
   const haalShootoutWeg = () => {
