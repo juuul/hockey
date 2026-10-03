@@ -20,7 +20,7 @@ Kort overzicht; alles in detail (per scherm, alle regels, accounts) staat in **`
 
 ### Tabbladen
 Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tabblad blijft staan na inloggen, teamwissel en verversen (`sessionStorage`). ⚠ op het tandwiel bij een echt sync-probleem, rood bolletje bij open aanvragen.
-1. **Dashboard** (`src/screens/Dashboard.tsx`): score (Wij → "Wie scoorde?"), veld + keeper, tik op speler = Wissel/Verplaatsen, één rij wissels, klokregel. **Onder de vouw** (bewust uit het zicht): extra wissels, resets, Undo, timer.
+1. **Dashboard** (`src/screens/Dashboard.tsx`): score (Wij → "Wie scoorde?"), veld + keeper, tik op speler = Wissel/Verplaatsen, één rij wissels, klokregel. **Onder de vouw** (bewust uit het zicht): extra wissels, Wedstrijd afsluiten, resets, Undo, timer.
 2. **Spelers**: categorie (O12+/O11/O10/O9 = 11/9/8/6 spelers, `CATEGORIE`), opstelling, wie doet mee, toevoegen/verwijderen.
 3. **Voorkeur**: per speler (ook keeper) 1e en 2e positie.
 4. **Historie**: "Deze wedstrijd" + afsluiten, balans, topscorers, wedstrijden en tegenstanders.

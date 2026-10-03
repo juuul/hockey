@@ -6,6 +6,7 @@ import SubstituteModal from '../components/SubstituteModal'
 import ResetModal from '../components/ResetModal'
 import Timer, { KlokRegel } from '../components/Timer'
 import ScorerModal from '../components/ScorerModal'
+import { WedstrijdAfsluitenKnop } from '../components/DezeWedstrijd'
 import KiesDoelpuntWeg, { scorersVan } from '../components/KiesDoelpuntWeg'
 import { tel } from '../statistiek'
 import { sorteerWissels, veldKleuren } from '../opstelling'
@@ -172,6 +173,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </>
       )}
       {!magBeheren && <p className="kijker-melding">Je kijkt live mee. Alleen beheerders kunnen de wedstrijd bijhouden.</p>}
+      {magBewerken && <WedstrijdAfsluitenKnop />}
       {magBewerken && <button className="btn btn-gevaar" onClick={() => setVraag('alles')}>Alles resetten</button>}
       {magBewerken && (
         <>

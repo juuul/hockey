@@ -7,10 +7,10 @@ import './DezeWedstrijd.css'
 
 // De lopende wedstrijd (tabblad Historie): tegenstander, stand, scorers en afsluiten
 export default function DezeWedstrijd() {
-  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, weerOpenen, magBeheren: magBewerken, programma } = useHockey()
+  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, weerOpenen, magBeheren: magBewerken, programma } = useHockey()
   const isAfgesloten = !!wedstrijd.afgesloten
   const uitProgramma = programma.find(p => p.id === wedstrijd.programmaId)
-  const [vraag, setVraag] = useState<'gegevens' | 'afsluiten' | null>(null)
+  const [vraag, setVraag] = useState<'gegevens' | null>(null)
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
 
   const scorers = Object.entries(
@@ -44,7 +44,7 @@ export default function DezeWedstrijd() {
           ))}
         </div>
       )}
-      {magBewerken && !isAfgesloten && <button className="btn btn-primary" onClick={() => setVraag('afsluiten')}>{wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Wedstrijd afsluiten'}</button>}
+      {magBewerken && !isAfgesloten && <WedstrijdAfsluitenKnop />}
       {magBewerken && isAfgesloten && <button className="btn btn-secondary" onClick={() => { weerOpenen(); tel('wedstrijd-heropend') }}>Wedstrijd weer openen</button>}
 
       {vraag === 'gegevens' && (
@@ -56,6 +56,17 @@ export default function DezeWedstrijd() {
           onClose={() => setVraag(null)}
         />
       )}
+    </section>
+  )
+}
+
+// Wedstrijd afsluiten (beheerders): op het Dashboard (onder de vouw) en bij Historie → Deze wedstrijd
+export function WedstrijdAfsluitenKnop() {
+  const { score, wedstrijd, wedstrijdAfsluiten } = useHockey()
+  const [vraag, setVraag] = useState<'afsluiten' | null>(null)
+  return (
+    <>
+      <button className="btn btn-primary" onClick={() => setVraag('afsluiten')}>{wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Wedstrijd afsluiten'}</button>
       {vraag === 'afsluiten' && (
         <WedstrijdModal
           titel={`${wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Afsluiten'}: ${score.wij} – ${score.zij}`}
@@ -69,6 +80,6 @@ export default function DezeWedstrijd() {
           onClose={() => setVraag(null)}
         />
       )}
-    </section>
+    </>
   )
 }
