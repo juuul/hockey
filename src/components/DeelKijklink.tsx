@@ -12,14 +12,14 @@ const TEKSTEN = {
   kijk: {
     knop: '🔗 Meekijklink delen',
     uitleg: 'Wie de link opent, kijkt live mee zonder account en kan niets wijzigen.',
-    deelTekst: (team: string) => `Kijk live mee met ${team} (score, opstelling en wissels):`,
+    deelTekst: (team: string) => `Hoi! Volg ${team} live tijdens de wedstrijd: score, opstelling en wissels 👇`,
     titel: (team: string) => `${team} live`,
     vraag: 'Nieuwe meekijklink?',
     regels: [{ icoon: '🔗', tekst: 'De oude link werkt dan niet meer' }, { icoon: '👀', tekst: 'Wie via de oude link meekijkt, stopt' }],
   },
   aanvraag: {
     knop: '🔗 Aanmeldlink voor ouders delen',
-    uitleg: 'Ouders vragen via deze link zelf een account aan (hun naam, kind en e-mail). Jij en de andere beheerders krijgen een mail om toe te laten.',
+    uitleg: 'Ouders vullen via deze link hun naam, kind en e-mail in en krijgen meteen een uitnodiging als kijker. Jij en de andere beheerders krijgen een mail ter informatie.',
     deelTekst: (team: string) => `Vraag hier je account aan voor ${team} in de hockey-app:`,
     titel: (team: string) => `Account aanvragen ${team}`,
     vraag: 'Nieuwe aanmeldlink?',
