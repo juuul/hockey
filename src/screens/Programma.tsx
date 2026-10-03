@@ -24,7 +24,7 @@ const LEEG_ITEM = (inst: TeamInstellingen): ProgrammaItem => ({
 
 // Tabblad Programma: wedstrijden met tijden, fruit en spelbegeleiding. Beurten van je eigen kind(eren) vallen op
 export default function Programma({ naarDashboard }: { naarDashboard: () => void }) {
-  const { programma, spelers, clubs, magBeheren: magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer } = useHockey()
+  const { programma, spelers, clubs, magBeheren: magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer, wedstrijden, afgesloten } = useHockey()
   const { mijnKinderen, zetMijnKinderen, teamInstellingen } = useAccount()
   const [bewerk, setBewerk] = useState<ProgrammaItem | null>(null)
   const [standaardOpen, setStandaardOpen] = useState(false)
@@ -32,7 +32,8 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
 
   // 'Op het veld zetten': de gegevens van deze datum worden 'Deze wedstrijd', daarna naar het Dashboard voor de opstelling.
   // Staat er nog een wedstrijd open (stand of timer), dan eerst vragen: dan begint er een nieuwe
-  const openWedstrijd = score.wij + score.zij > 0 || timer.opgebouwd > 0 || timer.gestartOp !== null
+  // Na afsluiten staat alleen de uitslag nog op het Dashboard: dan zonder vraag een nieuwe wedstrijd beginnen
+  const openWedstrijd = !wedstrijd.afgesloten && (score.wij + score.zij > 0 || timer.opgebouwd > 0 || timer.gestartOp !== null)
   const klaarzetten = (p: ProgrammaItem, nieuw: boolean) => {
     if (nieuw) allesResetten()
     zetWedstrijd({ datum: p.datum, clubId: p.clubId || null, thuis: p.thuis, programmaId: p.id })
@@ -40,7 +41,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
     setKlaarVraag(null)
     naarDashboard()
   }
-  const opVeld = (p: ProgrammaItem) => (openWedstrijd ? setKlaarVraag(p) : klaarzetten(p, false))
+  const opVeld = (p: ProgrammaItem) => (openWedstrijd ? setKlaarVraag(p) : klaarzetten(p, !!wedstrijd.afgesloten))
   const [kiesKind, setKiesKind] = useState(false)
   const [alleenMijn, setAlleenMijn] = useState(false)
   // Standaard alleen wat nog komt; voorbije datums pas op verzoek
@@ -60,14 +61,19 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
   const gesorteerd = [...programma].sort((a, b) => a.datum.localeCompare(b.datum))
   const komend = gesorteerd.filter(p => (p.tot || p.datum) >= vandaagStr)
   const geweest = gesorteerd.filter(p => (p.tot || p.datum) < vandaagStr).reverse()
-  const volgendeId = komend.find(p => p.soort === 'wedstrijd')?.id
+  // Al gespeeld (afgesloten): de wedstrijd die net is afgesloten, of een opgeslagen wedstrijd op die datum tegen die club
+  const gespeeld = (p: ProgrammaItem) =>
+    p.soort !== 'wedstrijd' ? undefined
+    : (afgesloten && p.id === wedstrijd.programmaId ? afgesloten : undefined)
+      ?? (p.clubId ? wedstrijden.find(w => w.datum === p.datum && w.clubId === p.clubId) : undefined)
+  const volgendeId = komend.find(p => p.soort === 'wedstrijd' && !gespeeld(p))?.id
   const zichtbaar = (lijst: ProgrammaItem[]) => (alleenMijn ? lijst.filter(p => beurten(p).length > 0) : lijst)
 
   // Onderin elk kaartje (beheerders): Wijzigen, en bij komende wedstrijden Op het veld zetten
   const knoppen = (p: ProgrammaItem, isGeweest: boolean) => (
     <div className="prog-knoppenrij">
       <button className="btn btn-secondary" onClick={() => setBewerk(p)}>✏️ Wijzigen</button>
-      {p.soort === 'wedstrijd' && !isGeweest && p.id !== wedstrijd.programmaId && (
+      {p.soort === 'wedstrijd' && !isGeweest && p.id !== wedstrijd.programmaId && !gespeeld(p) && (
         <button className={`btn ${p.id === volgendeId ? 'btn-primary' : 'btn-secondary'}`} onClick={() => opVeld(p)}>🏑 Op het veld zetten</button>
       )}
     </div>
@@ -91,7 +97,9 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           {clubNaam(p) && <span className="prog-waar">{p.thuis ? 'Thuis' : 'Uit'}</span>}
           {p.id === volgendeId && <span className="prog-label volgende">Volgende</span>}
         </div>
-        {p.id === wedstrijd.programmaId && <div className="prog-klaar">✅ Staat nu klaar onder 🏑</div>}
+        {gespeeld(p)
+          ? <div className="prog-klaar">✅ Gespeeld {gespeeld(p)!.wij} – {gespeeld(p)!.zij}</div>
+          : p.id === wedstrijd.programmaId && <div className="prog-klaar">✅ Staat nu klaar onder 🏑</div>}
         <div className={`prog-tegen ${clubNaam(p) ? '' : 'onbekend'}`}>{clubNaam(p) || 'Tegenstander nog niet bekend'}</div>
         <div className="prog-regel">
           <span aria-hidden="true">⏰</span>

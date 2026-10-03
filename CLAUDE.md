@@ -35,7 +35,8 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Wissels sorteren**: minste wissels eerst; bij gelijk komt wie het laatst eruit ging onderaan.
 - **Kleuren** (alleen informatief) op invalvolgorde: laatste 2 rood, 2 oranje (bij 6 spelers 1 en 1), rest groen; keeper geen kleur.
 - **Nieuwe opstelling**: eerlijk loten wie begint, dan 1e en 2e voorkeur, rest willekeurig.
-- **Alles resetten** / **Wedstrijd afsluiten** (niet terug te draaien) / **Undo** (niet de timer): zie de docs.
+- **Wedstrijd afsluiten** slaat op, maar maakt het Dashboard niet leeg: de uitslag blijft (voor iedereen) staan als "Afgelopen" tot er een nieuwe wedstrijd begint (klaarzetten, Nieuwe wedstrijd, of de volgende dag). Beheerders kunnen hem weer openen; opnieuw afsluiten overschrijft dezelfde wedstrijd (`WedstrijdInfo.afgesloten` / `bewerkt`).
+- **Alles resetten** / **Undo** (niet de timer): zie de docs.
 - **Speelduur** per spelvorm in `src/speelduur.ts` (KNHB); klok stopt vanzelf aan het eind.
 
 ### Vaste keuzes van de gebruiker

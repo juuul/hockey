@@ -7,7 +7,8 @@ import './DezeWedstrijd.css'
 
 // De lopende wedstrijd (tabblad Historie): tegenstander, stand, scorers en afsluiten
 export default function DezeWedstrijd() {
-  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, magBeheren: magBewerken, programma } = useHockey()
+  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, wedstrijdAfsluiten, weerOpenen, magBeheren: magBewerken, programma } = useHockey()
+  const isAfgesloten = !!wedstrijd.afgesloten
   const uitProgramma = programma.find(p => p.id === wedstrijd.programmaId)
   const [vraag, setVraag] = useState<'gegevens' | 'afsluiten' | null>(null)
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
@@ -21,8 +22,8 @@ export default function DezeWedstrijd() {
 
   return (
     <section className="deze-wedstrijd">
-      <h2 className="section-title">Deze wedstrijd</h2>
-      <button className="wedstrijd-kaart" onClick={() => setVraag('gegevens')} disabled={!magBewerken}>
+      <h2 className="section-title">{isAfgesloten ? 'Deze wedstrijd · afgesloten' : 'Deze wedstrijd'}</h2>
+      <button className="wedstrijd-kaart" onClick={() => setVraag('gegevens')} disabled={!magBewerken || isAfgesloten}>
         <span className="wedstrijd-kaart-club">{tegenstander ? `Tegen ${tegenstander}` : magBewerken ? 'Kies tegenstander' : 'Tegenstander nog niet gekozen'}</span>
         <span className="wedstrijd-kaart-info">{wedstrijd.thuis ? 'Thuis' : 'Uit'} · {wedstrijd.datum ? datumTekst(wedstrijd.datum) : 'vandaag'}</span>
         {uitProgramma && (uitProgramma.verzamelen || uitProgramma.spelen) && (
@@ -43,7 +44,8 @@ export default function DezeWedstrijd() {
           ))}
         </div>
       )}
-      {magBewerken && <button className="btn btn-primary" onClick={() => setVraag('afsluiten')}>Wedstrijd afsluiten</button>}
+      {magBewerken && !isAfgesloten && <button className="btn btn-primary" onClick={() => setVraag('afsluiten')}>{wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Wedstrijd afsluiten'}</button>}
+      {magBewerken && isAfgesloten && <button className="btn btn-secondary" onClick={() => { weerOpenen(); tel('wedstrijd-heropend') }}>Wedstrijd weer openen</button>}
 
       {vraag === 'gegevens' && (
         <WedstrijdModal
@@ -56,11 +58,13 @@ export default function DezeWedstrijd() {
       )}
       {vraag === 'afsluiten' && (
         <WedstrijdModal
-          titel={`Afsluiten: ${score.wij} – ${score.zij}`}
+          titel={`${wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Afsluiten'}: ${score.wij} – ${score.zij}`}
           start={wedstrijd}
           bevestig="Opslaan"
           clubVerplicht
-          uitleg="Daarna begint een nieuwe wedstrijd: nieuwe opstelling, wissels en score op 0, timer 0:00."
+          uitleg={wedstrijd.bewerkt
+            ? 'Overschrijft de wedstrijd die je eerder afsloot. De uitslag blijft vandaag op het Dashboard staan.'
+            : 'De wedstrijd wordt opgeslagen. De uitslag blijft vandaag op het Dashboard staan; daarna begint een nieuwe wedstrijd.'}
           onOpslaan={(info, naam) => { wedstrijdAfsluiten(info, naam); tel('wedstrijd-afgesloten'); setVraag(null) }}
           onClose={() => setVraag(null)}
         />

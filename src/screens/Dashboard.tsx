@@ -13,7 +13,7 @@ import './Dashboard.css'
 
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
-  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken } = useHockey()
+  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd } = useHockey()
   const [showSubstituteModal, setShowSubstituteModal] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState<Position>('LW')
   const [selectedPlayerName, setSelectedPlayerName] = useState('')
@@ -123,7 +123,15 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </button>
         <button className="score-min" onClick={() => { scoor('zij', -1); tel('score-zij-min') }} disabled={!magBewerken || score.zij === 0} aria-label="Doelpunt zij eraf">−</button>
       </div>
-      <KlokRegel />
+      {/* Afgesloten: de uitslag blijft staan (voor iedereen) tot er een nieuwe wedstrijd begint */}
+      {wedstrijd.afgesloten ? (
+        <div className="afgelopen-regel">
+          <span className="afgelopen-kop">🏁 Afgelopen{afgesloten?.tegenstander || clubs.find(c => c.id === wedstrijd.clubId)?.naam ? ` · tegen ${afgesloten?.tegenstander || clubs.find(c => c.id === wedstrijd.clubId)?.naam}` : ''}</span>
+          {huidigeScorers.length > 0 && (
+            <span className="afgelopen-scorers">{huidigeScorers.map(s => `⚽ ${s.naam}${s.aantal > 1 ? ` ${s.aantal}` : ''}`).join(' · ')}</span>
+          )}
+        </div>
+      ) : <KlokRegel />}
 
       <div className="field-container">
         {/* Rondjes schalen mee met de breedste rij en het aantal rijen (11 spelers: rijen van 4 en een laatste man) */}
@@ -156,7 +164,14 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
     )}
 
     <div className="dashboard-knoppen">
-      {!magBewerken && <p className="kijker-melding">Je kijkt live mee. Alleen beheerders kunnen de wedstrijd bijhouden.</p>}
+      {wedstrijd.afgesloten && magBeheren && (
+        <>
+          <p className="kijker-melding">De wedstrijd is afgesloten en opgeslagen. De uitslag blijft vandaag hier staan.</p>
+          <button className="btn btn-primary" onClick={() => { nieuweWedstrijd(); tel('nieuwe-wedstrijd') }}>Nieuwe wedstrijd</button>
+          <button className="btn btn-secondary" onClick={() => { weerOpenen(); tel('wedstrijd-heropend') }}>Wedstrijd weer openen</button>
+        </>
+      )}
+      {!magBeheren && <p className="kijker-melding">Je kijkt live mee. Alleen beheerders kunnen de wedstrijd bijhouden.</p>}
       {magBewerken && <button className="btn btn-gevaar" onClick={() => setVraag('alles')}>Alles resetten</button>}
       {magBewerken && (
         <>

@@ -374,3 +374,32 @@
 .inlog-balk:active {
   background: var(--vlak-blauw-actief);
 }
+
+/* Afgesloten wedstrijd: in plaats van de klokregel, met de scorers eronder */
+.afgelopen-regel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--vlak-grijs);
+  color: var(--tekst-2);
+  font-size: var(--base-readable-size);
+  line-height: 1.25;
+}
+
+.afgelopen-kop {
+  font-weight: 700;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.afgelopen-scorers {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -70,10 +70,13 @@ interface HockeyContextType {
   bewaarProgramma: (item: ProgrammaItem) => void
   verwijderProgramma: (id: string) => void
   wedstrijdAfsluiten: (info: WedstrijdInfo, tegenstander: string) => void
+  afgesloten: GespeeldeWedstrijd | null // afgesloten wedstrijd waarvan de uitslag nog op het Dashboard staat
+  weerOpenen: () => void
+  nieuweWedstrijd: () => void
   wijzigWedstrijd: (id: string, info: WedstrijdInfo, tegenstander: string, stand?: OpgeslagenStand) => void
   verwijderWedstrijd: (id: string) => void
   teamId: string | null
-  magBewerken: boolean // de lopende wedstrijd bijhouden (Dashboard)
+  magBewerken: boolean // de lopende wedstrijd bijhouden (Dashboard); niet als die is afgesloten
   magBeheren: boolean // spelers, voorkeuren, programma en historie wijzigen
   demo: boolean
   sync: SyncStatus | null
@@ -375,13 +378,14 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     if (wedstrijd.clubId === id) zetWedstrijd({ ...wedstrijd, clubId: null })
   }
 
-  // Bewaart de wedstrijd en begint een nieuwe (zoals Alles resetten). Niet terug te draaien met Undo.
+  // Bewaart de wedstrijd. De uitslag (stand, scorers, opstelling) blijft op het Dashboard staan tot er een nieuwe
+  // wedstrijd begint (klaarzetten, Nieuwe wedstrijd of de volgende dag). Weer geopend: overschrijft dezelfde wedstrijd.
   // De naam gaat mee omdat een net toegevoegde club nog niet in 'clubs' staat
   const wedstrijdAfsluiten = (info: WedstrijdInfo, tegenstander: string) => {
     if (!info.clubId) return
     const clubId = info.clubId
     const gespeeld: GespeeldeWedstrijd = {
-      id: pbId(),
+      id: wedstrijd.bewerkt || pbId(),
       datum: info.datum ?? vandaag(),
       clubId,
       tegenstander,
@@ -394,12 +398,32 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
       opgeslagenOp: Date.now(),
       ...(shootouts.length ? { shootouts: shootouts.map(s => ({ spelerId: s.spelerId, naam: spelers.find(x => x.id === s.spelerId)?.naam ?? 'Onbekend' })) } : {}),
     }
-    setWedstrijden(w => [...w, gespeeld])
+    setWedstrijden(w => (w.some(x => x.id === gespeeld.id) ? w.map(x => (x.id === gespeeld.id ? gespeeld : x)) : [...w, gespeeld]))
     setClubs(c => c.map(club => (club.id === clubId ? { ...club, laatstGebruikt: Date.now() } : club)))
-    zetWedstrijd({ ...LEGE_WEDSTRIJD, thuis: info.thuis })
-    allesResetten()
+    pauzeTimer()
+    zetWedstrijd({ ...info, datum: gespeeld.datum, programmaId: wedstrijd.programmaId, afgesloten: gespeeld.id, bewerkt: undefined })
     setHistory([])
   }
+
+  // Afgesloten wedstrijd weer bijhouden (zelfde dag); opnieuw afsluiten overschrijft de opgeslagen versie
+  const weerOpenen = () => {
+    if (!wedstrijd.afgesloten) return
+    zetWedstrijd({ ...wedstrijd, afgesloten: undefined, bewerkt: wedstrijd.afgesloten })
+  }
+
+  // Na een afgesloten wedstrijd: alles terug (zoals Alles resetten) en een lege 'Deze wedstrijd'
+  const nieuweWedstrijd = () => {
+    allesResetten()
+    zetWedstrijd({ ...LEGE_WEDSTRIJD, thuis: wedstrijd.thuis })
+    setHistory([])
+  }
+
+  const afgesloten = wedstrijd.afgesloten ? wedstrijden.find(w => w.id === wedstrijd.afgesloten) ?? null : null
+  // Een dag later begint een beheerder vanzelf een nieuwe wedstrijd (op de datum van de wedstrijd zelf, niet op de
+  // opgeslagen lijst: die kan op een ander toestel nog onderweg zijn)
+  useEffect(() => {
+    if (wedstrijd.afgesloten && magBewerken && wedstrijd.datum && wedstrijd.datum < vandaag()) nieuweWedstrijd()
+  }, [wedstrijd.afgesloten, wedstrijd.datum, magBewerken])
 
   const wijzigWedstrijd = (id: string, info: WedstrijdInfo, tegenstander: string, stand?: OpgeslagenStand) =>
     setWedstrijden(wedstrijden.map(w => (w.id === id && info.clubId
@@ -416,6 +440,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const verwijderWedstrijd = (id: string) => {
     setWedstrijden(wedstrijden.filter(w => w.id !== id))
     markeerVerwijderd('wedstrijden', id)
+    // De uitslag die nog op het Dashboard stond, is weg: nieuwe wedstrijd
+    if (wedstrijd.afgesloten === id) nieuweWedstrijd()
   }
 
   const resetScore = () => {
@@ -546,7 +572,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, afgesloten, weerOpenen, nieuweWedstrijd, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken: magBewerken && !wedstrijd.afgesloten, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )

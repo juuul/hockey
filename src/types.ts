@@ -90,6 +90,8 @@ export interface WedstrijdInfo {
   clubId: string | null;
   thuis: boolean;
   programmaId?: string; // klaargezet vanuit het programma (voor tijden en het label 'Klaargezet')
+  afgesloten?: string; // id van de opgeslagen wedstrijd: afgelopen, de uitslag blijft staan tot er een nieuwe wedstrijd begint
+  bewerkt?: string; // weer geopend: opnieuw afsluiten overschrijft deze opgeslagen wedstrijd
 }
 
 // Afgesloten wedstrijd. Namen worden meebewaard zodat de historie klopt als een speler of club later weg is
