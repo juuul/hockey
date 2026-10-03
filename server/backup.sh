@@ -11,7 +11,7 @@ RCLONE_CONF_DIR="${HOCKEY_RCLONE_DIR:-$HOME/.config/thuishub/rclone}"
 umask 077
 mkdir -p "$DEST"
 chmod 700 "$DEST"
-stamp=$(date +%Y%m%d-%H%M)
+stamp=$(date +%Y%m%d-%H%M%S)
 doel="$DEST/hockey-$stamp.db"
 
 sqlite3 -readonly "$BRON" ".backup '$doel'"
