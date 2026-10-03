@@ -1,9 +1,19 @@
 import PocketBase, { ClientResponseError, LocalAuthStore, RecordModel } from 'pocketbase'
 import { OPSLAG } from './opslag'
+import { toestelId } from './live'
 
 
 export const pb = new PocketBase(import.meta.env.VITE_SERVER ?? 'https://serverbot.taild1b3c5.ts.net', new LocalAuthStore(`${OPSLAG}_auth`))
 pb.autoCancellation(false)
+// Bij inloggen en de inlog verversen een willekeurig toestel-id meesturen (geen naam of IP): zo telt 'Gebruik per team'
+// ook hoeveel toestellen via de meekijklink meekijken (die delen samen één gastaccount)
+pb.beforeSend = (url, options) => {
+  const body = options.body
+  if (/\/auth-(with-password|refresh)$/.test(url.split('?')[0]) && (body == null || (typeof body === 'object' && !(body instanceof FormData)))) {
+    options.body = { ...(body ?? {}), toestel: toestelId(OPSLAG) }
+  }
+  return { url, options }
+}
 
 export type Rol = 'beheerder' | 'kijker'
 export const ROL_VELD: Record<Rol, 'beheerders' | 'kijkers'> = { beheerder: 'beheerders', kijker: 'kijkers' }

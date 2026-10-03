@@ -690,7 +690,7 @@ function WachtwoordKiezen({ token, klaar }: { token: string; klaar: () => void }
   )
 }
 
-interface TeamGebruik { id: string; naam: string; leden: number; week: number; maand: number; laatst: string | null; wie: string }
+interface TeamGebruik { id: string; naam: string; leden: number; actief: number; meekijklink: boolean; meekijkers: number; laatst: string | null; wie: string }
 
 // 'Vandaag 21:14', 'gisteren 9:05', 'za 27 sep 14:00'
 function wanneer(iso: string) {
@@ -702,7 +702,7 @@ function wanneer(iso: string) {
   return `${d.toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })} ${tijd}`
 }
 
-// Superadmin: per team hoe vaak de leden inlogden of de app openden, en wanneer het laatst
+// Superadmin: per team deze week de actieve leden en de toestellen via de meekijklink, en wanneer het laatst
 function Gebruik() {
   const [teams, setTeams] = useState<TeamGebruik[] | null>(null)
   const [fout, setFout] = useState<string | null>(null)
@@ -713,7 +713,7 @@ function Gebruik() {
 
   return (
     <Kaart titel="Gebruik per team">
-      <p className="account-uitleg">Keer ingelogd of de app geopend door de leden (binnen 10 minuten telt één keer). Bijgehouden vanaf 2 oktober 2026.</p>
+      <p className="account-uitleg">Afgelopen 7 dagen: leden die inlogden of de app openden, en toestellen die via de meekijklink keken.</p>
       <Melding tekst={fout} fout />
       {!teams && !fout && <p className="account-uitleg">Laden…</p>}
       <div className="account-lijst">
@@ -721,7 +721,8 @@ function Gebruik() {
           <div key={t.id} className="account-regel account-gebruik">
             <span className="account-regel-tekst">
               <span className="account-regel-naam">{t.naam}</span>
-              <span className="account-regel-sub">{t.week}× deze week · {t.maand}× in 30 dagen · {t.leden} {t.leden === 1 ? 'lid' : 'leden'}</span>
+              <span className="account-regel-sub">{t.actief} van {t.leden} {t.leden === 1 ? 'lid' : 'leden'} actief</span>
+              {t.meekijklink && <span className="account-regel-sub">Meekijklink: {t.meekijkers} {t.meekijkers === 1 ? 'toestel' : 'toestellen'}</span>}
               <span className="account-regel-sub">{t.laatst ? `Laatst: ${wanneer(t.laatst)}${t.wie ? ` (${t.wie})` : ''}` : 'Nog niet gebruikt'}</span>
             </span>
           </div>
