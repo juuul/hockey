@@ -86,3 +86,11 @@ interface Player {
 }
 interface Wissel { id: string; tijdstip: Date; inSpeler: string; uitSpeler: string; positie: Position }
 ```
+
+## Speeltijd per speler (`src/speeltijd.ts`)
+- Gemeten op de **wedstrijdklok** (`klokMs`), dus pauzes en rust tellen niet. Per speler de linie: aanval (`LW`, `CV`, `RW`), middenveld (`LM`, `LCM`, `CM`, `RCM`, `RM`), verdediging (rest), keeper, en **wissel** (op de bank) als eigen groep. Wie niet meedoet telt niet (`linieVan`).
+- Bijhouden: `speeltijdLog` in de context (opslag `speeltijd` + live stand): bij elke verandering in de indeling (wissel, verplaatsen, aan/afmelden, opstelling) een moment `{ t: klokstand ms, g: linie per speler }` (`logBij`; zelfde klokstand of klok teruggezet = laatste moment vervangen). Alleen het toestel dat bijhoudt legt vast, niet na afsluiten. Alles resetten / Nieuwe wedstrijd maakt het leeg.
+- Bij **Wedstrijd afsluiten** krijgt elke speler in `wedstrijden.spelers[].tijd` de seconden per linie (`a`, `m`, `v`, `k`, `w`); oudere wedstrijden hebben het niet. Weer openen + opnieuw afsluiten rekent met het hele log opnieuw.
+- **Dashboard**: op de wisseltegels onder de naam "14 min" (minuten in het veld), elke 15 s bijgewerkt zolang de klok loopt.
+- **Historie**: blok **Speeltijd** (seizoen, `speeltijdSeizoen` in `src/historie.ts`): per speler (op alfabet) minuten in het veld, een balk met de verdeling per linie (kleuren `--linie-a/m/v/k/w` in `index.css`, legenda erboven), aantal wedstrijden en het gemiddelde. In de details van een wedstrijd per speler minuten, balk en "aanval 30 · wissel 8".
+- Klopt alleen als de klok loopt en wissels meteen worden ingevoerd.

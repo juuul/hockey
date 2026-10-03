@@ -46,6 +46,23 @@ export function topscorers(wedstrijden: GespeeldeWedstrijd[], spelers: Player[])
     .sort((a, b) => Number(a.id === null) - Number(b.id === null) || b.aantal - a.aantal || a.naam.localeCompare(b.naam))
 }
 
+// Speeltijd over alle wedstrijden waarin die is bijgehouden: per speler seconden per linie (zie speeltijd.ts)
+export function speeltijdSeizoen(wedstrijden: GespeeldeWedstrijd[], spelers: Player[]): { id: string; naam: string; wedstrijden: number; tijd: Record<'a' | 'm' | 'v' | 'k' | 'w', number> }[] {
+  const per = new Map<string, { naam: string; wedstrijden: number; tijd: Record<'a' | 'm' | 'v' | 'k' | 'w', number> }>()
+  for (const w of wedstrijden) {
+    for (const sp of w.spelers) {
+      if (!sp.tijd) continue
+      const t = per.get(sp.id) ?? { naam: sp.naam, wedstrijden: 0, tijd: { a: 0, m: 0, v: 0, k: 0, w: 0 } }
+      t.wedstrijden++
+      for (const l of ['a', 'm', 'v', 'k', 'w'] as const) t.tijd[l] += sp.tijd[l] ?? 0
+      per.set(sp.id, t)
+    }
+  }
+  return [...per.entries()]
+    .map(([id, t]) => ({ id, ...t, naam: spelers.find(s => s.id === id)?.naam ?? t.naam }))
+    .sort((a, b) => a.naam.localeCompare(b.naam, 'nl', { sensitivity: 'base' }))
+}
+
 export const clubNaam = (w: GespeeldeWedstrijd, clubs: Club[]) => clubs.find(c => c.id === w.clubId)?.naam ?? w.tegenstander
 
 // Alle bekende clubs (ook zonder wedstrijden) plus clubs die alleen nog in de historie staan

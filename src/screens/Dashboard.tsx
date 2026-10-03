@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
 import { OPSTELLINGEN, Position, POSITIE_LABEL } from '../types'
@@ -10,11 +10,12 @@ import { WedstrijdAfsluitenKnop } from '../components/DezeWedstrijd'
 import KiesDoelpuntWeg, { scorersVan } from '../components/KiesDoelpuntWeg'
 import { tel } from '../statistiek'
 import { sorteerWissels, veldKleuren } from '../opstelling'
+import { klokMs, minuten, opVeld, speeltijden } from '../speeltijd'
 import './Dashboard.css'
 
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
-  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd } = useHockey()
+  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd, speeltijdLog, timer } = useHockey()
   const [showSubstituteModal, setShowSubstituteModal] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState<Position>('LW')
   const [selectedPlayerName, setSelectedPlayerName] = useState('')
@@ -36,9 +37,21 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
   // Eén regel wissels past in beeld; de rest staat onder de vouw, bereikbaar door de pagina te scrollen
   const wisselsInBeeld = substitutes.slice(0, 2)
   const wisselsEronder = substitutes.slice(2)
+  // Speeltijd (minuten in het veld) op de wisseltegels; elke 15 s bijwerken zolang de klok loopt
+  const [, setTik] = useState(0)
+  useEffect(() => {
+    if (timer.gestartOp === null) return
+    const id = setInterval(() => setTik(t => t + 1), 15000)
+    return () => clearInterval(id)
+  }, [timer.gestartOp])
+  const klok = klokMs(timer)
+  const tijden = klok > 0 ? speeltijden(speeltijdLog, klok) : {}
   const wisselTegel = (sub: typeof substitutes[number]) => (
     <div key={sub.id} className="substitute-item">
-      <span className="name">{sub.naam}</span>
+      <span className="name">
+        {sub.naam}
+        {tijden[sub.id] && <span className="speeltijd">{minuten(opVeld(tijden[sub.id]))} min</span>}
+      </span>
       <span className="count">{sub.wisselCount}×</span>
     </div>
   )

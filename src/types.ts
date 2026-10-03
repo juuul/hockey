@@ -104,7 +104,7 @@ export interface GespeeldeWedstrijd {
   wij: number;
   zij: number;
   doelpunten: { spelerId: string | null; naam: string }[];
-  spelers: { id: string; naam: string; wissels: number }[]; // wie meedeed
+  spelers: { id: string; naam: string; wissels: number; tijd?: Partial<Record<'a' | 'm' | 'v' | 'k' | 'w', number>> }[]; // wie meedeed; tijd = seconden per linie (zie speeltijd.ts), ontbreekt bij oudere wedstrijden
   opstelling: OpstellingNaam;
   opgeslagenOp: number;
   shootouts?: { spelerId: string; naam: string }[]; // wie na de wedstrijd een shoot-out nam (O10 en O9); ontbreekt bij oudere wedstrijden

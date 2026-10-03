@@ -403,3 +403,19 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Wisseltegel: minuten in het veld onder de naam */
+.substitute-item .name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.substitute-item .speeltijd {
+  font-weight: 400;
+  color: var(--tekst-zacht);
+  line-height: 1.1;
+}

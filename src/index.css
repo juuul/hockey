@@ -104,6 +104,19 @@
   --veld-onder: #284a15;
 }
 
+/* Linies in de speeltijdbalk (Historie): middentinten, leesbaar in licht en donker; wissel donkerder in donker */
+:root {
+  --linie-a: #f97316;
+  --linie-m: #3b82f6;
+  --linie-v: #10b981;
+  --linie-k: #eab308;
+  --linie-w: #94a3b8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-thema='licht']) { --linie-w: #64748b; }
+}
+:root[data-thema='donker'] { --linie-w: #64748b; }
+
 :root[data-thema='licht'] {
   color-scheme: light;
 }

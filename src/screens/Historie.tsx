@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useTerug } from '../terug'
 import { useHockey } from '../context/HockeyContext'
 import { GespeeldeWedstrijd, opstellingTekst } from '../types'
-import { balans, clubNaam, datumTekst, perTegenstander, sorteerWedstrijden, topscorers, uitslag, vindClub } from '../historie'
+import { balans, clubNaam, datumTekst, perTegenstander, sorteerWedstrijden, speeltijdSeizoen, topscorers, uitslag, vindClub } from '../historie'
+import { LINIE_NAAM, LINIES, minuten, opVeld } from '../speeltijd'
 import WedstrijdModal from '../components/WedstrijdModal'
 import DezeWedstrijd from '../components/DezeWedstrijd'
 import { tel } from '../statistiek'
@@ -26,6 +27,18 @@ export default function Historie() {
   const totaal = balans(wedstrijden)
   const scorers = topscorers(wedstrijden, spelers)
   const tegenstanders = perTegenstander(wedstrijden, clubs)
+  const seizoen = speeltijdSeizoen(wedstrijden, spelers)
+  // Balk per speler: aandeel per linie (ook wissel) van de tijd dat ze meedeed
+  const verdeling = (tijd: Partial<Record<'a' | 'm' | 'v' | 'k' | 'w', number>>) => {
+    const totaal = LINIES.reduce((n, l) => n + (tijd[l] ?? 0), 0)
+    return (
+      <span className="linie-balk" aria-hidden="true">
+        {totaal > 0 && LINIES.map(l => (tijd[l] ?? 0) > 0 && <span key={l} className={`linie-deel linie-${l}`} style={{ flexGrow: tijd[l] }} />)}
+      </span>
+    )
+  }
+  const linieTekst = (tijd: Partial<Record<'a' | 'm' | 'v' | 'k' | 'w', number>>) =>
+    LINIES.filter(l => minuten(tijd[l] ?? 0) > 0).map(l => `${LINIE_NAAM[l].toLowerCase()} ${minuten(tijd[l] ?? 0)}`).join(' · ')
   const naamBezet = club && nieuweNaam.trim() !== '' && vindClub(clubs, nieuweNaam)?.id !== undefined && vindClub(clubs, nieuweNaam)?.id !== club.id
 
   // Wie kan er gescoord hebben: wie toen meedeed (met de huidige naam als die speler nog bestaat), anders het hele team
@@ -68,6 +81,28 @@ export default function Historie() {
               </li>
             ))}
           </ol>
+        </section>
+      )}
+
+      {seizoen.length > 0 && (
+        <section>
+          <h2 className="section-title">Speeltijd</h2>
+          <p className="historie-uitleg">Minuten in het veld, en per linie hoe de tijd verdeeld was (wissel = op de bank). Alleen wedstrijden waarin de klok liep.</p>
+          <div className="linie-legenda" aria-hidden="true">
+            {LINIES.map(l => <span key={l} className="linie-legenda-item"><span className={`linie-stip linie-${l}`} />{LINIE_NAAM[l]}</span>)}
+          </div>
+          <div className="historie-lijst">
+            {seizoen.map(s => (
+              <div key={s.id} className="historie-regel speeltijd-regel" aria-label={`${s.naam}: ${minuten(opVeld(s.tijd))} minuten in het veld; ${linieTekst(s.tijd)}`}>
+                <span className="speeltijd-kop">
+                  <span className="regel-naam">{s.naam}</span>
+                  <span className="regel-waarde">{minuten(opVeld(s.tijd))} min</span>
+                </span>
+                {verdeling(s.tijd)}
+                <span className="regel-sub">{s.wedstrijden} {s.wedstrijden === 1 ? 'wedstrijd' : 'wedstrijden'} · gem. {minuten(opVeld(s.tijd) / s.wedstrijden)} min</span>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
@@ -122,6 +157,20 @@ export default function Historie() {
               <p className="detail-regel">{UITSLAG_TEKST[uitslag(open)]}</p>
               {open.doelpunten.length > 0 && <p className="detail-regel">⚽ {scorerRegels(open)}</p>}
               <p className="detail-regel">{open.spelers.length} speelsters · {opstellingTekst(open.opstelling)}</p>
+              {open.spelers.some(sp => sp.tijd) && (
+                <div className="detail-speeltijd">
+                  {[...open.spelers].filter(sp => sp.tijd).sort((a, b) => opVeld(b.tijd!) - opVeld(a.tijd!)).map(sp => (
+                    <div key={sp.id} className="detail-speeltijd-regel">
+                      <span className="speeltijd-kop">
+                        <span className="regel-naam">{spelers.find(x => x.id === sp.id)?.naam ?? sp.naam}</span>
+                        <span className="regel-waarde">{minuten(opVeld(sp.tijd!))} min</span>
+                      </span>
+                      {verdeling(sp.tijd!)}
+                      <span className="regel-sub">{linieTekst(sp.tijd!)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="modal-actions detail-knoppen">
               {magBewerken && <button className="btn btn-gevaar" onClick={() => { setWeg(open); setOpen(null) }}>Verwijderen</button>}

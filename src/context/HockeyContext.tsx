@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
+import { indeling, klokMs, logBij, SpeeltijdMoment, speeltijden } from '../speeltijd'
 import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Shootout, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, naamBezet, verplaatsSpelers } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
@@ -70,6 +71,7 @@ interface HockeyContextType {
   bewaarProgramma: (item: ProgrammaItem) => void
   verwijderProgramma: (id: string) => void
   wedstrijdAfsluiten: (info: WedstrijdInfo, tegenstander: string) => void
+  speeltijdLog: SpeeltijdMoment[] // wie in welke linie stond, per moment op de wedstrijdklok
   afgesloten: GespeeldeWedstrijd | null // afgesloten wedstrijd waarvan de uitslag nog op het Dashboard staat
   weerOpenen: () => void
   nieuweWedstrijd: () => void
@@ -144,6 +146,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const [shootouts, setShootouts] = useState<Shootout[]>(() => lees(P, 'shootouts', []))
   useEffect(() => { schrijf(P, 'shootouts', shootouts) }, [shootouts])
 
+  // Speeltijd: bij elke verandering in de indeling (wissel, verplaatsen, afmelden) de klokstand en de linie per speler
+  const [speeltijdLog, setSpeeltijdLog] = useState<SpeeltijdMoment[]>(() => lees(P, 'speeltijd', []))
+  useEffect(() => { schrijf(P, 'speeltijd', speeltijdLog) }, [speeltijdLog])
+
   const [opstelling, setOpstelling] = useState<OpstellingNaam>(() => {
     const saved = lees<unknown>(P, 'opstelling', null)
     const bekend = leesOpstelling(saved)
@@ -201,6 +207,13 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
 
   const [clubs, setClubs] = useState<Club[]>(() => leesOfVoorbeeld('clubs', () => DEMO_CLUBS, []))
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
+  // Alleen het toestel dat bijhoudt legt vast (de rest krijgt het via de live stand); niet na afsluiten
+  const indelingNu = JSON.stringify(indeling(spelers))
+  useEffect(() => {
+    if (!magBewerken || wedstrijd.afgesloten) return
+    setSpeeltijdLog(l => logBij(l, klokMs(timer), JSON.parse(indelingNu)))
+  }, [indelingNu, magBewerken, wedstrijd.afgesloten])
+
   const [wedstrijden, setWedstrijden] = useState<GespeeldeWedstrijd[]>(() => leesOfVoorbeeld<GespeeldeWedstrijd[]>('wedstrijden', demoWedstrijden, []))
   // Wat op dit toestel expliciet is verwijderd en nog naar de server moet (alleen dat wordt daar gewist)
   const [programma, setProgramma] = useState<ProgrammaItem[]>(() => leesOfVoorbeeld('programma', demoProgramma, []))
@@ -356,6 +369,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     setScore({ wij: 0, zij: 0 })
     setDoelpunten([])
     setShootouts([])
+    setSpeeltijdLog([])
     stopTimer()
   }
 
@@ -384,6 +398,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const wedstrijdAfsluiten = (info: WedstrijdInfo, tegenstander: string) => {
     if (!info.clubId) return
     const clubId = info.clubId
+    const tijden = speeltijden(logBij(speeltijdLog, klokMs(timer), indeling(spelers)), klokMs(timer))
     const gespeeld: GespeeldeWedstrijd = {
       id: wedstrijd.bewerkt || pbId(),
       datum: info.datum ?? vandaag(),
@@ -393,7 +408,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
       wij: score.wij,
       zij: score.zij,
       doelpunten: doelpunten.map(id => ({ spelerId: id, naam: spelers.find(s => s.id === id)?.naam ?? 'Onbekend' })),
-      spelers: spelers.filter(s => s.meedoen).map(s => ({ id: s.id, naam: s.naam, wissels: s.wisselCount })),
+      spelers: spelers.filter(s => s.meedoen).map(s => ({ id: s.id, naam: s.naam, wissels: s.wisselCount, ...(tijden[s.id] ? { tijd: tijden[s.id] } : {}) })),
       opstelling,
       opgeslagenOp: Date.now(),
       ...(shootouts.length ? { shootouts: shootouts.map(s => ({ spelerId: s.spelerId, naam: spelers.find(x => x.id === s.spelerId)?.naam ?? 'Onbekend' })) } : {}),
@@ -514,13 +529,15 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const { status: sync, nuSynchroniseren } = useTeamSync({ teamId, prefix: P, records, toepassen, verwijderd, verwijderdVerwerkt })
 
   // ── Lopende wedstrijd live delen met het team ──
-  const stand: Stand = { spelers: spelersStand(spelers), wisselingen, score, doelpunten, opstelling, timer, wedstrijd, shootouts }
+  const stand: Stand = { spelers: spelersStand(spelers), wisselingen, score, doelpunten, opstelling, timer, wedstrijd, shootouts, speeltijd: speeltijdLog }
   const standToepassen = (st: Stand) => {
     zetSpelersRuw(huidig => spelersMetStand(huidig, st.spelers))
     setWisselingen(st.wisselingen)
     setScore(st.score)
     setDoelpunten(st.doelpunten)
     setShootouts(st.shootouts ?? [])
+    // Oudere versies sturen geen speeltijd mee: dan de eigen indeling houden
+    if (st.speeltijd) setSpeeltijdLog(st.speeltijd)
     const ontvangen = leesOpstelling(st.opstelling)
     if (ontvangen) setOpstelling(ontvangen)
     setTimer(st.timer)
@@ -572,7 +589,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, afgesloten, weerOpenen, nieuweWedstrijd, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken: magBewerken && !wedstrijd.afgesloten, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, speeltijdLog, afgesloten, weerOpenen, nieuweWedstrijd, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken: magBewerken && !wedstrijd.afgesloten, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )

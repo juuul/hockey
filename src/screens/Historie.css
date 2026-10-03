@@ -182,3 +182,65 @@
 .knop-rood {
   background: #dc2626;
 }
+
+/* Speeltijd: per speler minuten in het veld en een balk met de verdeling per linie */
+.speeltijd-regel,
+.detail-speeltijd-regel {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.speeltijd-kop {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.linie-balk {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--vlak-zacht);
+}
+
+.linie-deel { flex-basis: 0; }
+.linie-a { background: var(--linie-a); }
+.linie-m { background: var(--linie-m); }
+.linie-v { background: var(--linie-v); }
+.linie-k { background: var(--linie-k); }
+.linie-w { background: var(--linie-w); }
+
+.linie-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-bottom: 8px;
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+}
+
+.linie-legenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.linie-stip {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.detail-speeltijd {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  text-align: left;
+}
+
+.detail-speeltijd .regel-sub {
+  white-space: normal;
+}

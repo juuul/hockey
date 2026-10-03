@@ -38,6 +38,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Wedstrijd afsluiten** slaat op, maar maakt het Dashboard niet leeg: de uitslag blijft (voor iedereen) staan als "Afgelopen" tot er een nieuwe wedstrijd begint (klaarzetten, Nieuwe wedstrijd, of de volgende dag). Beheerders kunnen hem weer openen; opnieuw afsluiten overschrijft dezelfde wedstrijd (`WedstrijdInfo.afgesloten` / `bewerkt`).
 - **Alles resetten** / **Undo** (niet de timer): zie de docs.
 - **Speelduur** per spelvorm in `src/speelduur.ts` (KNHB); klok stopt vanzelf aan het eind.
+- **Speeltijd per speler** (`src/speeltijd.ts`): per linie (aanval/middenveld/verdediging/keeper) plus wissel als eigen groep, gemeten op de wedstrijdklok; wie niet meedoet telt niet. Getoond op de wisseltegels (min), per wedstrijd en per seizoen in Historie.
 
 ### Vaste keuzes van de gebruiker
 - Geen meldingen (toasts) na een bevestiging; bevestigingsvragen alleen bij resets, timer-stop, iemand uit het team halen en een uitnodiging intrekken.
