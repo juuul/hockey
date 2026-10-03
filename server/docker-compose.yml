@@ -1,10 +1,13 @@
 # Hockey-server (PocketBase). Alleen op 127.0.0.1: van buitenaf bereikbaar via Tailscale Funnel.
 # Bijwerken (nieuwe migraties/hooks): docker compose up -d --build
+# .env (niet in git, alleen voor de eigenaar leesbaar) bevat PB_ENCRYPTION_KEY: daarmee versleutelt PocketBase de
+# instellingen (o.a. het mailwachtwoord) in de database. Sleutel ook bewaren in de wachtwoordmanager (zie docs/herstel.md).
 services:
   pocketbase:
     build: .
     container_name: hockey-pocketbase
     restart: unless-stopped
+    env_file: .env
     ports:
       - "127.0.0.1:8090:8090"
     volumes:
