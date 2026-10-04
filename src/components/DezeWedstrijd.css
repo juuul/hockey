@@ -75,3 +75,21 @@
   font-size: calc(var(--base-readable-size) * 1.6);
   font-variant-numeric: tabular-nums;
 }
+
+/* Stand met de knop ernaast */
+.deze-wedstrijd-rij {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.deze-wedstrijd-rij .deze-wedstrijd-getal {
+  flex: 0 0 auto;
+  font-weight: 800;
+  color: var(--tekst);
+  padding: 0 6px;
+}
+
+.deze-wedstrijd-rij .btn {
+  flex: 1 1 auto;
+}

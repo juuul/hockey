@@ -23,7 +23,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 1. **Dashboard** (`src/screens/Dashboard.tsx`): score (Wij → "Wie scoorde?"), veld + keeper, tik op speler = Wissel/Verplaatsen, één rij wissels, klokregel. **Onder de vouw** (bewust uit het zicht): extra wissels, Wedstrijd afsluiten, resets, Undo, timer.
 2. **Spelers**: categorie (O12+/O11/O10/O9 = 11/9/8/6 spelers, `CATEGORIE`), opstelling, wie doet mee, toevoegen/verwijderen.
 3. **Voorkeur**: per speler (ook keeper) 1e en 2e positie.
-4. **Historie**: "Deze wedstrijd" + afsluiten, balans, topscorers, wedstrijden en tegenstanders.
+4. **Historie**: compacte "Deze wedstrijd" (stand + Afsluiten), balans op één regel, één lijst **Spelers** (doelpunten + speeltijdbalk) en **Wedstrijden** met een filter op tegenstander (club wijzigen via het filter).
 5. **Programma** (`src/screens/Programma.tsx`): datums met fruit/spelbegeleiding, "Mijn kind", "Op het veld zetten".
 6. **Shoot-out** (alleen O10/O9, `heeftShootouts`): wie nam er hoeveel, minst genomen bovenaan.
 7. **Instellingen** (`src/screens/Instellingen.tsx`): inloggen, teams, leden, links uit mails, weergave; superadmin ook "Gebruik per team".

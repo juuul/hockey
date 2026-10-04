@@ -5,25 +5,18 @@ import { tel } from '../statistiek'
 import WedstrijdModal from './WedstrijdModal'
 import './DezeWedstrijd.css'
 
-// De lopende wedstrijd (tabblad Historie): tegenstander, stand, scorers en afsluiten
+// De lopende wedstrijd (tabblad Historie), compact: tegenstander (tik = wijzigen), stand en afsluiten
 export default function DezeWedstrijd() {
-  const { spelers, score, doelpunten, clubs, wedstrijd, zetWedstrijd, weerOpenen, magBeheren: magBewerken, programma } = useHockey()
+  const { score, clubs, wedstrijd, zetWedstrijd, weerOpenen, magBeheren: magBewerken, programma } = useHockey()
   const isAfgesloten = !!wedstrijd.afgesloten
   const uitProgramma = programma.find(p => p.id === wedstrijd.programmaId)
   const [vraag, setVraag] = useState<'gegevens' | null>(null)
   const tegenstander = clubs.find(c => c.id === wedstrijd.clubId)?.naam
 
-  const scorers = Object.entries(
-    doelpunten.reduce<Record<string, number>>((perNaam, id) => {
-      const naam = spelers.find(s => s.id === id)?.naam ?? 'Onbekend'
-      return { ...perNaam, [naam]: (perNaam[naam] ?? 0) + 1 }
-    }, {})
-  ).map(([naam, aantal]) => ({ naam, aantal })).sort((a, b) => b.aantal - a.aantal)
-
   return (
     <section className="deze-wedstrijd">
-      <h2 className="section-title">{isAfgesloten ? 'Deze wedstrijd · afgesloten' : 'Deze wedstrijd'}</h2>
       <button className="wedstrijd-kaart" onClick={() => setVraag('gegevens')} disabled={!magBewerken || isAfgesloten}>
+        <span className="wedstrijd-kaart-info">{isAfgesloten ? 'Deze wedstrijd · afgesloten' : 'Deze wedstrijd'}</span>
         <span className="wedstrijd-kaart-club">{tegenstander ? `Tegen ${tegenstander}` : magBewerken ? 'Kies tegenstander' : 'Tegenstander nog niet gekozen'}</span>
         <span className="wedstrijd-kaart-info">{wedstrijd.thuis ? 'Thuis' : 'Uit'} · {wedstrijd.datum ? datumTekst(wedstrijd.datum) : 'vandaag'}</span>
         {uitProgramma && (uitProgramma.verzamelen || uitProgramma.spelen) && (
@@ -32,20 +25,12 @@ export default function DezeWedstrijd() {
           </span>
         )}
       </button>
-      <div className="deze-wedstrijd-stand" aria-label={`Stand ${score.wij} tegen ${score.zij}`}>
-        <span>Wij</span>
-        <span className="deze-wedstrijd-getal">{score.wij} – {score.zij}</span>
-        <span>Zij</span>
+      {/* Stand met de knop ernaast: afsluiten, of na afsluiten weer openen */}
+      <div className="deze-wedstrijd-rij">
+        <span className="deze-wedstrijd-getal" aria-label={`Stand ${score.wij} tegen ${score.zij}`}>{score.wij} – {score.zij}</span>
+        {magBewerken && !isAfgesloten && <WedstrijdAfsluitenKnop kort />}
+        {magBewerken && isAfgesloten && <button className="btn btn-secondary" onClick={() => { weerOpenen(); tel('wedstrijd-heropend') }}>Weer openen</button>}
       </div>
-      {scorers.length > 0 && (
-        <div className="doelpunten-lijst">
-          {scorers.map(({ naam, aantal }) => (
-            <span key={naam} className="doelpunt-scorer">⚽ {naam} <strong>{aantal}</strong></span>
-          ))}
-        </div>
-      )}
-      {magBewerken && !isAfgesloten && <WedstrijdAfsluitenKnop />}
-      {magBewerken && isAfgesloten && <button className="btn btn-secondary" onClick={() => { weerOpenen(); tel('wedstrijd-heropend') }}>Wedstrijd weer openen</button>}
 
       {vraag === 'gegevens' && (
         <WedstrijdModal
@@ -61,12 +46,12 @@ export default function DezeWedstrijd() {
 }
 
 // Wedstrijd afsluiten (beheerders): op het Dashboard (onder de vouw) en bij Historie → Deze wedstrijd
-export function WedstrijdAfsluitenKnop() {
+export function WedstrijdAfsluitenKnop({ kort = false }: { kort?: boolean }) {
   const { score, wedstrijd, wedstrijdAfsluiten } = useHockey()
   const [vraag, setVraag] = useState<'afsluiten' | null>(null)
   return (
     <>
-      <button className="btn btn-primary" onClick={() => setVraag('afsluiten')}>{wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Wedstrijd afsluiten'}</button>
+      <button className="btn btn-primary" onClick={() => setVraag('afsluiten')}>{wedstrijd.bewerkt ? 'Opnieuw afsluiten' : kort ? 'Afsluiten' : 'Wedstrijd afsluiten'}</button>
       {vraag === 'afsluiten' && (
         <WedstrijdModal
           titel={`${wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Afsluiten'}: ${score.wij} – ${score.zij}`}

@@ -44,12 +44,22 @@ function zaterdag(n: number): string {
 
 const naam = (id: string) => DEMO_SPELERS.find(s => s.id === id)!.naam
 const goals = (...ids: string[]) => ids.map(id => ({ spelerId: id, naam: naam(id) }))
-const iedereen = (wissels: number[]) => DEMO_SPELERS.map((s, i) => ({ id: s.id, naam: s.naam, wissels: wissels[i] ?? 0 }))
+// Verzonnen speeltijd (4 × 17:30 = 4200 s): per wissel 8 min op de bank, de rest vooral in de eigen linie en wat in de linie ernaast
+const LINIE_VAN: Record<string, 'a' | 'm' | 'v' | 'k'> = { LW: 'a', CV: 'a', RW: 'a', LM: 'm', LCM: 'm', RCM: 'm', RM: 'm', LBM: 'v', CBM: 'v', RBM: 'v', K: 'k' }
+const NAAST = { a: 'm', m: 'a', v: 'm', k: 'k' } as const
+const demoTijd = (positie: string, wissels: number, n: number) => {
+  const eigen = LINIE_VAN[positie] ?? 'm'
+  if (eigen === 'k') return { k: 4200 }
+  const w = Math.min(wissels, 3) * 480
+  const anders = ((n * 7 + positie.length * 5) % 4) * 300
+  return { [eigen]: 4200 - w - anders, [NAAST[eigen]]: anders, w }
+}
+const iedereen = (wissels: number[], n: number) => DEMO_SPELERS.map((s, i) => ({ id: s.id, naam: s.naam, wissels: wissels[i] ?? 0, tijd: demoTijd(s.positie, wissels[i] ?? 0, n) }))
 
 export function demoWedstrijden(): GespeeldeWedstrijd[] {
   const w = (n: number, club: number, thuis: boolean, zij: number, doelpunten: GespeeldeWedstrijd['doelpunten'], wissels: number[]): GespeeldeWedstrijd => ({
     id: `demo-w${n}`, datum: zaterdag(-n), clubId: DEMO_CLUBS[club].id, tegenstander: DEMO_CLUBS[club].naam, thuis,
-    wij: doelpunten.length, zij, doelpunten, spelers: iedereen(wissels), opstelling: '3-4-3', opgeslagenOp: n,
+    wij: doelpunten.length, zij, doelpunten, spelers: iedereen(wissels, n), opstelling: '3-4-3', opgeslagenOp: n,
   })
   return [
     w(1, 0, true, 1, goals('2', '1', '5'), [2, 1, 2, 1, 1, 2, 1, 1, 1, 1, 0, 2, 2]),

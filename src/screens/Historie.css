@@ -244,3 +244,48 @@
 .detail-speeltijd .regel-sub {
   white-space: normal;
 }
+
+/* Balans op één regel */
+.balans-regel {
+  font-size: var(--base-readable-size);
+  color: var(--tekst-zacht);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.balans-W { color: var(--groen-tekst); font-weight: 700; }
+.balans-V { color: var(--rood-tel); font-weight: 700; }
+
+.speler-min { flex-shrink: 0; }
+
+/* Wedstrijden met filter op tegenstander */
+.wedstrijden-kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.club-filter {
+  min-height: 60px;
+  max-width: 100%;
+  padding: 0 10px;
+  font: inherit;
+  font-size: var(--base-readable-size);
+  color: var(--tekst);
+  background: var(--vlak);
+  border: 2px solid var(--rand);
+  border-radius: 10px;
+}
+
+.club-balans {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 4px 0 8px;
+}
+
+.speeltijd-kop .regel-naam { flex: 1 1 auto; min-width: 0; }
