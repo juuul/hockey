@@ -50,6 +50,84 @@ function stuurUitnodiging(app, inv, herinnering) {
   app.newMailClient().send(msg)
 }
 
+// Mail gaat via hockey@juliaan.eu (Vimexx). Alles komt uit de omgeving (server/.env); het wachtwoord staat alleen
+// in het geheugen, niet in de database
+const MAIL_DOMEIN = "@juliaan.eu" // anders faalt DMARC (p=reject)
+const MAIL_PER_UUR = 150 // Vimexx staat 200 per uur toe
+
+function mailConfig() {
+  const from = $os.getenv("MAIL_FROM").trim().replace(/^(["'])(.*)\1$/, "$2") // aanhalingstekens mogen
+  const m = from.match(/^(.*?)\s*<([^>]+)>$/)
+  return {
+    host: $os.getenv("SMTP_HOST").trim(),
+    port: parseInt($os.getenv("SMTP_PORT") || "465", 10),
+    user: $os.getenv("SMTP_USER").trim(),
+    pass: $os.getenv("SMTP_PASS"),
+    naam: m ? m[1].replace(/^"|"$/g, "").trim() : "",
+    adres: (m ? m[2] : from).trim(),
+  }
+}
+
+function mailFout(cfg) {
+  const leeg = ["SMTP_HOST", "SMTP_USER", "SMTP_PASS", "MAIL_FROM"].filter((k) => !$os.getenv(k))
+  if (leeg.length) return leeg.join(", ") + " ontbreekt in server/.env"
+  if (!cfg.adres.toLowerCase().endsWith(MAIL_DOMEIN)) return "MAIL_FROM moet een " + MAIL_DOMEIN + "-adres zijn (DMARC)"
+  if (cfg.port !== 465 && cfg.port !== 587) return "SMTP_PORT moet 465 of 587 zijn"
+  return ""
+}
+
+// Mailinstellingen in de instellingen zetten: 465 = SSL/TLS, 587 = STARTTLS
+function zetMail(settings, cfg, metWachtwoord) {
+  settings.smtp.enabled = true
+  settings.smtp.host = cfg.host
+  settings.smtp.port = cfg.port
+  settings.smtp.username = cfg.user
+  settings.smtp.password = metWachtwoord ? cfg.pass : ""
+  settings.smtp.tls = cfg.port === 465
+  settings.smtp.authMethod = "PLAIN"
+  settings.meta.senderAddress = cfg.adres
+  settings.meta.senderName = cfg.naam
+}
+
+// Bij het starten: alles behalve het wachtwoord opslaan (zodat het beheerscherm klopt en het oude Gmail-wachtwoord
+// weg is), daarna het wachtwoord alleen in het geheugen
+function mailInstellen(app) {
+  const cfg = mailConfig()
+  const fout = mailFout(cfg)
+  if (fout) {
+    console.log("MAIL NIET INGESTELD: " + fout)
+    return
+  }
+  const s = app.settings()
+  if (s.smtp.host !== cfg.host || s.smtp.port !== cfg.port || s.smtp.username !== cfg.user || s.smtp.password !== "" ||
+      s.smtp.tls !== (cfg.port === 465) || !s.smtp.enabled || s.meta.senderAddress !== cfg.adres || s.meta.senderName !== cfg.naam) {
+    zetMail(s, cfg, false)
+    app.save(s)
+  }
+  mailInGeheugen(app)
+  console.log("Mail via " + cfg.host + ":" + cfg.port + " als " + cfg.naam + " <" + cfg.adres + ">")
+}
+
+// Na elk herladen van de instellingen (ook na opslaan in het beheerscherm) het wachtwoord weer uit de omgeving
+function mailInGeheugen(app) {
+  const cfg = mailConfig()
+  if (!mailFout(cfg)) zetMail(app.settings(), cfg, true)
+}
+
+// Maximaal MAIL_PER_UUR mails per (glijdend) uur, over alle mails van de server heen
+function telMail(app) {
+  const nu = Date.now()
+  let tijden = []
+  try { tijden = JSON.parse(app.store().get("hockey_mailtijden") || "[]") } catch (_) {}
+  tijden = tijden.filter((t) => nu - t < 3600 * 1000)
+  if (tijden.length >= MAIL_PER_UUR) {
+    console.log("MAIL NIET VERSTUURD: limiet van " + MAIL_PER_UUR + " per uur bereikt")
+    throw new BadRequestError("Er zijn het afgelopen uur te veel mails verstuurd. Probeer het later opnieuw.")
+  }
+  tijden.push(nu)
+  app.store().set("hockey_mailtijden", JSON.stringify(tijden))
+}
+
 function mail(app, aan, onderwerp, html) {
   const meta = app.settings().meta
   app.newMailClient().send(new MailerMessage({
@@ -196,6 +274,7 @@ function ruimUitnodigingenOp(app) {
       } catch (err) {
         console.log("herinnering mislukt", inv.id, err)
       }
+      sleep(2000) // niet alles tegelijk naar de mailserver
     }
   }
   for (const teamId of teVerwijderen) {
@@ -210,4 +289,4 @@ function ruimUitnodigingenOp(app) {
   }
 }
 
-module.exports = { ruimUitnodigingenOp, beslisAanmelding, ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }
+module.exports = { mailInstellen, mailInGeheugen, telMail, ruimUitnodigingenOp, beslisAanmelding, ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }

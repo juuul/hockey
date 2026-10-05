@@ -1,5 +1,28 @@
 /// <reference path="../pb_data/types.d.ts" />
 
+// Mail via hockey@juliaan.eu: instellingen uit server/.env, wachtwoord alleen in het geheugen
+onBootstrap((e) => {
+  e.next()
+  require(`${__hooks}/hockey.js`).mailInstellen(e.app)
+})
+
+onSettingsReload((e) => {
+  e.next()
+  require(`${__hooks}/hockey.js`).mailInGeheugen(e.app)
+})
+
+// Opslaan in het beheerscherm: het wachtwoord uit de omgeving niet mee de database in schrijven
+onSettingsUpdateRequest((e) => {
+  if ($os.getenv("SMTP_PASS")) e.newSettings.smtp.password = ""
+  e.next()
+})
+
+// Elke mail van de server (ook wachtwoord vergeten) telt mee voor de limiet per uur
+onMailerSend((e) => {
+  require(`${__hooks}/hockey.js`).telMail(e.app)
+  e.next()
+})
+
 // Uitnodiging aanmaken: token en maker bepaalt de server, daarna gaat de mail eruit
 onRecordCreateRequest((e) => {
   const h = require(`${__hooks}/hockey.js`)
