@@ -233,7 +233,7 @@ function beslisAanmelding(app, a, besluit, teamnaamIn) {
       a.set("team", team.id)
       tx.save(a)
     })
-    nodigUit(app, a.getString("team"), email, "beheerder", a.getString("terug"), "")
+    nodigUit(app, a.getString("team"), email, "beheerder", a.getString("terug"), "", a.getString("naam"))
     return "goedgekeurd"
   }
   if (besluit === "af") {

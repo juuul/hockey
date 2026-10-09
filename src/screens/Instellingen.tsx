@@ -632,10 +632,14 @@ function UitnodigingAannemen({ token, klaar }: { token: string; klaar: () => voi
       {!info.bestaat && (
         <>
           <input type="email" autoComplete="username" value={info.email} readOnly hidden />
-          <label className="account-label">
-            Je naam
-            <input className="modal-input" autoComplete="name" value={naam} onChange={e => setNaam(e.target.value)} />
-          </label>
+          {info.naam?.trim() ? (
+            <p className="account-uitleg">Naam: <strong>{info.naam}</strong></p>
+          ) : (
+            <label className="account-label">
+              Je naam
+              <input className="modal-input" autoComplete="name" value={naam} onChange={e => setNaam(e.target.value)} />
+            </label>
+          )}
           <label className="account-label">
             Kies een wachtwoord (minstens 8 tekens)
             <input className="modal-input" type="password" autoComplete="new-password" value={wachtwoord} onChange={e => setWachtwoord(e.target.value)} />

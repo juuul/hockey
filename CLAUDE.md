@@ -63,6 +63,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 ### Accounts en sync (kern)
 - Rollen: **beheerder** (alles in het eigen team), **kijker** (alleen meekijken), **superadmin** (eigenaar, alle teams; vlag alleen via het beheerscherm). Alleen een beheerder kan iemand beheerder maken.
 - Geen vrij aanmelden: alleen via een uitnodigingslink (dat is ook de e-mailbevestiging). Nieuwe teams en ouders via de aanmeldlink krijgen meteen een uitnodiging; herinnering na 3 dagen, na 7 dagen weg (dagelijkse cron).
+- Naam eenmaal invullen: team- en ouderaanmeldingen nemen de naam mee naar de uitnodiging. Bij account maken staat de bekende naam als tekst; alleen zonder bekende naam verschijnt een naamveld.
 - Links uit mails via `location.hash` (`#uitnodiging=`, `#wachtwoord=`, `#aanmelding=`, `#kijk=`, `#aanvraag=`, `#toegang=`).
 - **Synchroniseren** (`src/sync.ts`): offline eerst, drie standen per record. **Verwijderen alleen expliciet** (id in `verwijderd`); lokaal ontbreken is nooit een reden om op de server te wissen.
 - **Live wedstrijd** (`src/live.ts`): één record per team in `standen`, laatste schrijver wint.
