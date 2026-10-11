@@ -4,7 +4,7 @@ function normaliseer(clubs, club, detail, gecontroleerd = new Date().toISOString
   const seizoen = detail?.data?.season_name || `${jaar}-${jaar + 1}`
   const uit = { clubs: [], teams: [], wedstrijden: [] }
   const clubdata = clubs?.data || (club ? [club.data] : [])
-  uit.clubs = clubdata.filter(c => c.type === 'regular').map(c => ({ bronId: c.federation_reference_id, naam: c.friendly_name || c.name, plaats: c.city || '', gecontroleerd }))
+  uit.clubs = clubdata.filter(c => c.type === 'regular').map(c => ({ bronId: c.federation_reference_id, naam: c.friendly_name || c.name, plaats: c.city || '', ...(c.district ? { district: c.district } : {}), gecontroleerd }))
   const teamdata = new Map((club?.data?.teams || []).map(t => [String(t.id), t]))
   const matches = new Map()
   for (const poule of detail?.data?.poules || []) {

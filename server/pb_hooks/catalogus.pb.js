@@ -2,13 +2,30 @@
 // Import alleen via een lokale beheeropdracht, geen publiek schrijfendpoint.
 $app.rootCmd.addCommand(new Command({ use: "catalogus-import", run: (cmd, args) => {
   if (!args.length) throw new Error("Geef een lokaal JSON-bestand op")
-  const data = JSON.parse(String.fromCharCode.apply(null, $os.readFile(args[0])))
+  const data = JSON.parse(toString($os.readFile(args[0])))
   require(`${__hooks}/catalogus.js`).importeer($app, data)
   if (data.taakId) {
     const t = $app.findRecordById("catalogus_taken", data.taakId)
     t.set("status", "klaar"); t.set("fout", ""); $app.save(t)
   }
   console.log("Catalogus bijgewerkt: " + data.clubs.length + " clubs, " + data.teams.length + " teams, " + data.wedstrijden.length + " wedstrijden")
+} }))
+$app.rootCmd.addCommand(new Command({ use: "catalogus-kalenders", run: (cmd, args) => {
+  const lijst = JSON.parse(toString($os.readFile(args[0])))
+  $app.runInTransaction((tx) => {
+    if (!Array.isArray(lijst) || lijst.length > 500) throw new Error("Ongeldig aantal kalenders")
+    for (const data of lijst) {
+      if (!/^\d{4}-\d{4}$/.test(data.seizoen) || !["Veld", "Zaal"].includes(data.spelvorm) || !Array.isArray(data.dagen) || data.dagen.some(d => !/^\d{4}-\d\d-\d\d$/.test(d.datum) || !["speeldag", "reserve", "slotdag"].includes(d.status))) throw new Error("Ongeldige kalender")
+      const [start, einde] = data.seizoen.split("-")
+      if (Number(einde) !== Number(start) + 1 || data.dagen.some(d => d.datum < start + "-07-01" || d.datum >= einde + "-08-01")) throw new Error("Kalenderdatum buiten het bronseizoen")
+      let r
+      try { r = tx.findFirstRecordByData("catalogus_kalenders", "bronId", data.bronId) } catch (_) { r = new Record(tx.findCollectionByNameOrId("catalogus_kalenders")) }
+      for (const k of ["bronId", "naam", "seizoen", "district", "spelvorm", "doelgroep", "bron", "dagen", "autoLeeftijden"]) r.set(k, data[k])
+      tx.save(r)
+    }
+    for (const team of tx.findRecordsByFilter("teams", "officieelTeam != ''", "", 0, 0)) require(`${__hooks}/catalogus.js`).synchroniseer(tx, team)
+  })
+  console.log("Kalenders bijgewerkt: " + lijst.length)
 } }))
 $app.rootCmd.addCommand(new Command({ use: "catalogus-taken", run: () => {
   const taken = $app.findRecordsByFilter("catalogus_taken", "status = 'nieuw' || (status = 'bezig' && updated < {:oud})", "created", 3, 0, { oud: new Date(Date.now() - 10 * 60 * 1000).toISOString() })
@@ -51,6 +68,27 @@ routerAdd("POST", "/api/hockey/catalogus/omgeving/{id}/koppel", (e) => {
   e.app.runInTransaction((tx) => {
     team.set("officieelTeam", officieel.id)
     tx.save(team)
+    require(`${__hooks}/catalogus.js`).synchroniseer(tx, team)
+  })
+  return e.json(200, { ok: true })
+})
+routerAdd("GET", "/api/hockey/catalogus/omgeving/{id}/kalenders", (e) => {
+  if (!e.auth || e.auth.collection().name !== "users") throw new UnauthorizedError("Log eerst in")
+  const team = e.app.findRecordById("teams", e.request.pathValue("id"))
+  if (!e.auth.getBool("superadmin") && !team.getStringSlice("beheerders").includes(e.auth.id)) throw new ForbiddenError("Alleen beheerders")
+  const officieel = e.app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
+  return e.json(200, { kalenders: require(`${__hooks}/catalogus.js`).kalendersVoor(e.app, team, officieel) })
+})
+routerAdd("POST", "/api/hockey/catalogus/omgeving/{id}/kalenders", (e) => {
+  if (!e.auth || e.auth.collection().name !== "users") throw new UnauthorizedError("Log eerst in")
+  const team = e.app.findRecordById("teams", e.request.pathValue("id"))
+  if (!e.auth.getBool("superadmin") && !team.getStringSlice("beheerders").includes(e.auth.id)) throw new ForbiddenError("Alleen beheerders")
+  const ids = e.requestInfo().body.kalenders
+  if (!Array.isArray(ids) || ids.length > 4 || !team.getString("officieelTeam")) throw new BadRequestError("Kies maximaal vier kalenders voor een gekoppeld team")
+  const officieel = e.app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
+  for (const id of ids) if (e.app.findRecordById("catalogus_kalenders", String(id)).getString("seizoen") !== officieel.getString("seizoen")) throw new BadRequestError("Kies kalenders uit hetzelfde seizoen")
+  e.app.runInTransaction(tx => {
+    team.set("planningKalenders", [...new Set(ids)]); tx.save(team)
     require(`${__hooks}/catalogus.js`).synchroniseer(tx, team)
   })
   return e.json(200, { ok: true })
@@ -100,11 +138,11 @@ cronAdd("catalogus", "30 7 * * *", () => {
 })
 // Bronmetadata is serverbeheer; een oude/offline client mag deze niet verwijderen of vervalsen.
 onRecordUpdateRequest((e) => {
-  for (const veld of ["bronId", "bronBasis", "bronWijziging", "bronStatus"]) e.record.set(veld, e.record.original().get(veld))
+  for (const veld of ["bronId", "bronBasis", "bronWijziging", "bronStatus", "bronPlanning"]) e.record.set(veld, e.record.original().get(veld))
   e.next()
 }, "programma")
 onRecordCreateRequest((e) => {
-  e.record.set("bronId", ""); e.record.set("bronStatus", ""); e.record.set("bronBasis", null); e.record.set("bronWijziging", null)
+  e.record.set("bronId", ""); e.record.set("bronStatus", ""); e.record.set("bronBasis", null); e.record.set("bronWijziging", null); e.record.set("bronPlanning", null)
   e.next()
 }, "programma")
 // Laatste beheerder beschermen bij rollen wijzigen; serverimports vallen niet onder requesthooks.
@@ -120,12 +158,14 @@ onRecordDeleteRequest((e) => {
 
 // Bewust verwijderde officiële wedstrijden niet opnieuw aanmaken bij een bronupdate.
 onRecordDeleteRequest((e) => {
-  if (e.record.getString("bronId")) {
+  if (e.record.getString("bronId") || e.record.getString("bronPlanning")) {
     e.app.runInTransaction((tx) => {
       const team = tx.findRecordById("teams", e.record.getString("team"))
       let ids = []
       try { ids = JSON.parse(team.getString("bronGenegeerd") || "[]") || [] } catch (_) {}
-      team.set("bronGenegeerd", [...new Set([...ids, e.record.getString("bronId")])])
+      let planning
+      try { planning = JSON.parse(e.record.getString("bronPlanning") || "null") } catch (_) {}
+      team.set("bronGenegeerd", [...new Set([...ids, e.record.getString("bronId"), planning?.id].filter(Boolean))])
       tx.save(team)
     })
   }

@@ -31,12 +31,48 @@ function veldenVan(w, officieel) {
   const thuis = w.getString("thuisBronId") === officieel.getString("bronId")
   return { datum: w.getString("datum"), spelen: w.getString("spelen"), thuis, tegenstander: w.getString(thuis ? "uitNaam" : "thuisNaam"), locatie: w.getString("locatie") }
 }
+function kalendersVoor(app, team, officieel) {
+  let kalenders = json(team, "planningKalenders")
+  if (!Array.isArray(kalenders)) {
+    const club = app.findFirstRecordByData("catalogus_clubs", "bronId", officieel.getString("clubBronId"))
+    // Alleen ondubbelzinnige jeugdprofielen automatisch kiezen. Andere klassen
+    // hebben verschillende kalenders; de beheerder kiest dan expliciet.
+    kalenders = app.findRecordsByFilter("catalogus_kalenders", "seizoen = {:s} && district = {:d} && (spelvorm = {:v} || ({:v} = 'Veld' && spelvorm = 'Zaal'))", "", 0, 0, { s: officieel.getString("seizoen"), d: club.getString("district"), v: officieel.getString("spelvorm") })
+      .filter(k => (json(k, "autoLeeftijden") || []).includes(officieel.getString("leeftijd")) && !/landelijk|super|subtop|topklasse/i.test(officieel.getString("klasse")))
+      .map(k => k.id)
+  }
+  return kalenders
+}
 function synchroniseer(app, team) {
   const officieel = app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
   const lijst = app.findRecordsByFilter("catalogus_wedstrijden", "seizoen = {:s} && (thuisBronId = {:id} || uitBronId = {:id})", "datum", 0, 0, { s: officieel.getString("seizoen"), id: officieel.getString("bronId") })
+  const genegeerd = json(team, "bronGenegeerd") || []
+  const kalenders = kalendersVoor(app, team, officieel)
+  for (const id of kalenders) {
+    const kalender = app.findRecordById("catalogus_kalenders", id)
+    if (kalender.getString("seizoen") !== officieel.getString("seizoen")) continue
+    for (const dag of json(kalender, "dagen") || []) {
+      if (dag.datum < new Date().toISOString().slice(0, 10)) continue
+      const sleutel = "planning:" + kalender.getString("spelvorm") + ":" + dag.datum
+      if (genegeerd.includes(sleutel)) continue
+      const regels = app.findRecordsByFilter("programma", "team = {:t}", "", 0, 0, { t: team.id })
+      const planning = { id: sleutel, datum: dag.datum, status: dag.status, bron: kalender.getString("bron"), spelvorm: kalender.getString("spelvorm"), kalender: kalender.id, omschrijving: dag.omschrijving || "" }
+      const bestaand = regels.find(r => json(r, "bronPlanning")?.id === sleutel)
+      if (bestaand) {
+        bestaand.set("bronPlanning", planning); app.save(bestaand)
+        continue
+      }
+      // Een verplaatste, ingevulde of al gekoppelde speeldag behoudt zijn identiteit.
+      if (regels.some(r => json(r, "bronPlanning")?.id === sleutel || r.getString("datum") === dag.datum) || (kalender.getString("spelvorm") === officieel.getString("spelvorm") && lijst.some(w => w.getString("datum") === dag.datum))) continue
+      const p = new Record(app.findCollectionByNameOrId("programma"))
+      p.set("team", team.id); p.set("soort", "wedstrijd"); p.set("datum", dag.datum)
+      p.set("bronPlanning", planning)
+      app.save(p)
+    }
+  }
   for (const w of lijst) {
     const bronId = w.getString("bronId"), nieuw = veldenVan(w, officieel)
-    if ((json(team, "bronGenegeerd") || []).includes(bronId)) continue
+    if (genegeerd.includes(bronId) || genegeerd.includes("planning:" + officieel.getString("spelvorm") + ":" + nieuw.datum)) continue
     let p, bestaand = false
     try { p = app.findFirstRecordByFilter("programma", "team = {:t} && bronId = {:id}", { t: team.id, id: bronId }) } catch (_) {}
     if (!p) {
@@ -44,6 +80,17 @@ function synchroniseer(app, team) {
       const kandidaten = app.findRecordsByFilter("programma", "team = {:t} && bronId = '' && soort = 'wedstrijd' && datum = {:d}", "", 0, 0, { t: team.id, d: nieuw.datum })
         .filter((r) => r.getString("tegenstander").trim().toLowerCase() === nieuw.tegenstander.toLowerCase() && r.getBool("thuis") === nieuw.thuis)
       if (kandidaten.length === 1) { p = kandidaten[0]; bestaand = true }
+      else if (kandidaten.length === 0) {
+        // Alleen een expliciet geplande, unieke lege speeldag aanvullen; geen gewone
+        // handmatige wedstrijd op datum alleen koppelen, en geen doubleheader gokken.
+        const planning = app.findRecordsByFilter("programma", "team = {:t} && bronId = '' && soort = 'wedstrijd' && datum = {:d} && tegenstander = '' && clubId = ''", "", 0, 0, { t: team.id, d: nieuw.datum })
+          .filter(r => json(r, "bronPlanning")?.spelvorm === officieel.getString("spelvorm"))
+        if (planning.length === 1 && lijst.filter(x => x.getString("datum") === nieuw.datum).length === 1) {
+          p = planning[0]
+          // Lege bronvelden vormen de basis; eigen tijden/locatie blijven behouden.
+          p.set("bronBasis", { datum: p.getString("datum"), spelen: "", thuis: p.getBool("thuis"), tegenstander: "", locatie: "" })
+        }
+      }
     }
     if (!p) {
       p = new Record(app.findCollectionByNameOrId("programma"))
@@ -91,4 +138,4 @@ function zetTaak(app, club, team) {
   if (taak && Date.now() - new Date(taak.getString("updated")).getTime() < 3600000) return
   upsert(app, "catalogus_taken", "sleutel = {:s}", { s: sleutel }, { sleutel, clubBronId: club.getString("bronId"), teamBronId: team ? team.getString("bronId") : "", pouleId: team ? team.getString("pouleId") : "", status: "nieuw", fout: "" })
 }
-module.exports = { importeer, synchroniseer, zetTaak }
+module.exports = { importeer, synchroniseer, zetTaak, kalendersVoor }

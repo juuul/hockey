@@ -23,7 +23,7 @@ const VELDEN: Record<Soort, string[]> = {
   spelers: ['id', 'naam', 'voorkeur1', 'voorkeur2'],
   clubs: ['id', 'naam', 'laatstGebruikt'],
   wedstrijden: ['id', 'datum', 'clubId', 'tegenstander', 'thuis', 'wij', 'zij', 'doelpunten', 'spelers', 'opstelling', 'opgeslagenOp', 'shootouts'],
-  programma: ['id', 'datum', 'tot', 'soort', 'clubId', 'tegenstander', 'thuis', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie', 'bronId', 'bronBasis', 'bronWijziging', 'locatie', 'bronStatus'],
+  programma: ['id', 'datum', 'tot', 'soort', 'clubId', 'tegenstander', 'thuis', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie', 'bronId', 'bronBasis', 'bronWijziging', 'locatie', 'bronStatus', 'bronPlanning'],
 }
 
 // Tekstvelden die leeg '' zijn als ze ontbreken (de server geeft '' terug, de app soms undefined)

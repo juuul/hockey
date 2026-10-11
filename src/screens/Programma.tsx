@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Speeldagen from '../components/Speeldagen'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
 import { begeleidingTekst, NIET_NODIG, ProgrammaItem } from '../types'
@@ -25,7 +26,8 @@ const LEEG_ITEM = (inst: TeamInstellingen): ProgrammaItem => ({
 // Tabblad Programma: wedstrijden met tijden, fruit en spelbegeleiding. Beurten van je eigen kind(eren) vallen op
 export default function Programma({ naarDashboard }: { naarDashboard: () => void }) {
   const { programma, spelers, clubs, magBeheren: magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer, wedstrijden, afgesloten } = useHockey()
-  const { mijnKinderen, zetMijnKinderen, teamInstellingen } = useAccount()
+  const { mijnKinderen, zetMijnKinderen, teamInstellingen, actiefTeam } = useAccount()
+  const [planningOpen, setPlanningOpen] = useState(false)
   const [bewerk, setBewerk] = useState<ProgrammaItem | null>(null)
   const [standaardOpen, setStandaardOpen] = useState(false)
   const [klaarVraag, setKlaarVraag] = useState<ProgrammaItem | null>(null)
@@ -114,6 +116,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span aria-hidden="true">🚗</span>
           <span>begeleiding: {begeleidingTekst(p, naam)}</span>
         </div>
+        {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''} · <a href={p.bronPlanning.bron} target="_blank" rel="noreferrer">Kalender</a></div>}
         {p.locatie && <div className="prog-regel">📍 {p.locatie}</div>}
         {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
         {!!Object.keys(p.bronWijziging || {}).length && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
@@ -151,6 +154,8 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         </button>
         {magBewerken && <button className="prog-filter" onClick={() => setStandaardOpen(true)}>Begeleiding</button>}
       </div>
+      {magBewerken && actiefTeam?.officieelTeam && <button className="btn btn-secondary" onClick={() => setPlanningOpen(true)}>Speeldagen plannen · veld en zaal</button>}
+      {planningOpen && <Speeldagen dicht={() => setPlanningOpen(false)} />}
       {magBewerken && <button className="btn btn-primary prog-toevoegen" onClick={() => setBewerk(LEEG_ITEM(teamInstellingen))}>+ Datum toevoegen</button>}
 
       {programma.length === 0 && <p className="prog-uitleg midden">Nog geen programma.{magBewerken ? ' Voeg de eerste datum toe.' : ''}</p>}

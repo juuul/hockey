@@ -26,6 +26,7 @@ export const ROL_UITLEG: Record<Rol, string> = {
 export interface Gebruiker extends RecordModel { email: string; name: string; superadmin: boolean; teamaanmeldingen?: boolean; gast?: boolean; kinderen?: Record<string, string[]> | null }
 export interface Team extends RecordModel {
   naam: string
+  planningKalenders?: string[] | null
   officieelTeam?: string
   vindbaar?: boolean
   omgevingNaam?: string

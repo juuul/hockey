@@ -139,6 +139,7 @@ export interface ProgrammaItem {
   tegenstander: string;
   thuis: boolean;
   locatie?: string;
+  bronPlanning?: { id: string; datum: string; status: 'speeldag' | 'reserve' | 'slotdag'; bron: string; spelvorm: string; kalender: string; omschrijving?: string } | null;
   bronStatus?: string;
   bronId?: string;
   bronBasis?: { datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie?: string } | null;
