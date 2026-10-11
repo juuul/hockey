@@ -10,16 +10,16 @@ import './DeelKijklink.css'
 // - 'aanvraag': aanmeldlink voor ouders (alleen beheerders), ouders vragen toegang aan
 const TEKSTEN = {
   kijk: {
-    knop: '🔗 Meekijklink delen',
-    uitleg: 'Wie de link opent, kijkt live mee zonder account en kan niets wijzigen.',
-    deelTekst: (team: string) => `Hoi! Volg ${team} live tijdens de wedstrijd: score, opstelling en wissels 👇`,
+    knop: '🔗 Teamlink delen',
+    uitleg: 'Via deze link vraag je toegang aan. De beheerder keurt de aanvraag goed voordat je kunt meekijken.',
+    deelTekst: (team: string) => `Vraag hier toegang tot ${team} in de hockey-app:`,
     titel: (team: string) => `${team} live`,
     vraag: 'Nieuwe meekijklink?',
-    regels: [{ icoon: '🔗', tekst: 'De oude link werkt dan niet meer' }, { icoon: '👀', tekst: 'Wie via de oude link meekijkt, stopt' }],
+    regels: [{ icoon: '🔗', tekst: 'De oude link werkt dan niet meer' }, { icoon: '👀', tekst: 'Goedgekeurde leden behouden hun toegang' }],
   },
   aanvraag: {
     knop: '🔗 Aanmeldlink voor ouders delen',
-    uitleg: 'Ouders vullen via deze link hun naam, kind en e-mail in en krijgen meteen een uitnodiging als kijker. Jij en de andere beheerders krijgen een mail ter informatie.',
+    uitleg: 'Via deze link vragen ouders en begeleiders toegang aan. Jij keurt de aanvragen goed voordat zij een uitnodiging ontvangen.',
     deelTekst: (team: string) => `Vraag hier je account aan voor ${team} in de hockey-app:`,
     titel: (team: string) => `Account aanvragen ${team}`,
     vraag: 'Nieuwe aanmeldlink?',

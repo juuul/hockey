@@ -62,7 +62,9 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 
 ### Accounts en sync (kern)
 - Rollen: **beheerder** (alles in het eigen team), **kijker** (alleen meekijken), **superadmin** (eigenaar, alle teams; vlag alleen via het beheerscherm). Alleen een beheerder kan iemand beheerder maken.
-- Geen vrij aanmelden: alleen via een uitnodigingslink (dat is ook de e-mailbevestiging). Nieuwe teams en ouders via de aanmeldlink krijgen meteen een uitnodiging; herinnering na 3 dagen, na 7 dagen weg (dagelijkse cron).
+- Club/seizoen/officieel team kiezen uit de openbare catalogus. Meerdere privéomgevingen per officieel team mogelijk; de maker is beheerder van zijn eigen omgeving. Een nieuwe gebruiker bevestigt e-mail via uitnodiging en kiest daarna een wachtwoord; bestaande accounts hoeven hun naam niet opnieuw in te vullen.
+- Bestaande omgeving: toegang aanvragen, beheerder keurt goed, daarna uitnodiging. Publieke team- en aanvraagroutes tonen nooit spelers of leden. Nieuwe deelbare links zijn aanvraaglinks; anonieme gastaccounts en oude meekijklinks zijn ingetrokken op de bijgewerkte backend.
+- Officiële wedstrijden: bron-ID + bronbasis gescheiden van eigen tijden, verzameltijd, locatie en taken. Import behoudt handmatige afwijkingen en verwijderingen. Bronwijzigingen zijn zichtbaar; per veld expliciet herstellen mogelijk. Bestaande teams koppelen zonder spelers, leden of historie te vervangen.
 - Naam eenmaal invullen: team- en ouderaanmeldingen nemen de naam mee naar de uitnodiging. Bij account maken staat de bekende naam als tekst; alleen zonder bekende naam verschijnt een naamveld.
 - Links uit mails via `location.hash` (`#uitnodiging=`, `#wachtwoord=`, `#aanmelding=`, `#kijk=`, `#aanvraag=`, `#toegang=`).
 - **Synchroniseren** (`src/sync.ts`): offline eerst, drie standen per record. **Verwijderen alleen expliciet** (id in `verwijderd`); lokaal ontbreken is nooit een reden om op de server te wissen.
@@ -103,7 +105,9 @@ Sleutels `hockey_<naam>` op live en `hockey_test_<naam>` op test (zelfde domein,
 - Een migratie die al op de server gedraaid heeft **nooit aanpassen**: altijd een nieuwe migratie toevoegen.
 - Hooks altijd eerst `node --check server/pb_hooks/*.js` (een syntaxfout laat PocketBase alle hooks overslaan).
 - Wijzigingen eerst testen op een losse container met eigen datamap in de scratchpad (poort 8099, nep-SMTP, migraties/hooks daar wél gemount), nooit op de echte data. Voor problemen met echte data: een kopie maken met sqlite `backup()` (alleen-lezen bron) en daarop testen.
-- Test en live gebruiken dezelfde server (zelfde accounts en teams). `appURL` (voor de wachtwoordlinks) staat op https://hockey.juliaan.eu/; uitnodigingen en aanmeldingen gaan terug naar de app waar ze vandaan kwamen (`terug`, alleen adressen uit `TOEGESTAAN` in `pb_hooks/hockey.js`).
+- Test heeft een eigen server: `docker compose -p hockey-test -f server/docker-compose.test.yml up -d --build`, container `hockey-pocketbase-test`, `server/pb_test_data/`, localhost 8091. Geen productieaccounts, -sleutels of -SMTP; mail wordt afgevangen door Mailpit (localhost 8092). `HOCKEY_ENV=test` zet ook resetlinks naar `/test/`. Oude `hockey_test_`-opslag wordt bij eerste gebruik van de losse backend gewist.
+- Funnel: productie `/api` → 8090/api; test `/test/api` → 8091/api. Testfrontend kiest automatisch de serverbasis `/test`, live de oorspronkelijke basis. Beheerschermen en testmailbox blijven buiten Funnel. Beide serverdeploys hebben een eigen composebestand; nooit het productiecomposebestand gebruiken om test bij te werken.
+- Openbare catalogus: `server/catalogus/start.json` bevat uitsluitend openbare clubs/teams/wedstrijden. Import via lokale CLI `catalogus-import`, niet via publieke schrijfrechten. Achtergrondwerker `server/scripts/catalogus-worker.py --omgeving test` verwerkt aangevraagde clubs/teams; `--clubs` controleert de clublijst. Alleen actieve gekoppelde teams krijgen dagelijkse verzoeken. Details en beperkingen in `docs/functionaliteit.md` en `server/README.md`.
 - Geen mail bij inloggen vanaf een nieuwe plek (PocketBase `authAlert` uit, migratie 1790400015).
 - Echte bezoekers-IP via `X-Forwarded-For` (Tailscale zet die), zodat de limieten per bezoeker gelden. Limieten staan aan (PocketBase-standaard + aanmelding).
 

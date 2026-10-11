@@ -1,0 +1,27 @@
+# Losse testserver: geen productiedata, sleutels of SMTP-instellingen.
+services:
+  pocketbase-test:
+    build: .
+    container_name: hockey-pocketbase-test
+    restart: unless-stopped
+    environment:
+      HOCKEY_ENV: test
+    command: ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--origins=https://hockey.juliaan.eu,http://localhost:5173,http://192.168.2.50:5173"]
+    ports:
+      - "127.0.0.1:8091:8090"
+    volumes:
+      - ./pb_test_data:/pb/pb_data
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    depends_on: [mailpit]
+  mailpit:
+    image: axllent/mailpit:v1.27.8
+    container_name: hockey-test-mail
+    restart: unless-stopped
+    environment:
+      MP_MAX_MESSAGES: 200
+    ports:
+      - "127.0.0.1:8092:8025"
+    security_opt: ["no-new-privileges:true"]

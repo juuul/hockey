@@ -138,6 +138,11 @@ export interface ProgrammaItem {
   clubId: string;
   tegenstander: string;
   thuis: boolean;
+  locatie?: string;
+  bronStatus?: string;
+  bronId?: string;
+  bronBasis?: { datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie?: string } | null;
+  bronWijziging?: Partial<{ datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie: string }> | null;
   verzamelen: string; // 'UU:MM' of ''
   spelen: string;
   fruit: string;

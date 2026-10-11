@@ -1,0 +1,3909 @@
+{
+  "clubs": [
+    {
+      "bronId": "HH11AR3",
+      "naam": "Amsterdam",
+      "plaats": "Amstelveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MG20CJ7",
+      "naam": "IJburg",
+      "plaats": "Amsterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK27NK0",
+      "naam": "Noorderlicht",
+      "plaats": "Amsterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PP4",
+      "naam": "Souburgh",
+      "plaats": "Alblasserdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AJ7",
+      "naam": "Alkmaar",
+      "plaats": "Alkmaar",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AM8",
+      "naam": "Almere",
+      "plaats": "Almere",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FG1",
+      "naam": "FIT",
+      "plaats": "Amsterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NT6",
+      "naam": "Rood-Wit",
+      "plaats": "Aerdenhout",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MF15SY7",
+      "naam": "Westerpark",
+      "plaats": "Amsterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK24MP7",
+      "naam": "Dynamics",
+      "plaats": "Amsterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AV1",
+      "naam": "Apeldoorn",
+      "plaats": "Apeldoorn",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AY2",
+      "naam": "Arnhem",
+      "plaats": "Velp",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10QR2",
+      "naam": "Antilope",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QP7",
+      "naam": "Upward",
+      "plaats": "Arnhem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BC1",
+      "naam": "Baarn",
+      "plaats": "Baarn",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BP2",
+      "naam": "Berkel-Rodenrijs",
+      "plaats": "Berkel en Rodenrijs",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BN8",
+      "naam": "Berkel-Enschot",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CC4",
+      "naam": "Breda",
+      "plaats": "Breda",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MS6",
+      "naam": "Overbos",
+      "plaats": "Beverwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NC7",
+      "naam": "Push",
+      "plaats": "Breda",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SL5",
+      "naam": "Zwart-Wit",
+      "plaats": "Breda",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK28BV6",
+      "naam": "Bredius Rollers",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MG21QL8",
+      "naam": "Buitenhout",
+      "plaats": "Almere",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10QZ8",
+      "naam": "CHT",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CS6",
+      "naam": "Culemborg",
+      "plaats": "Culemborg",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CM4",
+      "naam": "Civicum",
+      "plaats": "Cuijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CQ2",
+      "naam": "Craeyenhout",
+      "plaats": "Den Haag",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DQ5",
+      "naam": "DDHC",
+      "plaats": "Raamsdonksveer",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GC6",
+      "naam": "Graspiepers",
+      "plaats": "Drachten",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10SC3",
+      "naam": "Rollers",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JY9",
+      "naam": "Kieviten",
+      "plaats": "Wassenaar",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LF2",
+      "naam": "Meeuwen",
+      "plaats": "Emmeloord",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10SK9",
+      "naam": "De Peperbus",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10RF1",
+      "naam": "Pont",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DM7",
+      "naam": "Drienerlo",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JP6",
+      "naam": "HUDITO",
+      "plaats": "Delft",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DB0",
+      "naam": "Deventer",
+      "plaats": "Deventer",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PG1",
+      "naam": "Shinty",
+      "plaats": "Driebergen-Rijsenburg",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DD4",
+      "naam": "Doetinchem",
+      "plaats": "Doetinchem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10RK6",
+      "naam": "Doing",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DG5",
+      "naam": "Don Quishoot",
+      "plaats": "Eindhoven",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DH2",
+      "naam": "Doorn",
+      "plaats": "Doorn",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DJ6",
+      "naam": "Dopie",
+      "plaats": "Delft",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DK3",
+      "naam": "Dordrecht",
+      "plaats": "Dordrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DL0",
+      "naam": "Dorsteti",
+      "plaats": "Wijk bij Duurstede",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DP8",
+      "naam": "DSHC",
+      "plaats": "Delft",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DR2",
+      "naam": "DVS",
+      "plaats": "Waalre",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DV0",
+      "naam": "Eemsmond",
+      "plaats": "Delfzijl",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AH3",
+      "naam": "EMM’21",
+      "plaats": "Roelofarendsveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DX4",
+      "naam": "EHV",
+      "plaats": "Enschede",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11ND4",
+      "naam": "PW",
+      "plaats": "Enschede",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FJ2",
+      "naam": "Flevoland",
+      "plaats": "Dronten",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FN0",
+      "naam": "GCHC",
+      "plaats": "Groningen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FT2",
+      "naam": "GHBS",
+      "plaats": "Groningen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NL0",
+      "naam": "Rapid",
+      "plaats": "Gorinchem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10RP1",
+      "naam": "GIDOS (BE)",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FV6",
+      "naam": "Gilze-Rijen",
+      "plaats": "Rijen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FW3",
+      "naam": "Goes",
+      "plaats": "Goes",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FY7",
+      "naam": "Gooische",
+      "plaats": "Bussum",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FZ4",
+      "naam": "Goor",
+      "plaats": "Goor",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GB9",
+      "naam": "Gouda",
+      "plaats": "Gouda",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10RR5",
+      "naam": "GP Bulls",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GH1",
+      "naam": "Gron.Studs",
+      "plaats": "Groningen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GM6",
+      "naam": "Hardenberg",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10RV3",
+      "naam": "Haag 88",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GF7",
+      "naam": "Groen-Geel",
+      "plaats": "Wassenaar",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GW6",
+      "naam": "HDM",
+      "plaats": "Den Haag",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GN3",
+      "naam": "Harlingen",
+      "plaats": "Harlingen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GP7",
+      "naam": "Hattem",
+      "plaats": "Hattem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AN5",
+      "naam": "Alphen",
+      "plaats": "Alphen aan den Rijn",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AX5",
+      "naam": "Ares",
+      "plaats": "Apeldoorn",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GR1",
+      "naam": "HCAS",
+      "plaats": "Asten",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "LV95KY6",
+      "naam": "AthenA",
+      "plaats": "Amsterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK23NK0",
+      "naam": "Baarle",
+      "plaats": "Baarle-nassau",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BJ0",
+      "naam": "Bedum",
+      "plaats": "Bedum",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BW1",
+      "naam": "Bloemendaal",
+      "plaats": "Bloemendaal",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BY5",
+      "naam": "Boekel",
+      "plaats": "Boekel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CH9",
+      "naam": "Capelle",
+      "plaats": "Capelle aan den Ijssel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CL7",
+      "naam": "Catwyck",
+      "plaats": "Katwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CR9",
+      "naam": "Cranendonck",
+      "plaats": "Maarheeze",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HZ0",
+      "naam": "Hoeksche Waard",
+      "plaats": "Mijnsheerenland",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK23HQ4",
+      "naam": "Delfshaven",
+      "plaats": "Rotterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK27FS2",
+      "naam": "Delta Venlo",
+      "plaats": "Venlo",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK29FX7",
+      "naam": "Den Haag",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CY8",
+      "naam": "Derby",
+      "plaats": "Zwijndrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK25QK9",
+      "naam": "Diemen",
+      "plaats": "Diemen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DT6",
+      "naam": "Eelde",
+      "plaats": "Paterswolde",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CF5",
+      "naam": "Eemvallei",
+      "plaats": "Amersfoort",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DW7",
+      "naam": "Eersel",
+      "plaats": "Eersel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DY1",
+      "naam": "Eindhoven",
+      "plaats": "Eindhoven",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FD0",
+      "naam": "Etten-Leur",
+      "plaats": "Etten-leur",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MJ21QV9",
+      "naam": "Feijenoord",
+      "plaats": "Rotterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FQ1",
+      "naam": "Geldermalsen",
+      "plaats": "Geldermalsen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FS5",
+      "naam": "Gemert",
+      "plaats": "Gemert",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GS8",
+      "naam": "Goeree Overflakkee",
+      "plaats": "Middelharnis",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK20MV9",
+      "naam": "Gorssel/Epse",
+      "plaats": "Epse",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GD3",
+      "naam": "Grave",
+      "plaats": "Escharen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GK2",
+      "naam": "Haarlem",
+      "plaats": "Haarlem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HJ8",
+      "naam": "Helmond",
+      "plaats": "Helmond",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HS1",
+      "naam": "Hisalis",
+      "plaats": "Lisse",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HH4",
+      "naam": "HCHN",
+      "plaats": "Nijverdal",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JK1",
+      "naam": "Horst",
+      "plaats": "Horst",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RZ0",
+      "naam": "IJsseloever",
+      "plaats": "IJsselstein",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JT4",
+      "naam": "Kampen",
+      "plaats": "Kampen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK17FX6",
+      "naam": "Kromme Rijn",
+      "plaats": "Bunnik",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KH3",
+      "naam": "Leerdam",
+      "plaats": "Leerdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LB4",
+      "naam": "HCM",
+      "plaats": "Arnhem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK29FW0",
+      "naam": "Martinus",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LL4",
+      "naam": "Mierlo",
+      "plaats": "Mierlo",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LM1",
+      "naam": "Mill",
+      "plaats": "Mill",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LN8",
+      "naam": "Mistral",
+      "plaats": "Rucphen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LY5",
+      "naam": "Nieuwkoop",
+      "plaats": "Nieuwkoop",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK19ND0",
+      "naam": "Nova",
+      "plaats": "Heerlen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MD1",
+      "naam": "Nuth",
+      "plaats": "Nuth",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MD56QW2",
+      "naam": "Overbetuwe",
+      "plaats": "Elst",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MJ56CW2",
+      "naam": "Oude IJsselstreek",
+      "plaats": "Ulft",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MJ3",
+      "naam": "Oirschot",
+      "plaats": "Oirschot",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK22GS0",
+      "naam": "Oranje-Rood",
+      "plaats": "Eindhoven",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NF8",
+      "naam": "Pijnacker",
+      "plaats": "Pijnacker",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK29FX9",
+      "naam": "Polaris",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NG5",
+      "naam": "QZ",
+      "plaats": "Nijmegen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MG26YY8",
+      "naam": "HCRB",
+      "plaats": "Reeuwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK23LM8",
+      "naam": "Rijnvliet",
+      "plaats": "Utrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JC5",
+      "naam": "Scherpenzeel",
+      "plaats": "Scherpenzeel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK23RH1",
+      "naam": "Schiedam",
+      "plaats": "Schiedam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PF4",
+      "naam": "Scoop",
+      "plaats": "Sittard",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GT5",
+      "naam": "HCSO",
+      "plaats": "Stadskanaal",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MJ18RY7",
+      "naam": "Spaarndam",
+      "plaats": "Spaarndam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PR8",
+      "naam": "Spire",
+      "plaats": "Hoogwoud",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MJ56BV2",
+      "naam": "Tilburg",
+      "plaats": "Tilburg",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RC9",
+      "naam": "Voorne",
+      "plaats": "Hellevoetsluis",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RF0",
+      "naam": "Waalwijk",
+      "plaats": "Waalwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RG7",
+      "naam": "Waddinxveen",
+      "plaats": "Waddinxveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MJ56CY6",
+      "naam": "Walcheren",
+      "plaats": "Vlissingen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RT8",
+      "naam": "Winsum",
+      "plaats": "Winsum",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "LX34VT7",
+      "naam": "Ypenburg",
+      "plaats": "Den Haag",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK12LJ1",
+      "naam": "Zwolle",
+      "plaats": "Zwolle",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GX3",
+      "naam": "HDS",
+      "plaats": "Den Haag",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HN6",
+      "naam": "HGC",
+      "plaats": "Wassenaar",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GJ5",
+      "naam": "Haackey",
+      "plaats": "Haaksbergen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NH2",
+      "naam": "Quick Stick",
+      "plaats": "Heerenveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HR4",
+      "naam": "Hilversum",
+      "plaats": "Loosdrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PB6",
+      "naam": "Saxenburg",
+      "plaats": "Haarlem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BD8",
+      "naam": "Bakel",
+      "plaats": "Bakel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AP9",
+      "naam": "Amersfoort",
+      "plaats": "Amersfoort",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AS0",
+      "naam": "AMVJ",
+      "plaats": "Amstelveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BF2",
+      "naam": "Barendrecht",
+      "plaats": "Barendrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BQ9",
+      "naam": "Berlicum",
+      "plaats": "Berlicum nb",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GL9",
+      "naam": "Haaskamp",
+      "plaats": "Amerongen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JF6",
+      "naam": "Hondsrug",
+      "plaats": "Zuidlaren",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK27RG4",
+      "naam": "Dokkum",
+      "plaats": "DOKKUM",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MD56QY6",
+      "naam": "Druten",
+      "plaats": "Afferden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FB6",
+      "naam": "Emmen",
+      "plaats": "Emmen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GG4",
+      "naam": "Groningen",
+      "plaats": "Haren",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HQ7",
+      "naam": "Hilvarenbeek",
+      "plaats": "Hilvarenbeek",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JD2",
+      "naam": "Holten-Rijssen",
+      "plaats": "Holten",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JL8",
+      "naam": "Houten",
+      "plaats": "Houten",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KR3",
+      "naam": "Liempde",
+      "plaats": "Liempde",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK24QL1",
+      "naam": "Losser",
+      "plaats": "Overdinkel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LQ9",
+      "naam": "Montfoort",
+      "plaats": "Montfoort",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LW1",
+      "naam": "Naarden",
+      "plaats": "Naarden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MB7",
+      "naam": "Nuenen",
+      "plaats": "Nuenen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HG7",
+      "naam": "Peel en Maas",
+      "plaats": "Panningen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MZ5",
+      "naam": "Prinsenbeek",
+      "plaats": "Prinsenbeek",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK28PH0",
+      "naam": "Ridderkerk",
+      "plaats": "Ridderkerk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NX4",
+      "naam": "Rotterdam",
+      "plaats": "Rotterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JM5",
+      "naam": "HSD",
+      "plaats": "Zierikzee",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HM9",
+      "naam": "Den Bosch",
+      "plaats": "Den Bosch",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QJ5",
+      "naam": "Twente",
+      "plaats": "Hengelo",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QK2",
+      "naam": "Uden",
+      "plaats": "Uden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK22MP7",
+      "naam": "UNO",
+      "plaats": "Utrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "LV95LB8",
+      "naam": "Wateringse veld",
+      "plaats": "Den Haag",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SC2",
+      "naam": "Zeewolde",
+      "plaats": "Zeewolde",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SF3",
+      "naam": "Zevenbergen",
+      "plaats": "Zevenbergen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FR8",
+      "naam": "Geldrop",
+      "plaats": "Geldrop",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HF0",
+      "naam": "Heeze",
+      "plaats": "Heeze",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK18KJ8",
+      "naam": "Phoenix (BE)",
+      "plaats": "Neerpelt",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AA4",
+      "naam": "Abcoude",
+      "plaats": "Abcoude",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HY3",
+      "naam": "HOD",
+      "plaats": "Valkenswaard",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LT0",
+      "naam": "Mijdrecht",
+      "plaats": "Mijdrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SD9",
+      "naam": "Zevenaar",
+      "plaats": "Zevenaar",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JG3",
+      "naam": "Hoogeveen",
+      "plaats": "Hoogeveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HL2",
+      "naam": "Hermes",
+      "plaats": "Den Helder",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PN0",
+      "naam": "Son",
+      "plaats": "Son",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JQ3",
+      "naam": "Huizen",
+      "plaats": "Naarden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JS7",
+      "naam": "HVA (Assen)",
+      "plaats": "Assen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BT0",
+      "naam": "Bleiswijk",
+      "plaats": "Bleiswijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QF7",
+      "naam": "Terriërs",
+      "plaats": "Heiloo",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HW9",
+      "naam": "Hockeer",
+      "plaats": "Cadier en Keer",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LV4",
+      "naam": "Myra",
+      "plaats": "Amstelveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PV6",
+      "naam": "Spijkenisse",
+      "plaats": "Spijkenisse",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QW6",
+      "naam": "Victoria",
+      "plaats": "Rotterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RL2",
+      "naam": "Weert",
+      "plaats": "Weert",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RS1",
+      "naam": "Westland",
+      "plaats": "Naaldwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MG20CZ9",
+      "naam": "Stix",
+      "plaats": "Joure",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10SF4",
+      "naam": "Kennemer Keien",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PX0",
+      "naam": "Strawberries",
+      "plaats": "Driehuis",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KB1",
+      "naam": "Klein Zwitserland",
+      "plaats": "Den Haag",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KG6",
+      "naam": "Laren",
+      "plaats": "Laren",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KK4",
+      "naam": "Leiden",
+      "plaats": "Oegstgeest",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NV0",
+      "naam": "Roomburg",
+      "plaats": "Leiden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KS0",
+      "naam": "Lochem",
+      "plaats": "Lochem",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KT7",
+      "naam": "Loenen",
+      "plaats": "Loenen aan de Vecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AG6",
+      "naam": "Alecto",
+      "plaats": "Leiderdorp",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KX5",
+      "naam": "Maastricht",
+      "plaats": "Maastricht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KY2",
+      "naam": "Made",
+      "plaats": "Made",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK29FX8",
+      "naam": "Mosa Verde",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LH6",
+      "naam": "Meppel",
+      "plaats": "Meppel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AK4",
+      "naam": "Alliance",
+      "plaats": "Heemstede",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AL1",
+      "naam": "Almelo",
+      "plaats": "Almelo",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BG9",
+      "naam": "Barneveld",
+      "plaats": "Barneveld",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BK7",
+      "naam": "Bemmel",
+      "plaats": "RESSEN",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BL4",
+      "naam": "Bennebroek",
+      "plaats": "Bennebroek",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BR6",
+      "naam": "Best",
+      "plaats": "Best",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BS3",
+      "naam": "Beuningen",
+      "plaats": "Beuningen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BZ2",
+      "naam": "Bommelerwaard",
+      "plaats": "Zaltbommel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CB7",
+      "naam": "Boxmeer",
+      "plaats": "Boxmeer",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CK0",
+      "naam": "Castricum",
+      "plaats": "Castricum",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CN1",
+      "naam": "Coevorden",
+      "plaats": "Coevorden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DN4",
+      "naam": "Drunen",
+      "plaats": "Drunen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CT3",
+      "naam": "Dalfsen",
+      "plaats": "Dalfsen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CV7",
+      "naam": "Daring",
+      "plaats": "Veendam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CW4",
+      "naam": "Dash",
+      "plaats": "Hoogezand",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DF8",
+      "naam": "Dommel",
+      "plaats": "Sint-Michielsgestel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JZ6",
+      "naam": "Kikkers",
+      "plaats": "Nieuw-vennep",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LJ0",
+      "naam": "Mezen",
+      "plaats": "Harderwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NQ5",
+      "naam": "Reigers",
+      "plaats": "Hoofddorp",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CX1",
+      "naam": "DES",
+      "plaats": "Kaatsheuvel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CZ5",
+      "naam": "Deurne",
+      "plaats": "Deurne",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RK5",
+      "naam": "Warande",
+      "plaats": "Oosterhout",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DC7",
+      "naam": "Dieren",
+      "plaats": "Dieren",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11DS9",
+      "naam": "Ede",
+      "plaats": "Ede",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FC3",
+      "naam": "Epe",
+      "plaats": "Epe",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FH8",
+      "naam": "Fletiomare",
+      "plaats": "Utrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FL6",
+      "naam": "Forescate",
+      "plaats": "Voorschoten",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FX0",
+      "naam": "Goirle",
+      "plaats": "Goirle",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GQ4",
+      "naam": "HBS",
+      "plaats": "Bloemendaal",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GY0",
+      "naam": "Heerhugowaard",
+      "plaats": "Heerhugowaard",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HX6",
+      "naam": "HOCO",
+      "plaats": "Oisterwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JB8",
+      "naam": "Hoevelaken",
+      "plaats": "Hoevelaken",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KD5",
+      "naam": "Krimpen",
+      "plaats": "Krimpen aan den Ijssel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KM8",
+      "naam": "Lelystad",
+      "plaats": "Lelystad",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "LV95KZ3",
+      "naam": "Lemmer",
+      "plaats": "Lemmer",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KP9",
+      "naam": "Leusden",
+      "plaats": "Stoutenburg",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KQ6",
+      "naam": "Liberty",
+      "plaats": "Dongen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KV1",
+      "naam": "Maarn",
+      "plaats": "Maarn",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LG9",
+      "naam": "MEP",
+      "plaats": "Boxtel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LS3",
+      "naam": "Muiderberg",
+      "plaats": "Muiderberg",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LX8",
+      "naam": "Nieuwegein",
+      "plaats": "Nieuwegein",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MC4",
+      "naam": "Nunspeet",
+      "plaats": "Nunspeet",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MK0",
+      "naam": "Olympia",
+      "plaats": "Terneuzen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MN1",
+      "naam": "Oosterbeek",
+      "plaats": "Oosterbeek",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MR9",
+      "naam": "Oudenbosch",
+      "plaats": "Oudenbosch",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NB0",
+      "naam": "Purmerend",
+      "plaats": "Purmerend",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NM7",
+      "naam": "Rapide",
+      "plaats": "Hulst",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NS9",
+      "naam": "Roden",
+      "plaats": "Roden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PM3",
+      "naam": "Soest",
+      "plaats": "Soest",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PW3",
+      "naam": "Steenwijk",
+      "plaats": "Steenwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QG4",
+      "naam": "Teteringen",
+      "plaats": "Teteringen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QL9",
+      "naam": "Udenhout",
+      "plaats": "Udenhout",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QM6",
+      "naam": "Uitgeest",
+      "plaats": "Uitgeest",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QT5",
+      "naam": "Venray",
+      "plaats": "Venray",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QV9",
+      "naam": "Vianen",
+      "plaats": "Vianen ut",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RB2",
+      "naam": "Voorhout",
+      "plaats": "Voorhout",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RM9",
+      "naam": "Weesp",
+      "plaats": "Weesp",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RR4",
+      "naam": "Westerkwartier",
+      "plaats": "Zuidhorn",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RW9",
+      "naam": "Wijchen",
+      "plaats": "Wijchen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RV2",
+      "naam": "Woerden",
+      "plaats": "Woerden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SK8",
+      "naam": "Zutphen",
+      "plaats": "Zutphen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QB9",
+      "naam": "Tempo",
+      "plaats": "Bergen op Zoom",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FF4",
+      "naam": "Evergreen",
+      "plaats": "Maassluis",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FK9",
+      "naam": "Forcial",
+      "plaats": "Rockanje",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KW8",
+      "naam": "Maarssen",
+      "plaats": "Maarssen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HD6",
+      "naam": "HDL",
+      "plaats": "Heeswijk-dinther",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11HC9",
+      "naam": "Heesch",
+      "plaats": "Heesch",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KJ7",
+      "naam": "Leeuwarden",
+      "plaats": "Leeuwarden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11ML7",
+      "naam": "Ommen",
+      "plaats": "Arrien",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SG0",
+      "naam": "Zoetermeer",
+      "plaats": "Zoetermeer",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QZ7",
+      "naam": "Voordaan",
+      "plaats": "Groenekan",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK28TC7",
+      "naam": "Never Less",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RX6",
+      "naam": "IJssel",
+      "plaats": "Nieuwerkerk aan den Ijssel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MF5",
+      "naam": "Nijkerk",
+      "plaats": "Nijkerk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MG2",
+      "naam": "Nijmegen",
+      "plaats": "Nijmegen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LZ2",
+      "naam": "Noordwijk",
+      "plaats": "Noordwijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11AW8",
+      "naam": "Apeliotes",
+      "plaats": "Nijmegen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CD1",
+      "naam": "Bully",
+      "plaats": "Oldenzaal",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MM4",
+      "naam": "Ommoord",
+      "plaats": "Rotterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MQ2",
+      "naam": "Oss",
+      "plaats": "Oss",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MW4",
+      "naam": "Pinoké",
+      "plaats": "Amstelveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QC6",
+      "naam": "Tempo '34",
+      "plaats": "Rotterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CP5",
+      "naam": "Concordia",
+      "plaats": "Roermond",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KN5",
+      "naam": "Leonidas",
+      "plaats": "Rotterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NY1",
+      "naam": "Rijswijk",
+      "plaats": "Rijswijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NR2",
+      "naam": "Ring Pass",
+      "plaats": "Delft",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QN3",
+      "naam": "Union",
+      "plaats": "Malden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MT3",
+      "naam": "Pelikaan",
+      "plaats": "Roosendaal",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NW7",
+      "naam": "Rosmalen",
+      "plaats": "Rosmalen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PC3",
+      "naam": "Schaerweijde",
+      "plaats": "Zeist",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PH8",
+      "naam": "Schoonhoven",
+      "plaats": "Schoonhoven",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK27DT3",
+      "naam": "Muiden",
+      "plaats": "Muiden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MD54ZN6",
+      "naam": "Scoop Delft",
+      "plaats": "Delft",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10SW3",
+      "naam": "SGB",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PJ2",
+      "naam": "Shot",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MH9",
+      "naam": "Oedenrode",
+      "plaats": "Sint-Oedenrode",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PK9",
+      "naam": "Sjinborn",
+      "plaats": "Valkenburg lb",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JJ4",
+      "naam": "Hopbel",
+      "plaats": "Schijndel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KZ9",
+      "naam": "Magnus",
+      "plaats": "Schagen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NZ8",
+      "naam": "Salland",
+      "plaats": "Raalte",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PL6",
+      "naam": "Sneek",
+      "plaats": "Sneek",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PD0",
+      "naam": "SCHC",
+      "plaats": "Bilthoven",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10TJ5",
+      "naam": "Stick Flyers",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JV8",
+      "naam": "Kampong",
+      "plaats": "Utrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MV7",
+      "naam": "Phoenix",
+      "plaats": "Zeist",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KF9",
+      "naam": "Kromhouters",
+      "plaats": "Tiel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JR0",
+      "naam": "Hurley",
+      "plaats": "Amstelveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10QX4",
+      "naam": "Black Scorpions",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MJ21QX3",
+      "naam": "Thor",
+      "plaats": "Leiden",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PQ1",
+      "naam": "Spandersbosch",
+      "plaats": "Hilversum",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10TN3",
+      "naam": "Tukkers United",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11NJ6",
+      "naam": "Qui Vive",
+      "plaats": "De Kwakel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QQ4",
+      "naam": "USHC",
+      "plaats": "Utrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RD6",
+      "naam": "VVV HC",
+      "plaats": "Amstelveen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK10TS8",
+      "naam": "VIOS '82",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11QY0",
+      "naam": "Vlijmen",
+      "plaats": "Vlijmen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BH6",
+      "naam": "Basko",
+      "plaats": "Veldhoven",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11CJ3",
+      "naam": "Cartouche",
+      "plaats": "Voorburg",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11LR6",
+      "naam": "MOP",
+      "plaats": "Vught",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11FP4",
+      "naam": "Geel-Zwart",
+      "plaats": "Veghel",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11MX1",
+      "naam": "Pollux",
+      "plaats": "Vlaardingen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11PT2",
+      "naam": "Spitsbergen",
+      "plaats": "Veenendaal",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MF96PX4",
+      "naam": "Twello",
+      "plaats": "Twello",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MJ18TR4",
+      "naam": "Waterland",
+      "plaats": "Monnickendam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RN6",
+      "naam": "Were Di",
+      "plaats": "Tilburg",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RQ7",
+      "naam": "Westerduiven",
+      "plaats": "Duiven",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11JH0",
+      "naam": "Hoorn (WFHC)",
+      "plaats": "Zwaag",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MK29FX0",
+      "naam": "Wheel Warriors",
+      "plaats": "",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11GV9",
+      "naam": "HCW (Winschoten)",
+      "plaats": "Winschoten",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RJ8",
+      "naam": "Wageningen",
+      "plaats": "Wageningen",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11BB4",
+      "naam": "Avanti",
+      "plaats": "Winterswijk",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11RY3",
+      "naam": "Xenios",
+      "plaats": "Amsterdam",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SB5",
+      "naam": "Zandvoort",
+      "plaats": "Zandvoort",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11KC8",
+      "naam": "Kraaien",
+      "plaats": "Wijdewormer",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "HH11SJ1",
+      "naam": "Zundert",
+      "plaats": "Zundert",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "MG20WT7",
+      "naam": "Zwaluwen",
+      "plaats": "Utrecht",
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    }
+  ],
+  "teams": [
+    {
+      "bronId": "774",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180863",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "586",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D2-O",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182681",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6870",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181315",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "608",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D4",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181317",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6890",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D5",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181314",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "23668",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DO25-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182632",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "23669",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DO25-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182636",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "31272",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DO25-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182637",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "31226",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DO25-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182635",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "34660",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DO25-5",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182645",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "34624",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DO25-6",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182645",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "35644",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DO25-7",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182644",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1316",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D30-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182689",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1306",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D30-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181304",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "39839",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D45-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181305",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "35891",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC D45-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181307",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "46655",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC DS2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "183060",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6840",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180864",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6861",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H2-O",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182694",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6869",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H3",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181321",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6879",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H4",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181322",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "32149",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC HO25-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O25",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182649",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1636",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H30-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "182703",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1637",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H30-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181328",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6911",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H45-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181332",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "29847",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H45-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181339",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "14701",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H45-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181349",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "21705",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC H45-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181362",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "35576",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC HS1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "183088",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "35597",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC HS2",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "183088",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "43930",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC T1-mix",
+      "seizoen": "2026-2027",
+      "geslacht": "",
+      "leeftijd": "",
+      "categorie": "Senioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181104",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6851",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180873",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6853",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180885",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6855",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181114",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6857",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181117",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6859",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-5",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181131",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6860",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-6",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181132",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "17400",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-7",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181129",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "24448",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO18-8",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181123",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1045",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180892",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1062",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180899",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1081",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181145",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6866",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181149",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1128",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-5",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181161",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6868",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-6",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181165",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "9332",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-7",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181375",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "14765",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-8",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181142",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "16023",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-9",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181148",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "21524",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO16-10",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181166",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180952",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1077",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180955",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1104",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181169",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1163",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181186",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1182",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-5",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181190",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1210",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-6",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181188",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1215",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-7",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181191",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6878",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO14-8",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181197",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1222",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO12-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181202",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "1230",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO12-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181203",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "877",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO12-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181210",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "893",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO12-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181209",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "906",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO12-5",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181214",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "947",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO12-6",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181217",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "46179",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO11-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O11",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "5e klasse",
+      "pouleId": "181242",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "46180",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO11-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O11",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181241",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6850",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO18-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180913",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6852",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO18-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181246",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6854",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO18-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181248",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6856",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO18-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181252",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6858",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO18-5",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O18",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181247",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6862",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO16-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180934",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6863",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO16-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180942",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6864",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO16-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181259",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6865",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO16-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181262",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6867",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO16-5",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O16",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181254",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6871",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO14-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180947",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6872",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO14-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181265",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6873",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO14-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181266",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6874",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO14-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O14",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181276",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6880",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO12-1",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181280",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6881",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO12-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181281",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6882",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO12-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181287",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6883",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO12-4",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O12",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181289",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6842",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO10-Wit",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180976",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6844",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO10-Lila",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180978",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6846",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO10-Oranje",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180957",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6848",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO10-Paars",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180979",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6849",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO10-Geel",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180958",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6892",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO9-Geel",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180989",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6894",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO9-Lila",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181004",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6896",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO9-Oranje",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "180986",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6898",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO9-Paars",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181012",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6900",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO9-Roze",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181013",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6902",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO9-Wit",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181003",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6903",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO9-Groen",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181014",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "19961",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO8-Geel",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O8",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181039",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "20007",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO8-Oranje",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O8",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181038",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "19994",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO8-Paars",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O8",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181040",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "20020",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC MO8-Wit",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O8",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181035",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6841",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO10-Zwart",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181056",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6843",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO10-Groen",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181057",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6845",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO10-Oranje",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O10",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181055",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6891",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO9-Zwart",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181066",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6893",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO9-Groen",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181080",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6895",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO9-Oranje",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181065",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "6897",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO9-Grijs",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O9",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181079",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "19929",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO8-Grijs",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O8",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181095",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "19931",
+      "clubBronId": "HH11PD0",
+      "naam": "SCHC JO8-Groen",
+      "seizoen": "2026-2027",
+      "geslacht": "Jongens / heren",
+      "leeftijd": "O8",
+      "categorie": "Jongste jeugd",
+      "spelvorm": "Veld",
+      "klasse": "",
+      "pouleId": "181094",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "46022",
+      "clubBronId": "HH11KW8",
+      "naam": "Maarssen MO11-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O11",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "5e klasse",
+      "pouleId": "181242",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "46256",
+      "clubBronId": "MK22MP7",
+      "naam": "UNO MO11-3",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O11",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "5e klasse",
+      "pouleId": "181242",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "45981",
+      "clubBronId": "HH11JV8",
+      "naam": "Kampong MO11-6",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O11",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "5e klasse",
+      "pouleId": "181242",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "48813",
+      "clubBronId": "HH11MV7",
+      "naam": "Phoenix MO11-6",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O11",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "5e klasse",
+      "pouleId": "181242",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "45988",
+      "clubBronId": "MK17FX6",
+      "naam": "Kromme Rijn MO11-2",
+      "seizoen": "2026-2027",
+      "geslacht": "Meisjes / dames",
+      "leeftijd": "O11",
+      "categorie": "Junioren",
+      "spelvorm": "Veld",
+      "klasse": "5e klasse",
+      "pouleId": "181242",
+      "actief": true,
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    }
+  ],
+  "wedstrijden": [
+    {
+      "bronId": "2051252",
+      "seizoen": "2026-2027",
+      "thuisBronId": "46022",
+      "uitBronId": "46179",
+      "datum": "2026-09-05",
+      "spelen": "08:30",
+      "thuisNaam": "Maarssen MO11-3",
+      "uitNaam": "SCHC MO11-1",
+      "locatie": "Sportpark Oostwaard · DentiQ (2)",
+      "status": "final",
+      "uitslag": {
+        "home": 6,
+        "away": 4
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051251",
+      "seizoen": "2026-2027",
+      "thuisBronId": "46256",
+      "uitBronId": "45981",
+      "datum": "2026-09-05",
+      "spelen": "10:00",
+      "thuisNaam": "UNO MO11-3",
+      "uitNaam": "Kampong MO11-6",
+      "locatie": "Sportpark Vechtzoom · Veld 2",
+      "status": "final",
+      "uitslag": {
+        "home": 1,
+        "away": 1
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051250",
+      "seizoen": "2026-2027",
+      "thuisBronId": "48813",
+      "uitBronId": "45988",
+      "datum": "2026-09-06",
+      "spelen": "09:00",
+      "thuisNaam": "Phoenix MO11-6",
+      "uitNaam": "Kromme Rijn MO11-2",
+      "locatie": "Sportpark Koeburgweg · 3. Sunny Camp veld",
+      "status": "final",
+      "uitslag": {
+        "home": 7,
+        "away": 2
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051255",
+      "seizoen": "2026-2027",
+      "thuisBronId": "45988",
+      "uitBronId": "46022",
+      "datum": "2026-09-12",
+      "spelen": "08:30",
+      "thuisNaam": "Kromme Rijn MO11-2",
+      "uitNaam": "Maarssen MO11-3",
+      "locatie": "Sportpark Tolhuislaan · Veld 1",
+      "status": "final",
+      "uitslag": {
+        "home": 3,
+        "away": 6
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051254",
+      "seizoen": "2026-2027",
+      "thuisBronId": "45981",
+      "uitBronId": "48813",
+      "datum": "2026-09-12",
+      "spelen": "10:20",
+      "thuisNaam": "Kampong MO11-6",
+      "uitNaam": "Phoenix MO11-6",
+      "locatie": "Laan van Maarschalkerweerd (Kampong) · Kunstgras 8",
+      "status": "final",
+      "uitslag": {
+        "home": 1,
+        "away": 5
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051253",
+      "seizoen": "2026-2027",
+      "thuisBronId": "46179",
+      "uitBronId": "46256",
+      "datum": "2026-09-12",
+      "spelen": "10:30",
+      "thuisNaam": "SCHC MO11-1",
+      "uitNaam": "UNO MO11-3",
+      "locatie": "Sportpark Kees Boekelaan (SCHC) · Veld 7",
+      "status": "final",
+      "uitslag": {
+        "home": 10,
+        "away": 0
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051256",
+      "seizoen": "2026-2027",
+      "thuisBronId": "48813",
+      "uitBronId": "46179",
+      "datum": "2026-09-19",
+      "spelen": "08:30",
+      "thuisNaam": "Phoenix MO11-6",
+      "uitNaam": "SCHC MO11-1",
+      "locatie": "Sportpark Koeburgweg · 3. Sunny Camp veld",
+      "status": "final",
+      "uitslag": {
+        "home": 4,
+        "away": 3
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051258",
+      "seizoen": "2026-2027",
+      "thuisBronId": "45981",
+      "uitBronId": "45988",
+      "datum": "2026-09-19",
+      "spelen": "08:30",
+      "thuisNaam": "Kampong MO11-6",
+      "uitNaam": "Kromme Rijn MO11-2",
+      "locatie": "Laan van Maarschalkerweerd (Kampong) · Kunstgras 5",
+      "status": "final",
+      "uitslag": {
+        "home": 1,
+        "away": 3
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051257",
+      "seizoen": "2026-2027",
+      "thuisBronId": "46256",
+      "uitBronId": "46022",
+      "datum": "2026-09-19",
+      "spelen": "10:45",
+      "thuisNaam": "UNO MO11-3",
+      "uitNaam": "Maarssen MO11-3",
+      "locatie": "Sportpark Vechtzoom · Veld 1",
+      "status": "final",
+      "uitslag": {
+        "home": 0,
+        "away": 5
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051261",
+      "seizoen": "2026-2027",
+      "thuisBronId": "46179",
+      "uitBronId": "45981",
+      "datum": "2026-09-26",
+      "spelen": "09:00",
+      "thuisNaam": "SCHC MO11-1",
+      "uitNaam": "Kampong MO11-6",
+      "locatie": "Sportpark Kees Boekelaan (SCHC) · Veld 6",
+      "status": "final",
+      "uitslag": {
+        "home": 6,
+        "away": 1
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051260",
+      "seizoen": "2026-2027",
+      "thuisBronId": "46022",
+      "uitBronId": "48813",
+      "datum": "2026-09-26",
+      "spelen": "10:10",
+      "thuisNaam": "Maarssen MO11-3",
+      "uitNaam": "Phoenix MO11-6",
+      "locatie": "Sportpark Oostwaard · DentiQ (2)",
+      "status": "final",
+      "uitslag": {
+        "home": 7,
+        "away": 1
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051259",
+      "seizoen": "2026-2027",
+      "thuisBronId": "46256",
+      "uitBronId": "45988",
+      "datum": "2026-09-26",
+      "spelen": "10:45",
+      "thuisNaam": "UNO MO11-3",
+      "uitNaam": "Kromme Rijn MO11-2",
+      "locatie": "Sportpark Vechtzoom · Veld 1",
+      "status": "final",
+      "uitslag": {
+        "home": 2,
+        "away": 5
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051262",
+      "seizoen": "2026-2027",
+      "thuisBronId": "48813",
+      "uitBronId": "46256",
+      "datum": "2026-10-03",
+      "spelen": "08:30",
+      "thuisNaam": "Phoenix MO11-6",
+      "uitNaam": "UNO MO11-3",
+      "locatie": "Sportpark Koeburgweg · 3. Sunny Camp veld",
+      "status": "final",
+      "uitslag": {
+        "home": 5,
+        "away": 3
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051263",
+      "seizoen": "2026-2027",
+      "thuisBronId": "45981",
+      "uitBronId": "46022",
+      "datum": "2026-10-03",
+      "spelen": "10:00",
+      "thuisNaam": "Kampong MO11-6",
+      "uitNaam": "Maarssen MO11-3",
+      "locatie": "Laan van Maarschalkerweerd (Kampong) · Kunstgras 8",
+      "status": "final",
+      "uitslag": {
+        "home": 0,
+        "away": 7
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    },
+    {
+      "bronId": "2051264",
+      "seizoen": "2026-2027",
+      "thuisBronId": "45988",
+      "uitBronId": "46179",
+      "datum": "2026-10-03",
+      "spelen": "10:30",
+      "thuisNaam": "Kromme Rijn MO11-2",
+      "uitNaam": "SCHC MO11-1",
+      "locatie": "Sportpark Tolhuislaan · Veld 1",
+      "status": "final",
+      "uitslag": {
+        "home": 3,
+        "away": 8
+      },
+      "gecontroleerd": "2026-10-11T18:54:20.894Z"
+    }
+  ]
+}

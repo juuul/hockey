@@ -3,7 +3,7 @@ import { OPSLAG } from './opslag'
 import { toestelId } from './live'
 
 
-export const pb = new PocketBase(import.meta.env.VITE_SERVER ?? 'https://serverbot.taild1b3c5.ts.net', new LocalAuthStore(`${OPSLAG}_auth`))
+export const pb = new PocketBase(import.meta.env.VITE_SERVER ?? (import.meta.env.MODE === 'test' ? 'https://serverbot.taild1b3c5.ts.net/test' : 'https://serverbot.taild1b3c5.ts.net'), new LocalAuthStore(`${OPSLAG}_auth`))
 pb.autoCancellation(false)
 // Bij inloggen en de inlog verversen een willekeurig toestel-id meesturen (geen naam of IP): zo telt 'Gebruik per team'
 // ook hoeveel toestellen via de meekijklink meekijken (die delen samen één gastaccount)
@@ -26,6 +26,9 @@ export const ROL_UITLEG: Record<Rol, string> = {
 export interface Gebruiker extends RecordModel { email: string; name: string; superadmin: boolean; teamaanmeldingen?: boolean; gast?: boolean; kinderen?: Record<string, string[]> | null }
 export interface Team extends RecordModel {
   naam: string
+  officieelTeam?: string
+  vindbaar?: boolean
+  omgevingNaam?: string
   beheerders: string[]
   kijkers: string[]
   kijklink?: string
@@ -58,8 +61,7 @@ export const gastEmail = (teamId: string) => `kijk-${teamId}@meekijken.invalid`
 export const kijkLink = (teamId: string, token: string) => `${appAdres()}#kijk=${teamId}.${token}`
 
 export async function haalKijkLink(teamId: string, vernieuw = false): Promise<string> {
-  const r = await pb.send<{ token: string }>(`/api/hockey/kijklink/${teamId}`, { method: 'POST', body: { vernieuw } })
-  return kijkLink(teamId, r.token)
+  return haalAanvraagLink(teamId, vernieuw)
 }
 
 // Aanmeldlink voor ouders: '<teamId>.<token>'. Alleen beheerders maken of vernieuwen hem

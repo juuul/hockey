@@ -7,6 +7,7 @@ import { useTerug } from '../terug'
 import DeelKijklink from '../components/DeelKijklink'
 import ResetModal from '../components/ResetModal'
 import { leesThema, Thema, zetThema } from '../thema'
+import TeamAanmelden, { TeamKoppelen } from '../components/TeamSelectie'
 import '../components/Modal.css'
 import './Instellingen.css'
 
@@ -159,7 +160,7 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
       </Kaart>
       <Kaart titel="Nog geen account?">
         <p className="account-uitleg"><strong>Zit je team al in de app?</strong> Vraag de trainer of teammanager om de aanmeldlink van je team, of om een uitnodiging per mail.</p>
-        <p className="account-uitleg"><strong>Wil je de app voor je eigen team gebruiken?</strong> Meld je team aan. Na goedkeuring krijg je een mail om je account te maken, en word je beheerder van het team.</p>
+        <p className="account-uitleg"><strong>Wil je de app voor je eigen team gebruiken?</strong> Kies je club en team. Maak een eigen omgeving als beheerder, of vraag toegang tot een bestaande omgeving.</p>
         <button className="btn btn-primary" type="button" onClick={aanmelden}>Mijn team aanmelden</button>
       </Kaart>
     </>
@@ -168,21 +169,9 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
 
 function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Gebruiker; openTeam: (id: string) => void; aanmelden: () => void; gebruik: () => void }) {
   const { teams, teamsLaden, uitloggen, actiefTeamId, kiesTeam } = useAccount()
-  const [nieuwTeam, setNieuwTeam] = useState('')
   const [fout, setFout] = useState<string | null>(null)
 
   useEffect(() => { teamsLaden().catch(err => setFout(foutTekst(err))) }, [teamsLaden])
-
-  const maakTeam = async () => {
-    try {
-      await pb.collection('teams').create({ naam: nieuwTeam.trim() })
-      setNieuwTeam('')
-      tel('team-gemaakt')
-      await teamsLaden()
-    } catch (err) {
-      setFout(foutTekst(err))
-    }
-  }
 
   const actief = teams.find(t => t.id === actiefTeamId)
   const actieveRol = actief ? rolIn(actief, gebruiker.id) : null
@@ -244,22 +233,19 @@ function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Geb
           )}
         </div>
         <SyncRegel />
-        <DeelKijklink />
-        <DeelKijklink soort="aanvraag" />
+        {actief?.officieelTeam && (gebruiker.superadmin || actieveRol === 'beheerder') && <label className="account-label">
+          <input type="checkbox" checked={!!actief.vindbaar} onChange={async e => {
+            try { await pb.collection('teams').update(actief.id, { vindbaar: e.target.checked }); await teamsLaden() }
+            catch (err) { setFout(foutTekst(err)) }
+          }} />
+          Omgevingsnaam vindbaar bij teamselectie (spelers en leden blijven privé)
+        </label>}
+        {actief && (gebruiker.superadmin || actieveRol === 'beheerder') && <TeamKoppelen id={actief.id} gekoppeld={actief.officieelTeam} />}
+          <DeelKijklink />
       </Kaart>
 
-      <Kaart titel={gebruiker.superadmin ? 'Nieuw team' : 'Ander team'}>
-        {gebruiker.superadmin ? (
-          <form className="account-form" onSubmit={e => { e.preventDefault(); if (nieuwTeam.trim()) maakTeam() }}>
-            <input className="modal-input" placeholder="Naam nieuw team" value={nieuwTeam} onChange={e => setNieuwTeam(e.target.value)} />
-            <button className="btn btn-primary" type="submit" disabled={!nieuwTeam.trim()}>Team maken</button>
-          </form>
-        ) : (
-          <>
-            <p className="account-uitleg">Wil je de app ook voor een ander team gebruiken?</p>
-            <button className="btn btn-secondary" onClick={aanmelden}>Nog een team aanmelden</button>
-          </>
-        )}
+      <Kaart titel="Ander team">
+        <button className="btn btn-secondary" onClick={aanmelden}>Team kiezen of eigen omgeving maken</button>
         <Melding tekst={fout} fout />
       </Kaart>
       {gebruiker.superadmin && (
@@ -311,7 +297,7 @@ function AanvragenKaart() {
         {toegang.map(a => (
           <div key={a.id} className="account-aanvraag">
             <span className="account-regel-naam">{a.naam}</span>
-            <span className="account-regel-sub">wil meekijken bij {a.expand?.team?.naam ?? 'het team'} · ouder van {a.kindNaam}</span>
+            <span className="account-regel-sub">wil meekijken bij {a.expand?.team?.naam ?? 'het team'}{a.kindNaam ? ` · ouder van ${a.kindNaam}` : ''}</span>
             <span className="account-regel-sub">{a.email}</span>
             <div className="account-aanvraag-knoppen">
               <button className="btn btn-primary" disabled={bezig} onClick={() => beslisToegang(a.id, 'kijker', a.naam)}>Toelaten</button>
@@ -736,58 +722,6 @@ function Gebruik() {
   )
 }
 
-function TeamAanmelden() {
-  const { gebruiker } = useAccount()
-  const [teamnaam, setTeamnaam] = useState('')
-  const [naam, setNaam] = useState(gebruiker?.name ?? '')
-  const [email, setEmail] = useState(gebruiker?.email ?? '')
-  const [bericht, setBericht] = useState('')
-  const [bezig, setBezig] = useState(false)
-  const [fout, setFout] = useState<string | null>(null)
-  const [verstuurd, setVerstuurd] = useState(false)
-
-  const versturen = async () => {
-    setBezig(true)
-    setFout(null)
-    try {
-      await pb.send('/api/hockey/aanmelding', { method: 'POST', body: { teamnaam, naam, email, bericht, terug: appAdres() } })
-      tel('team-aangemeld')
-      setVerstuurd(true)
-    } catch (err) {
-      setFout((err as { status?: number }).status === 429 ? 'Te veel aanmeldingen. Probeer het over een uur nog eens.' : foutTekst(err))
-    }
-    setBezig(false)
-  }
-
-  if (verstuurd) {
-    return <p className="account-melding">Je team is aangemaakt. Je krijgt een mail op {email.trim()} met een link om je account te maken; daarmee word je beheerder van het team.</p>
-  }
-
-  return (
-    <form className="account-form" onSubmit={e => { e.preventDefault(); versturen() }}>
-      <p className="account-uitleg">Meld je team aan. Je krijgt meteen een mail om je account te maken; je wordt dan beheerder van het team.</p>
-      <label className="account-label">
-        Naam van het team
-        <input className="modal-input" placeholder="bijv. MO11-3 HC Voorbeeld" value={teamnaam} onChange={e => setTeamnaam(e.target.value)} />
-      </label>
-      <label className="account-label">
-        Je naam
-        <input className="modal-input" autoComplete="name" value={naam} onChange={e => setNaam(e.target.value)} />
-      </label>
-      <label className="account-label">
-        E-mail
-        <input className="modal-input" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} />
-      </label>
-      <label className="account-label">
-        Bericht (mag leeg)
-        <textarea className="modal-input account-bericht" value={bericht} onChange={e => setBericht(e.target.value)} />
-      </label>
-      <Melding tekst={fout} fout />
-      <button className="btn btn-primary" type="submit" disabled={bezig || !teamnaam.trim() || !email.includes('@')}>Aanmelding versturen</button>
-    </form>
-  )
-}
-
 interface AanmeldingInfo { teamnaam: string; naam: string; email: string; bericht: string; status: 'nieuw' | 'goedgekeurd' | 'afgewezen'; created: string }
 
 // Geopend vanuit de mail aan de superadmin. De link zelf geeft het recht om te beslissen
@@ -849,54 +783,17 @@ function AanmeldingBeoordelen({ token }: { token: string }) {
 }
 
 // Geopend via een meekijklink (#kijk=<team>.<token>)
-function MeekijkenStart({ waarde, klaar, annuleer }: { waarde: string; klaar: () => void; annuleer: () => void }) {
-  const { gebruiker, teams, kiesTeam, meekijken, uitloggen } = useAccount()
-  const [teamId, token] = [waarde.slice(0, waarde.indexOf('.')), waarde.slice(waarde.indexOf('.') + 1)]
-  const [fout, setFout] = useState<string | null>(null)
-  const [bezig, setBezig] = useState(false)
-  const eigenLid = !!gebruiker && !gebruiker.gast && teams.some(t => t.id === teamId)
-  const ander = !!gebruiker && !gebruiker.gast && !eigenLid
-
-  const start = async () => {
-    setBezig(true)
-    setFout(null)
-    try {
-      if (gebruiker) uitloggen()
-      await meekijken(teamId, token)
-      tel('meekijken-gestart')
-      klaar()
-    } catch (err) {
-      setFout((err as { status?: number }).status === 400 ? 'Deze link werkt niet meer. Vraag om een nieuwe.' : foutTekst(err))
-    }
-    setBezig(false)
-  }
-
-  useEffect(() => {
-    // Zelf al lid van dit team: gewoon dat team openen
-    if (eigenLid) { kiesTeam(teamId); klaar(); return }
-    if (!ander) start()
-  }, [])
-
-  if (ander) {
-    return (
-      <div className="account-form">
-        <p className="account-uitleg">Je bent ingelogd als <strong>{gebruiker!.name || gebruiker!.email}</strong>. Om via deze link mee te kijken, word je uitgelogd.</p>
-        <Melding tekst={fout} fout />
-        <button className="btn btn-primary" onClick={start} disabled={bezig}>Uitloggen en meekijken</button>
-        <button className="btn btn-secondary" onClick={annuleer}>Annuleren</button>
-      </div>
-    )
-  }
-  return fout ? <Melding tekst={fout} fout /> : <p className="account-uitleg">Meekijken starten…</p>
+function MeekijkenStart({ annuleer }: { waarde: string; klaar: () => void; annuleer: () => void }) {
+  return <>
+    <p className="account-uitleg">Deze oude meekijklink geeft geen toegang meer. Vraag de beheerder om een aanmeldlink; na goedkeuring kun je met je eigen account meekijken.</p>
+    <button className="btn btn-secondary" onClick={annuleer}>Terug</button>
+  </>
 }
 
 const THEMAS: { id: Thema; naam: string }[] = [
-  { id: 'auto', naam: 'Automatisch' },
-  { id: 'licht', naam: 'Licht' },
-  { id: 'donker', naam: 'Donker' },
+  { id: 'auto', naam: 'Automatisch' }, { id: 'licht', naam: 'Licht' }, { id: 'donker', naam: 'Donker' },
 ]
 
-// Licht/donker: volgens de telefoon, of vast gekozen (geldt alleen op deze telefoon)
 function Weergave() {
   const [thema, setThema] = useState<Thema>(leesThema)
   const kies = (t: Thema) => {
@@ -920,68 +817,38 @@ function Weergave() {
   )
 }
 
-interface AanvraagForm { team: string; spelers: { id: string; naam: string }[] }
-const ANDERS = '__anders__'
-
-// Ouder opent de aanmeldlink van het team (#aanvraag=<team>.<token>) en vraagt toegang aan
+interface AanvraagForm { team: string }
 function ToegangAanvragen({ waarde }: { waarde: string }) {
+  const { gebruiker } = useAccount()
   const [form, setForm] = useState<AanvraagForm | null>(null)
   const [fout, setFout] = useState<string | null>(null)
-  const [naam, setNaam] = useState('')
-  const [kind, setKind] = useState('')
-  const [kindNaam, setKindNaam] = useState('')
-  const [email, setEmail] = useState('')
+  const [naam, setNaam] = useState(gebruiker?.name || '')
+  const [email, setEmail] = useState(gebruiker?.email || '')
   const [bezig, setBezig] = useState(false)
   const [verstuurd, setVerstuurd] = useState(false)
   const url = `/api/hockey/aanvraag/${encodeURIComponent(waarde)}`
-
   useEffect(() => {
-    pb.send<AanvraagForm>(url, {}).then(setForm).catch(err => setFout(foutTekst(err)))
+    let actief = true
+    pb.send<AanvraagForm>(url, {}).then(v => { if (actief) setForm(v) }).catch(e => { if (actief) setFout(foutTekst(e)) })
+    return () => { actief = false }
   }, [url])
-
-  const versturen = async () => {
-    setBezig(true)
-    setFout(null)
-    try {
-      await pb.send(url, { method: 'POST', body: { naam, email, kindId: kind === ANDERS ? '' : kind, kindNaam: kind === ANDERS ? kindNaam : '', terug: appAdres() } })
-      tel('toegang-aangevraagd')
-      setVerstuurd(true)
-    } catch (err) {
-      setFout((err as { status?: number }).status === 429 ? 'Te veel aanvragen. Probeer het over een uur nog eens.' : foutTekst(err))
-    }
-    setBezig(false)
-  }
-
   if (!form) return fout ? <Melding tekst={fout} fout /> : <p className="account-uitleg">Even laden…</p>
-  if (verstuurd) {
-    return <p className="account-melding">Je krijgt een mail op {email.trim()} met een link om je account te maken. Daarna kijk je mee met {form.team}.</p>
-  }
-  const kindGekozen = kind && (kind !== ANDERS || kindNaam.trim())
-  return (
-    <form className="account-form" onSubmit={e => { e.preventDefault(); versturen() }}>
-      <div className="account-wie"><span className="account-wie-naam">{form.team}</span></div>
-      <p className="account-uitleg">Vraag een account aan. Je krijgt meteen een mail met een link om je account te maken; daarna kijk je mee.</p>
-      <label className="account-label">
-        Jouw voornaam
-        <input className="modal-input" autoComplete="given-name" value={naam} onChange={e => setNaam(e.target.value)} />
-      </label>
-      <label className="account-label">
-        Voornaam van je kind
-        <select className="modal-input" value={kind} onChange={e => setKind(e.target.value)}>
-          <option value="">Kies…</option>
-          {form.spelers.map(s => <option key={s.id} value={s.id}>{s.naam}</option>)}
-          <option value={ANDERS}>Staat er niet bij</option>
-        </select>
-      </label>
-      {kind === ANDERS && <input className="modal-input" placeholder="Voornaam van je kind" value={kindNaam} onChange={e => setKindNaam(e.target.value)} />}
-      <label className="account-label">
-        E-mail
-        <input className="modal-input" type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} />
-      </label>
-      <Melding tekst={fout} fout />
-      <button className="btn btn-primary" type="submit" disabled={bezig || !naam.trim() || !kindGekozen || !email.includes('@')}>Aanvraag versturen</button>
-    </form>
-  )
+  if (verstuurd) return <p className="account-melding">Je aanvraag staat bij de beheerder van {form.team}. Na goedkeuring ontvang je een uitnodiging op {email.trim()}.</p>
+  return <form className="account-form" onSubmit={async e => {
+    e.preventDefault(); setBezig(true); setFout(null)
+    try {
+      await pb.send(url, { method: 'POST', body: { naam, email, terug: appAdres() } })
+      setVerstuurd(true)
+    } catch (err) { setFout(foutTekst(err)) }
+    finally { setBezig(false) }
+  }}>
+    <div className="account-wie"><span className="account-wie-naam">{form.team}</span></div>
+    <p className="account-uitleg">Vraag toegang aan. De beheerder beslist wie mag meekijken; spelersnamen blijven tot die tijd privé.</p>
+    <label className="account-label">Je naam<input className="modal-input" required autoComplete="name" value={naam} onChange={e => setNaam(e.target.value)} /></label>
+    <label className="account-label">E-mail<input className="modal-input" required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} /></label>
+    <Melding tekst={fout} fout />
+    <button className="btn btn-primary" type="submit" disabled={bezig || !naam.trim() || !email.includes('@')}>Toegang aanvragen</button>
+  </form>
 }
 
 interface AanvraagInfo { team: string; naam: string; email: string; kind: string; status: 'nieuw' | 'toegelaten' | 'afgewezen' }

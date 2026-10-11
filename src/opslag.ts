@@ -1,4 +1,4 @@
-// Test en live delen dezelfde origin (juliaan.eu), dus aparte opslag
+// Test en live delen dezelfde origin, maar hebben aparte servers en opslag.
 export const OPSLAG = import.meta.env.MODE === 'test' ? 'hockey_test' : 'hockey'
 
 // Per team een eigen opslag; zonder team de gewone (alleen deze telefoon)
@@ -20,4 +20,16 @@ export function schrijf(prefix: string, sleutel: string, waarde: unknown) {
   } catch {
     // vol of geblokkeerd: niets aan te doen
   }
+}
+
+// Oude testopslag kwam van de productieserver: niet naar de nieuwe testserver uploaden.
+if (import.meta.env.MODE === 'test') {
+  try {
+    if (localStorage.getItem('hockey_test_backend') !== 'apart-v1') {
+      for (const sleutel of Object.keys(localStorage)) {
+        if (sleutel.startsWith('hockey_test_')) localStorage.removeItem(sleutel)
+      }
+      localStorage.setItem('hockey_test_backend', 'apart-v1')
+    }
+  } catch { /* Opslag kan geblokkeerd zijn. */ }
 }

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { gastEmail, Gebruiker, pb, rolIn, STANDAARD_INSTELLINGEN, Team, TeamInstellingen } from '../server'
 import { lees, OPSLAG, schrijf } from '../opslag'
 import { DEMO_KIND } from '../demo'
@@ -32,6 +32,7 @@ const AccountContext = createContext<AccountContextType | undefined>(undefined)
 
 export function AccountProvider({ children }: { children: React.ReactNode }) {
   const [gebruiker, setGebruiker] = useState<Gebruiker | null>(() => (pb.authStore.isValid ? (pb.authStore.record as Gebruiker) : null))
+  const vorigeGebruiker = useRef(gebruiker?.id || null)
   const [teams, setTeams] = useState<Team[]>(() => lees(OPSLAG, 'teams', []))
   // Welk team de app gebruikt; bewaard zodat het ook zonder verbinding bij het opstarten klopt
   const [actiefTeamId, setActiefTeamId] = useState<string | null>(() => (pb.authStore.isValid ? lees(OPSLAG, 'actief_team', null) : null))
@@ -41,11 +42,22 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     schrijf(OPSLAG, 'actief_team', id)
   }
 
-  useEffect(() => pb.authStore.onChange((_, record) => setGebruiker(pb.authStore.isValid ? (record as Gebruiker) : null)), [])
+  useEffect(() => pb.authStore.onChange((_, record) => {
+    const nieuw = pb.authStore.isValid ? (record as Gebruiker) : null
+    if (vorigeGebruiker.current && vorigeGebruiker.current !== nieuw?.id) {
+      wisTeamCaches()
+      setTeams([])
+      kiesTeam(null)
+    }
+    vorigeGebruiker.current = nieuw?.id || null
+    setGebruiker(nieuw)
+  }), [])
 
   const teamsLaden = useCallback(async () => {
     if (!pb.authStore.isValid) return setTeams([])
     const lijst = await pb.collection('teams').getFullList<Team>({ sort: 'naam', expand: 'beheerders,kijkers' })
+    const bewaard = lees<Team[]>(OPSLAG, 'teams', [])
+    for (const oud of bewaard) if (!lijst.some(t => t.id === oud.id)) wisTeamCaches(oud.id)
     setTeams(lijst)
     schrijf(OPSLAG, 'teams', lijst)
     // Actief team bestaat niet meer (of nog geen keuze): bij precies één team dat nemen
@@ -55,6 +67,19 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       return nieuw
     })
   }, [])
+
+  // Lidmaatschap ook zonder herladen controleren; geweigerde toegang wist de lokale teamcache.
+  useEffect(() => {
+    if (!gebruiker) return
+    const laad = () => { teamsLaden().catch(() => {}) }
+    const interval = setInterval(laad, 30_000)
+    const zichtbaar = () => { if (document.visibilityState === 'visible') laad() }
+    document.addEventListener('visibilitychange', zichtbaar)
+    let gestopt = false
+    let stop: (() => void) | undefined
+    pb.collection('teams').subscribe('*', laad).then(fn => { if (gestopt) fn(); else stop = fn }).catch(() => {})
+    return () => { gestopt = true; stop?.(); clearInterval(interval); document.removeEventListener('visibilitychange', zichtbaar) }
+  }, [gebruiker?.id, teamsLaden])
 
   // Bij het opstarten de inlog verversen (en uitloggen als het account niet meer bestaat)
   useEffect(() => {
@@ -143,7 +168,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   }, [gebruiker?.id, aanvragenLaden])
 
   // Zonder team mag je alles (alleen deze telefoon); in een team alleen als beheerder of superadmin
-  const magBewerken = !actiefTeamId || !!gebruiker?.superadmin || (actiefTeam ? rolIn(actiefTeam, gebruiker?.id ?? '') === 'beheerder' : true)
+  const magBewerken = !actiefTeamId || !!gebruiker?.superadmin || (actiefTeam ? rolIn(actiefTeam, gebruiker?.id ?? '') === 'beheerder' : false)
 
   return (
     <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen, teamInstellingen, zetTeamInstellingen, aanvragen, aanvragenLaden }}>
@@ -156,4 +181,11 @@ export function useAccount() {
   const context = useContext(AccountContext)
   if (!context) throw new Error('useAccount must be used within AccountProvider')
   return context
+}
+
+function wisTeamCaches(teamId?: string) {
+  try {
+    const prefix = `${OPSLAG}_t_${teamId ? teamId + '_' : ''}`
+    for (const sleutel of Object.keys(localStorage)) if (sleutel.startsWith(prefix)) localStorage.removeItem(sleutel)
+  } catch { /* Opslag kan geblokkeerd zijn. */ }
 }

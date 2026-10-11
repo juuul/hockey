@@ -10,7 +10,10 @@ const TOEGESTAAN = [
   "https://juliaan.eu/hockey/test/",
   "http://192.168.2.50:5173/",
   "http://localhost:5173/",
-]
+].filter((adres) => {
+  if (adres.startsWith("http://")) return true
+  return $os.getenv("HOCKEY_ENV") === "test" ? adres.includes("/test/") : !adres.includes("/test/")
+})
 
 const GELDIG_DAGEN = 7
 
@@ -92,6 +95,21 @@ function zetMail(settings, cfg, metWachtwoord) {
 // Bij het starten: alles behalve het wachtwoord opslaan (zodat het beheerscherm klopt en het oude Gmail-wachtwoord
 // weg is), daarna het wachtwoord alleen in het geheugen
 function mailInstellen(app) {
+  if ($os.getenv("HOCKEY_ENV") === "test") {
+    const s = app.settings()
+    s.smtp.enabled = true
+    s.smtp.host = "mailpit"
+    s.smtp.port = 1025
+    s.smtp.tls = false
+    s.smtp.authMethod = ""
+    s.smtp.username = ""
+    s.smtp.password = ""
+    s.meta.senderAddress = "hockey@example.invalid"
+    s.meta.senderName = "Hockey TEST"
+    s.meta.appURL = "https://hockey.juliaan.eu/test/"
+    app.save(s)
+    return
+  }
   const cfg = mailConfig()
   const fout = mailFout(cfg)
   if (fout) {
@@ -110,6 +128,7 @@ function mailInstellen(app) {
 
 // Na elk herladen van de instellingen (ook na opslaan in het beheerscherm) het wachtwoord weer uit de omgeving
 function mailInGeheugen(app) {
+  if ($os.getenv("HOCKEY_ENV") === "test") return
   const cfg = mailConfig()
   if (!mailFout(cfg)) zetMail(app.settings(), cfg, true)
 }
@@ -227,7 +246,13 @@ function beslisAanmelding(app, a, besluit, teamnaamIn) {
     app.runInTransaction((tx) => {
       const team = new Record(tx.findCollectionByNameOrId("teams"))
       team.set("naam", teamnaam)
+      if (a.getString("officieelTeam")) {
+        team.set("officieelTeam", a.getString("officieelTeam"))
+        team.set("omgevingNaam", a.getString("omgevingNaam"))
+        team.set("vindbaar", true)
+      }
       tx.save(team)
+      if (team.getString("officieelTeam")) require(`${__hooks}/catalogus.js`).synchroniseer(tx, team)
       a.set("status", "goedgekeurd")
       a.set("teamnaam", teamnaam)
       a.set("team", team.id)
@@ -290,3 +315,28 @@ function ruimUitnodigingenOp(app) {
 }
 
 module.exports = { mailInstellen, mailInGeheugen, telMail, ruimUitnodigingenOp, beslisAanmelding, ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }
+
+// Publieke aanvraag geeft nooit meteen toegang en bevat geen spelerslijst.
+function maakAanvraag(app, team, b) {
+  const naam = String(b.naam || "").trim().slice(0, 60)
+  const email = String(b.email || "").trim().toLowerCase().slice(0, 200)
+  const terug = String(b.terug || "")
+  if (!naam) throw new BadRequestError("Vul je naam in")
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new BadRequestError("Vul een geldig e-mailadres in")
+  if (!TOEGESTAAN.includes(terug)) throw new BadRequestError("Onbekend terugadres")
+  try {
+    app.findFirstRecordByFilter("toegangsaanvragen", "team = {:t} && email = {:e} && status = 'nieuw'", { t: team.id, e: email })
+    return { ok: true }
+  } catch (_) {}
+  const a = new Record(app.findCollectionByNameOrId("toegangsaanvragen"))
+  a.set("team", team.id); a.set("naam", naam); a.set("email", email)
+  a.set("kindNaam", String(b.kindNaam || "").trim().slice(0, 60))
+  a.set("terug", terug); a.set("token", $security.randomString(40)); a.set("status", "nieuw")
+  app.save(a)
+  try {
+    mail(app, beheerderEmails(app, team), "Toegang gevraagd tot " + team.getString("naam"),
+      "<p>" + escape(naam) + " vraagt toegang tot " + escape(team.getString("naam")) + ".</p><p>Behandel deze aanvraag in de app bij Instellingen → Aanvragen.</p>")
+  } catch (_) { /* De aanvraag staat veilig in de app; mail is alleen een herinnering. */ }
+  return { ok: true }
+}
+module.exports.maakAanvraag = maakAanvraag

@@ -23,11 +23,11 @@ const VELDEN: Record<Soort, string[]> = {
   spelers: ['id', 'naam', 'voorkeur1', 'voorkeur2'],
   clubs: ['id', 'naam', 'laatstGebruikt'],
   wedstrijden: ['id', 'datum', 'clubId', 'tegenstander', 'thuis', 'wij', 'zij', 'doelpunten', 'spelers', 'opstelling', 'opgeslagenOp', 'shootouts'],
-  programma: ['id', 'datum', 'tot', 'soort', 'clubId', 'tegenstander', 'thuis', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie'],
+  programma: ['id', 'datum', 'tot', 'soort', 'clubId', 'tegenstander', 'thuis', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie', 'bronId', 'bronBasis', 'bronWijziging', 'locatie', 'bronStatus'],
 }
 
 // Tekstvelden die leeg '' zijn als ze ontbreken (de server geeft '' terug, de app soms undefined)
-const TEKST = new Set(['voorkeur1', 'voorkeur2', 'clubId', 'tegenstander', 'opstelling', 'tot', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie'])
+const TEKST = new Set(['voorkeur1', 'voorkeur2', 'clubId', 'tegenstander', 'opstelling', 'tot', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'notitie', 'bronId', 'locatie', 'bronStatus'])
 
 export function schoon(soort: Soort, r: Record<string, unknown>): Record<string, unknown> {
   const uit: Record<string, unknown> = {}
@@ -75,12 +75,18 @@ export function acties(lokaal: Alles, basis: Alles, verwijderd: Verwijderd = GEE
 
 // Wat de app na het ophalen moet hebben. 'afgewezen': lokale wijzigingen die de server weigerde → serverstand terug.
 // Lokaal ontbrekend (en niet expliciet verwijderd) → serverstand, nooit 'weg'
-export function samenvoegen(lokaal: Records, basis: Records, server: Records, afgewezen: Set<string> = new Set(), verwijderd: string[] = []): Records {
+export function samenvoegen(lokaal: Records, basis: Records, server: Records, afgewezen: Set<string> = new Set(), verwijderd: string[] = [], perVeld = false): Records {
   const uit: Records = {}
   for (const id of new Set([...Object.keys(lokaal), ...Object.keys(basis), ...Object.keys(server)])) {
     if (verwijderd.includes(id)) continue
     const lokaalGewijzigd = lokaal[id] !== undefined && !gelijk(lokaal[id], basis[id]) && !afgewezen.has(id)
-    const r = lokaalGewijzigd ? lokaal[id] : server[id]
+    let r = lokaalGewijzigd ? lokaal[id] : server[id]
+    if (perVeld && lokaalGewijzigd && basis[id] && server[id]) {
+      r = { ...server[id] }
+      for (const [veld, waarde] of Object.entries(lokaal[id])) {
+        if (!veld.startsWith('bron') && !gelijk(waarde, basis[id][veld])) r[veld] = waarde
+      }
+    }
     if (r !== undefined) uit[id] = r
   }
   return uit
@@ -171,7 +177,10 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
       if (a.soortActie === 'create') await col.create({ ...a.data, team: teamId })
       else if (a.soortActie === 'update') {
         const { id: _id, ...velden } = a.data!
-        await col.update(a.id, velden)
+        const gewijzigd = a.soort === 'programma'
+          ? Object.fromEntries(Object.entries(velden).filter(([veld, waarde]) => !veld.startsWith('bron') && !gelijk(waarde, basis[a.soort][a.id]?.[veld])))
+          : velden
+        await col.update(a.id, gewijzigd)
       } else await col.delete(a.id)
       if (a.soortActie === 'delete') {
         delete basis[a.soort][a.id]
@@ -200,7 +209,7 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
   const lokaal = lokaalNu()
   // Nog openstaande verwijderingen (niet in deze ronde verwerkt) blijven weg uit het resultaat
   const open = (soort: Soort) => (verwijderd[soort] ?? []).filter(id => !verwerkt[soort].includes(id))
-  const samengevoegd: Alles = perSoort(so => samenvoegen(lokaal[so] ?? {}, basis[so] ?? {}, server[so], afgewezen[so], open(so)))
+  const samengevoegd: Alles = perSoort(so => samenvoegen(lokaal[so] ?? {}, basis[so] ?? {}, server[so], afgewezen[so], open(so), so === 'programma'))
   const nogOpen: Verwijderd = perSoort(open)
   return {
     samengevoegd,

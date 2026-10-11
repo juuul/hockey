@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
 import { begeleidingTekst, NIET_NODIG, ProgrammaItem } from '../types'
-import type { TeamInstellingen } from '../server'
+import { foutTekst, pb, type TeamInstellingen } from '../server'
 import { datumTekst, vandaag } from '../historie'
 import { pbId } from '../sync'
 import { tel } from '../statistiek'
@@ -114,6 +114,9 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span aria-hidden="true">🚗</span>
           <span>begeleiding: {begeleidingTekst(p, naam)}</span>
         </div>
+        {p.locatie && <div className="prog-regel">📍 {p.locatie}</div>}
+        {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
+        {!!Object.keys(p.bronWijziging || {}).length && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
         {p.notitie && <div className="prog-regel notitie">{p.notitie}</div>}
         {mijn.length > 0 && (
           <div className="prog-labels">{mijn.map(b => <span key={b} className="prog-label mijn">Jij: {b}</span>)}</div>
@@ -217,6 +220,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
     const plek = (b: string) => (b === '' || b === NIET_NODIG ? standaardPlek(thuis, teamInstellingen) : b)
     setP({ ...p, thuis, begeleider1: plek(p.begeleider1), begeleider2: plek(p.begeleider2) })
   }
+  const [bronFout, setBronFout] = useState('')
   const [nieuweClub, setNieuweClub] = useState<string | null>(null)
   const [wegVraag, setWegVraag] = useState(false)
   useTerug(wegVraag, () => setWegVraag(false))
@@ -230,7 +234,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
       const id = clubToevoegen(nieuweClub)
       item = { ...p, clubId: id, tegenstander: nieuweClub.trim() }
     } else if (p.soort === 'wedstrijd') {
-      item = { ...p, tegenstander: clubs.find(c => c.id === p.clubId)?.naam ?? '' }
+      item = { ...p, tegenstander: clubs.find(c => c.id === p.clubId)?.naam ?? (p.bronId ? p.tegenstander : '') }
     }
     if (item.soort === 'vrij') item = { ...item, clubId: '', tegenstander: '', verzamelen: '', spelen: '', fruit: '', begeleider1: '', begeleider2: '' }
     else item = { ...item, tot: '' }
@@ -309,7 +313,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
                   value={nieuweClub !== null ? NIEUWE_CLUB : p.clubId}
                   onChange={e => { if (e.target.value === NIEUWE_CLUB) setNieuweClub(''); else { setNieuweClub(null); zet({ clubId: e.target.value }) } }}
                 >
-                  <option value="">Nog niet bekend</option>
+                  <option value="">{p.bronId && !p.clubId ? p.tegenstander : 'Nog niet bekend'}</option>
                   {[...clubs].sort((a, b) => a.naam.localeCompare(b.naam)).map(c => <option key={c.id} value={c.id}>{c.naam}</option>)}
                   <option value={NIEUWE_CLUB}>+ Nieuwe club…</option>
                 </select>
@@ -334,6 +338,10 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
                   <input type="time" className="modal-input" value={p.spelen} onChange={e => zet({ spelen: e.target.value })} />
                 </label>
               </div>
+              <label className="prog-veld">Locatie
+                <input className="modal-input" maxLength={200} value={p.locatie || ''} onChange={e => zet({ locatie: e.target.value })} />
+              </label>
+              {p.bronStatus && /cancel/i.test(p.bronStatus) && <p className="account-uitleg">Deze wedstrijd is volgens de officiële bron afgelast.</p>}
               {spelerSelect('🍎 Fruit', 'fruit')}
               {spelerSelect('🚗 Spelbegeleiding 1', 'begeleider1')}
               {spelerSelect('🚗 Spelbegeleiding 2', 'begeleider2')}
@@ -343,6 +351,18 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               </label>
             </>
           )}
+          {p.bronId && <p className="account-uitleg">Officiële wedstrijd. Verzameltijd en taken zijn eigen gegevens; handmatige wijzigingen blijven bij een bronupdate behouden.</p>}
+          {Object.entries(p.bronWijziging || {}).map(([veld, waarde]) => <div key={veld}>
+            <p className="account-uitleg">Officiële {({ datum: 'datum', spelen: 'aanvangstijd', thuis: 'thuis/uit', tegenstander: 'tegenstander', locatie: 'locatie' } as Record<string, string>)[veld]}: {typeof waarde === 'boolean' ? waarde ? 'thuis' : 'uit' : waarde}. Jouw aanpassing is behouden.</p>
+            <button className="btn btn-secondary" onClick={async () => {
+              try {
+                await pb.send(`/api/hockey/catalogus/programma/${p.id}/herstel`, { method: 'POST', body: { veld } })
+                // Sluit de editor zodat de herstelde serverstand via sync wordt opgehaald.
+                onClose()
+              } catch (e) { setBronFout(foutTekst(e)) }
+            }}>Gebruik officiële waarde</button>
+          </div>)}
+          {bronFout && <p className="account-melding fout" role="alert">{bronFout}</p>}
           {bestaat && <button className="btn btn-gevaar" onClick={() => setWegVraag(true)}>Verwijderen</button>}
         </div>
         <div className="modal-actions">

@@ -1,1 +1,5 @@
 pb_data
+
+pb_test_data
+.env
+.catalogus-*.lock
