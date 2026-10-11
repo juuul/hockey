@@ -7,6 +7,7 @@ export interface OfficieelTeam {
   geslacht: string; leeftijd: string; categorie: string; spelvorm: string; klasse: string; gecontroleerd: string
 }
 interface CatalogusClub { id: string; bronId: string; naam: string; plaats: string }
+interface OfficieleWedstrijd { id: string; datum: string; spelen: string; thuisNaam: string; uitNaam: string; uitslag?: { home: number; away: number } | null }
 interface Omgeving { id: string; naam: string; omgevingNaam: string }
 
 // Een club kiezen laadt alleen de teams van die club. Gegevens komen uit de eigen catalogus.
@@ -74,11 +75,37 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
           {lijst.map(t => <option key={t.id} value={t.id}>{t.naam} · {t.seizoen} · {t.spelvorm}{t.klasse ? ` · ${t.klasse}` : ''}</option>)}
         </select>
       </label>}
+      {gekozen && <OfficieelProgramma key={gekozen.id} team={gekozen} />}
       {gekozen && <p className="account-uitleg">Bron: KNHB Match Center. Gecontroleerd {new Date(gekozen.gecontroleerd).toLocaleDateString('nl-NL')}. Alleen gepubliceerde wedstrijden worden overgenomen.</p>}
       <button type="button" className="btn btn-secondary" onClick={() => setVervers(v => v + 1)}>Gegevens opnieuw controleren</button>
     </>}
     {fout && <p className="account-melding fout" role="alert">{fout}</p>}
   </>
+}
+
+// Het officiële programma is openbaar; dit component leest geen privéteamgegevens.
+function OfficieelProgramma({ team }: { team: OfficieelTeam }) {
+  const [wedstrijden, setWedstrijden] = useState<OfficieleWedstrijd[]>([])
+  const [fout, setFout] = useState('')
+  useEffect(() => {
+    let actief = true
+    const laad = () => pb.collection('catalogus_wedstrijden').getFullList<OfficieleWedstrijd>({
+      filter: pb.filter('seizoen = {:s} && (thuisBronId = {:id} || uitBronId = {:id})', { s: team.seizoen, id: team.bronId }), sort: 'datum',
+    }).then(w => { if (actief) { setWedstrijden(w); setFout('') } }).catch(e => { if (actief) setFout(foutTekst(e)) })
+    laad()
+    const interval = setInterval(laad, 30_000)
+    return () => { actief = false; clearInterval(interval) }
+  }, [team.id])
+  return <details>
+    <summary className="btn btn-secondary">Officieel wedstrijdprogramma bekijken</summary>
+    {!wedstrijden.length && !fout && <p className="account-uitleg">Er staan nog geen wedstrijden voor dit team in de catalogus. Ze verschijnen na een geslaagde broncontrole.</p>}
+    {wedstrijden.map(w => <div key={w.id} className="account-wie">
+      <span className="account-wie-sub">{new Date(w.datum + 'T12:00:00').toLocaleDateString('nl-NL')} · {w.spelen || 'tijd onbekend'}</span>
+      <span className="account-wie-sub">{w.thuisNaam} – {w.uitNaam}</span>
+      {w.uitslag && <span className="account-wie-sub">{w.uitslag.home} – {w.uitslag.away}</span>}
+    </div>)}
+    {fout && <p className="account-melding fout" role="alert">{fout}</p>}
+  </details>
 }
 
 export default function TeamAanmelden() {

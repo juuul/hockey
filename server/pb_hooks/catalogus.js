@@ -63,6 +63,22 @@ function synchroniseer(app, team) {
     // Basis blijft per veld staan zolang er een eigen aanpassing is, ook na meerdere imports.
     const volgendeBasis = { ...nieuw }
     for (const k of Object.keys(wijzigingen)) volgendeBasis[k] = basis[k]
+    // Dashboard en historie gebruiken een privéclub-id. Hergebruik dezelfde tegenstander,
+    // zodat een geïmporteerde wedstrijd ook bij klaarzetten zijn naam behoudt.
+    const tegenstander = p.getString("tegenstander")
+    let club
+    try { club = app.findRecordById("clubs", p.getString("clubId")) } catch (_) {}
+    if (club && club.getString("team") !== team.id) club = null
+    const vorigeNaam = basis && basis.tegenstander
+    // Een eigen weergavenaam van een bestaande tegenstander behouden.
+    if (tegenstander && (!club || (club.getString("naam") !== tegenstander && club.getString("naam") === vorigeNaam))) {
+      try { club = app.findFirstRecordByFilter("clubs", "team = {:t} && naam = {:n}", { t: team.id, n: tegenstander }) }
+      catch (_) {
+        club = new Record(app.findCollectionByNameOrId("clubs"))
+        club.set("team", team.id); club.set("naam", tegenstander); app.save(club)
+      }
+      p.set("clubId", club.id)
+    }
     p.set("bronStatus", w.getString("status")); p.set("bronId", bronId); p.set("bronBasis", volgendeBasis); p.set("bronWijziging", wijzigingen)
     app.save(p)
   }
