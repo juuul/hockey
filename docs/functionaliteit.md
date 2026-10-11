@@ -118,3 +118,5 @@ interface Wissel { id: string; tijdstip: Date; inSpeler: string; uitSpeler: stri
 - Tegenstanders krijgen een privéclub-id; bestaande tegenstanders worden hergebruikt. Daardoor blijft de naam bij Op het veld zetten en in Historie zichtbaar.
 - Import raakt gesloten wedstrijden, eigen scores, spelers en leden niet. Herhaalde import maakt geen dubbele programmaregels.
 - Test gebruikt een eigen database en mailopvang. Database-uitbreidingen worden eerst daar gecontroleerd. Bij livegang gaan code en migraties naar productie; testdata wordt niet naar productie gekopieerd. Productie krijgt zijn eigen openbare catalogusimport en bestaande teams kunnen worden gekoppeld.
+
+- Lokale catalogusopdrachten op productie krijgen `--encryptionEnv=PB_ENCRYPTION_KEY`, zodat PocketBase zijn bestaande versleutelde instellingen kan gebruiken. Test gebruikt geen productiesleutel. De achtergrondwerker heeft per omgeving een eigen lock en planning.

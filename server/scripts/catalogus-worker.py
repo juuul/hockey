@@ -22,7 +22,9 @@ except BlockingIOError:
     raise SystemExit(0)
 
 def pb(*cmd):
-    return subprocess.run(['docker', 'exec', container, '/pb/pocketbase', *cmd], check=True, capture_output=True, text=True).stdout
+    # PocketBase leest de bestaande sleutel zelf uit de containeromgeving.
+    vlaggen = ['--encryptionEnv=PB_ENCRYPTION_KEY'] if args.omgeving == 'productie' else []
+    return subprocess.run(['docker', 'exec', container, '/pb/pocketbase', *cmd, *vlaggen], check=True, capture_output=True, text=True).stdout
 
 # CLI kan bootstrapmeldingen bevatten; alleen de JSON-lijst uitlezen.
 regels = pb('catalogus-taken').splitlines()
