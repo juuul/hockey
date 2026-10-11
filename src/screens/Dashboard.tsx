@@ -198,9 +198,9 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
       )}
       <Timer />
       {!demo && magBewerken && (
-        <button className="btn btn-secondary wissels-tellen" role="switch" aria-checked={wisselsAltijdTellen}
+        <button className="btn btn-secondary wissels-tellen" role="switch" aria-checked={!wisselsAltijdTellen}
           onClick={() => zetWisselsAltijdTellen(!wisselsAltijdTellen)}>
-          Wissels altijd tellen: {wisselsAltijdTellen ? 'aan' : 'uit'}
+          Wissels alleen tellen tijdens het spel: {wisselsAltijdTellen ? 'uit' : 'aan'}
         </button>
       )}
 
