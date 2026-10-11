@@ -31,7 +31,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 **Niet ingelogd** (`demo`): alles werkt alleen op de telefoon, lege telefoon begint met voorbeeldgegevens (`src/demo.ts`).
 
 ### Spelregels (kern, in `src/opstelling.ts`)
-- **Wisselteller** +1 bij wie het veld **uit** gaat. Verplaatsen met een wisselspeler is een correctie (`verplaatsSpelers`).
+- **Wisselteller** +1 bij wie het veld **uit** gaat. Ingelogd alleen tijdens een lopend kwart/helft, niet bij stilstand, pauze of rust; onderaan het Dashboard staat **Wissels altijd tellen** (standaard uit, per team bewaard en live gedeeld). Zonder inloggen telt elke wissel. Verplaatsen met een wisselspeler is een correctie (`verplaatsSpelers`).
 - **Wissels sorteren**: minste wissels eerst; bij gelijk komt wie het laatst eruit ging onderaan.
 - **Kleuren** (alleen informatief) op invalvolgorde: laatste 2 rood, 2 oranje (bij 6 spelers 1 en 1), rest groen; keeper geen kleur.
 - **Nieuwe opstelling**: eerlijk loten wie begint, dan 1e en 2e voorkeur, rest willekeurig.
