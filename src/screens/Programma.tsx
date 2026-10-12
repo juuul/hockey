@@ -70,6 +70,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
     p.soort !== 'wedstrijd' ? undefined
     : (afgesloten && p.id === wedstrijd.programmaId ? afgesloten : undefined)
       ?? (p.clubId ? wedstrijden.find(w => w.datum === p.datum && w.clubId === p.clubId) : undefined)
+  const kalenderLinks = [...new Set(programma.map(p => p.bronPlanning?.bron).filter((bron): bron is string => !!bron))]
   const volgendeId = komend.find(p => p.soort === 'wedstrijd' && !gespeeld(p))?.id
   const zichtbaar = (lijst: ProgrammaItem[]) => (alleenMijn ? lijst.filter(p => beurten(p).length > 0) : lijst)
 
@@ -118,7 +119,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span aria-hidden="true">🚗</span>
           <span>begeleiding: {begeleidingTekst(p, naam)}</span>
         </div>
-        {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''} · <a href={p.bronPlanning.bron} target="_blank" rel="noreferrer">Kalender</a></div>}
+        {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''}</div>}
         {p.locatieAdres && <a className="btn btn-secondary" href={navigatieLink(p.locatieAdres)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a>}
         {p.locatie && <div className="prog-regel">📍 {p.locatie}</div>}
         {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
@@ -151,6 +152,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         )}
       </section>
 
+      {kalenderLinks.length > 0 && <div className="prog-filters">{kalenderLinks.map((bron, i) => <a key={bron} className="btn btn-secondary" href={bron} target="_blank" rel="noreferrer">Speelkalender{kalenderLinks.length > 1 ? ` ${i + 1}` : ''}</a>)}</div>}
       <div className="prog-filters">
         <button className={`prog-filter ${toonGeweest ? 'actief' : ''}`} onClick={() => setToonGeweest(!toonGeweest)} aria-pressed={toonGeweest}>
           ⇄ {toonGeweest ? 'Geweest' : 'Nog te spelen'}
@@ -236,15 +238,13 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   const zet = (velden: Partial<ProgrammaItem>) => setP({ ...p, ...velden })
   const spelerKeuzes = [...spelers].sort((a, b) => a.naam.localeCompare(b.naam))
 
-  const reisGeldig = p.reisMinuten == null || (Number.isInteger(p.reisMinuten) && p.reisMinuten >= 0 && p.reisMinuten <= 1440)
   const opslaan = () => {
-    if (p.soort === 'wedstrijd' && !reisGeldig) return
-    let item = p
+    let item = { ...p, reisMinuten: null }
     if (p.soort === 'wedstrijd' && nieuweClub !== null && nieuweClub.trim()) {
       const id = clubToevoegen(nieuweClub)
-      item = { ...p, clubId: id, tegenstander: nieuweClub.trim() }
+      item = { ...item, clubId: id, tegenstander: nieuweClub.trim() }
     } else if (p.soort === 'wedstrijd') {
-      item = { ...p, tegenstander: clubs.find(c => c.id === p.clubId)?.naam ?? (p.bronId ? p.tegenstander : '') }
+      item = { ...item, tegenstander: clubs.find(c => c.id === p.clubId)?.naam ?? (p.bronId ? p.tegenstander : '') }
     }
     if (item.soort === 'vrij') item = { ...item, clubId: '', tegenstander: '', verzamelen: '', verzamelDatum: '', reisMinuten: null, locatieAdres: '', spelen: '', fruit: '', begeleider1: '', begeleider2: '' }
     else item = { ...item, tot: '' }
@@ -378,7 +378,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
         </div>
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>Annuleren</button>
-          <button className="btn btn-primary" disabled={p.soort === 'wedstrijd' && !reisGeldig} onClick={opslaan}>Opslaan</button>
+          <button className="btn btn-primary" onClick={opslaan}>Opslaan</button>
         </div>
 
         {wegVraag && (
