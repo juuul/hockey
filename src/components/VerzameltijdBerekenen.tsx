@@ -39,7 +39,7 @@ export default function VerzameltijdBerekenen({ item, zet }: { item: ProgrammaIt
   return <div>
     <h3>Verzameltijd berekenen</h3>
     <label className="prog-veld">Wedstrijdadres<input className="modal-input" maxLength={300} value={item.locatieAdres || ''} placeholder={item.thuis && !zaal ? info?.clubAdres : 'Straat, huisnummer, postcode en plaats'} onChange={e => zet({ locatieAdres: e.target.value })} /></label>
-    {bestemming && <a className="btn btn-secondary" href={navigatieLink(bestemming)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a>}
+    {bestemming.trim() ? <a className="btn btn-secondary" href={navigatieLink(bestemming)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a> : <button type="button" className="btn btn-secondary" disabled title="Wedstrijdadres nog niet bekend">Navigeer naar wedstrijd</button>}
     <p role="status">{bezig ? 'Reistijd ophalen…' : reis != null ? `Reistijd: ${reis} minuten` : 'Reistijd nog niet beschikbaar'}</p>
     {voorstel && <button className="btn btn-primary" onClick={() => zet({ verzamelen: voorstel.tijd, verzamelDatum: voorstel.datum, reisMinuten: null, ...(item.locatieAdres ? {} : { locatieAdres: bestemming }) })}>Gebruik voorstel: {voorstel.datum !== item.datum ? `${voorstel.datum} · ` : ''}{voorstel.tijd}</button>}
     {fout && <p className="account-melding fout" role="alert">{fout}</p>}

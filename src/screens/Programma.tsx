@@ -120,7 +120,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span>begeleiding: {begeleidingTekst(p, naam)}</span>
         </div>
         {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''}</div>}
-        {p.locatieAdres && <a className="btn btn-secondary" href={navigatieLink(p.locatieAdres)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a>}
+        {p.locatieAdres?.trim() ? <a className="btn btn-secondary" href={navigatieLink(p.locatieAdres)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a> : <button type="button" className="btn btn-secondary" disabled title="Wedstrijdadres nog niet bekend">Navigeer naar wedstrijd</button>}
         {p.locatie && <div className="prog-regel">📍 {p.locatie}</div>}
         {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
         {!!Object.keys(p.bronWijziging || {}).length && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
