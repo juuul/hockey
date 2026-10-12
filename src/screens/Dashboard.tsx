@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
-import { OPSTELLINGEN, Position, POSITIE_LABEL } from '../types'
+import { OPSTELLINGEN, heeftKeeper, Position, POSITIE_LABEL } from '../types'
 import SubstituteModal from '../components/SubstituteModal'
 import ResetModal from '../components/ResetModal'
 import Timer, { KlokRegel } from '../components/Timer'
@@ -159,7 +159,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           {OPSTELLINGEN[opstelling].map(rij => (
             <div key={rij.join()} className={`field-row rij-${rij.length}`}>{rij.map(slot)}</div>
           ))}
-          <div className="field-row single">{slot('K')}</div>
+          {heeftKeeper(spelvorm) && <div className="field-row single">{slot('K')}</div>}
         </div>
       </div>
 

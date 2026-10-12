@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
 import { indeling, klokMs, logBij, SpeeltijdMoment, speeltijden } from '../speeltijd'
-import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Shootout, Spelvorm, spelvormVan, veldPosities, Wissel, WedstrijdInfo } from '../types'
-import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, naamBezet, verplaatsSpelers } from '../opstelling'
+import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Shootout, Spelvorm, spelvormVan, veldPosities, heeftKeeper, Wissel, WedstrijdInfo } from '../types'
+import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, pasSpelvormAan, naamBezet, verplaatsSpelers } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
 import { lees, OPSLAG, schrijf, teamOpslag } from '../opslag'
 import { Alles, GEEN_VERWIJDERD, Lokaal, naarRecords, nieuweIds, pbId, perSoort, Soort, spelersToepassen, Verwijderd, voorkeurenUit } from '../sync'
@@ -166,6 +166,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   // Een veldspeler op een plek die in deze opstelling niet (meer) bestaat (bv. een vervallen opstelling
   // of een oude stand van een ander toestel): naar een vrije plek schuiven
   useEffect(() => {
+    if (!heeftKeeper(spelvorm) && spelers.some(s => s.isKeeper)) {
+      zetSpelersRuw(huidig => pasSpelvormAan(huidig, opstelling))
+      return
+    }
     if (spelers.some(s => s.inVeld && !s.isKeeper && !posities.includes(s.positie))) {
       zetSpelersRuw(huidig => pasOpstellingAan(huidig, posities))
     }
@@ -248,15 +252,16 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     localStorage.setItem(`${P}_wedstrijden`, JSON.stringify(wedstrijden))
   }, [wedstrijden])
 
-  const [history, setHistory] = useState<{ spelers: Player[]; wisselingen: Wissel[]; score: Score; doelpunten: (string | null)[]; shootouts: Shootout[] }[]>([])
+  const [history, setHistory] = useState<{ opstelling: OpstellingNaam; spelers: Player[]; wisselingen: Wissel[]; score: Score; doelpunten: (string | null)[]; shootouts: Shootout[] }[]>([])
 
   const remember = () => {
-    setHistory(h => [...h, { spelers, wisselingen, score, doelpunten, shootouts }])
+    setHistory(h => [...h, { opstelling, spelers, wisselingen, score, doelpunten, shootouts }])
   }
 
   const undo = () => {
     const last = history[history.length - 1]
-    if (!last) return
+    if (!last || (spelvormVan(last.opstelling) !== spelvorm && (timer.gestartOp !== null || timer.opgebouwd > 0))) return
+    setOpstelling(last.opstelling)
     zetSpelersRuw(last.spelers)
     setWisselingen(last.wisselingen)
     setScore(last.score)
@@ -362,9 +367,10 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
 
   const kiesOpstelling = (nieuw: OpstellingNaam) => {
     if (nieuw === opstelling) return
+    if (spelvormVan(nieuw) !== spelvorm && (timer.gestartOp !== null || timer.opgebouwd > 0)) return
     remember()
     setOpstelling(nieuw)
-    setSpelers(pasOpstellingAan(spelers, veldPosities(nieuw)))
+    setSpelers(pasSpelvormAan(spelers, nieuw))
   }
 
   // Nieuwe wedstrijd: opnieuw loten, tellers, score en timer terug. Spelers, aanwezigheid, voorkeuren en opstelling blijven
@@ -596,7 +602,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   return (
-    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0, setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, wisselsAltijdTellen, zetWisselsAltijdTellen, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, speeltijdLog, afgesloten, weerOpenen, nieuweWedstrijd, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken: magBewerken && !wedstrijd.afgesloten, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0 && !(spelvormVan(history[history.length - 1].opstelling) !== spelvorm && (timer.gestartOp !== null || timer.opgebouwd > 0)), setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, wisselsAltijdTellen, zetWisselsAltijdTellen, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, speeltijdLog, afgesloten, weerOpenen, nieuweWedstrijd, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken: magBewerken && !wedstrijd.afgesloten, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )

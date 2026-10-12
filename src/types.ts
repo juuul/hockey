@@ -40,9 +40,9 @@ export const POSITIE_LABEL: Record<Position, string> = {
 export const VELD_VOLGORDE: Position[] = ['LW', 'CV', 'RW', 'LM', 'LCM', 'CM', 'RCM', 'RM', 'LBM', 'LCA', 'CBM', 'RCA', 'RBM'];
 
 // Totaal aantal spelers incl. keeper
-export type Spelvorm = 11 | 9 | 8 | 6;
+export type Spelvorm = 11 | 9 | 8 | 6 | 'mini3' | 'zaal6' | 'zaaljeugd6' | 'zaalmini3' | 'zaalmini4' | 'hockey5' | 'hockey7';
 
-export type OpstellingNaam = '3-3-4' | '3-4-3' | '2-3-3' | '3-3-2' | '3-2-3' | '2-3-2' | '1-3-3' | '2-2-3' | '2-1-2' | '2-2-1' | '1-2-2';
+export type OpstellingNaam = '3-3-4' | '3-4-3' | '2-3-3' | '3-3-2' | '3-2-3' | '2-3-2' | '1-3-3' | '2-2-3' | '2-1-2' | '2-2-1' | '1-2-2' | 'mini-1-2' | 'mini-2-1' | 'zaalmini-1-2' | 'zaalmini-2-1' | 'zaalmini-2-2' | 'zaal-2-1-2' | 'zaal-2-2-1' | 'zaal-1-2-2' | 'zaaljeugd-2-1-2' | 'zaaljeugd-2-2-1' | 'zaaljeugd-1-2-2' | 'hockeyvijf-2-2' | 'hockeyvijf-1-2-1' | 'hockeyzeven-2-3-2' | 'hockeyzeven-3-2-2';
 
 // Rijen van voor naar achter (keeper staat er altijd los onder)
 export const OPSTELLINGEN: Record<OpstellingNaam, Position[][]> = {
@@ -59,6 +59,21 @@ export const OPSTELLINGEN: Record<OpstellingNaam, Position[][]> = {
   '2-1-2': [['LW', 'RW'], ['CM'], ['LBM', 'RBM']],
   '2-2-1': [['LW', 'RW'], ['LM', 'RM'], ['CBM']],
   '1-2-2': [['CV'], ['LM', 'RM'], ['LBM', 'RBM']],
+  'mini-1-2': [['CV'], ['LBM', 'RBM']],
+  'mini-2-1': [['LW', 'RW'], ['CBM']],
+  'zaalmini-1-2': [['CV'], ['LBM', 'RBM']],
+  'zaalmini-2-1': [['LW', 'RW'], ['CBM']],
+  'zaalmini-2-2': [['LW','RW'],['LBM','RBM']],
+  'zaal-2-1-2': [['LW','RW'],['CM'],['LBM','RBM']],
+  'zaal-2-2-1': [['LW','RW'],['LM','RM'],['CBM']],
+  'zaal-1-2-2': [['CV'],['LM','RM'],['LBM','RBM']],
+  'zaaljeugd-2-1-2': [['LW','RW'],['CM'],['LBM','RBM']],
+  'zaaljeugd-2-2-1': [['LW','RW'],['LM','RM'],['CBM']],
+  'zaaljeugd-1-2-2': [['CV'],['LM','RM'],['LBM','RBM']],
+  'hockeyvijf-2-2': [['LW','RW'],['LBM','RBM']],
+  'hockeyvijf-1-2-1': [['CV'],['LM','RM'],['CBM']],
+  'hockeyzeven-2-3-2': [['LW','RW'],['LM','CM','RM'],['LBM','RBM']],
+  'hockeyzeven-3-2-2': [['LW','CV','RW'],['LM','RM'],['LBM','RBM']],
 };
 
 // De eerste is de standaard bij die spelvorm
@@ -67,13 +82,20 @@ export const OPSTELLINGEN_PER_SPELVORM: Record<Spelvorm, OpstellingNaam[]> = {
   9: ['2-3-3', '3-3-2', '3-2-3'],
   8: ['2-3-2', '1-3-3', '2-2-3'],
   6: ['2-1-2', '2-2-1', '1-2-2'],
+  mini3: ['mini-1-2','mini-2-1'],
+  zaalmini3: ['zaalmini-1-2','zaalmini-2-1'],
+  zaalmini4: ['zaalmini-2-2'],
+  zaal6: ['zaal-2-1-2','zaal-2-2-1','zaal-1-2-2'],
+  zaaljeugd6: ['zaaljeugd-2-1-2','zaaljeugd-2-2-1','zaaljeugd-1-2-2'],
+  hockey5: ['hockeyvijf-2-2','hockeyvijf-1-2-1'],
+  hockey7: ['hockeyzeven-2-3-2','hockeyzeven-3-2-2'],
 };
 
 // In beeld: de KNHB-categorie bij de spelvorm (11-tal vanaf O12, 9-tal O11, 8-tal O10, 6-tal O9)
-export const CATEGORIE: Record<Spelvorm, string> = { 11: 'O12+', 9: 'O11', 8: 'O10', 6: 'O9' };
+export const CATEGORIE: Record<Spelvorm, string> = { 11: 'O12+ / senioren', 9: 'O11', 8: 'O10', 6: 'O9', mini3:'O7 / O8',zaalmini3:'Mini’s · 3 tegen 3',zaalmini4:'Mini’s · 4 tegen 4',zaaljeugd6:'O9 / O10',zaal6:'O11+ / senioren',hockey5:'Hockey5s',hockey7:'Hockey7s' };
 
 export const spelvormVan = (opstelling: OpstellingNaam): Spelvorm =>
-  ([11, 9, 8, 6] as const).find(v => OPSTELLINGEN_PER_SPELVORM[v].includes(opstelling)) ?? 9;
+  ([11, 9, 8, 6, 'mini3', 'zaalmini3', 'zaalmini4', 'zaaljeugd6', 'zaal6', 'hockey5', 'hockey7'] as const).find(v => OPSTELLINGEN_PER_SPELVORM[v].includes(opstelling)) ?? 9;
 
 export const veldPosities = (opstelling: OpstellingNaam): Position[] => OPSTELLINGEN[opstelling].flat();
 
@@ -114,10 +136,10 @@ export interface GespeeldeWedstrijd {
 export interface Shootout { spelerId: string }
 
 // Na afloop van elke wedstrijd shoot-outs: alleen bij 8-tal (O10) en 6-tal (O9)
-export const heeftShootouts = (spelvorm: Spelvorm) => spelvorm === 8 || spelvorm === 6;
+export const heeftShootouts = (spelvorm: Spelvorm) => spelvorm === 8 || spelvorm === 6 || spelvorm === 'zaaljeugd6';
 
 // Hockeytaal: van achter naar voor, zonder keeper (intern '3-3-4' = 3 voor, 3 midden, 4 achter → '4-3-3')
-export const opstellingTekst = (naam: string): string => naam.split('-').reverse().join('-');
+export const opstellingTekst = (naam: string): string => naam.split('-').filter(x => /^\d+$/.test(x)).reverse().join('-');
 
 export const isOpstelling = (naam: unknown): naam is OpstellingNaam => typeof naam === 'string' && naam in OPSTELLINGEN;
 
@@ -167,3 +189,8 @@ export function begeleidingTekst(p: ProgrammaItem, naam: (id: string) => string)
   if (namen.length === 0) return 'nog te bepalen';
   return open ? `${namen.join(', ')} · nog ${open} te bepalen` : namen.join(', ');
 }
+
+export const isZaal = (vorm: Spelvorm) => typeof vorm === 'string' && vorm.startsWith('zaal');
+export const heeftKeeper = (vorm: Spelvorm) => !['mini3','zaalmini3','zaalmini4','hockey7'].includes(String(vorm));
+export const aantalSpelers = (vorm: Spelvorm) => typeof vorm === 'number' ? vorm : ({mini3:3,zaalmini3:3,zaalmini4:4,zaal6:6,zaaljeugd6:6,hockey5:5,hockey7:7} as const)[vorm];
+export const SPELVORMEN: Spelvorm[] = [11,9,8,6,'mini3','hockey5','hockey7','zaal6','zaaljeugd6','zaalmini3','zaalmini4'];

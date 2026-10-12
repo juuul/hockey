@@ -1,4 +1,4 @@
-import { Player, Position, Wissel } from './types'
+import { Player, Position, Wissel, OpstellingNaam, heeftKeeper, spelvormVan, veldPosities } from './types'
 
 function schud<T>(lijst: T[]): T[] {
   const kopie = [...lijst]
@@ -137,3 +137,8 @@ export const opAlfabet = <T extends { naam: string }>(lijst: T[]): T[] => [...li
 
 export const naamSleutel = (naam: string) => naam.trim().replace(/\s+/g, ' ').toLocaleLowerCase('nl')
 export const naamBezet = (bestaand: string[], naam: string) => bestaand.some(b => naamSleutel(b) === naamSleutel(naam))
+
+export function pasSpelvormAan(spelers: Player[], opstelling: OpstellingNaam): Player[] {
+  const basis = heeftKeeper(spelvormVan(opstelling)) ? spelers : spelers.map(s => s.isKeeper ? { ...s, isKeeper: false, positie: 'CBM' as Position, inVeld: false } : s)
+  return pasOpstellingAan(basis, veldPosities(opstelling))
+}

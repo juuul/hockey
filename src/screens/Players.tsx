@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { speelduurTekst } from '../speelduur'
-import { CATEGORIE, OPSTELLINGEN_PER_SPELVORM, opstellingTekst, Player } from '../types'
+import { CATEGORIE, OPSTELLINGEN_PER_SPELVORM, SPELVORMEN, isZaal, heeftKeeper, aantalSpelers, opstellingTekst, Player } from '../types'
 import AddPlayerModal from '../components/AddPlayerModal'
 import DeletePlayerModal from '../components/DeletePlayerModal'
 import { tel } from '../statistiek'
@@ -9,7 +9,7 @@ import { opAlfabet } from '../opstelling'
 import './Players.css'
 
 export default function Players() {
-  const { spelers, addSpeler, deleteSpeler, zetMeedoen, doelpunten, spelvorm, opstelling, kiesOpstelling, magBeheren: magBewerken } = useHockey()
+  const { spelers, addSpeler, deleteSpeler, zetMeedoen, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, magBeheren: magBewerken } = useHockey()
   const [showAddModal, setShowAddModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [playerToDelete, setPlayerToDelete] = useState<{ id: string; naam: string } | null>(null)
@@ -43,22 +43,28 @@ export default function Players() {
 
   return (
     <div className="players-screen">
+      <div className="spelvorm-kop">Spelinstellingen</div>
+      <div className="spelvorm" role="radiogroup" aria-label="Veld of zaal">
+        {([false,true] as const).map(zaal => <button key={String(zaal)} className={`spelvorm-knop ${isZaal(spelvorm) === zaal ? 'actief' : ''}`} role="radio" aria-checked={isZaal(spelvorm) === zaal} disabled={!magBewerken || timer.gestartOp !== null || timer.opgebouwd > 0} onClick={() => kiesOpstelling(OPSTELLINGEN_PER_SPELVORM[zaal ? 'zaal6' : 11][0])}>{zaal ? 'Zaal' : 'Veld'}</button>)}
+      </div>
       <div className="spelvorm-kop">Categorie</div>
-      <div className="spelvorm" role="radiogroup" aria-label="Categorie">
-        {([11, 9, 8, 6] as const).map(v => (
+      <div className="spelvorm spelvorm-categorie" role="radiogroup" aria-label="Categorie">
+        {SPELVORMEN.filter(v => isZaal(v) === isZaal(spelvorm)).map(v => (
           <button
             key={v}
             role="radio"
             aria-checked={spelvorm === v}
             className={`spelvorm-knop ${spelvorm === v ? 'actief' : ''}`}
             onClick={() => { if (v !== spelvorm) { kiesOpstelling(OPSTELLINGEN_PER_SPELVORM[v][0]); tel(`spelvorm-${v}`) } }}
-            disabled={!magBewerken}
+            disabled={!magBewerken || timer.gestartOp !== null || timer.opgebouwd > 0}
           >
             {CATEGORIE[v]}
           </button>
         ))}
       </div>
-      <div className="spelvorm-uitleg">{spelvorm} spelers met keeper · {speelduurTekst(spelvorm)}</div>
+      {['mini3','zaalmini3','zaalmini4','hockey5'].includes(String(spelvorm)) && <p className="spelvorm-uitleg">Wedstrijdduur kan per district of toernooi verschillen; dit is de gekozen standaard.</p>}
+      <div className="spelvorm-uitleg">{aantalSpelers(spelvorm)} spelers {heeftKeeper(spelvorm) ? 'met keeper' : 'zonder keeper'} · {speelduurTekst(spelvorm)}</div>
+      {(timer.gestartOp !== null || timer.opgebouwd > 0) && <p className="spelvorm-uitleg">Begin een nieuwe wedstrijd om veld/zaal of categorie te veranderen.</p>}
       <div className="spelvorm" role="radiogroup" aria-label="Opstelling">
         {OPSTELLINGEN_PER_SPELVORM[spelvorm].map(naam => (
           <button

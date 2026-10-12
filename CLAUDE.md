@@ -37,6 +37,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Nieuwe opstelling**: eerlijk loten wie begint, dan 1e en 2e voorkeur, rest willekeurig.
 - **Wedstrijd afsluiten** slaat op, maar maakt het Dashboard niet leeg: de uitslag blijft (voor iedereen) staan als "Afgelopen" tot er een nieuwe wedstrijd begint (klaarzetten, Nieuwe wedstrijd, of de volgende dag). Beheerders kunnen hem weer openen; opnieuw afsluiten overschrijft dezelfde wedstrijd (`WedstrijdInfo.afgesloten` / `bewerkt`).
 - **Alles resetten** / **Undo** (niet de timer): zie de docs.
+- **Spelinstellingen** bij Spelers: Veld/Zaal, categorie en opstelling. Veld 11/9/8/6/3, Hockey5s/Hockey7s; zaal 6 (O11+/senioren), 6 (O9/O10) en kleine 3-/4-tallen zonder keeper. Variant zit in de opstellingsnaam en wordt live/historisch bewaard. Veranderen van categorie/veld/zaal kan alleen vóór een begonnen wedstrijd. Undo herstelt ook de opstelling.
 - **Speelduur** per spelvorm in `src/speelduur.ts` (KNHB); klok stopt vanzelf aan het eind.
 - **Speeltijd per speler** (`src/speeltijd.ts`): per linie (aanval/middenveld/verdediging/keeper) plus wissel als eigen groep, gemeten op de wedstrijdklok; wie niet meedoet telt niet. Getoond op de wisseltegels (min), per wedstrijd en per seizoen in Historie.
 

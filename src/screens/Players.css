@@ -259,3 +259,6 @@
   color: var(--tekst-zacht);
   margin-top: 4px;
 }
+
+.spelvorm-categorie { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.spelvorm-categorie .spelvorm-knop { padding: 10px 4px; overflow-wrap: anywhere; }

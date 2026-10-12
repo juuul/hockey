@@ -101,7 +101,7 @@ export default function Timer() {
         {schema.map((d, i) => <span key={i} style={{ flexGrow: d.lengte }}>{d.soort === 'kwart' ? d.kwart : d.soort === 'rust' ? 'rust' : ''}</span>)}
       </div>
       {magBewerken && <>
-        <div className="timer-uitleg">{kwarten.length === 2 ? 'Helft' : 'Kwart'} begint nu:</div>
+        <div className="timer-uitleg">{kwarten.length === 1 ? 'Wedstrijd' : kwarten.length === 2 ? 'Helft' : 'Kwart'} begint nu:</div>
         <div className="timer-kwarten">
           {kwarten.map(({ d, i }) => (
             <button
@@ -109,8 +109,8 @@ export default function Timer() {
               className={`btn ${i === groen ? 'timer-start' : i < fase.index ? 'gespeeld' : 'btn-secondary'}`}
               onClick={() => { zetKlok(beginVan(i, schema), true); tel('timer-kwart') }}
             >
-              {i === volgende && <span aria-hidden="true">▶ </span>}{d.kwart}e
-              <small>{kwarten.length === 2 ? 'helft' : 'kwart'}</small>
+              {i === volgende && <span aria-hidden="true">▶ </span>}{kwarten.length === 1 ? 'Start' : `${d.kwart}e`}
+              {kwarten.length > 1 && <small>{kwarten.length === 2 ? 'helft' : 'kwart'}</small>}
             </button>
           ))}
         </div>

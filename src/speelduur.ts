@@ -25,13 +25,13 @@ export const SCHEMA: Deel[] = [
   { soort: 'kwart', kwart: 4, lengte: KWART },
 ]
 
-const helften = (minuten: number): Deel[] => [
+const helften = (minuten: number, rust = 5): Deel[] => [
   { soort: 'kwart', kwart: 1, lengte: minuten * MIN },
-  { soort: 'rust', kwart: 2, lengte: 5 * MIN },
+  { soort: 'rust', kwart: 2, lengte: rust * MIN },
   { soort: 'kwart', kwart: 2, lengte: minuten * MIN },
 ]
 
-export const schemaVoor = (spelvorm: Spelvorm): Deel[] => (spelvorm === 8 ? helften(30) : spelvorm === 6 ? helften(25) : SCHEMA)
+export const schemaVoor = (spelvorm: Spelvorm): Deel[] => (spelvorm === 'zaal6' ? helften(20,3) : spelvorm === 'zaaljeugd6' ? helften(15,3) : (spelvorm === 'zaalmini3' || spelvorm === 'zaalmini4') ? helften(10,3) : spelvorm === 'mini3' ? helften(15) : spelvorm === 'hockey7' ? [{soort:'kwart',kwart:1,lengte:25*MIN}] : spelvorm === 'hockey5' ? [{soort:'kwart',kwart:1,lengte:10*MIN}] : spelvorm === 8 ? helften(30) : spelvorm === 6 ? helften(25) : SCHEMA)
 const isHelften = (schema: Deel[]) => schema.filter(d => d.soort === 'kwart').length === 2
 
 export interface Fase {
@@ -76,11 +76,11 @@ export function voortgang(verstreken: number, schema: Deel[] = SCHEMA): number[]
 }
 
 // '2e kwart' of bij helften '2e helft'
-export const speelNaam = (nummer: number, schema: Deel[]) => `${nummer}e ${isHelften(schema) ? 'helft' : 'kwart'}`
+export const speelNaam = (nummer: number, schema: Deel[]) => schema.filter(d => d.soort === 'kwart').length === 1 ? 'Wedstrijd' : `${nummer}e ${isHelften(schema) ? 'helft' : 'kwart'}`
 
 export const deelNaam = (d: Deel | null, schema: Deel[] = SCHEMA) =>
   !d ? 'Afgelopen' : d.soort === 'kwart' ? speelNaam(d.kwart, schema) : d.soort === 'rust' ? 'Rust' : 'Pauze'
 
 // Kort voor onder de keuze van de categorie
 export const speelduurTekst = (spelvorm: Spelvorm) =>
-  spelvorm === 8 ? '2 × 30 min' : spelvorm === 6 ? '2 × 25 min' : '4 × 17:30'
+  spelvorm === 'zaal6' ? '2 × 20 min' : spelvorm === 'zaaljeugd6' ? '2 × 15 min' : (spelvorm === 'zaalmini3' || spelvorm === 'zaalmini4') ? '2 × 10 min' : spelvorm === 'mini3' ? '2 × 15 min' : spelvorm === 'hockey5' ? '1 × 10 min' : spelvorm === 'hockey7' ? '1 × 25 min' : spelvorm === 8 ? '2 × 30 min' : spelvorm === 6 ? '2 × 25 min' : '4 × 17:30'
