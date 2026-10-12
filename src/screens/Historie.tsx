@@ -82,7 +82,7 @@ export default function Historie() {
 
       {perSpeler.length > 0 && (
         <section>
-          <h2 className="section-title">Spelers</h2>
+          <h2 className="section-title">Speeltijd per positie</h2>
           {seizoen.length > 0 && (
             <div className="linie-legenda" aria-hidden="true">
               {LINIES.map(l => <span key={l} className="linie-legenda-item"><span className={`linie-stip linie-${l}`} />{LINIE_NAAM[l].toLowerCase()}</span>)}
@@ -98,7 +98,7 @@ export default function Historie() {
                 <span className="speeltijd-kop">
                   <span className="regel-naam">{sp.naam}</span>
                   {sp.goals > 0 && <span className="regel-waarde">⚽ {sp.goals}</span>}
-                  <span className="regel-sub speler-min">{sp.seizoen ? `${minuten(opVeld(sp.seizoen.tijd))} min` : '—'}</span>
+                  <span className="regel-sub speler-min">{sp.seizoen ? `${minuten(opVeld(sp.seizoen.tijd))} min` : '0 min'}</span>
                 </span>
                 {verdeling(sp.seizoen?.tijd || {})}
               </div>
@@ -157,7 +157,7 @@ export default function Historie() {
                     <div key={sp.id} className="detail-speeltijd-regel">
                       <span className="speeltijd-kop">
                         <span className="regel-naam">{spelers.find(x => x.id === sp.id)?.naam ?? sp.naam}</span>
-                        <span className="regel-waarde">{sp.tijd ? `${minuten(opVeld(sp.tijd))} min` : '—'}</span>
+                        <span className="regel-waarde">{sp.tijd ? `${minuten(opVeld(sp.tijd))} min` : '0 min'}</span>
                       </span>
                       {verdeling(sp.tijd || {})}
                       <span className="regel-sub">{sp.tijd ? linieTekst(sp.tijd) : 'Nog geen speeltijd geregistreerd'}</span>
