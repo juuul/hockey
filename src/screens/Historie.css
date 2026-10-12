@@ -289,3 +289,5 @@
 }
 
 .speeltijd-kop .regel-naam { flex: 1 1 auto; min-width: 0; }
+
+.linie-balk.leeg { background: var(--rand); }

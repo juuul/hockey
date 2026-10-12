@@ -31,11 +31,11 @@ export default function Historie() {
   const tegenstanders = perTegenstander(wedstrijden, clubs)
   const seizoen = speeltijdSeizoen(wedstrijden, spelers)
   // Eén lijst per speler: doelpunten en speeltijd samen (op alfabet; onbekende scorer onderaan)
-  const perSpeler = [...new Set([...scorers.map(s => s.id), ...seizoen.map(s => s.id)])]
+  const perSpeler = [...new Set([...spelers.map(s => s.id), ...scorers.map(s => s.id), ...seizoen.map(s => s.id)])]
     .map(id => {
       const sc = scorers.find(s => s.id === id)
       const sz = seizoen.find(s => s.id === id)
-      return { id, naam: sz?.naam ?? sc?.naam ?? 'Onbekend', goals: sc?.aantal ?? 0, seizoen: sz }
+      return { id, naam: spelers.find(s => s.id === id)?.naam ?? sz?.naam ?? sc?.naam ?? 'Onbekend', goals: sc?.aantal ?? 0, seizoen: sz }
     })
     .sort((a, b) => Number(a.id === null) - Number(b.id === null) || a.naam.localeCompare(b.naam, 'nl', { sensitivity: 'base' }))
   const gekozen = tegenstanders.find(t => t.clubId === filterClub)
@@ -44,7 +44,7 @@ export default function Historie() {
   const verdeling = (tijd: Partial<Record<'a' | 'm' | 'v' | 'k' | 'w', number>>) => {
     const totaal = LINIES.reduce((n, l) => n + (tijd[l] ?? 0), 0)
     return (
-      <span className="linie-balk" aria-hidden="true">
+      <span className={`linie-balk ${totaal > 0 ? '' : 'leeg'}`} aria-hidden="true">
         {totaal > 0 && LINIES.map(l => (tijd[l] ?? 0) > 0 && <span key={l} className={`linie-deel linie-${l}`} style={{ flexGrow: tijd[l] }} />)}
       </span>
     )
@@ -62,7 +62,7 @@ export default function Historie() {
   const scorerRegels = (w: GespeeldeWedstrijd) =>
     topscorers([w], spelers).map(s => `${s.naam}${s.aantal > 1 ? ` ${s.aantal}×` : ''}`).join(', ')
 
-  if (wedstrijden.length === 0 && clubs.length === 0) {
+  if (wedstrijden.length === 0 && clubs.length === 0 && spelers.length === 0) {
     return (
       <div className="historie">
         <DezeWedstrijd />
@@ -98,9 +98,9 @@ export default function Historie() {
                 <span className="speeltijd-kop">
                   <span className="regel-naam">{sp.naam}</span>
                   {sp.goals > 0 && <span className="regel-waarde">⚽ {sp.goals}</span>}
-                  {sp.seizoen && <span className="regel-sub speler-min">{minuten(opVeld(sp.seizoen.tijd))} min</span>}
+                  <span className="regel-sub speler-min">{sp.seizoen ? `${minuten(opVeld(sp.seizoen.tijd))} min` : '—'}</span>
                 </span>
-                {sp.seizoen && verdeling(sp.seizoen.tijd)}
+                {verdeling(sp.seizoen?.tijd || {})}
               </div>
             ))}
           </div>
@@ -151,16 +151,16 @@ export default function Historie() {
               <p className="detail-regel">{UITSLAG_TEKST[uitslag(open)]}</p>
               {open.doelpunten.length > 0 && <p className="detail-regel">⚽ {scorerRegels(open)}</p>}
               <p className="detail-regel">{open.spelers.length} speelsters · {opstellingTekst(open.opstelling)}</p>
-              {open.spelers.some(sp => sp.tijd) && (
+              {open.spelers.length > 0 && (
                 <div className="detail-speeltijd">
-                  {[...open.spelers].filter(sp => sp.tijd).sort((a, b) => opVeld(b.tijd!) - opVeld(a.tijd!)).map(sp => (
+                  {[...open.spelers].sort((a, b) => opVeld(b.tijd || {}) - opVeld(a.tijd || {})).map(sp => (
                     <div key={sp.id} className="detail-speeltijd-regel">
                       <span className="speeltijd-kop">
                         <span className="regel-naam">{spelers.find(x => x.id === sp.id)?.naam ?? sp.naam}</span>
-                        <span className="regel-waarde">{minuten(opVeld(sp.tijd!))} min</span>
+                        <span className="regel-waarde">{sp.tijd ? `${minuten(opVeld(sp.tijd))} min` : '—'}</span>
                       </span>
-                      {verdeling(sp.tijd!)}
-                      <span className="regel-sub">{linieTekst(sp.tijd!)}</span>
+                      {verdeling(sp.tijd || {})}
+                      <span className="regel-sub">{sp.tijd ? linieTekst(sp.tijd) : 'Nog geen speeltijd geregistreerd'}</span>
                     </div>
                   ))}
                 </div>
