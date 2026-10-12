@@ -38,7 +38,7 @@ function beheerder(e) {
 function routeMinuten(response) {
   const duur = response?.routes?.[0]?.duration
   if (typeof duur !== "string" || !/^\d+(\.\d+)?s$/.test(duur)) throw new BadRequestError("Geen reistijd gevonden; vul de minuten zelf in")
-  const minuten = Math.ceil(Number(duur.slice(0, -1)) / 300) * 5
+  const minuten = Math.ceil(Number(duur.slice(0, -1)) / 60)
   if (!Number.isFinite(minuten) || minuten < 0 || minuten > 1440) throw new BadRequestError("Reistijd valt buiten het bereik")
   return minuten
 }

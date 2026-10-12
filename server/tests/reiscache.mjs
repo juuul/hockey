@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 const sandbox = { module: {exports:{}} }
 runInNewContext(readFileSync(new URL('../pb_hooks/reiscache.js', import.meta.url),'utf8'), sandbox)
 const h = sandbox.module.exports
-for (const [sec, min] of [[0,0],[0.1,5],[299.9,5],[300,5],[300.1,10],[2100.1,40],[86400,1440]]) assert.equal(h.rijMinuten(sec), min)
+for (const [sec, min] of [[0,0],[0.1,1],[299.9,5],[300,5],[300.1,6],[2100.1,36],[86400,1440]]) assert.equal(h.rijMinuten(sec), min)
 for (const sec of [-1, NaN, Infinity, '300', 86401]) assert.throws(() => h.rijMinuten(sec))
 assert.equal(h.resultaat(null), null)
 assert.equal(h.resultaat({getString: () => 'nieuw'}), null)

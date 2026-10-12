@@ -11,7 +11,7 @@ $app.rootCmd.addCommand(new Command({use:"test-google-reis",run:()=>{
   check(b.origin.address==="Voorbeeldclub"&&b.destination.address==="Voorbeeld sporthal"&&b.travelMode==="DRIVE","Route onjuist")
   gezien=true;return {statusCode:200,json:{routes:[{duration:"2100.1s"}]}}
  })
- check(gezien&&minuten===40,"Reistijd/afronding onjuist")
+ check(gezien&&minuten===36,"Reistijd/afronding onjuist")
  for(const antwoord of [{statusCode:403,json:{}},{statusCode:200,json:{routes:[]}},{statusCode:200,json:{routes:[{duration:"onbekend"}]}}]){
   let geweigerd=false;try{h.haalReistijd("Club","Hal","fictieve-testwaarde",()=>antwoord)}catch(_){geweigerd=true}
   check(geweigerd,"Foutantwoord geaccepteerd")

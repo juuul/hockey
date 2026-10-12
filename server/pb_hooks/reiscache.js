@@ -13,7 +13,7 @@ function locatie(app, adres, label, club) {
 }
 function rijMinuten(seconden) {
   if (typeof seconden !== "number" || !Number.isFinite(seconden) || seconden < 0 || seconden > 86400) throw new Error("Ongeldige routeafstand in tijd")
-  return Math.ceil(seconden / 300) * 5
+  return Math.ceil(seconden / 60)
 }
 function zorgRoute(app, vertrek, bestemming) {
   let r

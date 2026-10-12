@@ -95,7 +95,7 @@ Controle: bundel `server/tests/verzamelen.ts` met esbuild en voer uit met Node. 
 
 ### Eigen router en gedeelde reistijden
 
-Bekende poule-/wedstrijdparen worden één keer berekend en op vijf minuten omhoog afgerond. De cache gebruikt `reis_locaties` en `reis_routes` in de eigen omgevingsdatabase. Alleen openbare club/accommodatieadressen komen in de cache. Google-content wordt hiervoor niet gebruikt of opgeslagen. De eigen autoschatting bevat geen actuele files.
+Bekende poule-/wedstrijdparen worden één keer berekend en in hele minuten opgeslagen. De cache gebruikt `reis_locaties` en `reis_routes` in de eigen omgevingsdatabase. Alleen openbare club/accommodatieadressen komen in de cache. Google-content wordt hiervoor niet gebruikt of opgeslagen. De eigen autoschatting bevat geen actuele files.
 
 Eenmalige inrichting:
 
