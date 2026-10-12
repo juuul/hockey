@@ -14,6 +14,7 @@ services:
       - "127.0.0.1:8091:8090"
     volumes:
       - ./pb_test_data:/pb/pb_data
+      - ./planning_documenten/test:/pb/planning_documenten:ro
     read_only: true
     tmpfs: [/tmp]
     security_opt: ["no-new-privileges:true"]

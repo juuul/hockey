@@ -7,6 +7,7 @@ import { useTerug } from '../terug'
 import DeelKijklink from '../components/DeelKijklink'
 import ResetModal from '../components/ResetModal'
 import { leesThema, Thema, zetThema } from '../thema'
+import PlanningDocumenten from '../components/PlanningDocumenten'
 import VerzamelenInstellen from '../components/VerzamelenInstellen'
 import TeamAanmelden, { TeamKoppelen } from '../components/TeamSelectie'
 import '../components/Modal.css'
@@ -251,6 +252,7 @@ function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Geb
       </Kaart>
       {actief && (gebruiker.superadmin || actieveRol === 'beheerder') && <VerzamelenInstellen key={actief.id} team={actief} />}
       {gebruiker.superadmin && <VerzamelenInstellen />}
+      {gebruiker.superadmin && <PlanningDocumenten />}
       {gebruiker.superadmin && (
         <Kaart titel="Gebruik">
           <button className="btn btn-secondary" onClick={gebruik}>📊 Gebruik per team</button>

@@ -1,0 +1,89 @@
+{
+  "publicatiePagina": "https://www.knhb.nl/competitie/speeldagenkalender",
+  "documenten": [
+    {
+      "id": "nh-jeugd",
+      "naam": "Nh Jeugd",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/29d0cbd4-5464-41ca-8b96-79d079199387/speeldagenkalender-nh-2026-2027-jongste-jeugd.pdf",
+      "basisSha256": "7a7865f4967acea74ec3057d52b8659a945cf70b7dbbd426ace399d90f52db08"
+    },
+    {
+      "id": "no-jeugd",
+      "naam": "No Jeugd",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/6c5088d6-7bd4-420e-b055-b27cae2a78f2/speeldagenkalender-no-2026-2027-jongste-jeugd.pdf",
+      "basisSha256": "8f483b8b455818b85d72cf353359d7ddc49cdcb71077c63acaff05631a4c5556"
+    },
+    {
+      "id": "mn-jeugd",
+      "naam": "Mn Jeugd",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/08e67a9a-30b2-499f-98dc-f45064a058f6/speeldagenkalender-mn-2026-2027-jongste-jeugd.pdf",
+      "basisSha256": "2498f332d5a448c12e989379157ded33bc602750fd344f55096fcb8c197c794b"
+    },
+    {
+      "id": "zh-jeugd",
+      "naam": "Zh Jeugd",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/34e4c190-bce6-45b3-ac85-7773ba329f40/speeldagenkalender-zh-seizoen-26-27-jongste-jeugd.pdf",
+      "basisSha256": "4b85cdbfe4bb85322ac2df9cd8e317ec618c162dfcbf090d106f172a5a4106f2"
+    },
+    {
+      "id": "zn-jeugd",
+      "naam": "Zn Jeugd",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/7b38991a-266f-4557-9125-a13061220a5e/speeldagenkalender-zn-2026-2027-jongste-jeugd.pdf",
+      "basisSha256": "50a4a9d8f4985d0e9334727680b565217eac64f49ed6e9f3da58a7a289a6e35b"
+    },
+    {
+      "id": "nh-senioren",
+      "naam": "Nh Senioren",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/877c49d3-c771-42e8-98ef-26efcebeb299/speeldagenkalender-nh-2026-2027-senioren.pdf",
+      "basisSha256": "285c4247b4998b8689aceb741024179867859ad04688b924f11d4ca40f682dce"
+    },
+    {
+      "id": "no-senioren",
+      "naam": "No Senioren",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/65603138-a043-4af3-8ae7-2888bb6d50e9/speeldagenkalender-no-2026-2027-senioren.pdf",
+      "basisSha256": "92293d14034a6cd679ebeb640685c555a7966a97484339d8f0022e5d03057815"
+    },
+    {
+      "id": "mn-senioren",
+      "naam": "Mn Senioren",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/9d6a6416-4099-4ee3-b31a-a803b6af1997/speeldagenkalender-mn-2026-2027-senioren.pdf",
+      "basisSha256": "f189d2a9dac6245ee59c7463c195034c417d9a555e456334e96feca7b5a61ce1"
+    },
+    {
+      "id": "zh-senioren",
+      "naam": "Zh Senioren",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/3109c901-841e-4466-9100-4be538c5ae4a/speeldagenkalender-zh-seizoen-26-27-senioren.pdf",
+      "basisSha256": "84f1b184f665daf5b99e350d45c118f859b222fe99887ffb2b2e46b79a376924"
+    },
+    {
+      "id": "zn-senioren",
+      "naam": "Zn Senioren",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/a8a1aed9-5b00-4de8-b224-6889d511f86b/speeldagenkalender-zn-2026-2027-senioren.pdf",
+      "basisSha256": "1e4b62269fb8b9434adad730576cc92057b4689a96561949e60bb1a3805ac957"
+    },
+    {
+      "id": "bonds",
+      "naam": "Bonds",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+      "basisSha256": "bd9725a252794ef0eb51917b2ab2f9eee61de99d6af2adcc28cbf56cb7c67cc0"
+    },
+    {
+      "id": "7s",
+      "naam": "7S",
+      "seizoen": "2026-2027",
+      "url": "https://media.static-hw.nl/media/7d063a7d-ea57-4a79-8df8-3654ce0b7a26/speeldagenkalender-hockey-7-seizoen-26-27-update-27-5-1.pdf",
+      "basisSha256": "4f5edc0e94661a5207cc615fadd319ed222f785a140434400e7c407e739e525c"
+    }
+  ]
+}

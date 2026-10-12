@@ -7,3 +7,6 @@ pb_test_data
 routing_data/
 
 .reis-*.lock
+
+planning_documenten/
+.env.planning

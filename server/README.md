@@ -118,3 +118,28 @@ Bronnen: https://www.pdok.nl/pdok-locatieserver , https://github.com/Project-OSR
 `programma.verzamelModus` is altijd automatisch. Migratie 1790400027 zet ook eerder handmatige en gewiste tijden om. Recordhooks berekenen automatisch met de opgeslagen reistijd; de reiswerker werkt automatische programma-items elke minuut bij. Aanvang/adres onbekend betekent geen verzameltijd. Recordhooks overschrijven ook binnenkomende handmatige verzameltijden met de berekening. `verzamelen-bijwerken` is een lokale CLI voor direct herberekenen.
 
 Controle: `server/tests/verzameltijden.pb.js` als tijdelijke hook op een geïsoleerde testkopie; `test-tijden` controleert thuis/uit, wijzigende aanvang, overschrijven van handmatige en gewiste keuzes, onbekende route en de vorige dag.
+
+### Planningsdocumenten: 03:00-controle en handmatige verwerking
+
+Register: `server/catalogus/planning-documenten.json` bevat 12 openbare bronnen en de SHA256 van de eerder gecontroleerde originele PDF’s. Nieuwe seizoenen/documentlinks worden na beoordeling aan dit register toegevoegd. Alle bronnen worden gecontroleerd, niet alleen gebruikte teamprofielen. De publicatiepagina wordt vergeleken op PDF-links.
+
+Privéconfig: `server/planning_documenten/config.json`, chmod 600, met één `ontvanger` (e-mailadres). Deze map is uitgesloten van git/Docker-build. `test/` en `productie/` bevatten elk `controle.db`, `status.json` en `bestanden/<document-id>/<sha>.pdf`. Bewaar deze map in een private back-up: de bestanden zijn het bewijs voor vergelijking en goedkeuring. De schema-opzet staat in de werker; geen wijzigingen aan de wedstrijddatabase nodig voor controleren/mailen.
+
+```sh
+python3 server/scripts/planning-documenten.py --omgeving test controleer
+python3 server/scripts/planning-documenten.py --omgeving test testmail
+```
+
+Cron draait beide controles om 03:00 op een host met Europe/Amsterdam; productie en test hebben aparte locks/logs. Test gebruikt Mailpit, productie de bestaande SMTP-config in de container. Native PocketBase leest zelf `PB_ENCRYPTION_KEY`; geen hostscript leest productie-`.env`. Mailhooks worden alleen tijdelijk in `/tmp` voor de lokale CLI geladen, nooit via een publiek mailendpoint. Een SMTP-bevestiging is geen bewijs van inboxbezorging.
+
+Na een mail: vraag in de GPT-app om de opgeslagen versie te vergelijken met de geaccepteerde versie (document-ID en SHA staan in mail/status). Verwerk alle profielen van dat document in een lokaal JSON-bestand. Controleer verplaatste/vervallen dagen en eventuele privéteamafspraken expliciet. Pas na gebruikersgoedkeuring:
+
+```sh
+python3 server/scripts/planning-documenten.py --omgeving test accepteer DOCUMENT_ID SHA256 --kalenders /pad/naar/gecontroleerde-kalenders.json
+# Alleen opmaak veranderd, geen wijziging in planning:
+python3 server/scripts/planning-documenten.py --omgeving test accepteer DOCUMENT_ID SHA256 --geen-inhoudelijke-wijziging
+```
+
+Productie is een aparte, uitdrukkelijk geautoriseerde acceptatie met `--omgeving productie`; een testacceptatie zet niets live. Alleen de nieuwste bewaarde versie kan geaccepteerd worden, en de fingerprint wordt opnieuw gecontroleerd. Kalenderimport is de bestaande lokale transactie die gekoppelde teams synchroniseert; de controle zelf doet nooit een import. Houd ook het gecontroleerde bron-JSON in de repo actueel bij inhoudelijke wijzigingen.
+
+Controle: `python3 server/tests/planning-documenten.py` test onveranderde/gewijzigde documenten, versiebehoud, deduplicatie, mailretry, downloadfouten, URL-normalisatie en kalenderinvoer. Handmatige controles mogen direct met `controleer` worden gestart; status in de app is alleen voor superadmins.

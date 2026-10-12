@@ -8,3 +8,6 @@ __pycache__/
 routing_data/
 
 .reis-*.lock
+
+planning_documenten/
+.env.planning

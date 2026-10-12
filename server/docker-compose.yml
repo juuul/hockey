@@ -12,6 +12,7 @@ services:
       - "127.0.0.1:8090:8090"
     volumes:
       - ./pb_data:/pb/pb_data
+      - ./planning_documenten/productie:/pb/planning_documenten:ro
     read_only: true
     tmpfs:
       - /tmp
