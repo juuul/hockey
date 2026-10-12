@@ -141,6 +141,16 @@ function zetTaak(app, club, team) {
   upsert(app, "catalogus_taken", "sleutel = {:s}", { s: sleutel }, { sleutel, clubBronId: club.getString("bronId"), teamBronId: team ? team.getString("bronId") : "", pouleId: team ? team.getString("pouleId") : "", status: "nieuw", fout: "" })
 }
 function herstel(app, p, team, veld) {
+  if (!p.getString("bronId")) {
+    const planning = json(p, "bronPlanning")
+    if (veld !== "alles" || !planning?.datum) throw new BadRequestError("Deze wedstrijd heeft geen bronplanning")
+    p.set("datum", planning.datum); p.set("soort", "wedstrijd"); p.set("tot", "")
+    for (const naam of ["clubId", "tegenstander", "spelen", "locatie", "locatieAdres", "verzamelen", "verzamelDatum"]) p.set(naam, "")
+    p.set("thuis", true); p.set("verzamelModus", "automatisch"); p.set("reisMinuten", null)
+    app.save(p)
+    synchroniseer(app, team)
+    return
+  }
   const w = app.findFirstRecordByData("catalogus_wedstrijden", "bronId", p.getString("bronId"))
   const officieel = app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
   const velden = veldenVan(w, officieel)

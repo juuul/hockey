@@ -362,16 +362,15 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
             }}>Gebruik officiële waarde</button>
           </div>)}
           {bronFout && <p className="account-melding fout" role="alert">{bronFout}</p>}
-          {bestaat && p.soort === 'wedstrijd' && <button className="btn btn-secondary" disabled={herstellen} onClick={async () => {
+          {bestaat && p.soort === 'wedstrijd' && (p.bronId || p.bronPlanning) && <button className="btn btn-secondary" disabled={herstellen} onClick={async () => {
             setBronFout('')
-            if (!p.bronId) { zet({ verzamelModus: 'automatisch', reisMinuten: null }); return }
             setHerstellen(true)
             try {
               await pb.send(`/api/hockey/catalogus/programma/${p.id}/herstel`, { method: 'POST', body: { veld: 'alles' } })
               onClose()
             } catch (e) { setBronFout(foutTekst(e)) }
             finally { setHerstellen(false) }
-          }}>{herstellen ? 'Herstellen…' : p.bronId ? 'Herstel officiële planning' : 'Verzameltijd automatisch'}</button>}
+          }}>{herstellen ? 'Herstellen…' : 'Herstel brongegevens'}</button>}
           {bestaat && <button className="btn btn-gevaar" onClick={() => setWegVraag(true)}>Verwijderen</button>}
         </div>
         <div className="modal-actions">

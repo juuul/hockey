@@ -16,6 +16,16 @@ $app.rootCmd.addCommand(new Command({use:'test-planning-herstel',run:()=>{
   check(nieuw.getString('verzamelModus')==='automatisch','niet automatisch')
   check(nieuw.getString('notitie')==='Fixture behouden'&&nieuw.getString('fruit')===speler.id,'eigen taken verloren')
   const voor=nieuw.getString('spelen');let fout=false;try{require(`${__hooks}/catalogus.js`).herstel(tx,nieuw,team,'onbekend')}catch(_){fout=true}check(fout&&nieuw.getString('spelen')===voor,'ongeldig veld geaccepteerd')
+  const geplande=tx.findRecordsByFilter('programma',"bronId = '' && bronPlanning != null",'',0,0).find(r=>{try{return !!JSON.parse(r.getString('bronPlanning')).datum}catch(_){return false}})
+  if(geplande){
+    const basis=JSON.parse(geplande.getString('bronPlanning')),omgeving=tx.findRecordById('teams',geplande.getString('team'))
+    geplande.set('datum','2027-06-30');geplande.set('spelen','09:35');geplande.set('tegenstander','Fictieve tegenstander');geplande.set('locatieAdres','Fictief adres');geplande.set('notitie','Kalendernotitie behouden');tx.save(geplande)
+    require(`${__hooks}/catalogus.js`).herstel(tx,geplande,omgeving,'alles')
+    const hersteld=tx.findRecordById('programma',geplande.id)
+    check(hersteld.getString('datum')===basis.datum&&hersteld.getString('verzamelModus')==='automatisch','kalender niet hersteld')
+    if(!hersteld.getString('bronId'))check(!hersteld.getString('spelen')&&!hersteld.getString('tegenstander')&&!hersteld.getString('locatieAdres'),'eigen planning niet gewist')
+    check(hersteld.getString('notitie')==='Kalendernotitie behouden','kalendernotitie verloren')
+  }
   afgerond=true;throw new Error('TEST_ROLLBACK')
  })}catch(e){if(!afgerond)throw e}
  console.log('HERSTEL_OK: officiële planning, automatisch, taak/notitie behouden, onbekend veld geweigerd')
