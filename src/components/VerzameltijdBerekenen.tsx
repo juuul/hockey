@@ -11,8 +11,9 @@ export default function VerzameltijdBerekenen({ item, zet }: { item: ProgrammaIt
   const [info, setInfo] = useState<ReisInfo | null>(null)
   const [vertrek, setVertrek] = useState('')
   const [fout, setFout] = useState('')
+  const [zelfInvoer, setZelfInvoer] = useState(false)
   const [bezig, setBezig] = useState(false)
-  const [google, setGoogle] = useState<{ minuten: number; bestemming: string; vertrek: string } | null>(null)
+  const [schatting, setSchatting] = useState<{ minuten: number; bestemming: string; vertrek: string; bron: string; opgeslagen: boolean } | null>(null)
   useEffect(() => {
     if (!actiefTeam) return
     let actief = true
@@ -21,29 +22,40 @@ export default function VerzameltijdBerekenen({ item, zet }: { item: ProgrammaIt
     }).catch(e => { if (actief) setFout(foutTekst(e)) })
     return () => { actief = false }
   }, [actiefTeam?.id])
-  if (!actiefTeam) return null
-  const bestemming = item.locatieAdres || (item.thuis ? info?.clubAdres : '') || ''
-  const geldigGoogle = google?.bestemming === bestemming && google?.vertrek === vertrek
-  const reis = geldigGoogle ? google!.minuten : item.reisMinuten
+  const zaal = item.bronPlanning?.spelvorm === 'Zaal' || info?.spelvorm === 'Zaal'
+  const bestemming = item.locatieAdres || (item.thuis && !zaal ? info?.clubAdres : '') || ''
+  const geldigeSchatting = schatting?.bestemming === bestemming && schatting?.vertrek === vertrek
+  const reis = geldigeSchatting ? schatting!.minuten : item.reisMinuten
   const voorstel = info && reis != null ? berekenVerzamelen(item.datum, item.spelen, reis, info.effectief) : null
+  useEffect(() => {
+    if (!actiefTeam || !info?.databaseBeschikbaar || !vertrek || !bestemming || item.reisMinuten != null || zelfInvoer) return
+    let actief = true
+    pb.send(`/api/hockey/reiscache/team/${actiefTeam.id}`, { method: 'POST', body: { vertrekAdres: vertrek, locatieAdres: bestemming } }).then(data => {
+      if (actief && typeof data.minuten === 'number') setSchatting({ minuten: data.minuten, bestemming, vertrek, bron: data.bron, opgeslagen: true })
+    }).catch(() => { /* Een ontbrekende cache blokkeert handmatige invoer niet. */ })
+    return () => { actief = false }
+  }, [actiefTeam?.id, info?.databaseBeschikbaar, vertrek, bestemming, item.reisMinuten, zelfInvoer])
+  if (!actiefTeam) return null
   const ophalen = async () => {
-    setBezig(true); setFout(''); setGoogle(null)
+    setBezig(true); setFout(''); setSchatting(null)
     try {
       const data = await pb.send(`/api/hockey/reistijd/team/${actiefTeam.id}`, { method: 'POST', body: { vertrekAdres: vertrek, locatieAdres: bestemming } })
-      setGoogle({ minuten: data.minuten, bestemming, vertrek })
+      setZelfInvoer(false); zet({ reisMinuten: null })
+      setSchatting({ minuten: data.minuten, bestemming, vertrek, bron: data.bron || 'zelfde locatie', opgeslagen: data.opgeslagen === true })
     } catch (e) { setFout(foutTekst(e)) }
     setBezig(false)
   }
   return <div>
     <h3>Verzameltijd berekenen</h3>
-    <label className="prog-veld">Vertrekadres<input className="modal-input" maxLength={300} value={vertrek} onChange={e => { setVertrek(e.target.value); setGoogle(null) }} /></label>
-    <label className="prog-veld">Wedstrijdadres<input className="modal-input" maxLength={300} value={item.locatieAdres || ''} placeholder={item.thuis ? info?.clubAdres : 'Straat, huisnummer, postcode en plaats'} onChange={e => { zet({ locatieAdres: e.target.value }); setGoogle(null) }} /></label>
+    <label className="prog-veld">Vertrekadres<input className="modal-input" maxLength={300} value={vertrek} onChange={e => { setVertrek(e.target.value); setSchatting(null) }} /></label>
+    <label className="prog-veld">Wedstrijdadres<input className="modal-input" maxLength={300} value={item.locatieAdres || ''} placeholder={item.thuis && !zaal ? info?.clubAdres : 'Straat, huisnummer, postcode en plaats'} onChange={e => { zet({ locatieAdres: e.target.value }); setSchatting(null) }} /></label>
     {bestemming && <a className="btn btn-secondary" href={navigatieLink(bestemming)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a>}
-    <label className="prog-veld">Reistijd zelf invullen (minuten)<input className="modal-input" type="number" inputMode="numeric" min="0" max="1440" step="1" value={reis != null && Number.isFinite(reis) ? reis : ''} onChange={e => { setGoogle(null); zet({ reisMinuten: e.target.value === '' ? null : Number(e.target.value) }) }} /></label>
-    <button className="btn btn-secondary" disabled={bezig || !info?.googleBeschikbaar || !vertrek.trim() || !bestemming.trim()} onClick={ophalen}>{bezig ? 'Reistijd ophalen…' : 'Reistijd ophalen'}</button>
-    {geldigGoogle && <p className="account-uitleg">Schatting zonder actuele files<br /><img src={googleLogo} alt="Google Maps" style={{ height: 19, width: 'auto', margin: '10px 10px 5px' }} /></p>}
+    <label className="prog-veld">Reistijd zelf invullen (minuten)<input className="modal-input" type="number" inputMode="numeric" min="0" max="1440" step="1" value={reis != null && Number.isFinite(reis) ? reis : ''} onChange={e => { setZelfInvoer(true); setSchatting(null); zet({ reisMinuten: e.target.value === '' ? null : Number(e.target.value) }) }} /></label>
+    <button className="btn btn-secondary" disabled={bezig || !(info?.databaseBeschikbaar || info?.googleBeschikbaar) || !vertrek.trim() || !bestemming.trim()} onClick={ophalen}>{bezig ? 'Reistijd ophalen…' : 'Reistijd ophalen'}</button>
+    {geldigeSchatting && schatting?.bron === 'Google Maps' && <p className="account-uitleg">Schatting zonder actuele files<br /><img src={googleLogo} alt="Google Maps" style={{ height: 19, width: 'auto', margin: '10px 10px 5px' }} /></p>}
+    {geldigeSchatting && schatting?.opgeslagen && <p className="account-uitleg">Opgeslagen reistijd · naar boven afgerond op 5 minuten · zonder actuele files. Bron: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> / <a href="https://www.pdok.nl/pdok-locatieserver" target="_blank" rel="noreferrer">PDOK/BAG</a>.</p>}
     {info && <p className="account-uitleg">{info.effectief.voorbereidingMinuten} min voorbereiding + reistijd + {info.effectief.bufferMinuten} min buffer. De teamstandaard staat in Instellingen.</p>}
-    {!info?.googleBeschikbaar && info && <p className="account-uitleg">Google Maps is nog niet aangesloten; vul de reistijd zelf in. Bij dezelfde vertrek- en wedstrijdlocatie kun je 0 invullen.</p>}
+    {info && <p className="account-uitleg">Een opgeslagen reistijd wordt automatisch voorgesteld zodra de adressen bekend zijn. Zelf invullen kan altijd. Bij dezelfde vertrek- en wedstrijdlocatie kun je 0 invullen.</p>}
     {voorstel && <button className="btn btn-primary" onClick={() => zet({ verzamelen: voorstel.tijd, verzamelDatum: voorstel.datum, ...(item.locatieAdres ? {} : { locatieAdres: bestemming }) })}>Gebruik voorstel: {voorstel.datum !== item.datum ? `${voorstel.datum} · ` : ''}{voorstel.tijd}</button>}
     {reis != null && (!Number.isInteger(reis) || reis < 0 || reis > 1440) && <p className="account-melding fout" role="alert">Vul hele minuten tussen 0 en 1440 in.</p>}
     {!voorstel && <p className="account-uitleg">Vul aanvangstijd en reistijd in om een voorstel te berekenen.</p>}

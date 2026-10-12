@@ -21,11 +21,14 @@ routerAdd("POST", "/api/hockey/verzamelinstellingen/team/{id}", e => {
 })
 routerAdd("POST", "/api/hockey/reistijd/team/{id}", e => {
   const h = require(`${__hooks}/reizen.js`); h.beheerder(e)
-  const sleutel = $os.getenv("GOOGLE_MAPS_API_KEY")
-  if (!sleutel) throw new BadRequestError("Google Maps is nog niet aangesloten; vul de reistijd zelf in")
   const b = e.requestInfo().body
   for (const veld of ["vertrekAdres", "locatieAdres"]) if (typeof b[veld] !== "string" || !b[veld].trim() || b[veld].length > 300) throw new BadRequestError("Vul vertrekadres en wedstrijdadres in")
   if (b.vertrekAdres.trim().toLowerCase() === b.locatieAdres.trim().toLowerCase()) return e.json(200, { minuten: 0 })
+  const cache = require(`${__hooks}/reiscache.js`), r = cache.zoek(e.app, b.vertrekAdres, b.locatieAdres), opgeslagen = cache.resultaat(r)
+  if (opgeslagen) return e.json(200, opgeslagen)
+  if (r?.getString("status") === "nieuw") throw new BadRequestError("Deze reistijd wordt nog berekend; probeer later opnieuw of vul minuten in")
+  const sleutel = $os.getenv("GOOGLE_MAPS_API_KEY")
+  if (!sleutel) throw new BadRequestError("Nog geen opgeslagen reistijd voor deze adressen; vul de minuten zelf in")
   return e.json(200, { minuten: h.haalReistijd(b.vertrekAdres, b.locatieAdres, sleutel), bron: "Google Maps" })
 })
 

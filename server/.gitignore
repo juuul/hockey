@@ -4,3 +4,7 @@ pb_test_data/
 __pycache__/
 
 .env.routes.test
+
+routing_data/
+
+.reis-*.lock

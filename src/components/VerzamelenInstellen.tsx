@@ -5,7 +5,7 @@ import { useAccount } from '../context/AccountContext'
 
 export interface ReisInfo {
   globaal: VerzamelInstellingen; eigen: Partial<VerzamelInstellingen> & { vertrekAdres?: string };
-  effectief: VerzamelInstellingen & { vertrekAdres: string }; clubAdres: string; googleBeschikbaar: boolean;
+  effectief: VerzamelInstellingen & { vertrekAdres: string }; clubAdres: string; googleBeschikbaar: boolean; databaseBeschikbaar?: boolean; spelvorm?: string;
 }
 export default function VerzamelenInstellen({ team }: { team?: Team }) {
   const { teamsLaden } = useAccount()
@@ -52,7 +52,7 @@ export default function VerzamelenInstellen({ team }: { team?: Team }) {
     <label className="account-label">Voorbereiding (minuten)<input className="account-input" type="number" inputMode="numeric" min="0" max="360" step="1" disabled={!geladen} value={Number.isNaN(waarden.voorbereidingMinuten) ? '' : waarden.voorbereidingMinuten} onChange={e => { if (team) setEigen(true); setWaarden({ ...waarden, voorbereidingMinuten: e.target.value === '' ? NaN : Number(e.target.value) }) }} /></label>
     <label className="account-label">Extra buffer (minuten)<input className="account-input" type="number" inputMode="numeric" min="0" max="360" step="1" disabled={!geladen} value={Number.isNaN(waarden.bufferMinuten) ? '' : waarden.bufferMinuten} onChange={e => { if (team) setEigen(true); setWaarden({ ...waarden, bufferMinuten: e.target.value === '' ? NaN : Number(e.target.value) }) }} /></label>
     {team && <label className="account-label">Vertrekadres<input className="account-input" maxLength={300} value={vertrekAdres} placeholder={clubAdres || 'Adres waar het team verzamelt'} onChange={e => setVertrekAdres(e.target.value)} /><span className="account-uitleg">Leeg laten gebruikt het clubadres, zodra dat bekend is. Deze keuze blijft privé binnen het team.</span></label>}
-    <p className="account-uitleg">{google ? 'Reistijd ophalen met Google Maps is beschikbaar; handmatig invullen kan ook.' : 'Google Maps is nog niet aangesloten. Reistijd handmatig invullen werkt al.'}</p>
+    <p className="account-uitleg">Reistijden tussen bekende clubs en accommodaties worden opgeslagen en naar boven afgerond op 5 minuten. Handmatig invullen blijft mogelijk.{google ? ' Google Maps is daarnaast beschikbaar voor een andere vertrekplaats.' : ''}</p>
     {fout && <p className="account-melding fout" role="alert">{fout}</p>}
     <button className="btn btn-primary" disabled={!geladen || bezig || (eigen && !geldig)} onClick={opslaan}>{bezig ? 'Bezig…' : 'Opslaan'}</button>
   </section>

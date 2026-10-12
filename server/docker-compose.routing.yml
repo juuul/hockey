@@ -1,0 +1,14 @@
+# Alleen openbare OSM-weggegevens; geen accounts, teamdata of Google-sleutels.
+services:
+  routing:
+    image: ghcr.io/project-osrm/osrm-backend:v6.0.0
+    container_name: hockey-routing
+    restart: unless-stopped
+    command: ["osrm-routed", "--algorithm", "mld", "--threads", "1", "/data/netherlands.osrm"]
+    ports: ["127.0.0.1:5001:5000"]
+    volumes: ["./routing_data:/data:ro"]
+    read_only: true
+    mem_limit: 3g
+    cpus: 1
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]

@@ -80,7 +80,7 @@ Controle: `node server/tests/kalenders.mjs` valideert kalenderdata en MO11/O12-r
 
 ### Google Routes en verzameltijden
 
-De superadmin stelt onder Instellingen de globale voorbereiding (30 min) en buffer (5 min) in. Teambeheerders kunnen privé afwijken. Reistijd handmatig invullen werkt zonder externe koppeling. Automatisch ophalen gebruikt de officiële Google Routes API; geen publieke geocoder of demo-router. De integratie bewaart geen Google-routeantwoorden.
+De superadmin stelt onder Instellingen de globale voorbereiding (30 min) en buffer (5 min) in. Teambeheerders kunnen privé afwijken. Reistijd handmatig invullen werkt zonder externe koppeling. Automatisch ophalen gebruikt eerst de eigen reisdatabase; voor andere adressen is de officiële Google Routes API optioneel. De integratie bewaart geen Google-routeantwoorden.
 
 Activeren door de eigenaar:
 
@@ -92,3 +92,23 @@ Activeren door de eigenaar:
 De app toont beschikbaarheid; hij toont of bewaart de API-sleutel nooit. Routes wordt alleen aangeroepen als een teambeheerder op Reistijd ophalen drukt. Google-aanvragen bevatten geen spelersnamen of gebruikers-id’s. Statische schattingen omvatten geen actuele files. Test de juiste accommodatie, ook voor zaal. Navigatielinks gebruiken Google Maps URLs: https://developers.google.com/maps/documentation/urls/get-started .
 
 Controle: bundel `server/tests/verzamelen.ts` met esbuild en voer uit met Node. `server/tests/reizen.pb.js` is een tijdelijke CLI-testhook voor een geïsoleerde testcontainer; `test-google-reis` gebruikt fictieve HTTP-antwoorden en doet geen betaalde Google-aanvraag.
+
+### Eigen router en gedeelde reistijden
+
+Bekende poule-/wedstrijdparen worden één keer berekend en op vijf minuten omhoog afgerond. De cache gebruikt `reis_locaties` en `reis_routes` in de eigen omgevingsdatabase. Alleen openbare club/accommodatieadressen komen in de cache. Google-content wordt hiervoor niet gebruikt of opgeslagen. De eigen autoschatting bevat geen actuele files.
+
+Eenmalige inrichting:
+
+```sh
+python3 server/scripts/routing-bouw.py
+docker compose -p hockey-routing -f server/docker-compose.routing.yml up -d
+python3 server/scripts/reis-worker.py --omgeving test
+```
+
+De kaart van Nederland wordt via Geofabrik opgehaald en met het OSRM-autoprofiel verwerkt. Bestanden onder `server/routing_data/` zijn groot, openbaar en uitgesloten van git en de PocketBase Docker-build. De router is gebonden aan localhost:5001, met maximaal één CPU en 3 GB RAM. Kaartbouw is beperkt tot drie CPU’s en 12 GB RAM. Stop de routingcontainer voor een kaartupdate, herbouw tijdens een beheerperiode en start hem daarna weer; dit herberekent bestaande routes niet automatisch.
+
+De reiswerker gebruikt alleen officiële club-/accommodatieadressen, controleert PDOK/BAG op exact postcode, huisnummer/toevoeging en straat, cachet de gevonden punten en verwerkt maximaal 100 nieuwe gerichte paren per run. Geen kruisproduct van alle Nederlandse clubs. Een tijdelijke routerstoring laat nieuwe paren pending en bestaande waarden intact; een ambigu adres wordt als fout gemarkeerd. Geen fictieve nulwaarden.
+
+Test wordt elke minuut verwerkt. Productie krijgt bij geautoriseerde livegang een eigen taak met `--omgeving productie`; de bestaande instellingenversleuteling blijft intact. Beide databases zijn gescheiden; de routingcontainer bevat alleen openbare OSM-weggegevens. In een geïsoleerde testcontainer kan de werker met `--omgeving test --testcontainer hockey-reiscache-check` worden gecontroleerd.
+
+Bronnen: https://www.pdok.nl/pdok-locatieserver , https://github.com/Project-OSRM/osrm-backend , https://download.geofabrik.de/europe/netherlands.html , https://www.openstreetmap.org/copyright . De openbare route-export staat op `/api/hockey/reisdata` en bevat geen private teamdata.

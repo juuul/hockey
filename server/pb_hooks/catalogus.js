@@ -23,6 +23,7 @@ function importeer(app, data) {
       upsert(tx, "catalogus_teams", "bronId = {:id} && seizoen = {:s}", { id: t.bronId, s: t.seizoen }, t)
     }
     for (const w of data.wedstrijden) upsert(tx, "catalogus_wedstrijden", "bronId = {:id}", { id: w.bronId }, w)
+    require(`${__hooks}/reiscache.js`).synchroniseer(tx)
     // Bronwaarden bijwerken in gekoppelde privéomgevingen, handmatige waarden beschermen.
     for (const team of tx.findRecordsByFilter("teams", "officieelTeam != ''", "", 0, 0)) synchroniseer(tx, team)
   })

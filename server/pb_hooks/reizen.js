@@ -20,13 +20,14 @@ function valideer(body, team) {
 }
 function teamInfo(app, team) {
   const standaard = globaal(app), eigen = json(team, "reisInstellingen") || {}
-  let clubAdres = ""
+  let clubAdres = "", spelvorm = ""
   if (team.getString("officieelTeam")) {
     const officieel = app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
+    spelvorm = officieel.getString("spelvorm")
     const club = app.findFirstRecordByData("catalogus_clubs", "bronId", officieel.getString("clubBronId"))
     clubAdres = club.getString("adres")
   }
-  return { globaal: standaard, eigen, effectief: { ...standaard, ...eigen, vertrekAdres: eigen.vertrekAdres || clubAdres }, clubAdres, googleBeschikbaar: !!$os.getenv("GOOGLE_MAPS_API_KEY") }
+  return { databaseBeschikbaar: true, spelvorm, globaal: standaard, eigen, effectief: { ...standaard, ...eigen, vertrekAdres: eigen.vertrekAdres || clubAdres }, clubAdres, googleBeschikbaar: !!$os.getenv("GOOGLE_MAPS_API_KEY") }
 }
 function beheerder(e) {
   if (!e.auth || e.auth.collection().name !== "users" || e.auth.getBool("gast")) throw new UnauthorizedError("Log eerst in")
@@ -37,7 +38,7 @@ function beheerder(e) {
 function routeMinuten(response) {
   const duur = response?.routes?.[0]?.duration
   if (typeof duur !== "string" || !/^\d+(\.\d+)?s$/.test(duur)) throw new BadRequestError("Geen reistijd gevonden; vul de minuten zelf in")
-  const minuten = Math.ceil(Number(duur.slice(0, -1)) / 60)
+  const minuten = Math.ceil(Number(duur.slice(0, -1)) / 300) * 5
   if (!Number.isFinite(minuten) || minuten < 0 || minuten > 1440) throw new BadRequestError("Reistijd valt buiten het bereik")
   return minuten
 }
