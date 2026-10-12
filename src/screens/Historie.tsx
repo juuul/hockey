@@ -97,7 +97,7 @@ export default function Historie() {
               >
                 <span className="speeltijd-kop">
                   <span className="regel-naam">{sp.naam}</span>
-                  {sp.goals > 0 && <span className="regel-waarde">⚽ {sp.goals}</span>}
+                  <span className="regel-waarde">⚽ {sp.goals}</span>
                   <span className="regel-sub speler-min">{sp.seizoen ? `${minuten(opVeld(sp.seizoen.tijd))} min` : '0 min'}</span>
                 </span>
                 {verdeling(sp.seizoen?.tijd || {})}
