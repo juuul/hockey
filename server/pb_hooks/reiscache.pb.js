@@ -1,5 +1,5 @@
 $app.rootCmd.addCommand(new Command({ use: "reis-synchroniseer", run: () => {
-  $app.runInTransaction(tx => require(`${__hooks}/reiscache.js`).synchroniseer(tx))
+  $app.runInTransaction(tx => { require(`${__hooks}/reiscache.js`).synchroniseer(tx); require(`${__hooks}/verzamelen.js`).alle(tx) })
   console.log("REIS_SYNC_OK")
 } }))
 $app.rootCmd.addCommand(new Command({ use: "reis-taken", run: () => {

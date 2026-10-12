@@ -112,3 +112,9 @@ De reiswerker gebruikt alleen officiële club-/accommodatieadressen, controleert
 Test wordt elke minuut verwerkt. Productie krijgt bij geautoriseerde livegang een eigen taak met `--omgeving productie`; de bestaande instellingenversleuteling blijft intact. Beide databases zijn gescheiden; de routingcontainer bevat alleen openbare OSM-weggegevens. In een geïsoleerde testcontainer kan de werker met `--omgeving test --testcontainer hockey-reiscache-check` worden gecontroleerd.
 
 Bronnen: https://www.pdok.nl/pdok-locatieserver , https://github.com/Project-OSRM/osrm-backend , https://download.geofabrik.de/europe/netherlands.html , https://www.openstreetmap.org/copyright . De openbare route-export staat op `/api/hockey/reisdata` en bevat geen private teamdata.
+
+### Automatische verzameltijd
+
+`programma.verzamelModus` kiest automatisch, handmatig of wissen. Migratie 1790400026 behoudt bestaande ingevulde tijden als handmatig. Recordhooks berekenen automatisch met de opgeslagen reistijd; de reiswerker werkt automatische programma-items elke minuut bij. Aanvang/adres onbekend betekent geen verzameltijd. Handmatig en wissen blijven bij bronupdates behouden. `verzamelen-bijwerken` is een lokale CLI voor direct herberekenen.
+
+Controle: `server/tests/verzameltijden.pb.js` als tijdelijke hook op een geïsoleerde testkopie; `test-tijden` controleert thuis/uit, wijzigende aanvang, handmatig behoud, blijvend wissen, onbekende route en de vorige dag.

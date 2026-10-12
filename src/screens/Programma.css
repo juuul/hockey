@@ -306,3 +306,9 @@
   color: var(--tekst-zacht);
   line-height: 1.25;
 }
+
+.prog-tijd-knop { min-height: 60px; padding: 10px 0; border: 0; background: transparent; color: var(--tekst); font: inherit; text-align: left; cursor: pointer; }
+.prog-tijd-knop:disabled { cursor: default; }
+
+.tijd-keuze { flex-direction: column; }
+.tijd-keuze .keuze-knop { flex: 0 0 auto; }

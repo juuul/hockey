@@ -147,6 +147,7 @@ export interface ProgrammaItem {
   bronId?: string;
   bronBasis?: { datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie?: string; locatieAdres?: string } | null;
   bronWijziging?: Partial<{ datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie: string; locatieAdres: string }> | null;
+  verzamelModus?: 'automatisch' | 'handmatig' | 'wissen';
   verzamelen: string; // 'UU:MM' of ''
   spelen: string;
   fruit: string;

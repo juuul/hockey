@@ -1,3 +1,4 @@
+import ProgrammaTijd from '../components/ProgrammaTijd'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
 import { navigatieLink } from '../verzamelen'
@@ -22,12 +23,12 @@ const standaardPlek = (thuis: boolean, inst: TeamInstellingen) =>
 
 const LEEG_ITEM = (inst: TeamInstellingen): ProgrammaItem => ({
   id: pbId(), datum: vandaag(), tot: '', soort: 'wedstrijd', clubId: '', tegenstander: '', thuis: true,
-  verzamelen: '', verzamelDatum: '', reisMinuten: null, locatieAdres: '', spelen: '', fruit: '', begeleider1: standaardPlek(true, inst), begeleider2: standaardPlek(true, inst), notitie: '',
+  verzamelModus: 'automatisch', verzamelen: '', verzamelDatum: '', reisMinuten: null, locatieAdres: '', spelen: '', fruit: '', begeleider1: standaardPlek(true, inst), begeleider2: standaardPlek(true, inst), notitie: '',
 })
 
 // Tabblad Programma: wedstrijden met tijden, fruit en spelbegeleiding. Beurten van je eigen kind(eren) vallen op
 export default function Programma({ naarDashboard }: { naarDashboard: () => void }) {
-  const { programma, spelers, clubs, magBeheren: magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer, wedstrijden, afgesloten } = useHockey()
+  const { programma, bewaarProgramma, spelers, clubs, magBeheren: magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer, wedstrijden, afgesloten } = useHockey()
   const { mijnKinderen, zetMijnKinderen, teamInstellingen, actiefTeam } = useAccount()
   const [planningOpen, setPlanningOpen] = useState(false)
   const [bewerk, setBewerk] = useState<ProgrammaItem | null>(null)
@@ -106,12 +107,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           ? <div className="prog-klaar">✅ Gespeeld {gespeeld(p)!.wij} – {gespeeld(p)!.zij}</div>
           : p.id === wedstrijd.programmaId && <div className="prog-klaar">✅ Staat nu klaar onder 🏑</div>}
         <div className={`prog-tegen ${clubNaam(p) ? '' : 'onbekend'}`}>{clubNaam(p) || 'Tegenstander nog niet bekend'}</div>
-        <div className="prog-regel">
-          <span aria-hidden="true">⏰</span>
-          {p.verzamelen || p.spelen
-            ? <span>{p.verzamelen ? `verzamelen ${p.verzamelDatum && p.verzamelDatum !== p.datum ? p.verzamelDatum + ' · ' : ''}${p.verzamelen}` : ''}{p.verzamelen && p.spelen ? ' · ' : ''}{p.spelen ? `aanvang ${p.spelen}` : ''}</span>
-            : <span className="onbekend">tijden nog niet bekend</span>}
-        </div>
+        <ProgrammaTijd item={p} bewaar={bewaarProgramma} bewerkbaar={magBewerken} />
         <div className={`prog-regel ${mijn.includes('fruit') ? 'mijn' : ''}`}>
           <span aria-hidden="true">🍎</span><span>fruit: {naam(p.fruit) || '–'}</span>
         </div>
@@ -338,16 +334,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
                   </button>
                 ))}
               </div>
-              <div className="prog-tijden">
-                <label className="prog-veld">
-                  Verzamelen
-                  <input type="time" className="modal-input" value={p.verzamelen} onChange={e => zet({ verzamelen: e.target.value, verzamelDatum: p.datum })} />
-                </label>
-                <label className="prog-veld">
-                  Aanvang
-                  <input type="time" className="modal-input" value={p.spelen} onChange={e => zet({ spelen: e.target.value })} />
-                </label>
-              </div>
+              <ProgrammaTijd item={p} bewaar={setP} bewerkbaar />
               <label className="prog-veld">Locatie
                 <input className="modal-input" maxLength={200} value={p.locatie || ''} onChange={e => zet({ locatie: e.target.value })} />
               </label>

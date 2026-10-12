@@ -1,3 +1,4 @@
+import ProgrammaTijd from './ProgrammaTijd'
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { datumTekst } from '../historie'
@@ -7,7 +8,7 @@ import './DezeWedstrijd.css'
 
 // De lopende wedstrijd (tabblad Historie), compact: tegenstander (tik = wijzigen), stand en afsluiten
 export default function DezeWedstrijd() {
-  const { score, clubs, wedstrijd, zetWedstrijd, weerOpenen, magBeheren: magBewerken, programma } = useHockey()
+  const { score, clubs, wedstrijd, zetWedstrijd, weerOpenen, magBeheren: magBewerken, programma, bewaarProgramma } = useHockey()
   const isAfgesloten = !!wedstrijd.afgesloten
   const uitProgramma = programma.find(p => p.id === wedstrijd.programmaId)
   const [vraag, setVraag] = useState<'gegevens' | null>(null)
@@ -19,12 +20,8 @@ export default function DezeWedstrijd() {
         <span className="wedstrijd-kaart-info">{isAfgesloten ? 'Deze wedstrijd · afgesloten' : 'Deze wedstrijd'}</span>
         <span className="wedstrijd-kaart-club">{tegenstander ? `Tegen ${tegenstander}` : magBewerken ? 'Kies tegenstander' : 'Tegenstander nog niet gekozen'}</span>
         <span className="wedstrijd-kaart-info">{wedstrijd.thuis ? 'Thuis' : 'Uit'} · {wedstrijd.datum ? datumTekst(wedstrijd.datum) : 'vandaag'}</span>
-        {uitProgramma && (uitProgramma.verzamelen || uitProgramma.spelen) && (
-          <span className="wedstrijd-kaart-info">
-            ⏰ {uitProgramma.verzamelen ? `verzamelen ${uitProgramma.verzamelen}` : ''}{uitProgramma.verzamelen && uitProgramma.spelen ? ' · ' : ''}{uitProgramma.spelen ? `aanvang ${uitProgramma.spelen}` : ''}
-          </span>
-        )}
       </button>
+      {uitProgramma && <ProgrammaTijd item={uitProgramma} bewaar={bewaarProgramma} bewerkbaar={magBewerken && !isAfgesloten} />}
       {/* Stand met de knop ernaast: afsluiten, of na afsluiten weer openen */}
       <div className="deze-wedstrijd-rij">
         <span className="deze-wedstrijd-getal" aria-label={`Stand ${score.wij} tegen ${score.zij}`}>{score.wij} – {score.zij}</span>
