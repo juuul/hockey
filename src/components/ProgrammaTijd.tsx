@@ -14,13 +14,13 @@ export default function ProgrammaTijd({ item, bewaar, bewerkbaar }: { item: Prog
 }
 function TijdPopup({ item, bewaar, dicht }: { item: ProgrammaItem; bewaar: (p: ProgrammaItem) => void; dicht: () => void }) {
   const [draft, setDraft] = useState(item)
-  const [modus, setModus] = useState(item.verzamelModus || (item.verzamelen ? 'handmatig' : 'automatisch'))
+  const [modus, setModus] = useState<'automatisch' | 'handmatig'>(item.verzamelModus === 'wissen' ? 'handmatig' : item.verzamelModus || (item.verzamelen ? 'handmatig' : 'automatisch'))
   const zet = (velden: Partial<ProgrammaItem>) => setDraft(p => ({ ...p, ...velden }))
   const { voorstel, fout, bezig } = useVerzameltijd({ item: draft, zet })
   useTerug(true, dicht)
   const opslaan = () => {
     if (modus === 'handmatig' && !draft.verzamelen) return
-    bewaar({ ...draft, verzamelModus: modus, verzamelen: modus === 'automatisch' ? voorstel?.tijd || '' : modus === 'wissen' ? '' : draft.verzamelen, verzamelDatum: modus === 'automatisch' ? voorstel?.datum || '' : modus === 'wissen' ? '' : draft.verzamelDatum || draft.datum, reisMinuten: null })
+    bewaar({ ...draft, verzamelModus: modus, verzamelen: modus === 'automatisch' ? voorstel?.tijd || '' : draft.verzamelen, verzamelDatum: modus === 'automatisch' ? voorstel?.datum || '' : draft.verzamelDatum || draft.datum, reisMinuten: null })
     dicht()
   }
   return <div className="modal show" onClick={dicht}><div className="modal-content" role="dialog" aria-modal="true" aria-label="Wedstrijdtijden" onClick={e => e.stopPropagation()}>
@@ -28,7 +28,7 @@ function TijdPopup({ item, bewaar, dicht }: { item: ProgrammaItem; bewaar: (p: P
     <div className="prog-velden">
       <label className="prog-veld">Aanvang<input className="modal-input" type="time" value={draft.spelen} onChange={e => zet({ spelen: e.target.value })} /></label>
       <div className="keuze-knoppen tijd-keuze" role="radiogroup" aria-label="Verzameltijd">
-        {(['automatisch', 'handmatig', 'wissen'] as const).map(m => <button type="button" key={m} className={`keuze-knop ${modus === m ? 'actief' : ''}`} role="radio" aria-checked={modus === m} onClick={() => setModus(m)}>{m === 'automatisch' ? 'Automatisch' : m === 'handmatig' ? 'Handmatig' : 'Wissen'}</button>)}
+        {(['automatisch', 'handmatig'] as const).map(m => <button type="button" key={m} className={`keuze-knop ${modus === m ? 'actief' : ''}`} role="radio" aria-checked={modus === m} onClick={() => setModus(m)}>{m === 'automatisch' ? 'Automatisch' : 'Handmatig'}</button>)}
       </div>
       {modus === 'handmatig' && <>
         <label className="prog-veld">Verzameldatum<input type="date" className="modal-input" value={draft.verzamelDatum || draft.datum} onChange={e => zet({ verzamelDatum: e.target.value })} /></label>
