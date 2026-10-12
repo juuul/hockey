@@ -5,12 +5,9 @@ function bereken(datum, tijd, minuten, instellingen) {
   return new Date(d.getTime() - (minuten + instellingen.voorbereidingMinuten + instellingen.bufferMinuten) * 60000).toISOString()
 }
 function pasAan(app, p) {
-  const modus = p.getString("verzamelModus") || (p.getString("verzamelen") ? "handmatig" : "automatisch")
-  if (!["automatisch", "handmatig", "wissen"].includes(modus)) throw new BadRequestError("Ongeldige verzameltijdkeuze")
-  p.set("verzamelModus", modus)
-  if (modus === "handmatig") return
+  p.set("verzamelModus", "automatisch")
   let tijd = null
-  if (modus === "automatisch" && p.getString("soort") === "wedstrijd") {
+  if (p.getString("soort") === "wedstrijd") {
     const team = app.findRecordById("teams", p.getString("team"))
     const info = require(`${__hooks}/reizen.js`).teamInfo(app, team)
     let planning = {}; try { planning = JSON.parse(p.getString("bronPlanning") || "{}") || {} } catch (_) {}
