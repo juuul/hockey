@@ -227,6 +227,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
     setP({ ...p, thuis, locatieAdres: '', begeleider1: plek(p.begeleider1), begeleider2: plek(p.begeleider2) })
   }
   const [bronFout, setBronFout] = useState('')
+  const [herstellen, setHerstellen] = useState(false)
   const [nieuweClub, setNieuweClub] = useState<string | null>(null)
   const [wegVraag, setWegVraag] = useState(false)
   useTerug(wegVraag, () => setWegVraag(false))
@@ -361,6 +362,16 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
             }}>Gebruik officiële waarde</button>
           </div>)}
           {bronFout && <p className="account-melding fout" role="alert">{bronFout}</p>}
+          {bestaat && p.soort === 'wedstrijd' && <button className="btn btn-secondary" disabled={herstellen} onClick={async () => {
+            setBronFout('')
+            if (!p.bronId) { zet({ verzamelModus: 'automatisch', reisMinuten: null }); return }
+            setHerstellen(true)
+            try {
+              await pb.send(`/api/hockey/catalogus/programma/${p.id}/herstel`, { method: 'POST', body: { veld: 'alles' } })
+              onClose()
+            } catch (e) { setBronFout(foutTekst(e)) }
+            finally { setHerstellen(false) }
+          }}>{herstellen ? 'Herstellen…' : p.bronId ? 'Herstel officiële planning' : 'Verzameltijd automatisch'}</button>}
           {bestaat && <button className="btn btn-gevaar" onClick={() => setWegVraag(true)}>Verwijderen</button>}
         </div>
         <div className="modal-actions">

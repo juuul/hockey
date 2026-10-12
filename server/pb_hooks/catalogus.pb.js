@@ -116,15 +116,11 @@ routerAdd("POST", "/api/hockey/catalogus/programma/{id}/herstel", (e) => {
   const p = e.app.findRecordById("programma", e.request.pathValue("id"))
   const team = e.app.findRecordById("teams", p.getString("team"))
   if (!e.auth.getBool("superadmin") && !team.getStringSlice("beheerders").includes(e.auth.id)) throw new ForbiddenError("Alleen beheerders")
-  const w = e.app.findFirstRecordByData("catalogus_wedstrijden", "bronId", p.getString("bronId"))
-  const officieel = e.app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
-  const thuis = w.getString("thuisBronId") === officieel.getString("bronId")
-  const velden = { datum: w.getString("datum"), spelen: w.getString("spelen"), thuis, tegenstander: w.getString(thuis ? "uitNaam" : "thuisNaam"), locatie: w.getString("locatie"), locatieAdres: w.getString("locatieAdres") }
   const veld = String(e.requestInfo().body.veld || "")
-  if (!Object.hasOwn(velden, veld)) throw new BadRequestError("Onbekend wedstrijdveld")
-  p.set(veld, velden[veld])
-  e.app.save(p)
-  require(`${__hooks}/catalogus.js`).synchroniseer(e.app, team)
+  e.app.runInTransaction(tx => {
+    const record = tx.findRecordById("programma", p.id), omgeving = tx.findRecordById("teams", team.id)
+    require(`${__hooks}/catalogus.js`).herstel(tx, record, omgeving, veld)
+  })
   return e.json(200, { ok: true })
 })
 // Alleen teams die werkelijk in gebruik zijn regelmatig verversen, geen rondgang door heel Nederland.

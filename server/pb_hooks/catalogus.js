@@ -140,4 +140,20 @@ function zetTaak(app, club, team) {
   if (taak && Date.now() - new Date(taak.getString("updated")).getTime() < 3600000) return
   upsert(app, "catalogus_taken", "sleutel = {:s}", { s: sleutel }, { sleutel, clubBronId: club.getString("bronId"), teamBronId: team ? team.getString("bronId") : "", pouleId: team ? team.getString("pouleId") : "", status: "nieuw", fout: "" })
 }
-module.exports = { importeer, synchroniseer, zetTaak, kalendersVoor }
+function herstel(app, p, team, veld) {
+  const w = app.findFirstRecordByData("catalogus_wedstrijden", "bronId", p.getString("bronId"))
+  const officieel = app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
+  const velden = veldenVan(w, officieel)
+  if (veld === "alles") {
+    for (const [naam, waarde] of Object.entries(velden)) p.set(naam, waarde)
+    p.set("clubId", ""); p.set("soort", "wedstrijd"); p.set("tot", "")
+    p.set("verzamelModus", "automatisch"); p.set("reisMinuten", null)
+    p.set("bronWijziging", null)
+  } else {
+    if (!Object.hasOwn(velden, veld)) throw new BadRequestError("Onbekend wedstrijdveld")
+    p.set(veld, velden[veld])
+  }
+  app.save(p)
+  synchroniseer(app, team)
+}
+module.exports = { importeer, synchroniseer, zetTaak, kalendersVoor, herstel }
