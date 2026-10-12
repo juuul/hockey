@@ -228,7 +228,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   // Thuis/uit omzetten: begeleidingsplekken zonder gekozen ouder volgen de standaard van het team
   const zetThuis = (thuis: boolean) => {
     const plek = (b: string) => (b === '' || b === NIET_NODIG ? standaardPlek(thuis, teamInstellingen) : b)
-    setP({ ...p, thuis, begeleider1: plek(p.begeleider1), begeleider2: plek(p.begeleider2) })
+    setP({ ...p, thuis, locatieAdres: '', begeleider1: plek(p.begeleider1), begeleider2: plek(p.begeleider2) })
   }
   const [bronFout, setBronFout] = useState('')
   const [nieuweClub, setNieuweClub] = useState<string | null>(null)
@@ -321,7 +321,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
                 <select
                   className="modal-input"
                   value={nieuweClub !== null ? NIEUWE_CLUB : p.clubId}
-                  onChange={e => { if (e.target.value === NIEUWE_CLUB) setNieuweClub(''); else { setNieuweClub(null); zet({ clubId: e.target.value }) } }}
+                  onChange={e => { if (e.target.value === NIEUWE_CLUB) setNieuweClub(''); else { setNieuweClub(null); zet({ clubId: e.target.value, tegenstander: clubs.find(c => c.id === e.target.value)?.naam || '', locatieAdres: '' }) } }}
                 >
                   <option value="">{p.bronId && !p.clubId ? p.tegenstander : 'Nog niet bekend'}</option>
                   {[...clubs].sort((a, b) => a.naam.localeCompare(b.naam)).map(c => <option key={c.id} value={c.id}>{c.naam}</option>)}

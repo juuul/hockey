@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
 import { pb, foutTekst } from '../server'
 import { berekenVerzamelen, navigatieLink } from '../verzamelen'
@@ -7,6 +8,7 @@ import type { ReisInfo } from './VerzamelenInstellen'
 
 export default function VerzameltijdBerekenen({ item, zet }: { item: ProgrammaItem; zet: (velden: Partial<ProgrammaItem>) => void }) {
   const { actiefTeam } = useAccount()
+  const { clubs } = useHockey()
   const [info, setInfo] = useState<ReisInfo | null>(null)
   const [fout, setFout] = useState('')
   const [bezig, setBezig] = useState(false)
@@ -23,6 +25,33 @@ export default function VerzameltijdBerekenen({ item, zet }: { item: ProgrammaIt
   const vertrek = info?.effectief.vertrekAdres || ''
   const zaal = item.bronPlanning?.spelvorm === 'Zaal' || info?.spelvorm === 'Zaal'
   const bestemming = item.locatieAdres || (item.thuis && !zaal ? info?.clubAdres : '') || ''
+  const tegenstander = clubs.find(c => c.id === item.clubId)?.naam || item.tegenstander
+  useEffect(() => {
+    if (!info || item.locatieAdres || !actiefTeam) return
+    let actief = true
+    ;(async () => {
+      if (item.thuis && !zaal && info.clubAdres) {
+        if (actief) zet({ locatieAdres: info.clubAdres })
+        return
+      }
+      if (item.thuis || !tegenstander) return
+      const officieel = actiefTeam.officieelTeam ? await pb.collection('catalogus_teams').getOne(actiefTeam.officieelTeam) : null
+      if (!officieel) return
+      const teams = await pb.collection('catalogus_teams').getFullList({ filter: pb.filter('naam = {:naam} && seizoen = {:seizoen} && spelvorm = {:vorm}', { naam: tegenstander, seizoen: officieel.seizoen, vorm: zaal ? 'Zaal' : 'Veld' }) })
+      const teamIds = teams.map(t => String(t.bronId))
+      const thuisFilter = teamIds.length ? '(' + teamIds.map(id => pb.filter('thuisBronId = {:id}', { id })).join(' || ') + ')' : "thuisNaam = {:naam}"
+      const wedstrijden = await pb.collection('catalogus_wedstrijden').getFullList({ filter: pb.filter(thuisFilter + " && seizoen = {:seizoen} && locatieAdres != ''" + (zaal ? " && datum = {:datum}" : ""), { naam: tegenstander, seizoen: officieel.seizoen, datum: item.datum }) })
+      const adressen = [...new Set(wedstrijden.map(w => String(w.locatieAdres)))]
+      if (adressen.length === 1) { if (actief) zet({ locatieAdres: adressen[0] }); return }
+      if (zaal) return
+      const clubIds = [...new Set(teams.map(t => t.clubBronId))]
+      const lijst = await pb.collection('catalogus_clubs').getFullList({ filter: pb.filter('naam = {:naam}', { naam: tegenstander }) })
+      for (const id of clubIds) lijst.push(await pb.collection('catalogus_clubs').getFirstListItem(pb.filter('bronId = {:id}', { id })))
+      const clubAdressen = [...new Set(lijst.map(c => String(c.adres || '')).filter(Boolean))]
+      if (actief && clubAdressen.length === 1) zet({ locatieAdres: clubAdressen[0] })
+    })().catch(e => { if (actief) setFout(foutTekst(e)) })
+    return () => { actief = false }
+  }, [actiefTeam?.id, info, item.clubId, tegenstander, item.thuis, zaal, item.datum, item.locatieAdres])
   const reis = schatting?.bestemming === bestemming && schatting?.vertrek === vertrek && schatting?.team === actiefTeam?.id ? schatting.minuten : null
   const voorstel = info && reis != null ? berekenVerzamelen(item.datum, item.spelen, reis, info.effectief) : null
   useEffect(() => {
