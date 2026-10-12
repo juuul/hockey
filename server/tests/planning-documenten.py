@@ -23,8 +23,17 @@ class PlanningTest(unittest.TestCase):
    m.verzend(c,fail);self.assertEqual(c.execute('select count(*) from meldingen where verzonden is null').fetchone()[0],1)
    sent=[];m.verzend(c,lambda *a:sent.append(a));m.verzend(c,lambda *a:sent.append(a));self.assertEqual(len(sent),1)
    m.controleer(c,registry,root,fail);m.controleer(c,registry,root,fail)
-   self.assertEqual(c.execute('select count(*) from meldingen').fetchone()[0],2)
+   self.assertEqual(c.execute('select count(*) from meldingen').fetchone()[0],1)
    self.assertEqual(c.execute('select laatste from documenten').fetchone()[0],hashlib.sha256(new).hexdigest())
+ def test_failures_do_not_mail(self):
+  with tempfile.TemporaryDirectory() as temp:
+   root=Path(temp);c=m.database(root/'test.db')
+   def fail(*args,**kwargs):raise OSError('fixture')
+   m.controleer(c,{'documenten':[],'publicatiePagina':'https://www.knhb.nl/competitie/speeldagenkalender'},root,fail)
+   self.assertEqual(c.execute('select count(*) from meldingen').fetchone()[0],0)
+   self.assertEqual(c.execute('select fout from controles').fetchone()[0],'OSError')
+   m.melding(c,'fout:oude-mail','Oude storingsmail','fixture');sent=[]
+   m.verzend(c,lambda *args:sent.append(args));self.assertEqual(sent,[])
  def test_calendar_validation(self):
   calendar={'bronId':'fixture','bron':'https://media.static-hw.nl/media/fixture.pdf','seizoen':'2026-2027','spelvorm':'Veld','dagen':[{'datum':'2026-10-31','status':'speeldag'}]}
   m.valideer_kalenders([calendar],calendar['bron'],calendar['seizoen'])

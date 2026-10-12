@@ -143,3 +143,5 @@ python3 server/scripts/planning-documenten.py --omgeving test accepteer DOCUMENT
 Productie is een aparte, uitdrukkelijk geautoriseerde acceptatie met `--omgeving productie`; een testacceptatie zet niets live. Alleen de nieuwste bewaarde versie kan geaccepteerd worden, en de fingerprint wordt opnieuw gecontroleerd. Kalenderimport is de bestaande lokale transactie die gekoppelde teams synchroniseert; de controle zelf doet nooit een import. Houd ook het gecontroleerde bron-JSON in de repo actueel bij inhoudelijke wijzigingen.
 
 Controle: `python3 server/tests/planning-documenten.py` test onveranderde/gewijzigde documenten, versiebehoud, deduplicatie, mailretry, downloadfouten, URL-normalisatie en kalenderinvoer. Handmatige controles mogen direct met `controleer` worden gestart; status in de app is alleen voor superadmins.
+
+Mailmeldingen zijn uitsluitend voor updates. Ongewijzigde controles en storingen geven geen mail; fouten staan in status/log. Eventuele oude wachtende storingsmails worden niet meer verzonden.

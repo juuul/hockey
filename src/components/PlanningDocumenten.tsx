@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { pb, foutTekst } from '../server'
 interface Document { id: string; naam: string; seizoen: string; url: string; geaccepteerd: string | null; laatste: string | null; gecontroleerd: string | null; fout: string | null; versies: { sha: string; gevonden: string; status: string }[] }
-interface Status { bijgewerkt: string | null; documenten: Document[]; wachtendeMails: number }
+interface Status { publicatieFout?: string | null; bijgewerkt: string | null; documenten: Document[]; wachtendeMails: number }
 export default function PlanningDocumenten() {
   const [data, setData] = useState<Status | null>(null)
   const [fout, setFout] = useState('')
@@ -17,6 +17,7 @@ export default function PlanningDocumenten() {
     <h2 className="instellingen-kaart-titel">Planningsdocumenten</h2>
     <p className="account-uitleg">Dagelijks om 03:00 gecontroleerd. Nieuwe bestanden worden gemeld per mail en wachten op handmatige beoordeling in de GPT-app.</p>
     {data?.bijgewerkt && <p className="account-uitleg">Laatste controle: {new Date(data.bijgewerkt).toLocaleString('nl-NL', { timeZone: 'Europe/Amsterdam' })}</p>}
+    {data?.publicatieFout && <p role="alert">De publicatiepagina kon niet worden gecontroleerd; bestaande planning behouden.</p>}
     {!!data?.wachtendeMails && <p role="alert">{data.wachtendeMails} mailmelding(en) wachten op verzending.</p>}
     {data?.documenten.map(d => <div key={d.id} className="account-uitleg">
       <strong>{d.naam} · {d.seizoen}</strong>

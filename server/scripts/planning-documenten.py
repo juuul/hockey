@@ -52,6 +52,7 @@ def database(pad):
     c.executescript('''
     create table if not exists documenten(id text primary key, naam text, seizoen text, url text, geaccepteerd text, laatste text, gecontroleerd text, fout text);
     create table if not exists versies(document text, sha text, gevonden text, pad text, status text, primary key(document,sha));
+    create table if not exists controles(sleutel text primary key, gecontroleerd text, fout text);
     create table if not exists meldingen(sleutel text primary key, onderwerp text, html text, verzonden text, fout text);
     ''')
     return c
@@ -88,7 +89,6 @@ def controleer(c, register, basis, ophalen=download):
                     +'<p>De PDF is op de server bewaard. Pas na jouw goedkeuring worden de centrale planning en teams bijgewerkt.</p>')
         except (OSError, ValueError) as exc:
             c.execute('update documenten set gecontroleerd=?,fout=? where id=?',(nu(),type(exc).__name__,d['id']))
-            melding(c,'fout:'+d['id']+':'+d['url'], 'Planningcontrole mislukt: '+d['naam'], '<p>Het bronbestand kon niet worden gecontroleerd. De bestaande planning blijft actief.</p><p>'+html.escape(d['url'])+'</p>')
         c.commit()
     # Nieuwe/verwijderde PDF-links op de publicatiepagina ook melden: een vervangende URL
     # mag niet onopgemerkt blijven doordat het oude bestand nog steeds bereikbaar is.
@@ -97,13 +97,14 @@ def controleer(c, register, basis, ophalen=download):
             gevonden = links(ophalen(register['publicatiePagina'], pdf=False))
             if not gevonden:
                 raise ValueError('Geen documentlinks in publicatiepagina')
+            c.execute('insert or replace into controles values(?,?,null)',('publicatie',nu()))
             bekend = set(d['url'] for d in register['documenten'])
             extra = sorted(set(gevonden)-bekend); weg = sorted(bekend-set(gevonden))
             if extra or weg:
                 sha = hashlib.sha256(json.dumps([extra,weg]).encode()).hexdigest()
                 melding(c,'publicatie:'+sha,'Planningpublicatie: nieuwe of verwijderde documentlinks','<p>De publicatiepagina bevat nieuwe of verdwenen PDF-links. Laat deze in de GPT-app beoordelen en werk zo nodig het documentregister bij.</p><p>Nieuw:</p>'+''.join('<p>'+html.escape(u)+'</p>' for u in extra)+'<p>Verdwenen:</p>'+''.join('<p>'+html.escape(u)+'</p>' for u in weg))
-        except (OSError, ValueError):
-            melding(c,'fout:publicatie','Planningpublicatie kon niet worden gecontroleerd','<p>De publicatiepagina kon niet worden gelezen. De documentcontrole en bestaande planning blijven behouden.</p>')
+        except (OSError, ValueError) as exc:
+            c.execute('insert or replace into controles values(?,?,?)',('publicatie',nu(),type(exc).__name__))
         c.commit()
 
 def stuur_mail(omgeving, ontvanger, onderwerp, inhoud):
@@ -119,7 +120,8 @@ def stuur_mail(omgeving, ontvanger, onderwerp, inhoud):
     if 'PLANNING_MAIL_OK' not in r.stdout: raise ValueError('Mailverzending niet bevestigd')
 
 def verzend(c, verstuur):
-    for sleutel, onderwerp, inhoud in c.execute('select sleutel,onderwerp,html from meldingen where verzonden is null').fetchall():
+    # Oude wachtende storingsmails worden niet meer verzonden.
+    for sleutel, onderwerp, inhoud in c.execute("select sleutel,onderwerp,html from meldingen where verzonden is null and sleutel not like 'fout:%'").fetchall():
         try:
             verstuur(onderwerp,inhoud)
             c.execute('update meldingen set verzonden=?,fout=null where sleutel=?',(nu(),sleutel))
@@ -132,7 +134,8 @@ def status(c,basis):
     docs=[dict(r) for r in c.execute('select id,naam,seizoen,url,geaccepteerd,laatste,gecontroleerd,fout from documenten order by id')]
     for d in docs:
         d['versies']=[dict(r) for r in c.execute('select sha,gevonden,status from versies where document=? order by gevonden desc',(d['id'],))]
-    rapport={'bijgewerkt':nu(),'documenten':docs,'wachtendeMails':c.execute('select count(*) from meldingen where verzonden is null').fetchone()[0]}
+    publicatie=c.execute("select fout from controles where sleutel='publicatie'").fetchone()
+    rapport={'publicatieFout':publicatie[0] if publicatie else None,'bijgewerkt':nu(),'documenten':docs,'wachtendeMails':c.execute("select count(*) from meldingen where verzonden is null and sleutel not like 'fout:%'").fetchone()[0]}
     p=basis/'status.json'; t=p.with_suffix('.tmp');t.write_text(json.dumps(rapport));t.replace(p)
 
 def valideer_kalenders(data, url, seizoen):
