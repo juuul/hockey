@@ -138,12 +138,15 @@ export interface ProgrammaItem {
   clubId: string;
   tegenstander: string;
   thuis: boolean;
+  locatieAdres?: string;
+  verzamelDatum?: string;
+  reisMinuten?: number | null;
   locatie?: string;
   bronPlanning?: { id: string; datum: string; status: 'speeldag' | 'reserve' | 'slotdag'; bron: string; spelvorm: string; kalender: string; omschrijving?: string } | null;
   bronStatus?: string;
   bronId?: string;
-  bronBasis?: { datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie?: string } | null;
-  bronWijziging?: Partial<{ datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie: string }> | null;
+  bronBasis?: { datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie?: string; locatieAdres?: string } | null;
+  bronWijziging?: Partial<{ datum: string; spelen: string; thuis: boolean; tegenstander: string; locatie: string; locatieAdres: string }> | null;
   verzamelen: string; // 'UU:MM' of ''
   spelen: string;
   fruit: string;

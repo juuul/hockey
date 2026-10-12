@@ -7,6 +7,7 @@ import { useTerug } from '../terug'
 import DeelKijklink from '../components/DeelKijklink'
 import ResetModal from '../components/ResetModal'
 import { leesThema, Thema, zetThema } from '../thema'
+import VerzamelenInstellen from '../components/VerzamelenInstellen'
 import TeamAanmelden, { TeamKoppelen } from '../components/TeamSelectie'
 import '../components/Modal.css'
 import './Instellingen.css'
@@ -65,7 +66,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'hoofd' && (gebruiker
           ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={() => setWeergave({ soort: 'aanmelden' })} gebruik={() => setWeergave({ soort: 'gebruik' })} />
           : <Inloggen aanmelden={() => setWeergave({ soort: 'aanmelden' })} />)}
-        {weergave.soort === 'hoofd' && <Weergave />}
+        {weergave.soort === 'hoofd' && <><Weergave /><p className="account-uitleg"><a href="./privacy.html" target="_blank" rel="noreferrer">Privacy</a> · <a href="./voorwaarden.html" target="_blank" rel="noreferrer">Gebruiksvoorwaarden</a></p></>}
       </div>
     </div>
   )
@@ -248,6 +249,8 @@ function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Geb
         <button className="btn btn-secondary" onClick={aanmelden}>Team kiezen of eigen omgeving maken</button>
         <Melding tekst={fout} fout />
       </Kaart>
+      {actief && (gebruiker.superadmin || actieveRol === 'beheerder') && <VerzamelenInstellen key={actief.id} team={actief} />}
+      {gebruiker.superadmin && <VerzamelenInstellen />}
       {gebruiker.superadmin && (
         <Kaart titel="Gebruik">
           <button className="btn btn-secondary" onClick={gebruik}>📊 Gebruik per team</button>

@@ -4,14 +4,14 @@ function normaliseer(clubs, club, detail, gecontroleerd = new Date().toISOString
   const seizoen = detail?.data?.season_name || `${jaar}-${jaar + 1}`
   const uit = { clubs: [], teams: [], wedstrijden: [] }
   const clubdata = clubs?.data || (club ? [club.data] : [])
-  uit.clubs = clubdata.filter(c => c.type === 'regular').map(c => ({ bronId: c.federation_reference_id, naam: c.friendly_name || c.name, plaats: c.city || '', ...(c.district ? { district: c.district } : {}), gecontroleerd }))
+  uit.clubs = clubdata.filter(c => c.type === 'regular').map(c => ({ bronId: c.federation_reference_id, naam: c.friendly_name || c.name, plaats: c.city || '', ...(c.address ? { adres: [c.address, c.zipcode, c.city].filter(Boolean).join(', ') } : {}), ...(c.district ? { district: c.district } : {}), gecontroleerd }))
   const teamdata = new Map((club?.data?.teams || []).map(t => [String(t.id), t]))
   const matches = new Map()
   for (const poule of detail?.data?.poules || []) {
     for (const w of poule.matches || []) {
       if (!w.home?.id || !w.away?.id || !/^\d{4}-\d\d-\d\dT/.test(w.date || '')) continue
       teamdata.set(String(w.home.id), w.home); teamdata.set(String(w.away.id), w.away)
-      matches.set(String(w.id), { bronId: String(w.id), seizoen, thuisBronId: String(w.home.id), uitBronId: String(w.away.id), datum: w.date.slice(0, 10), spelen: w.date.slice(11, 16), thuisNaam: w.home.name, uitNaam: w.away.name, locatie: [w.location?.facility?.name, w.location?.field?.name].filter(Boolean).join(' · '), status: w.status || '', uitslag: w.score || null, gecontroleerd })
+      matches.set(String(w.id), { bronId: String(w.id), seizoen, thuisBronId: String(w.home.id), uitBronId: String(w.away.id), datum: w.date.slice(0, 10), spelen: w.date.slice(11, 16), thuisNaam: w.home.name, uitNaam: w.away.name, locatie: [w.location?.facility?.name, w.location?.field?.name].filter(Boolean).join(' · '), locatieAdres: (w.location?.facility?.address || '').replace(/\s*\n\s*/g, ', '), status: w.status || '', uitslag: w.score || null, gecontroleerd })
     }
   }
   uit.wedstrijden = [...matches.values()]

@@ -29,7 +29,7 @@ function importeer(app, data) {
 }
 function veldenVan(w, officieel) {
   const thuis = w.getString("thuisBronId") === officieel.getString("bronId")
-  return { datum: w.getString("datum"), spelen: w.getString("spelen"), thuis, tegenstander: w.getString(thuis ? "uitNaam" : "thuisNaam"), locatie: w.getString("locatie") }
+  return { datum: w.getString("datum"), spelen: w.getString("spelen"), thuis, tegenstander: w.getString(thuis ? "uitNaam" : "thuisNaam"), locatie: w.getString("locatie"), locatieAdres: w.getString("locatieAdres") }
 }
 function kalendersVoor(app, team, officieel) {
   let kalenders = json(team, "planningKalenders")
@@ -88,7 +88,7 @@ function synchroniseer(app, team) {
         if (planning.length === 1 && lijst.filter(x => x.getString("datum") === nieuw.datum).length === 1) {
           p = planning[0]
           // Lege bronvelden vormen de basis; eigen tijden/locatie blijven behouden.
-          p.set("bronBasis", { datum: p.getString("datum"), spelen: "", thuis: p.getBool("thuis"), tegenstander: "", locatie: "" })
+          p.set("bronBasis", { datum: p.getString("datum"), spelen: "", thuis: p.getBool("thuis"), tegenstander: "", locatie: "", locatieAdres: "" })
         }
       }
     }
@@ -98,6 +98,7 @@ function synchroniseer(app, team) {
       for (const k of Object.keys(nieuw)) p.set(k, nieuw[k])
     }
     const basis = json(p, "bronBasis") || (bestaand ? nieuw : null)
+    if (basis && !Object.prototype.hasOwnProperty.call(basis, "locatieAdres")) basis.locatieAdres = ""
     const wijzigingen = {}
     for (const k of Object.keys(nieuw)) {
       const huidig = k === "thuis" ? p.getBool(k) : p.getString(k)

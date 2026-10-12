@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
+import { navigatieLink } from '../verzamelen'
 import Speeldagen from '../components/Speeldagen'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
@@ -20,7 +22,7 @@ const standaardPlek = (thuis: boolean, inst: TeamInstellingen) =>
 
 const LEEG_ITEM = (inst: TeamInstellingen): ProgrammaItem => ({
   id: pbId(), datum: vandaag(), tot: '', soort: 'wedstrijd', clubId: '', tegenstander: '', thuis: true,
-  verzamelen: '', spelen: '', fruit: '', begeleider1: standaardPlek(true, inst), begeleider2: standaardPlek(true, inst), notitie: '',
+  verzamelen: '', verzamelDatum: '', reisMinuten: null, locatieAdres: '', spelen: '', fruit: '', begeleider1: standaardPlek(true, inst), begeleider2: standaardPlek(true, inst), notitie: '',
 })
 
 // Tabblad Programma: wedstrijden met tijden, fruit en spelbegeleiding. Beurten van je eigen kind(eren) vallen op
@@ -106,7 +108,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         <div className="prog-regel">
           <span aria-hidden="true">⏰</span>
           {p.verzamelen || p.spelen
-            ? <span>{p.verzamelen ? `verzamelen ${p.verzamelen}` : ''}{p.verzamelen && p.spelen ? ' · ' : ''}{p.spelen ? `aanvang ${p.spelen}` : ''}</span>
+            ? <span>{p.verzamelen ? `verzamelen ${p.verzamelDatum && p.verzamelDatum !== p.datum ? p.verzamelDatum + ' · ' : ''}${p.verzamelen}` : ''}{p.verzamelen && p.spelen ? ' · ' : ''}{p.spelen ? `aanvang ${p.spelen}` : ''}</span>
             : <span className="onbekend">tijden nog niet bekend</span>}
         </div>
         <div className={`prog-regel ${mijn.includes('fruit') ? 'mijn' : ''}`}>
@@ -117,6 +119,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span>begeleiding: {begeleidingTekst(p, naam)}</span>
         </div>
         {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''} · <a href={p.bronPlanning.bron} target="_blank" rel="noreferrer">Kalender</a></div>}
+        {p.locatieAdres && <a className="btn btn-secondary" href={navigatieLink(p.locatieAdres)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a>}
         {p.locatie && <div className="prog-regel">📍 {p.locatie}</div>}
         {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
         {!!Object.keys(p.bronWijziging || {}).length && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
@@ -233,7 +236,9 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   const zet = (velden: Partial<ProgrammaItem>) => setP({ ...p, ...velden })
   const spelerKeuzes = [...spelers].sort((a, b) => a.naam.localeCompare(b.naam))
 
+  const reisGeldig = p.reisMinuten == null || (Number.isInteger(p.reisMinuten) && p.reisMinuten >= 0 && p.reisMinuten <= 1440)
   const opslaan = () => {
+    if (p.soort === 'wedstrijd' && !reisGeldig) return
     let item = p
     if (p.soort === 'wedstrijd' && nieuweClub !== null && nieuweClub.trim()) {
       const id = clubToevoegen(nieuweClub)
@@ -241,7 +246,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
     } else if (p.soort === 'wedstrijd') {
       item = { ...p, tegenstander: clubs.find(c => c.id === p.clubId)?.naam ?? (p.bronId ? p.tegenstander : '') }
     }
-    if (item.soort === 'vrij') item = { ...item, clubId: '', tegenstander: '', verzamelen: '', spelen: '', fruit: '', begeleider1: '', begeleider2: '' }
+    if (item.soort === 'vrij') item = { ...item, clubId: '', tegenstander: '', verzamelen: '', verzamelDatum: '', reisMinuten: null, locatieAdres: '', spelen: '', fruit: '', begeleider1: '', begeleider2: '' }
     else item = { ...item, tot: '' }
     if (item.tot && item.tot < item.datum) item = { ...item, tot: '' }
     bewaarProgramma(item)
@@ -336,7 +341,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               <div className="prog-tijden">
                 <label className="prog-veld">
                   Verzamelen
-                  <input type="time" className="modal-input" value={p.verzamelen} onChange={e => zet({ verzamelen: e.target.value })} />
+                  <input type="time" className="modal-input" value={p.verzamelen} onChange={e => zet({ verzamelen: e.target.value, verzamelDatum: p.datum })} />
                 </label>
                 <label className="prog-veld">
                   Aanvang
@@ -346,6 +351,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               <label className="prog-veld">Locatie
                 <input className="modal-input" maxLength={200} value={p.locatie || ''} onChange={e => zet({ locatie: e.target.value })} />
               </label>
+              <VerzameltijdBerekenen item={p} zet={zet} />
               {p.bronStatus && /cancel/i.test(p.bronStatus) && <p className="account-uitleg">Deze wedstrijd is volgens de officiële bron afgelast.</p>}
               {spelerSelect('🍎 Fruit', 'fruit')}
               {spelerSelect('🚗 Spelbegeleiding 1', 'begeleider1')}
@@ -358,7 +364,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
           )}
           {p.bronId && <p className="account-uitleg">Officiële wedstrijd. Verzameltijd en taken zijn eigen gegevens; handmatige wijzigingen blijven bij een bronupdate behouden.</p>}
           {Object.entries(p.bronWijziging || {}).map(([veld, waarde]) => <div key={veld}>
-            <p className="account-uitleg">Officiële {({ datum: 'datum', spelen: 'aanvangstijd', thuis: 'thuis/uit', tegenstander: 'tegenstander', locatie: 'locatie' } as Record<string, string>)[veld]}: {typeof waarde === 'boolean' ? waarde ? 'thuis' : 'uit' : waarde}. Jouw aanpassing is behouden.</p>
+            <p className="account-uitleg">Officiële {({ datum: 'datum', spelen: 'aanvangstijd', thuis: 'thuis/uit', tegenstander: 'tegenstander', locatie: 'locatie', locatieAdres: 'wedstrijdadres' } as Record<string, string>)[veld]}: {typeof waarde === 'boolean' ? waarde ? 'thuis' : 'uit' : waarde}. Jouw aanpassing is behouden.</p>
             <button className="btn btn-secondary" onClick={async () => {
               try {
                 await pb.send(`/api/hockey/catalogus/programma/${p.id}/herstel`, { method: 'POST', body: { veld } })
@@ -372,7 +378,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
         </div>
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>Annuleren</button>
-          <button className="btn btn-primary" onClick={opslaan}>Opslaan</button>
+          <button className="btn btn-primary" disabled={p.soort === 'wedstrijd' && !reisGeldig} onClick={opslaan}>Opslaan</button>
         </div>
 
         {wegVraag && (

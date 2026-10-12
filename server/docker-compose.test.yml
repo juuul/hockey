@@ -4,6 +4,9 @@ services:
     build: .
     container_name: hockey-pocketbase-test
     restart: unless-stopped
+    env_file:
+      - path: .env.routes.test
+        required: false
     environment:
       HOCKEY_ENV: test
     command: ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--origins=https://hockey.juliaan.eu,http://localhost:5173,http://192.168.2.50:5173"]

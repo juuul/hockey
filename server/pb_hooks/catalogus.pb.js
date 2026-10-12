@@ -119,7 +119,7 @@ routerAdd("POST", "/api/hockey/catalogus/programma/{id}/herstel", (e) => {
   const w = e.app.findFirstRecordByData("catalogus_wedstrijden", "bronId", p.getString("bronId"))
   const officieel = e.app.findRecordById("catalogus_teams", team.getString("officieelTeam"))
   const thuis = w.getString("thuisBronId") === officieel.getString("bronId")
-  const velden = { datum: w.getString("datum"), spelen: w.getString("spelen"), thuis, tegenstander: w.getString(thuis ? "uitNaam" : "thuisNaam"), locatie: w.getString("locatie") }
+  const velden = { datum: w.getString("datum"), spelen: w.getString("spelen"), thuis, tegenstander: w.getString(thuis ? "uitNaam" : "thuisNaam"), locatie: w.getString("locatie"), locatieAdres: w.getString("locatieAdres") }
   const veld = String(e.requestInfo().body.veld || "")
   if (!Object.hasOwn(velden, veld)) throw new BadRequestError("Onbekend wedstrijdveld")
   p.set(veld, velden[veld])

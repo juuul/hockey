@@ -77,3 +77,18 @@ docker exec hockey-pocketbase-test /pb/pocketbase catalogus-kalenders /tmp/kalen
 De lokale CLI importeert in één transactie en vult gekoppelde privéomgevingen aan. Publieke gebruikers hebben alleen leesrechten. De beheerder kiest zo nodig profielen via Programma → Speeldagen plannen. Bestaande afspraken blijven staan; verwijderingen worden onthouden. Een unieke bronwedstrijd neemt de bestaande lege speeldag over, inclusief eigen afspraken.
 
 Controle: `node server/tests/kalenders.mjs` valideert kalenderdata en MO11/O12-reservevoetnoten. `server/tests/speeldagen.pb.js` is een lokale CLI-testhook voor een geïsoleerde testcontainer met een tijdelijke hooksmap; `test-speeldagen` controleert aanvullen, behoud van afspraken, herhaling, verwijderingen en kalenderupdates met fictieve gegevens die in dezelfde transactie worden opgeruimd.
+
+### Google Routes en verzameltijden
+
+De superadmin stelt onder Instellingen de globale voorbereiding (30 min) en buffer (5 min) in. Teambeheerders kunnen privé afwijken. Reistijd handmatig invullen werkt zonder externe koppeling. Automatisch ophalen gebruikt de officiële Google Routes API; geen publieke geocoder of demo-router. De integratie bewaart geen Google-routeantwoorden.
+
+Activeren door de eigenaar:
+
+1. Maak in Google Cloud een API-sleutel met ingeschakelde Routes API en de benodigde Google Maps Platform-facturering. Beperk de sleutel tot Routes API en waar mogelijk de uitgaande server-IP’s; stel een passend quotum in. Zie https://developers.google.com/maps/documentation/routes/get-api-key .
+2. Test: maak `server/.env.routes.test` (niet in git, chmod 600) met alleen `GOOGLE_MAPS_API_KEY=` en de eigen sleutel als waarde. Het test-composebestand laadt dit optionele bestand automatisch. Gebruik geen productie-`.env` of productiesleutel in test.
+3. Start de testserver opnieuw via het eigen composebestand: `docker compose -p hockey-test -f server/docker-compose.test.yml up -d --build`. Een gewone restart leest het env-bestand niet opnieuw.
+4. Productie krijgt bij een afzonderlijk geautoriseerde livegang zijn eigen `GOOGLE_MAPS_API_KEY` in `server/.env`; de bestaande PocketBase-versleutelingssleutel wordt niet veranderd.
+
+De app toont beschikbaarheid; hij toont of bewaart de API-sleutel nooit. Routes wordt alleen aangeroepen als een teambeheerder op Reistijd ophalen drukt. Google-aanvragen bevatten geen spelersnamen of gebruikers-id’s. Statische schattingen omvatten geen actuele files. Test de juiste accommodatie, ook voor zaal. Navigatielinks gebruiken Google Maps URLs: https://developers.google.com/maps/documentation/urls/get-started .
+
+Controle: bundel `server/tests/verzamelen.ts` met esbuild en voer uit met Node. `server/tests/reizen.pb.js` is een tijdelijke CLI-testhook voor een geïsoleerde testcontainer; `test-google-reis` gebruikt fictieve HTTP-antwoorden en doet geen betaalde Google-aanvraag.
