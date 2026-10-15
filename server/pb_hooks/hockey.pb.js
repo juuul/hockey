@@ -21,6 +21,21 @@ onSettingsUpdateRequest((e) => {
 onMailerSend((e) => {
   require(`${__hooks}/hockey.js`).telMail(e.app)
   e.next()
+  try {
+    require(`${__hooks}/mail-verzonden.js`).bewaar(e.app, e.message)
+  } catch (_) {
+    // SMTP is al geslaagd: geen fout teruggeven die opnieuw versturen uitlokt.
+    e.app.logger().error("Verzonden mail kon niet voor IMAP worden klaargezet")
+  }
+})
+
+cronAdd("mail-verzonden", "* * * * *", () => {
+  if ($os.getenv("IMAP_SENT_ENABLED") !== "1" || $os.getenv("HOCKEY_ENV") === "test") return
+  try {
+    $os.cmd("python3", "/pb/scripts/mail-verzonden.py", $app.dataDir() + "/mail-verzonden").output()
+  } catch (_) {
+    $app.logger().error("IMAP-archivering mislukt; kopieën blijven wachten")
+  }
 })
 
 // Uitnodiging aanmaken: token en maker bepaalt de server, daarna gaat de mail eruit
