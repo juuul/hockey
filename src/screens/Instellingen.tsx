@@ -38,7 +38,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
     weergave.soort === 'uitnodiging' ? 'Uitnodiging'
     : weergave.soort === 'wachtwoord' ? 'Nieuw wachtwoord'
     : weergave.soort === 'team' ? 'Leden'
-    : weergave.soort === 'aanmelden' ? 'Team aanmelden'
+    : weergave.soort === 'aanmelden' ? 'Groep zoeken of maken'
     : weergave.soort === 'gebruik' ? 'Gebruik per team'
     : weergave.soort === 'aanmelding' ? 'Teamaanmelding'
     : weergave.soort === 'kijk' ? 'Meekijken'
@@ -161,9 +161,9 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
         {formulier}
       </Kaart>
       <Kaart titel="Nog geen account?">
-        <p className="account-uitleg"><strong>Zit je team al in de app?</strong> Vraag de trainer of teammanager om de aanmeldlink van je team, of om een uitnodiging per mail.</p>
-        <p className="account-uitleg"><strong>Wil je de app voor je eigen team gebruiken?</strong> Kies je club en team. Maak een eigen omgeving als beheerder, of vraag toegang tot een bestaande omgeving.</p>
-        <button className="btn btn-primary" type="button" onClick={aanmelden}>Mijn team aanmelden</button>
+        <p className="account-uitleg"><strong>Zit je team al in de app?</strong> Zoek je club, team en bestaande groep. Je kunt zelf toegang aanvragen; na goedkeuring door de beheerder ontvang je een uitnodiging per e-mail.</p>
+        <p className="account-uitleg"><strong>Een eigen groep starten?</strong> Kies je club en team en maak een nieuwe groep als beheerder.</p>
+        <button className="btn btn-primary" type="button" onClick={aanmelden}>Groep zoeken of maken</button>
       </Kaart>
     </>
   )
@@ -247,7 +247,7 @@ function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Geb
       </Kaart>
 
       <Kaart titel="Ander team">
-        <button className="btn btn-secondary" onClick={aanmelden}>Team kiezen of eigen omgeving maken</button>
+        <button className="btn btn-secondary" onClick={aanmelden}>Groep zoeken of maken</button>
         <Melding tekst={fout} fout />
       </Kaart>
       {actief && (gebruiker.superadmin || actieveRol === 'beheerder') && <VerzamelenInstellen key={actief.id} team={actief} />}

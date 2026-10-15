@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useAccount } from '../context/AccountContext'
 import { appAdres, foutTekst, pb } from '../server'
+import { clubKomtOvereen } from '../clubzoeken'
+import './TeamSelectie.css'
 
 export interface OfficieelTeam {
   id: string; bronId: string; clubBronId: string; naam: string; seizoen: string
@@ -40,16 +42,18 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
     const timer = setInterval(laad, 10_000)
     return () => { actief = false; clearInterval(timer) }
   }, [clubId, ververs, clubs])
-  const velden = [['seizoen', 'Seizoen'], ['geslacht', 'Meisjes, jongens of gemengd'], ['leeftijd', 'Leeftijd'], ['categorie', 'Categorie'], ['spelvorm', 'Veld of zaal'], ['klasse', 'Klasse']] as const
+  const velden = [['seizoen', 'Seizoen'], ['geslacht', 'Meisjes, jongens of gemengd'], ['leeftijd', 'Leeftijd'], ['spelvorm', 'Veld of zaal']] as const
   const lijst = teams.filter(t => velden.every(([veld]) => !filters[veld] || t[veld] === filters[veld]))
+  const gevondenClubs = clubs.filter(c => clubKomtOvereen(c.naam, c.plaats, zoek))
   return <>
     <label className="account-label">Zoek je club
-      <input className="modal-input" type="search" placeholder="Bijvoorbeeld SCHC" value={zoek} onChange={e => setZoek(e.target.value)} />
+      <input className="modal-input" type="search" placeholder="Clubnaam, afkorting of plaats, bijvoorbeeld sc" value={zoek} onChange={e => setZoek(e.target.value)} />
     </label>
+    {!!zoek.trim() && !gevondenClubs.length && <p className="account-uitleg" role="status">Geen clubs gevonden. Probeer een andere naam, afkorting of plaats.</p>}
     <label className="account-label">Club
       <select className="modal-input" value={clubId} onChange={e => { setClubId(e.target.value); setFilters({}); kies(null) }}>
         <option value="">Kies je club…</option>
-        {clubs.filter(c => c.id === clubId || `${c.naam} ${c.plaats}`.toLowerCase().includes(zoek.toLowerCase())).map(c => <option key={c.id} value={c.id}>{c.naam} · {c.plaats}</option>)}
+        {clubs.filter(c => c.id === clubId || gevondenClubs.includes(c)).map(c => <option key={c.id} value={c.id}>{c.naam} · {c.plaats}</option>)}
       </select>
     </label>
     {club && <>
@@ -72,7 +76,7 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
           if (t) pb.send(`/api/hockey/catalogus/team/${t.id}/ververs`, { method: 'POST' }).catch(() => {})
         }}>
           <option value="">Kies je team…</option>
-          {lijst.map(t => <option key={t.id} value={t.id}>{t.naam} · {t.seizoen} · {t.spelvorm}{t.klasse ? ` · ${t.klasse}` : ''}</option>)}
+          {lijst.map(t => <option key={t.id} value={t.id}>{t.naam} · {t.seizoen} · {t.spelvorm}</option>)}
         </select>
       </label>}
       {gekozen && <OfficieelProgramma key={gekozen.id} team={gekozen} />}
@@ -112,7 +116,8 @@ export default function TeamAanmelden() {
   const { gebruiker, teamsLaden, kiesTeam } = useAccount()
   const [officieel, setOfficieel] = useState<OfficieelTeam | null>(null)
   const [omgevingen, setOmgevingen] = useState<Omgeving[]>([])
-  const [omgeving, setOmgeving] = useState('nieuw')
+  const [keuze, setKeuze] = useState<'bestaand' | 'nieuw'>('bestaand')
+  const [omgeving, setOmgeving] = useState('')
   const [omgevingNaam, setOmgevingNaam] = useState('')
   const [naam, setNaam] = useState(gebruiker?.name || '')
   const [email, setEmail] = useState(gebruiker?.email || '')
@@ -121,54 +126,62 @@ export default function TeamAanmelden() {
   const [fout, setFout] = useState('')
   const [melding, setMelding] = useState('')
   useEffect(() => {
-    setOmgevingen([]); setOmgeving('nieuw'); setFout('')
+    setOmgevingen([]); setOmgeving(''); setFout(''); setLaden(false)
     if (!officieel) return
     let actief = true
     setLaden(true)
     pb.send<Omgeving[]>(`/api/hockey/catalogus/team/${officieel.id}/omgevingen`, {}).then(lijst => {
-      if (actief) { setOmgevingen(lijst); setOmgeving(lijst.length ? '' : 'nieuw') }
+      if (actief) { setOmgevingen(lijst); setOmgeving(lijst.length === 1 ? lijst[0].id : '') }
     }).catch(e => { if (actief) setFout(foutTekst(e)) }).finally(() => { if (actief) setLaden(false) })
     return () => { actief = false }
   }, [officieel?.id])
   const versturen = async () => {
-    if (!officieel || !omgeving) return
+    if (!officieel || laden || (keuze === 'bestaand' && !omgeving)) return
     setBezig(true); setFout('')
     try {
-      if (omgeving !== 'nieuw') {
+      if (keuze === 'bestaand') {
         await pb.send(`/api/hockey/catalogus/omgeving/${omgeving}/aanvraag`, { method: 'POST', body: { naam: gebruiker?.name || naam, email: gebruiker?.email || email, terug: appAdres() } })
         setMelding('Je aanvraag staat klaar voor de beheerder. Na goedkeuring krijg je een uitnodiging per e-mail. Tot die tijd blijven de teamgegevens privé.')
       } else if (gebruiker) {
         const r = await pb.send<{ id: string }>('/api/hockey/catalogus/omgeving', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam } })
         await teamsLaden(); kiesTeam(r.id)
-        setMelding('Je eigen teamomgeving is aangemaakt. Je bent beheerder en kunt nu bij Leden anderen uitnodigen.')
+        setMelding('Je eigen groep is aangemaakt. Je bent beheerder en kunt nu bij Leden anderen uitnodigen.')
       } else {
         await pb.send('/api/hockey/aanmelding', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam, naam, email, terug: appAdres() } })
-        setMelding(`Je krijgt een uitnodiging op ${email.trim()}. Open die om een wachtwoord te kiezen. Daarna ben je beheerder van je eigen teamomgeving.`)
+        setMelding(`Je krijgt een uitnodiging op ${email.trim()}. Open die om een wachtwoord te kiezen. Daarna ben je beheerder van je eigen groep.`)
       }
     } catch (e) { setFout(foutTekst(e)) }
     finally { setBezig(false) }
   }
   if (melding) return <p className="account-melding">{melding}</p>
   return <form className="account-form" onSubmit={e => { e.preventDefault(); versturen() }}>
-    <p className="account-uitleg">Kies je officiële team. Je kunt toegang vragen tot een bestaande omgeving of een eigen omgeving maken. Elke omgeving heeft eigen spelers, leden en instellingen.</p>
+    <fieldset className="teamselectie-keuzes">
+      <legend>Wat wil je doen?</legend>
+      <label className="teamselectie-keuze"><input type="radio" name="groepskeuze" checked={keuze === 'bestaand'} onChange={() => setKeuze('bestaand')} /><span>Bestaande groep zoeken</span></label>
+      <label className="teamselectie-keuze"><input type="radio" name="groepskeuze" checked={keuze === 'nieuw'} onChange={() => setKeuze('nieuw')} /><span>Nieuwe eigen groep maken</span></label>
+    </fieldset>
+    <p className="account-uitleg">{keuze === 'bestaand' ? 'Zoek je club en team en kies de groep waarbij je wilt aansluiten. Je kunt zelf toegang aanvragen; na goedkeuring krijg je een uitnodiging per e-mail.' : 'Kies je club en officiële team om een eigen groep te maken. Elke groep heeft eigen spelers, leden en instellingen.'}</p>
     <TeamKiezer gekozen={officieel} kies={setOfficieel} />
     {officieel && <>
-      {laden ? <p className="account-uitleg">Teamomgevingen ophalen…</p> : <label className="account-label">Teamomgeving
-        <select className="modal-input" value={omgeving} onChange={e => setOmgeving(e.target.value)}>
-          <option value="">Kies een omgeving…</option>
-          {omgevingen.map(o => <option key={o.id} value={o.id}>{o.naam} · omgeving {o.id.slice(-5)}</option>)}
-          <option value="nieuw">Nieuwe eigen teamomgeving maken</option>
-        </select>
-      </label>}
-      {omgeving === 'nieuw' && <label className="account-label">Groepsnaam (openbaar, optioneel)
+      {keuze === 'bestaand' && (laden ? <p className="account-uitleg">Groepen ophalen…</p> : !!omgevingen.length ? <fieldset className="teamselectie-keuzes">
+        <legend>Kies de bestaande groep</legend>
+        {omgevingen.map(o => <label key={o.id} className="teamselectie-keuze">
+          <input type="radio" name="bestaande-groep" value={o.id} checked={omgeving === o.id} onChange={() => setOmgeving(o.id)} />
+          <span>{o.naam}{omgevingen.filter(andere => andere.naam === o.naam).length > 1 ? ` · groep ${o.id.slice(-5)}` : ''}</span>
+        </label>)}
+      </fieldset> : !fout && <div>
+        <p className="account-uitleg">Er zijn geen vindbare groepen bij dit team. Vraag de beheerder om een aanmeldlink als de groep afgeschermd is, of maak zelf een groep.</p>
+        <button className="btn btn-secondary" type="button" onClick={() => setKeuze('nieuw')}>Eigen groep maken</button>
+      </div>)}
+      {keuze === 'nieuw' && <label className="account-label">Groepsnaam (openbaar, optioneel)
         <input className="modal-input" placeholder="Bijvoorbeeld begeleiding" maxLength={40} value={omgevingNaam} onChange={e => setOmgevingNaam(e.target.value)} />
       </label>}
-      {!gebruiker && <>
+      {!gebruiker && (keuze === 'nieuw' || !!omgevingen.length) && <>
         <label className="account-label">Je naam<input className="modal-input" autoComplete="name" required maxLength={60} value={naam} onChange={e => setNaam(e.target.value)} /></label>
         <label className="account-label">E-mail<input className="modal-input" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>
       </>}
-      <p className="account-uitleg">Een nieuwe omgeving beheren geeft geen toegang tot andere omgevingen van dit team.</p>
-      <button className="btn btn-primary" type="submit" disabled={bezig || laden || !omgeving || (!gebruiker && (!naam.trim() || !email.includes('@')))}>{omgeving === 'nieuw' ? 'Eigen teamomgeving maken' : 'Toegang aanvragen'}</button>
+      {keuze === 'nieuw' && <p className="account-uitleg">Een nieuwe groep beheren geeft geen toegang tot andere groepen van dit team.</p>}
+      {(keuze === 'nieuw' || !!omgevingen.length) && <button className="btn btn-primary" type="submit" disabled={bezig || laden || (keuze === 'bestaand' && !omgeving) || (!gebruiker && (!naam.trim() || !email.includes('@')))}>{keuze === 'nieuw' ? 'Eigen groep maken' : 'Toegang aanvragen bij deze groep'}</button>}
     </>}
     {fout && <p className="account-melding fout" role="alert">{fout}</p>}
   </form>

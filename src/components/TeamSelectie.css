@@ -1,0 +1,40 @@
+.teamselectie-keuzes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.teamselectie-keuzes legend {
+  color: var(--tekst);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.teamselectie-keuze {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 12px;
+  border: 2px solid var(--rand);
+  border-radius: 10px;
+  background: var(--vlak);
+  color: var(--tekst);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.teamselectie-keuze:has(input:checked) {
+  border-color: var(--blauw-tekst);
+}
+
+.teamselectie-keuze input {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--blauw-tekst);
+}

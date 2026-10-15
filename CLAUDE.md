@@ -62,6 +62,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Geen namen van echte speelsters in de repo** (openbaar); testnamen in `src/demo.ts`.
 
 ### Accounts en sync (kern)
+- **Groep zoeken of maken**: kies eerst bestaande groep (standaard) of nieuwe eigen groep. Clubzoeker ondersteunt ontbrekende tussenletters (`sc` vindt SCHC); alleen seizoen, geslacht, leeftijd en veld/zaal filteren. Bestaande vindbare groepen staan direct als keuzekaarten in beeld; één groep wordt automatisch geselecteerd. Toegang blijft afhankelijk van goedkeuring door de beheerder.
 - Rollen: **beheerder** (alles in het eigen team), **kijker** (alleen meekijken), **superadmin** (eigenaar, alle teams; vlag alleen via het beheerscherm). Alleen een beheerder kan iemand beheerder maken.
 - Club/seizoen/officieel team kiezen uit de openbare catalogus; het officiële programma is zonder account te bekijken. Meerdere privéomgevingen per officieel team mogelijk; de maker is beheerder van zijn eigen omgeving. Een nieuwe gebruiker bevestigt e-mail via uitnodiging en kiest daarna een wachtwoord; bestaande accounts hoeven hun naam niet opnieuw in te vullen.
 - Bestaande omgeving: toegang aanvragen, beheerder keurt goed, daarna uitnodiging. Publieke team- en aanvraagroutes tonen nooit spelers of leden. Nieuwe deelbare links zijn aanvraaglinks; anonieme gastaccounts en oude meekijklinks zijn ingetrokken op de bijgewerkte backend.
