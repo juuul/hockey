@@ -8,6 +8,9 @@ services:
     container_name: hockey-pocketbase
     restart: unless-stopped
     env_file: .env
+    environment:
+      IMAP_SENT_ENABLED: "1"
+      IMAP_SENT_FOLDER: Sent
     ports:
       - "127.0.0.1:8090:8090"
     volumes:
