@@ -9,7 +9,7 @@ const bron = fs.readFileSync(path.resolve(__dirname, '../../src/components/DeelK
 const code = ts.transpileModule(bron, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText
 const url = 'https://example.invalid/#aanvraag=testteam.testtoken'
 
-async function test(soort, scenario, compact) {
+async function test(soort, scenario, compact, knop) {
   const gedeeld = []
   const gekopieerd = []
   const meldingen = []
@@ -38,8 +38,9 @@ async function test(soort, scenario, compact) {
     assert.ok(naam in modules, `Onverwachte import: ${naam}`)
     return modules[naam]
   } })
-  const component = exports.default({ soort, compact })
+  const component = exports.default({ soort, compact, knop })
   if (compact) assert.equal(component.props.children[1], false)
+  if (knop) assert.ok(component.props.children[0].props.className.includes('btn-primary'))
   await component.props.children[0].props.onClick()
   // Serialiseren verwijdert alleen de prototypes uit de andere VM-context.
   if (navigator.share) assert.deepEqual(JSON.parse(JSON.stringify(gedeeld)), [{ url }])
@@ -50,7 +51,7 @@ async function test(soort, scenario, compact) {
 
 ;(async () => {
   for (const soort of ['kijk', 'aanvraag']) {
-    for (const compact of [false, true]) for (const scenario of ['delen', 'klembord', 'deelfout', 'handmatig', 'geannuleerd']) await test(soort, scenario, compact)
+    for (const compact of [false, true]) for (const knop of [false, true]) for (const scenario of ['delen', 'klembord', 'deelfout', 'handmatig', 'geannuleerd']) await test(soort, scenario, compact, knop)
   }
   console.log('DEELLINK_OK: beide linksoorten delen uitsluitend de URL; klembord, handmatige terugval en annuleren werken.')
 })().catch(err => { console.error(err); process.exit(1) })

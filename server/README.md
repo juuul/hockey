@@ -32,6 +32,10 @@ Een nieuwe testdatabase bevat geen echte gebruikers. Testmails lees je in Mailpi
 
 ## Openbare catalogus
 
+Alle aan een officieel team gekoppelde privéomgevingen zijn vindbaar via `/api/hockey/catalogus/team/{id}/omgevingen`, ook als een oud record vindbaar=false heeft. Die oude vlag heeft geen effect meer. De publieke respons blijft beperkt tot id, naam en omgevingsnaam. Aanvragen voor een gekoppelde groep blijven nieuw tot een beheerder goedkeurt; vindbaarheid wijzigt geen leden, rollen of privégegevens. Ongekoppelde omgevingen worden niet aan een officieel team toegeschreven.
+
+Controle: `tests/vindbaarheid.pb.js` mag uitsluitend als extra CLI-hook op een nieuwe geïsoleerde database met `HOCKEY_ENV=test` worden gemount. Na migraties maakt `test-vindbaarheid-fixture` drie fictieve groepen. Start die aparte server op localhost 8099 en voer `node server/tests/vindbaarheid.mjs` uit; `test-vindbaarheid-controle` controleert daarna dat aanvragen nog nieuw zijn en geen lidmaatschap/uitnodiging hebben aangemaakt. Nooit deze fixture op de gewone test- of productiedatabase draaien.
+
 Het startbestand bevat uitsluitend openbare club-, team- en wedstrijdgegevens, zonder spelers of contactgegevens. Import is een lokale beheeropdracht die geen API-wachtwoord vereist:
 
 ```sh

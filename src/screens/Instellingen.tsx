@@ -220,10 +220,10 @@ function Overzicht({ gebruiker, openTeam, openMenu }: { gebruiker: Gebruiker; op
       <MenuRegel tekst="Team wisselen" open={() => openMenu('wisselen')} />
       <SyncRegel />
     </section>
+    <DeelKijklink compact knop />
     <div className="instellingen-menu">
       {aantal > 0 && <MenuRegel tekst={`Aanvragen (${aantal})`} open={() => openMenu('aanvragen')} />}
       {beheert && <MenuRegel tekst="Leden" open={() => openTeam(actiefTeam!.id)} />}
-      <DeelKijklink compact />
       {beheert && <MenuRegel tekst="Teaminstellingen" open={() => openMenu('teaminstellingen')} />}
       {beheert && <MenuRegel tekst="Verzameltijd" sub="Automatisch berekend" open={() => openMenu('verzamelen')} />}
       <MenuRegel tekst="Weergave" sub={THEMAS.find(t => t.id === leesThema())?.naam} open={() => openMenu('weergave')} />
@@ -256,23 +256,12 @@ function TeamWisselen({ gebruiker, gekozen, aanmelden }: { gebruiker: Gebruiker;
 }
 
 function TeamInstellingen() {
-  const { actiefTeam, teamsLaden } = useAccount()
-  const [fout, setFout] = useState<string | null>(null)
-  const [bezig, setBezig] = useState(false)
+  const { actiefTeam } = useAccount()
   if (!actiefTeam) return null
   return <>
     <Kaart titel={actiefTeam.naam}>
-      {actiefTeam.officieelTeam && <label className="instellingen-schakelaar">
-        <input type="checkbox" checked={!!actiefTeam.vindbaar} disabled={bezig} onChange={async e => {
-          setBezig(true); setFout(null)
-          try { await pb.collection('teams').update(actiefTeam.id, { vindbaar: e.target.checked }); await teamsLaden() }
-          catch (err) { setFout(foutTekst(err)) }
-          finally { setBezig(false) }
-        }} />Vindbaar bij team zoeken
-      </label>}
-      {actiefTeam.officieelTeam && <p className="account-uitleg">Alleen de groepsnaam is openbaar. Spelers en leden blijven privé.</p>}
+      {actiefTeam.officieelTeam && <p className="account-uitleg">Je groep is vindbaar. Spelers en leden blijven privé.</p>}
       <TeamKoppelen id={actiefTeam.id} gekoppeld={actiefTeam.officieelTeam} />
-      <Melding tekst={fout} fout />
     </Kaart>
     <DeelKijklink />
   </>

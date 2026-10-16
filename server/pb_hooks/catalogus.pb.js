@@ -46,16 +46,17 @@ routerAdd("POST", "/api/hockey/catalogus/team/{id}/ververs", (e) => {
   require(`${__hooks}/catalogus.js`).zetTaak(e.app, c, t)
   return e.json(200, { ok: true })
 })
+// Alle gekoppelde groepen zijn vindbaar; de oude vlag 'vindbaar' wordt niet meer gebruikt.
 // Alleen openbare omgevingsnamen en id's, nooit leden, spelers, e-mail of deelbare tokens.
 routerAdd("GET", "/api/hockey/catalogus/team/{id}/omgevingen", (e) => {
   const id = e.app.findRecordById("catalogus_teams", e.request.pathValue("id")).id
-  const lijst = e.app.findRecordsByFilter("teams", "officieelTeam = {:id} && vindbaar = true", "naam", 100, 0, { id })
+  const lijst = e.app.findRecordsByFilter("teams", "officieelTeam = {:id}", "naam", 100, 0, { id })
   return e.json(200, lijst.map((t) => ({ id: t.id, naam: t.getString("naam"), omgevingNaam: t.getString("omgevingNaam") })))
 })
 routerAdd("POST", "/api/hockey/catalogus/omgeving/{id}/aanvraag", (e) => {
   const h = require(`${__hooks}/hockey.js`)
   const team = e.app.findRecordById("teams", e.request.pathValue("id"))
-  if (!team.getBool("vindbaar") || !team.getString("officieelTeam")) throw new NotFoundError("Teamomgeving niet gevonden")
+  if (!team.getString("officieelTeam")) throw new NotFoundError("Teamomgeving niet gevonden")
   return e.json(200, h.maakAanvraag(e.app, team, e.requestInfo().body))
 })
 routerAdd("POST", "/api/hockey/catalogus/omgeving/{id}/koppel", (e) => {

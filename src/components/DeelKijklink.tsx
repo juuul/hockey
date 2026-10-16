@@ -12,7 +12,7 @@ const TEKSTEN = {
   kijk: {
     knop: '🔗 Teamlink delen',
     uitleg: 'Via deze link vraag je toegang aan. De beheerder keurt de aanvraag goed voordat je kunt meekijken.',
-    vraag: 'Nieuwe meekijklink?',
+    vraag: 'Nieuwe teamlink?',
     regels: [{ icoon: '🔗', tekst: 'De oude link werkt dan niet meer' }, { icoon: '👀', tekst: 'Goedgekeurde leden behouden hun toegang' }],
   },
   aanvraag: {
@@ -23,7 +23,7 @@ const TEKSTEN = {
   },
 }
 
-export default function DeelKijklink({ soort = 'kijk', compact = false }: { soort?: 'kijk' | 'aanvraag'; compact?: boolean }) {
+export default function DeelKijklink({ soort = 'kijk', compact = false, knop = false }: { soort?: 'kijk' | 'aanvraag'; compact?: boolean; knop?: boolean }) {
   const t = TEKSTEN[soort]
   const { gebruiker, actiefTeam, teamsLaden } = useAccount()
   const [melding, setMelding] = useState<{ tekst: string; fout?: boolean } | null>(null)
@@ -68,7 +68,7 @@ export default function DeelKijklink({ soort = 'kijk', compact = false }: { soor
 
   return (
     <div className={`kijklink${compact ? ' kijklink-compact' : ''}`}>
-      <button className={compact ? 'instellingen-menuregel' : 'btn btn-primary'} onClick={() => deel()} disabled={bezig}>{compact ? <><span>Teamlink delen</span><span aria-hidden="true">↗</span></> : t.knop}</button>
+      <button className={compact && !knop ? 'instellingen-menuregel' : 'btn btn-primary'} onClick={() => deel()} disabled={bezig}>{compact ? knop ? 'Teamlink delen' : <><span>Teamlink delen</span><span aria-hidden="true">↗</span></> : t.knop}</button>
       {!compact && <p className="kijklink-uitleg">{t.uitleg}</p>}
       {melding && <p className={`kijklink-melding ${melding.fout ? 'fout' : ''}`} role="status">{melding.tekst}</p>}
       {link && <input className="modal-input kijklink-adres" readOnly value={link} onFocus={e => e.target.select()} />}

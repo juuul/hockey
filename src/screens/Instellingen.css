@@ -144,21 +144,6 @@
   color: var(--tekst-zacht);
 }
 
-.instellingen-schakelaar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 60px;
-  color: var(--tekst);
-  font-size: var(--base-readable-size);
-}
-
-.instellingen-schakelaar input {
-  width: 26px;
-  height: 26px;
-  flex-shrink: 0;
-}
-
 .instellingen-teamkeuze .instellingen-kop {
   border-bottom-width: 1px;
 }
