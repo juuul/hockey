@@ -6,22 +6,18 @@ import ResetModal from './ResetModal'
 import './DeelKijklink.css'
 
 // Delen van een link van het actieve team:
-// - 'kijk': meekijklink (beheerders en kijkers), iedereen met de link kijkt live mee
+// - 'kijk': teamlink (beheerders en kijkers), toegang blijft afhankelijk van goedkeuring
 // - 'aanvraag': aanmeldlink voor ouders (alleen beheerders), ouders vragen toegang aan
 const TEKSTEN = {
   kijk: {
     knop: '🔗 Teamlink delen',
     uitleg: 'Via deze link vraag je toegang aan. De beheerder keurt de aanvraag goed voordat je kunt meekijken.',
-    deelTekst: (team: string) => `Vraag hier toegang tot ${team} in de hockey-app:`,
-    titel: (team: string) => `${team} live`,
     vraag: 'Nieuwe meekijklink?',
     regels: [{ icoon: '🔗', tekst: 'De oude link werkt dan niet meer' }, { icoon: '👀', tekst: 'Goedgekeurde leden behouden hun toegang' }],
   },
   aanvraag: {
     knop: '🔗 Aanmeldlink voor ouders delen',
     uitleg: 'Via deze link vragen ouders en begeleiders toegang aan. Jij keurt de aanvragen goed voordat zij een uitnodiging ontvangen.',
-    deelTekst: (team: string) => `Vraag hier je account aan voor ${team} in de hockey-app:`,
-    titel: (team: string) => `Account aanvragen ${team}`,
     vraag: 'Nieuwe aanmeldlink?',
     regels: [{ icoon: '🔗', tekst: 'De oude aanmeldlink werkt dan niet meer' }, { icoon: '📨', tekst: 'Al verstuurde aanvragen blijven staan' }],
   },
@@ -47,10 +43,9 @@ export default function DeelKijklink({ soort = 'kijk' }: { soort?: 'kijk' | 'aan
       const url = soort === 'kijk' ? await haalKijkLink(actiefTeam.id, vernieuw) : await haalAanvraagLink(actiefTeam.id, vernieuw)
       if (vernieuw) teamsLaden().catch(() => {})
       tel(`${soort}link-${vernieuw ? 'vernieuwd' : 'gedeeld'}`)
-      const tekst = t.deelTekst(actiefTeam.naam)
       if (navigator.share) {
         try {
-          await navigator.share({ title: t.titel(actiefTeam.naam), text: tekst, url })
+          await navigator.share({ url })
           setBezig(false)
           return
         } catch (err) {
