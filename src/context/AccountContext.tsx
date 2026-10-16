@@ -8,6 +8,7 @@ interface AccountContextType {
   teams: Team[]
   teamsLaden: () => Promise<void>
   inloggen: (email: string, wachtwoord: string) => Promise<void>
+  googleInloggen: () => Promise<void>
   uitloggen: () => void
   actiefTeam: Team | null
   actiefTeamId: string | null
@@ -102,6 +103,11 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     await teamsLaden()
   }
 
+  const googleInloggen = async () => {
+    await pb.collection('users').authWithOAuth2({ provider: 'google' })
+    await teamsLaden()
+  }
+
   const uitloggen = () => pb.authStore.clear()
 
   // Via een meekijklink: inloggen als de gast van dat team en dat team kiezen
@@ -171,7 +177,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const magBewerken = !actiefTeamId || !!gebruiker?.superadmin || (actiefTeam ? rolIn(actiefTeam, gebruiker?.id ?? '') === 'beheerder' : false)
 
   return (
-    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen, teamInstellingen, zetTeamInstellingen, aanvragen, aanvragenLaden }}>
+    <AccountContext.Provider value={{ gebruiker, teams, teamsLaden, inloggen, googleInloggen, uitloggen, actiefTeam, actiefTeamId, kiesTeam, magBewerken, meekijken, mijnKinderen, zetMijnKinderen, teamInstellingen, zetTeamInstellingen, aanvragen, aanvragenLaden }}>
       {children}
     </AccountContext.Provider>
   )

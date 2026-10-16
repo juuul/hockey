@@ -86,6 +86,22 @@
   flex: 0 0 auto;
 }
 
+.account-scheiding {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--tekst-2);
+  font-size: 0.9em;
+}
+
+.account-scheiding::before,
+.account-scheiding::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: var(--rand);
+}
+
 .account-label {
   display: flex;
   flex-direction: column;

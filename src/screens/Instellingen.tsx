@@ -106,7 +106,7 @@ function SyncRegel() {
 }
 
 function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanmelden?: (keuze: 'bestaand' | 'nieuw') => void }) {
-  const { inloggen } = useAccount()
+  const { inloggen, googleInloggen } = useAccount()
   const [email, setEmail] = useState(startEmail)
   const [wachtwoord, setWachtwoord] = useState('')
   const [bezig, setBezig] = useState(false)
@@ -122,6 +122,15 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
       setMelding({ tekst: (err as { status?: number }).status === 400 ? 'E-mail of wachtwoord klopt niet.' : foutTekst(err), fout: true })
     }
     setBezig(false)
+  }
+
+  const google = () => {
+    setBezig(true)
+    setMelding(null)
+    googleInloggen()
+      .then(() => tel('ingelogd-google'))
+      .catch(err => setMelding({ tekst: foutTekst(err), fout: true }))
+      .finally(() => setBezig(false))
   }
 
   const vergeten = async () => {
@@ -150,6 +159,8 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
       <Melding tekst={melding?.tekst ?? null} fout={melding?.fout} />
       <button className="btn btn-primary" type="submit" disabled={bezig || !email.trim() || !wachtwoord}>Inloggen</button>
       <button className="btn btn-secondary" type="button" onClick={vergeten} disabled={bezig}>Wachtwoord vergeten</button>
+      <div className="account-scheiding" aria-hidden="true"><span>of</span></div>
+      <button className="btn btn-secondary" type="button" onClick={google} disabled={bezig}>Inloggen met Google</button>
     </form>
   )
   if (!aanmelden) return formulier
