@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict'
+import { begeleidingProfiel, begeleidingStandaard, begeleidingAantal, begeleidingPlekken, kiesTaak } from '../../src/begeleiding'
+import type { ProgrammaItem } from '../../src/types'
+const inst = { uitGeenBegeleiding: false, thuisGeenBegeleiding: false }
+assert.equal(begeleidingProfiel(6), 'o9')
+assert.equal(begeleidingProfiel(8), 'o10')
+assert.equal(begeleidingProfiel('mini3'), 'o78')
+assert.equal(begeleidingProfiel('zaaljeugd6', 'MO-10-1'), 'o10')
+assert.equal(begeleidingProfiel('zaaljeugd6', 'JO9-2'), 'o9')
+assert.equal(begeleidingProfiel('zaaljeugd6', 'Team'), 'onbekend')
+assert.equal(begeleidingProfiel('zaalmini4'), 'zaal-o8')
+for (const profiel of ['o9', 'o10', 'o78']) for (const thuis of [true, false]) {
+  assert.equal(begeleidingStandaard(profiel, thuis), profiel === 'o10' || thuis ? 1 : 0)
+}
+assert.equal(begeleidingStandaard('o78', true, 2), 2)
+assert.equal(begeleidingStandaard('zaal-o8', true), null)
+assert.equal(begeleidingAantal('o9', false, { ...inst, begeleidingUit: 1 }), 1)
+assert.equal(begeleidingAantal('o10', false, { ...inst, uitGeenBegeleiding: true }), 0, 'Expliciete oude voorkeur behouden')
+const p = { id: 'voorbeeld', soort: 'wedstrijd', thuis: false, fruit: '', begeleider1: '', begeleider2: '' } as ProgrammaItem
+assert.deepEqual(begeleidingPlekken(p, 'o9', inst), ['-', '-'])
+assert.deepEqual(begeleidingPlekken({ ...p, begeleider2: 'oud' }, 'o9', inst), ['-', 'oud'])
+for (const veld of ['fruit', 'begeleider1', 0, 2] as const) {
+  const nieuw = kiesTaak(p, veld, 'ouder', 'o10', inst, 11)
+  assert.equal(nieuw.fruit, 'ouder')
+  assert.equal(nieuw.begeleider1, 'ouder')
+  assert.equal(nieuw.begeleider2, '-')
+  assert.equal(nieuw.rijders?.filter(id => id === 'ouder').length, 1)
+  assert.equal(nieuw.rijders?.[typeof veld === 'number' ? veld : 0], 'ouder')
+  assert.equal(nieuw.rijders?.length, 3)
+  const apart = kiesTaak(nieuw, 'fruit', 'ander', 'o10', inst, 11)
+  assert.equal(apart.begeleider1, 'ouder')
+  assert.equal(apart.rijders?.filter(id => id === 'ouder').length, 1)
+}
+const uit9 = kiesTaak(p, 'fruit', 'ouder', 'o9', inst, 9)
+assert.equal(uit9.begeleider1, '-')
+assert.equal(uit9.rijders?.[0], 'ouder')
+const thuis9 = kiesTaak({ ...p, thuis: true }, 'fruit', 'ouder', 'o9', inst, 9)
+assert.equal(thuis9.begeleider1, 'ouder')
+assert.deepEqual(thuis9.rijders, [])
+assert.equal(kiesTaak({ ...p, begeleider1: 'bestaand' }, 'fruit', 'ander', 'o10', inst, 11).begeleider1, 'bestaand')
+assert.equal(kiesTaak(p, 0, '-', 'o10', inst, 11).fruit, '')
+assert.equal(kiesTaak(p, 'begeleider1', '', 'o10', inst, 11).fruit, '')
+console.log('BEGELEIDING_OK: O7/O8 per veldje, O9 thuis, O10 beide teams, zaalherkenning/onzekerheid, eigen keuzes, eerste taak koppelt één ouder, rest blijft apart.')
