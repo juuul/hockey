@@ -1,0 +1,27 @@
+.verzamelen-instellen .modal-input {
+  margin-bottom: 0;
+}
+
+.verzamelen-standaard {
+  color: var(--tekst-zacht);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.verzamelen-extra summary {
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+  cursor: pointer;
+  color: var(--blauw-tekst);
+  font-size: var(--base-readable-size);
+}
+
+.verzamelen-extra summary::before {
+  content: '›';
+  margin-right: 8px;
+}
+
+.verzamelen-extra[open] summary::before {
+  transform: rotate(90deg);
+}

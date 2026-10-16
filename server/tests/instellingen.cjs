@@ -8,6 +8,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
   const browser = await puppeteer.launch({ executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] })
   let page
   let syncFout = false
+  let reisFout = false
   let wijzigingen = []
   const fouten = []
   try {
@@ -19,6 +20,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
       await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }])
       const gebruiker = { id: 'oudertest1234567', email: 'ouder@example.invalid', name: 'Testouder', superadmin }
       const teams = [1, 2].map(n => ({ id: `testteam000000${n}`, naam: `Testteam ${n}`, beheerders: kijker ? [] : [gebruiker.id], kijkers: kijker ? [gebruiker.id] : [], officieelTeam: `officieel${n}`, vindbaar: true }))
+      const reistijden = {}
       await page.evaluateOnNewDocument(({ token, gebruiker, teams }) => {
         localStorage.clear()
         localStorage.setItem('hockey_test_backend', 'apart-v1')
@@ -56,8 +58,15 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
         else if (url.pathname.includes('/standen/records/')) body = { id: teams[0].id, versie: 0 }
         else if (url.pathname.includes('/toegangsaanvragen/records') && aanvragen) body = lijst([{ id: 'aanvraagtest', naam: 'Testaanvrager', email: 'aanvrager@example.invalid', team: teams[0].id }])
         else if (url.pathname.includes('/verzamelinstellingen')) {
+          if (req.method() === 'GET' && reisFout) return req.respond({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ message: 'Teststoring' }) })
           const globaal = { voorbereidingMinuten: 30, bufferMinuten: 5 }
-          body = url.pathname.includes('/team/') ? { globaal, eigen: {}, effectief: { ...globaal, vertrekAdres: '' }, clubAdres: '', googleBeschikbaar: false } : globaal
+          if (req.method() === 'POST') {
+            const data = JSON.parse(req.postData())
+            wijzigingen.push({ pad: url.pathname, data })
+            reistijden[url.pathname] = data
+          }
+          const eigen = reistijden[url.pathname] || {}
+          body = url.pathname.includes('/team/') ? { globaal, eigen, effectief: { voorbereidingMinuten: eigen.voorbereidingMinuten ?? 30, bufferMinuten: eigen.bufferMinuten ?? 5, vertrekAdres: eigen.vertrekAdres || '' }, clubAdres: '', googleBeschikbaar: false } : globaal
         }
         else if (url.pathname.includes('/aanvraaglink/')) body = { token: 'testtoken' }
         else if (url.pathname.endsWith('/planning/documenten')) body = { documenten: [], bijgewerkt: null, wachtendeMails: 0 }
@@ -104,6 +113,54 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await klik('Verzameltijd')
     await page.waitForSelector('input[type="number"]:not(:disabled)')
     assert.equal(await page.$$eval('input[type="number"]', ns => ns.length), 2)
+    assert.equal(await page.$('.verzamelen-instellen input[type="checkbox"]'), null)
+    assert.deepEqual(await page.$$eval('input[type="number"]', ns => ns.map(n => n.value)), ['30', '5'])
+    assert.equal(await page.$eval('.verzamelen-extra', el => el.open), false)
+    const vulGetal = async (index, waarde) => {
+      const velden = await page.$$('input[type="number"]')
+      await velden[index].click({ clickCount: 3 })
+      await page.keyboard.press('Backspace')
+      if (waarde !== '') await velden[index].type(String(waarde))
+    }
+    await vulGetal(0, '')
+    assert.equal(await page.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent === 'Opslaan').disabled), true)
+    for (const ongeldig of ['361', '-1', '1.5']) {
+      await vulGetal(0, ongeldig)
+      assert.equal(await page.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent === 'Opslaan').disabled), true)
+    }
+    await vulGetal(0, '0')
+    await vulGetal(1, '12')
+    await page.click('.verzamelen-extra summary')
+    await page.type('.verzamelen-extra input', 'Teststraat 1')
+    await klik('Opslaan')
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === 'Opslaan' && !b.disabled))
+    const eigenTijden = wijzigingen.filter(w => w.pad.includes('/verzamelinstellingen')).at(-1)
+    assert.deepEqual(eigenTijden.data, { voorbereidingMinuten: 0, bufferMinuten: 12, vertrekAdres: 'Teststraat 1' })
+    await terug()
+    await klik('Verzameltijd')
+    await page.waitForFunction(() => document.querySelector('input[type="number"]').value === '0')
+    assert.deepEqual(await page.$$eval('input[type="number"]', ns => ns.map(n => n.value)), ['0', '12'])
+    const aantalPosts = wijzigingen.length
+    await klik('Herstel standaardwaarden')
+    assert.deepEqual(await page.$$eval('input[type="number"]', ns => ns.map(n => n.value)), ['30', '5'])
+    assert.equal(wijzigingen.length, aantalPosts)
+    await klik('Opslaan')
+    await page.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === 'Opslaan' && !b.disabled))
+    const hersteld = wijzigingen.filter(w => w.pad.includes('/verzamelinstellingen')).at(-1)
+    assert.deepEqual(hersteld.data, { voorbereidingMinuten: null, bufferMinuten: null, vertrekAdres: 'Teststraat 1' })
+    if (process.env.REIS_PREVIEW_PATH) await page.screenshot({ path: process.env.REIS_PREVIEW_PATH })
+    await terug()
+    await klik('Verzameltijd')
+    await page.waitForFunction(() => document.querySelector('input[type="number"]').value === '30')
+    assert.deepEqual(await page.$$eval('input[type="number"]', ns => ns.map(n => n.value)), ['30', '5'])
+    await terug()
+    reisFout = true
+    await klik('Verzameltijd')
+    await page.waitForSelector('.verzamelen-instellen [role="alert"]')
+    reisFout = false
+    await klik('Opnieuw proberen')
+    await page.waitForSelector('input[type="number"]:not(:disabled)')
+    assert.deepEqual(await page.$$eval('input[type="number"]', ns => ns.map(n => n.value)), ['30', '5'])
     await terug()
     await klik('Leden')
     await page.waitForFunction(() => document.querySelector('.instellingen-kop-titel').textContent === 'Leden')
@@ -164,6 +221,6 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await page.click('.account-sync.fout')
     await page.waitForFunction(() => document.body.textContent.includes('Alles bijgewerkt'))
     assert.deepEqual(fouten, [])
-    console.log('INSTELLINGEN_OK: compact overzicht, Actief-label, delen zonder tekst, vindbaarheid, leden, verzameltijd, thema, teamwissel, Zonder team, account/uitloggen, kijkerrechten, aanvragen, superadmin, terug en sync-herstel.')
+    console.log('INSTELLINGEN_OK: compact overzicht, Actief-label, delen zonder tekst, vindbaarheid, leden, verzameltijd met standaardwaarden/herstel/validatie/laadherstel, thema, teamwissel, Zonder team, account/uitloggen, kijkerrechten, aanvragen, superadmin, terug en sync-herstel.')
   } finally { await browser.close() }
 })().catch(err => { console.error(err); process.exit(1) })
