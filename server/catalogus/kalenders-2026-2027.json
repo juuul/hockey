@@ -22094,7 +22094,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -22246,7 +22246,7 @@
     "district": "Landelijk",
     "spelvorm": "Zaal",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -22293,7 +22293,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -22450,7 +22450,7 @@
     "district": "Landelijk",
     "spelvorm": "Zaal",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -22497,7 +22497,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -22579,6 +22579,16 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -22654,7 +22664,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -22736,6 +22746,16 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -22806,7 +22826,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -22888,6 +22908,16 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -22968,7 +22998,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23050,6 +23080,16 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -23130,7 +23170,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23212,6 +23252,16 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -23282,7 +23332,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23364,6 +23414,16 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -23434,7 +23494,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23521,6 +23581,11 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -23591,7 +23656,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23678,6 +23743,11 @@
         "datum": "2027-03-21",
         "status": "speeldag",
         "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
       },
       {
         "datum": "2027-04-04",
@@ -23753,7 +23823,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23830,7 +23900,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23897,6 +23967,56 @@
         "datum": "2026-11-29",
         "status": "reserve",
         "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "21"
       }
     ]
   },
@@ -23907,7 +24027,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -23936,11 +24056,6 @@
         "omschrijving": "5"
       },
       {
-        "datum": "2026-10-11",
-        "status": "speeldag",
-        "omschrijving": "6"
-      },
-      {
         "datum": "2026-10-18",
         "status": "reserve",
         "omschrijving": "R"
@@ -23948,32 +24063,82 @@
       {
         "datum": "2026-10-25",
         "status": "speeldag",
-        "omschrijving": "7"
+        "omschrijving": "6"
       },
       {
         "datum": "2026-11-01",
         "status": "speeldag",
-        "omschrijving": "8"
+        "omschrijving": "7"
       },
       {
         "datum": "2026-11-08",
         "status": "speeldag",
-        "omschrijving": "9"
+        "omschrijving": "8"
       },
       {
         "datum": "2026-11-15",
         "status": "speeldag",
-        "omschrijving": "10"
+        "omschrijving": "9"
       },
       {
         "datum": "2026-11-22",
         "status": "speeldag",
-        "omschrijving": "11"
+        "omschrijving": "10"
       },
       {
         "datum": "2026-11-29",
         "status": "reserve",
         "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "20"
       }
     ]
   },
@@ -23984,7 +24149,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24026,7 +24191,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24063,7 +24228,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24125,7 +24290,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24182,7 +24347,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24339,7 +24504,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24481,7 +24646,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24643,7 +24808,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24790,7 +24955,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
@@ -24872,7 +25037,7 @@
     "district": "Landelijk",
     "spelvorm": "Veld",
     "doelgroep": "Bondscompetitie",
-    "bron": "https://media.static-hw.nl/media/735814a2-8b5a-4e36-92c1-90ad4d320877/26-27-land-speeldagenkalenders-def.pdf",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
     "autoLeeftijden": [],
     "dagen": [
       {
