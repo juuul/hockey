@@ -3,6 +3,7 @@ import { useAccount } from '../context/AccountContext'
 import { appAdres, foutTekst, pb } from '../server'
 import { clubKomtOvereen } from '../clubzoeken'
 import './TeamSelectie.css'
+import { lees, OPSLAG, schrijf } from '../opslag'
 
 export interface OfficieelTeam {
   id: string; bronId: string; clubBronId: string; naam: string; seizoen: string
@@ -12,9 +13,19 @@ interface CatalogusClub { id: string; bronId: string; naam: string; plaats: stri
 interface OfficieleWedstrijd { id: string; datum: string; spelen: string; thuisNaam: string; uitNaam: string; uitslag?: { home: number; away: number } | null }
 interface Omgeving { id: string; naam: string; omgevingNaam: string }
 
+function bewaardeClubs(): CatalogusClub[] {
+  const lijst = lees<unknown>(OPSLAG, 'catalogus_clubs', [])
+  if (!Array.isArray(lijst)) return []
+  return lijst.filter(c => c && ['id', 'bronId', 'naam', 'plaats'].every(k => typeof c[k] === 'string'))
+}
+
 // Een club kiezen laadt alleen de teams van die club. Gegevens komen uit de eigen catalogus.
 export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; kies: (t: OfficieelTeam | null) => void }) {
-  const [clubs, setClubs] = useState<CatalogusClub[]>([])
+  const [clubs, setClubs] = useState<CatalogusClub[]>(bewaardeClubs)
+  const [clubsLaden, setClubsLaden] = useState(true)
+  const [clubsGeladen, setClubsGeladen] = useState(false)
+  const [clubsFout, setClubsFout] = useState('')
+  const [clubPoging, setClubPoging] = useState(0)
   const [zoek, setZoek] = useState('')
   const [clubId, setClubId] = useState('')
   const [teams, setTeams] = useState<OfficieelTeam[]>([])
@@ -23,7 +34,38 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
   const [fout, setFout] = useState('')
   const [ververs, setVervers] = useState(0)
   useEffect(() => {
-    pb.collection('catalogus_clubs').getFullList<CatalogusClub>({ sort: 'naam' }).then(setClubs).catch(e => setFout(foutTekst(e)))
+    let actief = true
+    let controller: AbortController | undefined
+    let herhaal: ReturnType<typeof setTimeout> | undefined
+    const laad = async (poging = 0) => {
+      setClubsLaden(true); setClubsFout('')
+      controller = new AbortController()
+      const timeout = setTimeout(() => controller?.abort(), 10_000)
+      try {
+        const lijst = await pb.collection('catalogus_clubs').getFullList<CatalogusClub>({ sort: 'naam', signal: controller.signal })
+        if (!actief) return
+        setClubs(lijst); setClubsGeladen(true); setClubsLaden(false)
+        // Alleen openbare clubvelden bewaren, geen leden, tokens of accountgegevens.
+        schrijf(OPSLAG, 'catalogus_clubs', lijst.map(({ id, bronId, naam, plaats }) => ({ id, bronId, naam, plaats })))
+      } catch (e) {
+        if (!actief) return
+        const status = (e as { status?: number }).status
+        if (poging < 2 && (status === 0 || (status ?? 0) >= 500)) {
+          herhaal = setTimeout(() => laad(poging + 1), 1500 * (poging + 1))
+        } else {
+          setClubsFout(foutTekst(e)); setClubsLaden(false)
+        }
+      } finally {
+        clearTimeout(timeout)
+      }
+    }
+    laad()
+    return () => { actief = false; clearTimeout(herhaal); controller?.abort() }
+  }, [clubPoging])
+  useEffect(() => {
+    const opnieuw = () => setClubPoging(p => p + 1)
+    window.addEventListener('online', opnieuw)
+    return () => window.removeEventListener('online', opnieuw)
   }, [])
   const club = clubs.find(c => c.id === clubId)
   useEffect(() => {
@@ -49,9 +91,14 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
     <label className="account-label">Zoek je club
       <input className="modal-input" type="search" placeholder="Clubnaam, afkorting of plaats, bijvoorbeeld sc" value={zoek} onChange={e => setZoek(e.target.value)} />
     </label>
-    {!!zoek.trim() && !gevondenClubs.length && <p className="account-uitleg" role="status">Geen clubs gevonden. Probeer een andere naam, afkorting of plaats.</p>}
+    {clubsLaden && <p className="account-uitleg" role="status">{clubs.length ? 'Clublijst bijwerken… Je kunt alvast zoeken.' : 'Clubs ophalen… Bij een verbindingsprobleem proberen we het automatisch opnieuw.'}</p>}
+    {clubsFout && <div>
+      <p className="account-melding fout" role="alert">De clublijst kon niet worden opgehaald. {clubsFout}{clubs.length ? ' Je kunt de eerder opgehaalde clubs alvast doorzoeken. Voor teams en toegang aanvragen is verbinding nodig.' : ''}</p>
+      <button className="btn btn-secondary" type="button" onClick={() => setClubPoging(p => p + 1)}>Clubs opnieuw ophalen</button>
+    </div>}
+    {clubsGeladen && !clubsLaden && !clubsFout && !!zoek.trim() && !gevondenClubs.length && <p className="account-uitleg" role="status">Geen clubs gevonden. Probeer een andere naam, afkorting of plaats.</p>}
     <label className="account-label">Club
-      <select className="modal-input" value={clubId} onChange={e => { setClubId(e.target.value); setFilters({}); kies(null) }}>
+      <select className="modal-input" disabled={!clubs.length} value={clubId} onChange={e => { setClubId(e.target.value); setFilters({}); kies(null) }}>
         <option value="">Kies je club…</option>
         {clubs.filter(c => c.id === clubId || gevondenClubs.includes(c)).map(c => <option key={c.id} value={c.id}>{c.naam} · {c.plaats}</option>)}
       </select>

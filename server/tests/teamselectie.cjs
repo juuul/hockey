@@ -10,6 +10,7 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
     let aanvraag
     let nieuweGroep
     let enkeleGroep = false
+    let clubStoringen = 0
     const clubs = [{ id: 'club1', bronId: 'SCHC123', naam: 'SCHC', plaats: 'Bilthoven' }]
     const teams = [1, 2].map(n => ({ id: `team${n}`, bronId: String(n), naam: `SCHC MO11-${n}`, seizoen: '2026-2027', geslacht: 'Meisjes', leeftijd: 'O11', categorie: 'Jeugd', spelvorm: 'Veld', klasse: n === 1 ? '5e klasse' : '', gecontroleerd: '2026-10-15T12:00:00Z' }))
     const omgevingen = [{ id: 'groep1', naam: 'MO11-1 ouders' }, { id: 'groep2', naam: 'MO11-1 begeleiding' }]
@@ -19,7 +20,13 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
       if (url.pathname.includes('/api/')) {
         let body = {}
         const lijst = items => ({ items, page: 1, perPage: 1000, totalPages: 1, totalItems: items.length })
-        if (url.pathname.includes('catalogus_clubs/records')) body = lijst(clubs)
+        if (url.pathname.includes('catalogus_clubs/records')) {
+          if (req.method() === 'GET' && clubStoringen > 0) {
+            clubStoringen--
+            return req.abort('connectionfailed')
+          }
+          body = lijst(clubs)
+        }
         else if (url.pathname.includes('catalogus_teams/records')) body = lijst(teams)
         else if (url.pathname.includes('catalogus_wedstrijden/records')) body = lijst([])
         else if (url.pathname.endsWith('/team1/omgevingen')) body = enkeleGroep ? omgevingen.slice(0, 1) : omgevingen
@@ -50,11 +57,14 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
       const element = await page.evaluateHandle(label => [...document.querySelectorAll('label')].find(l => l.firstChild?.textContent.trim() === label)?.querySelector('select'), label)
       await element.asElement().select(waarde)
     }
-    const begin = async () => {
+    const openZoeker = async () => {
       await page.goto(process.env.TEST_URL || 'http://127.0.0.1:5187/', { waitUntil: 'networkidle0' })
       await page.click('button[aria-label="Instellingen"]')
       await klik('Groep zoeken of maken')
       await page.waitForSelector('input[type="search"]')
+    }
+    const begin = async () => {
+      await openZoeker()
       await page.type('input[type="search"]', 'sc')
       assert.ok(await page.evaluate(() => [...document.querySelectorAll('select option')].some(o => o.textContent.includes('SCHC'))))
       await kies('Club', 'club1')
@@ -94,7 +104,37 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
     await kies('Officieel team', 'team1')
     await page.waitForSelector('input[name="bestaande-groep"][value="groep1"]')
     assert.equal(await page.$eval('input[name="bestaande-groep"]', el => el.checked), true)
+
+    // Eerste keer zonder cache: een laadfout is nooit een leeg zoekresultaat.
+    await page.evaluate(() => localStorage.removeItem('hockey_test_catalogus_clubs'))
+    clubStoringen = 1
+    await openZoeker()
+    await page.type('input[type="search"]', 'Sc')
+    assert.equal(await page.evaluate(() => document.body.textContent.includes('Geen clubs gevonden')), false)
+    await page.waitForFunction(() => [...document.querySelectorAll('select option')].some(o => o.textContent.includes('SCHC')))
+
+    // Bij aanhoudende uitval blijft de eerder geladen openbare lijst bruikbaar.
+    clubStoringen = 3
+    await openZoeker()
+    await page.type('input[type="search"]', 'Sc')
+    await page.waitForFunction(() => document.body.textContent.includes('De clublijst kon niet worden opgehaald'))
+    assert.equal(await page.evaluate(() => document.body.textContent.includes('Geen clubs gevonden')), false)
+    assert.ok(await page.evaluate(() => [...document.querySelectorAll('select option')].some(o => o.textContent.includes('SCHC'))))
+    await klik('Clubs opnieuw ophalen')
+    await page.waitForFunction(() => !document.body.textContent.includes('De clublijst kon niet worden opgehaald') && !document.body.textContent.includes('Clublijst bijwerken'))
+
+    // Ook zonder cache is herstel mogelijk zodra het toestel weer online komt.
+    await page.evaluate(() => localStorage.removeItem('hockey_test_catalogus_clubs'))
+    clubStoringen = 3
+    await openZoeker()
+    await page.waitForFunction(() => document.body.textContent.includes('De clublijst kon niet worden opgehaald'))
+    assert.equal(await page.$eval('select', el => el.disabled), true)
+    await page.evaluate(() => window.dispatchEvent(new Event('online')))
+    await page.waitForFunction(() => [...document.querySelectorAll('select option')].some(o => o.textContent.includes('SCHC')))
+    await page.type('input[type="search"]', 'zzzzzz')
+    await page.waitForFunction(() => document.body.textContent.includes('Geen clubs gevonden'))
     console.log('TEAMSELECTIE_OK: sc vindt SCHC, beide MO11-teams zichtbaar, geen klasse/categorie, groep kiezen en toegang aanvragen, lege lijst, nieuwe groep en automatische keuze bij één groep.')
+    console.log('CLUBVERBINDING_OK: automatische herpoging, geen foutieve lege resultaten, openbare cache, handmatig opnieuw laden en herstel bij online.')
   } finally {
     await browser.close()
   }
