@@ -2,6 +2,7 @@ import { RefObject, useEffect, useRef, useState } from 'react'
 import './Verversen.css'
 
 const DREMPEL = 60
+const MAX_PIJL_MS = 2000
 
 // Eigen "trek omlaag om te verversen": html/body scrollen niet (alleen .content), dus het browsergebaar werkt hier niet
 export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObject<HTMLElement>; onVervers: () => Promise<unknown> }) {
@@ -18,6 +19,7 @@ export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObje
     let startX = 0
     let huidig = 0
     let gestopt = false
+    let pijlTimer: ReturnType<typeof setTimeout> | undefined
     let scrollVakken: HTMLElement[] = []
     let negeerKlikTot = 0
     const klik = (e: MouseEvent) => {
@@ -56,8 +58,13 @@ export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObje
         setLaden(true)
         negeerKlikTot = Date.now() + 300
         bezig.current = true
+        // Langzame servercontroles mogen het scherm niet langdurig blijven bedekken.
+        pijlTimer = setTimeout(() => {
+          if (!gestopt) { setLaden(false); setAfstand(0) }
+        }, MAX_PIJL_MS)
         // Alleen gegevens bijwerken: behoud dezelfde scherm-/formuliernodes en scrollpositie.
         void Promise.resolve().then(() => actie.current()).catch(() => {}).finally(() => {
+          clearTimeout(pijlTimer)
           bezig.current = false
           if (!gestopt) { setLaden(false); annuleer() }
         })
@@ -75,6 +82,7 @@ export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObje
     vak.addEventListener('click', klik, true)
     return () => {
       gestopt = true
+      clearTimeout(pijlTimer)
       vak.removeEventListener('touchstart', start)
       vak.removeEventListener('touchmove', beweeg)
       vak.removeEventListener('touchend', eind)

@@ -9,7 +9,7 @@ export function assetVersie(doc: Document, basis: string): string {
     .filter(pad => pad.includes('/assets/')).sort().join('|')
 }
 
-export async function verversAppVersie(vak: HTMLElement): Promise<void> {
+export async function verversAppVersie(vak: HTMLElement, gegevensKlaar: Promise<unknown> = Promise.resolve()): Promise<void> {
   const huidig = assetVersie(document, location.href)
   if (!huidig) return // Lokale ontwikkelserver gebruikt geen gepubliceerde assetnamen.
   const url = new URL(location.href)
@@ -19,7 +19,10 @@ export async function verversAppVersie(vak: HTMLElement): Promise<void> {
   if (!antwoord.ok) return
   const doc = new DOMParser().parseFromString(await antwoord.text(), 'text/html')
   const nieuw = assetVersie(doc, url.href)
-  if (!nieuw || nieuw === huidig || invoerOpen()) return
+  if (!nieuw || nieuw === huidig) return
+  // Controleer de versie parallel, maar rond eerst gegevensopslag af vóór echt herladen.
+  await gegevensKlaar
+  if (invoerOpen()) return
   const posities = [vak, ...vak.querySelectorAll<HTMLElement>('*')].filter(el => el.scrollTop > 0).map(el => {
     const stappen: number[] = []
     for (let node = el; node !== vak; node = node.parentElement!) stappen.unshift([...node.parentElement!.children].indexOf(node))

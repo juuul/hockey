@@ -46,6 +46,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - Geen meldingen (toasts) na een bevestiging; bevestigingsvragen alleen bij resets, timer-stop, iemand uit het team halen en een uitnodiging intrekken.
 - **Terugknop van de telefoon** (`useTerug` in `src/terug.ts`): pop-up dicht → subscherm terug → Dashboard → pas dan de app uit. **Nieuwe pop-ups altijd aansluiten.**
 - Trek omlaag om gegevens te verversen (`Verversen.tsx`), met controle van `.content` én geneste scrollvakken.
+  Het laadpijltje staat maximaal 2 seconden in beeld; tragere controles lopen op de achtergrond door zonder dubbele ronde. Gegevens- en appversiecontrole starten parallel. Een nieuwe appversie herlaadt pas na afronding van gegevensopslag, met scroll-/invoerbescherming.
   Haalt teamgegevens/live stand/aanvragen op en controleert de gepubliceerde assets zonder cache. Alleen bij een nieuwe appversie volgt een herlaadactie met scrollherstel; dezelfde versie houdt dezelfde schermnodes. Ook geneste scrollvakken (Spelers) moeten bovenaan staan. Touchcancel, horizontaal/multitouch en starten op invoervelden doen niets; knoppen laten trekken toe zonder de knop daarna per ongeluk te activeren; tijdens invoer/popups geen gebaarverversing. Achtergrondsync blijft werken met behoud van formulier/focus/scroll.
 - Spelers zijn **rondjes**, geen ovalen.
 

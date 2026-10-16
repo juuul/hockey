@@ -94,8 +94,8 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
         {screen === 'instellingen' && <Instellingen start={start} startGebruikt={startGebruikt} naarDashboard={() => setScreen('dashboard')} />}
       </div>
       <Verversen scrollVak={scrollVak} onVervers={async () => {
-        await Promise.allSettled([nuSynchroniseren(), teamsLaden(), aanvragenLaden()])
-        if (scrollVak.current) await verversAppVersie(scrollVak.current)
+        const gegevens = Promise.allSettled([nuSynchroniseren(), teamsLaden(), aanvragenLaden()])
+        await Promise.allSettled([gegevens, scrollVak.current ? verversAppVersie(scrollVak.current, gegevens) : undefined])
       }} />
       <OvernemenVraag />
     </div>
