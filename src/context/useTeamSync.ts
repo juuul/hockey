@@ -23,7 +23,7 @@ interface Props {
 
 // Offline eerst: de app werkt altijd op de lokale gegevens; deze hook stuurt verschillen door en haalt de serverstand op.
 // 'basis' (wat de server de vorige keer had) wordt bewaard, zodat ook na herstarten duidelijk is wat nog verstuurd moet worden.
-export function useTeamSync({ teamId, prefix, records, toepassen, verwijderd, verwijderdVerwerkt }: Props): { status: SyncStatus; nuSynchroniseren: () => void } {
+export function useTeamSync({ teamId, prefix, records, toepassen, verwijderd, verwijderdVerwerkt }: Props): { status: SyncStatus; nuSynchroniseren: () => Promise<void> } {
   const [status, setStatus] = useState<SyncStatus>({ geladen: false, wachtend: 0, offline: false, fout: null, serverLeeg: false })
   const recordsRef = useRef(records)
   recordsRef.current = records

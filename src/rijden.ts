@@ -7,10 +7,10 @@ export function autoPlekken(p: Pick<ProgrammaItem, 'thuis' | 'soort' | 'rijders'
   // Een kleiner geworden team mag bestaande ingeplande ouders niet stilzwijgend verliezen.
   const laatste = bewaard.reduce((n, id, i) => id && id !== NIET_NODIG ? i + 1 : n, 0)
   const aantal = Math.max(Math.ceil(Math.max(0, teamgrootte) / 4), laatste)
-  return Array.from({ length: aantal }, (_, i) => typeof bewaard[i] === 'string' ? bewaard[i] : NIET_NODIG)
+  return Array.from({ length: aantal }, (_, i) => typeof bewaard[i] === 'string' && bewaard[i] !== NIET_NODIG ? bewaard[i] : '')
 }
 
 export function rijdenTekst(plekken: string[], naam: (id: string) => string): string {
   if (!plekken.length) return 'niet nodig'
-  return plekken.map((id, i) => `auto ${i + 1}: ${id === NIET_NODIG ? 'n.v.t.' : id && naam(id) ? `ouder ${naam(id)}` : 'n.t.b.'}`).join(' · ')
+  return plekken.map((id, i) => `auto ${i + 1}: ${id && id !== NIET_NODIG && naam(id) ? `ouder ${naam(id)}` : 'nog te bepalen'}`).join(' · ')
 }

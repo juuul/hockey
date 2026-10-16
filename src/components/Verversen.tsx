@@ -1,33 +1,61 @@
-import { RefObject, useEffect, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 import './Verversen.css'
 
 const DREMPEL = 90
 
 // Eigen "trek omlaag om te verversen": html/body scrollen niet (alleen .content), dus het browsergebaar werkt hier niet
-export default function Verversen({ scrollVak }: { scrollVak: RefObject<HTMLElement> }) {
+export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObject<HTMLElement>; onVervers: () => Promise<unknown> }) {
   const [afstand, setAfstand] = useState(0)
   const [laden, setLaden] = useState(false)
+  const actie = useRef(onVervers)
+  actie.current = onVervers
+  const bezig = useRef(false)
 
   useEffect(() => {
     const vak = scrollVak.current
     if (!vak) return
     let startY: number | null = null
+    let startX = 0
     let huidig = 0
+    let gestopt = false
+    let scrollVakken: HTMLElement[] = []
+
+    const invoerOpen = () => !!document.querySelector('.modal.show, .reset-modal-overlay, dialog[open]') || !!document.activeElement?.matches('input, textarea, select, [contenteditable="true"]')
+    const annuleer = () => {
+      startY = null
+      huidig = 0
+      setAfstand(0)
+    }
 
     const start = (e: TouchEvent) => {
-      const inPopup = (e.target as Element).closest('.modal, .reset-modal-overlay')
-      startY = vak.scrollTop <= 0 && !inPopup ? e.touches[0].clientY : null
+      annuleer()
+      const interactief = (e.target as Element).closest('button, a, input, textarea, select, label, [contenteditable="true"]')
+      scrollVakken = [vak]
+      for (let el = e.target as HTMLElement; el && el !== vak; el = el.parentElement!) {
+        if (el.scrollHeight > el.clientHeight && /auto|scroll/.test(getComputedStyle(el).overflowY)) scrollVakken.push(el)
+      }
+      if (bezig.current || invoerOpen() || interactief || e.touches.length !== 1 || scrollVakken.some(el => el.scrollTop > 0)) return
+      startY = e.touches[0].clientY
+      startX = e.touches[0].clientX
     }
     const beweeg = (e: TouchEvent) => {
       if (startY === null) return
-      huidig = Math.max(0, (e.touches[0].clientY - startY) * 0.5)
+      if (invoerOpen() || e.touches.length !== 1 || scrollVakken.some(el => el.scrollTop > 0)) return annuleer()
+      const dy = e.touches[0].clientY - startY
+      const dx = Math.abs(e.touches[0].clientX - startX)
+      if (dy < -8 || dx > Math.max(16, dy)) return annuleer()
+      huidig = Math.max(0, dy * 0.5)
       setAfstand(huidig)
     }
     const eind = () => {
-      if (startY !== null && huidig >= DREMPEL) {
+      if (startY !== null && huidig >= DREMPEL && !invoerOpen()) {
         setLaden(true)
-        // Even laten zien dat er ververst wordt; de draaiende pijl loopt door tot de pagina opnieuw laadt
-        setTimeout(() => window.location.reload(), 150)
+        bezig.current = true
+        // Alleen gegevens bijwerken: behoud dezelfde scherm-/formuliernodes en scrollpositie.
+        void Promise.resolve().then(() => actie.current()).catch(() => {}).finally(() => {
+          bezig.current = false
+          if (!gestopt) { setLaden(false); annuleer() }
+        })
       } else {
         setAfstand(0)
       }
@@ -38,12 +66,13 @@ export default function Verversen({ scrollVak }: { scrollVak: RefObject<HTMLElem
     vak.addEventListener('touchstart', start, { passive: true })
     vak.addEventListener('touchmove', beweeg, { passive: true })
     vak.addEventListener('touchend', eind)
-    vak.addEventListener('touchcancel', eind)
+    vak.addEventListener('touchcancel', annuleer)
     return () => {
+      gestopt = true
       vak.removeEventListener('touchstart', start)
       vak.removeEventListener('touchmove', beweeg)
       vak.removeEventListener('touchend', eind)
-      vak.removeEventListener('touchcancel', eind)
+      vak.removeEventListener('touchcancel', annuleer)
     }
   }, [scrollVak])
 

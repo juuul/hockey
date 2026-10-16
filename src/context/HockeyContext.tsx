@@ -85,7 +85,7 @@ interface HockeyContextType {
   demo: boolean
   sync: SyncStatus | null
   live: LiveStatus | null
-  nuSynchroniseren: () => void
+  nuSynchroniseren: () => Promise<unknown>
   overnemenVraag: { spelers: number; clubs: number; wedstrijden: number } | null
   overnemen: (ja: boolean) => void
 }
@@ -538,7 +538,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   // Door de server verwerkte verwijderingen uit de lijst halen
   const verwijderdVerwerkt = (verwerkt: Verwijderd) =>
     setVerwijderd(v => perSoort(so => (v[so] ?? []).filter(id => !verwerkt[so].includes(id))))
-  const { status: sync, nuSynchroniseren } = useTeamSync({ teamId, prefix: P, records, toepassen, verwijderd, verwijderdVerwerkt })
+  const { status: sync, nuSynchroniseren: syncTeam } = useTeamSync({ teamId, prefix: P, records, toepassen, verwijderd, verwijderdVerwerkt })
+  const nuSynchroniseren = () => Promise.all([syncTeam(), liveRef.current?.ververs()])
 
   // ── Lopende wedstrijd live delen met het team ──
   const stand: Stand = { spelers: spelersStand(spelers), wisselingen, score, doelpunten, opstelling, timer, wedstrijd, shootouts, speeltijd: speeltijdLog, wisselsAltijdTellen }

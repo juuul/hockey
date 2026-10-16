@@ -39,7 +39,7 @@ interface Navigatie {
 
 function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
-  const { sync, live, demo, clubs, wedstrijd, spelvorm } = useHockey()
+  const { sync, live, demo, clubs, wedstrijd, spelvorm, nuSynchroniseren } = useHockey()
   // Shoot-out alleen bij O10 en O9; bij een andere categorie terug naar het Dashboard
   const tabs = TABS.filter(t => t.id !== 'shootout' || heeftShootouts(spelvorm))
   if (!tabs.some(t => t.id === screen)) screen = 'dashboard'
@@ -50,7 +50,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const tabNaam = (tab: { id: Scherm; naam: string }) => (tab.id === 'dashboard' && tegenstander ? tegenstander : tab.naam)
   const syncProbleem = !!((sync && (sync.offline || sync.fout)) || (live && !live.verbonden))
   // Open aanvragen (toegang tot een team, nieuwe teams): aantal op het tandwiel
-  const { aanvragen } = useAccount()
+  const { aanvragen, teamsLaden, aanvragenLaden } = useAccount()
   const aantalAanvragen = aanvragen.toegang.length + aanvragen.teams.length
 
   return (
@@ -91,7 +91,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
         {screen === 'historie' && <Historie />}
         {screen === 'instellingen' && <Instellingen start={start} startGebruikt={startGebruikt} naarDashboard={() => setScreen('dashboard')} />}
       </div>
-      <Verversen scrollVak={scrollVak} />
+      <Verversen scrollVak={scrollVak} onVervers={() => Promise.all([nuSynchroniseren(), teamsLaden(), aanvragenLaden()])} />
       <OvernemenVraag />
     </div>
   )

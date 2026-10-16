@@ -175,7 +175,7 @@ export interface ProgrammaItem {
   fruit: string;
   begeleider1: string; // '' = nog te bepalen, '-' = niet nodig, anders speler-id (ouder van)
   begeleider2: string;
-  rijders?: string[]; // per auto: '-' = n.v.t. (standaard), '' = n.t.b., anders ouder van speler-id
+  rijders?: string[]; // per auto: '' = nog te bepalen, anders ouder van speler-id; oud '-' wordt als leeg behandeld
   notitie: string;
 }
 

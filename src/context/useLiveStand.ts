@@ -10,6 +10,7 @@ export interface LiveStatus {
 
 export interface LiveStand {
   status: LiveStatus
+  ververs: () => Promise<void>
   // De stand die gelijk is aan de server (of null): nieuwe spelers uit de spelerslijst nemen hieruit hun plek over
   bekend: () => Stand | null
 }
@@ -164,5 +165,5 @@ export function useLiveStand({ teamId, prefix, stand, toepassen, magBewerken }: 
     }
   }, [])
 
-  return { status, bekend }
+  return { status, bekend, ververs: ophalen }
 }

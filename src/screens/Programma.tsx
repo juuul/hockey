@@ -365,7 +365,6 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
                 {autoPlekken(p, spelers.length).map((id, i) => <label className="prog-veld" key={i}>
                   🚗 Auto {i + 1}
                   <select className="modal-input" value={id} onChange={e => setP(kiesTaak(p, i, e.target.value, profiel, teamInstellingen, spelers.length))}>
-                    <option value={NIET_NODIG}>Niet van toepassing</option>
                     <option value="">Nog te bepalen</option>
                     {[...spelerKeuzes].sort((a, b) => telRijden(a.id) - telRijden(b.id) || a.naam.localeCompare(b.naam)).map(s => <option key={s.id} value={s.id} disabled={s.id !== id && autoPlekken(p, spelers.length).includes(s.id)}>Ouder van {s.naam} · 🚗 {telRijden(s.id)}×</option>)}
                     {id && id !== NIET_NODIG && !spelers.some(s => s.id === id) && <option value={id}>Eerder gekozen ouder (niet meer in team)</option>}
