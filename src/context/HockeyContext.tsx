@@ -136,7 +136,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     return saved ? JSON.parse(saved) : { wij: 0, zij: 0 }
   })
 
-  const setSpelers = (nieuw: Player[]) => zetSpelersRuw(stempelInkomers(spelers, nieuw))
+  const setSpelers = (nieuw: Player[], tellen = true) => zetSpelersRuw(stempelInkomers(spelers, nieuw, tellen))
 
   // Scorers van onze doelpunten, in volgorde; null = onbekend
   const [doelpunten, setDoelpunten] = useState<(string | null)[]>(() => {
@@ -335,7 +335,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
         return { ...s, inVeld: false, wisselCount: s.wisselCount + (tellen ? 1 : 0) }
       }
       return s
-    }))
+    }), tellen)
 
     const newWissel: Wissel = {
       id: Date.now().toString(),

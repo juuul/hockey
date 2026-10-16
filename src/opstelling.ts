@@ -74,12 +74,12 @@ export function sorteerWissels(wissels: Player[], wisselingen: Wissel[]): Player
   return [...wissels].sort((a, b) => a.wisselCount - b.wisselCount || laatstUit(a.id) - laatstUit(b.id))
 }
 
-// Wie het veld in komt, krijgt het volgende volgnummer (wie samen invallen, krijgen hetzelfde)
-export function stempelInkomers(oud: Player[], nieuw: Player[]): Player[] {
+// Alleen een meetellende wissel krijgt een nieuw volgnummer; anders komt de speler groen het veld in.
+export function stempelInkomers(oud: Player[], nieuw: Player[], tellen = true): Player[] {
   const volgende = Math.max(0, ...oud.map(s => s.inVolgorde ?? 0)) + 1
   return nieuw.map(s => {
     const voorheen = oud.find(o => o.id === s.id)
-    return s.inVeld && !voorheen?.inVeld ? { ...s, inVolgorde: volgende } : s
+    return s.inVeld && !voorheen?.inVeld ? { ...s, inVolgorde: tellen ? volgende : 0 } : s
   })
 }
 
