@@ -159,6 +159,27 @@
 
 .prog-waar {
   font-size: var(--base-readable-size);
+  font-weight: 700;
+  border: 2px solid var(--rand-sterk);
+  border-radius: 10px;
+  padding: 4px 10px;
+  color: var(--tekst);
+  background: var(--vlak-grijs);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.prog-waar.thuis {
+  background: var(--groen-vlak);
+  color: var(--groen-tekst);
+}
+
+.prog-waar.uit {
+  background: var(--vlak-blauw);
+  color: var(--blauw-tekst);
+}
+
+.prog-waar.onbekend {
   color: var(--tekst-zacht);
 }
 

@@ -1,6 +1,7 @@
 import ProgrammaTijd from '../components/ProgrammaTijd'
 import DatumTijdKiezer from '../components/DatumTijdKiezer'
 import { autoPlekken, rijdenTekst } from '../rijden'
+import { thuisUitBekend, thuisUitTekst } from '../programmaLocatie'
 import { begeleidingProfiel, begeleidingStandaard, begeleidingPlekken, begeleidingAantal, kiesTaak } from '../begeleiding'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
@@ -105,7 +106,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
       <>
         <div className="prog-kop">
           <span className="prog-datum">{datum}</span>
-          {clubNaam(p) && <span className="prog-waar">{p.thuis ? 'Thuis' : 'Uit'}</span>}
+          <span className={`prog-waar ${thuisUitBekend(p) ? p.thuis ? 'thuis' : 'uit' : 'onbekend'}`}>{thuisUitTekst(p)}</span>
           {p.id === volgendeId && <span className="prog-label volgende">Volgende</span>}
         </div>
         {gespeeld(p)
