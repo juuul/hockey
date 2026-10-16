@@ -3,6 +3,7 @@ import type { ProgrammaItem } from '../types'
 import { useTerug } from '../terug'
 import { useVerzameltijd } from './useVerzameltijd'
 import './Modal.css'
+import DatumTijdKiezer from './DatumTijdKiezer'
 
 export default function ProgrammaTijd({ item, bewaar, bewerkbaar }: { item: ProgrammaItem; bewaar: (p: ProgrammaItem) => void; bewerkbaar: boolean }) {
   const [open, setOpen] = useState(false)
@@ -21,10 +22,10 @@ function TijdPopup({ item, bewaar, dicht }: { item: ProgrammaItem; bewaar: (p: P
     bewaar({ ...draft, verzamelModus: 'automatisch', verzamelen: voorstel?.tijd || '', verzamelDatum: voorstel?.datum || '', reisMinuten: null })
     dicht()
   }
-  return <div className="modal show" onClick={dicht}><div className="modal-content" role="dialog" aria-modal="true" aria-label="Wedstrijdtijden" onClick={e => e.stopPropagation()}>
+  return <div className="modal show"><div className="modal-content" role="dialog" aria-modal="true" aria-label="Wedstrijdtijden" onClick={e => e.stopPropagation()}>
     <h2 className="modal-title">Wedstrijdtijden</h2>
     <div className="prog-velden">
-      <label className="prog-veld">Aanvang<input className="modal-input" type="time" onClick={e => { try { e.currentTarget.showPicker?.() } catch (_) { e.currentTarget.focus() } }} value={draft.spelen} onChange={e => zet({ spelen: e.target.value })} /></label>
+      <label className="prog-veld">Aanvang<DatumTijdKiezer soort="time" waarde={draft.spelen} onChange={spelen => zet({ spelen })} optioneel /></label>
       <p role="status">{bezig ? 'Berekenen…' : voorstel ? `Verzamelen: ${voorstel.datum !== draft.datum ? voorstel.datum + ' · ' : ''}${voorstel.tijd}` : 'Verzameltijd nog niet beschikbaar'}</p>
       {fout && <p role="alert" className="account-melding fout">{fout}</p>}
     </div>

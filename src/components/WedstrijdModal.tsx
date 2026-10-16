@@ -7,6 +7,7 @@ import { vandaag, vindClub, zoekClubs } from '../historie'
 import './Modal.css'
 import './WedstrijdModal.css'
 import { useTerug } from '../terug'
+import DatumTijdKiezer from './DatumTijdKiezer'
 
 interface Props {
   titel: string
@@ -82,7 +83,7 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
   }
 
   return (
-    <div className="modal show" onClick={onClose}>
+    <div className="modal show">
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-title">{titel}</div>
         <div className="wedstrijd-velden">
@@ -90,7 +91,7 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
 
           <label className="wedstrijd-label">
             Datum
-            <input type="date" className="modal-input wedstrijd-datum" value={datum} onChange={e => e.target.value && setDatum(e.target.value)} />
+            <DatumTijdKiezer soort="date" waarde={datum} onChange={setDatum} />
           </label>
 
           <div className="keuze-knoppen" role="radiogroup" aria-label="Thuis of uit">

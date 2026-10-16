@@ -89,6 +89,7 @@ Bediend op een telefoon van ~10 cm diagonaal (~360px breed):
 - **Schermvullend** (`100dvh`), geen vaste breedtes/hoogtes. Het dashboard vult precies het scherm; alles wat niet vaak nodig is staat onder de vouw.
 - **Veld schaalt mee** via container units (`cqw`/`cqh`): rondje = min(93cqw / breedste rij, 96cqh / aantal rijen incl. keeper), met `--breedste` (min. 3) en `--rijen` (min. 4) op `.field`. Rijen van 4 (11 spelers) krijgen minder rand en 22px letters. Spelers zijn **rondjes** (gebruiker koos tegen ovalen); ze worden alleen breder als een naam niet past.
 - **Pop-ups**: gecentreerd, grote tekst en knoppen.
+- **Datum/tijd**: gedeelde appkiezer (`DatumTijdKiezer`) in een modaal HTML-dialog; achterliggend formulier is inert. Kalenderselectie pas overnemen met Kiezen; Terug/telefoonterug bewaart het formulier. Geen native datum-/tijdpopups boven bereikbare Opslaan-knoppen. Programma-, wedstrijd- en tijdformulieren sluiten niet bij tikken op de achtergrond.
 - Test op een smal, laag scherm (360×640).
 
 ## Techniek

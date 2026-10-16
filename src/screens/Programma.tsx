@@ -1,4 +1,5 @@
 import ProgrammaTijd from '../components/ProgrammaTijd'
+import DatumTijdKiezer from '../components/DatumTijdKiezer'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
 import { navigatieLink } from '../verzamelen'
@@ -193,7 +194,7 @@ function KindKiezen({ gekozen, onKlaar, onClose }: { gekozen: string[]; onKlaar:
   const [ids, setIds] = useState(gekozen)
   const wissel = (id: string) => setIds(ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id])
   return (
-    <div className="modal show" onClick={onClose}>
+    <div className="modal show">
       <div className="modal-content" onClick={e => e.stopPropagation()}>
         <div className="modal-title">Mijn kind</div>
         <div className="modal-subtitle">Je kunt er meer kiezen.</div>
@@ -290,7 +291,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
         <div className="prog-velden">
           <label className="prog-veld">
             Datum
-            <input type="date" className="modal-input" value={p.datum} onChange={e => e.target.value && zet({ datum: e.target.value })} />
+            <DatumTijdKiezer soort="date" waarde={p.datum} onChange={datum => zet({ datum })} />
           </label>
           <div className="keuze-knoppen" role="radiogroup" aria-label="Soort">
             {(['wedstrijd', 'vrij'] as const).map(s => (
@@ -308,7 +309,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               </label>
               <label className="prog-veld">
                 Tot en met (bij een periode)
-                <input type="date" className="modal-input" value={p.tot} onChange={e => zet({ tot: e.target.value })} />
+                <DatumTijdKiezer soort="date" waarde={p.tot} onChange={tot => zet({ tot })} optioneel />
               </label>
             </>
           ) : (
