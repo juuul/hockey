@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 import { gastEmail, Gebruiker, pb, rolIn, STANDAARD_INSTELLINGEN, Team, TeamInstellingen } from '../server'
 import { lees, OPSLAG, schrijf } from '../opslag'
 import { DEMO_KIND } from '../demo'
+import { kiesStartteam } from '../teamkeuze'
 
 interface AccountContextType {
   gebruiker: Gebruiker | null
@@ -53,16 +54,16 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     setGebruiker(nieuw)
   }), [])
 
-  const teamsLaden = useCallback(async () => {
+  const teamsLaden = useCallback(async (bijInloggen = false) => {
     if (!pb.authStore.isValid) return setTeams([])
     const lijst = await pb.collection('teams').getFullList<Team>({ sort: 'naam', expand: 'beheerders,kijkers' })
     const bewaard = lees<Team[]>(OPSLAG, 'teams', [])
     for (const oud of bewaard) if (!lijst.some(t => t.id === oud.id)) wisTeamCaches(oud.id)
     setTeams(lijst)
     schrijf(OPSLAG, 'teams', lijst)
-    // Actief team bestaat niet meer (of nog geen keuze): bij precies één team dat nemen
+    // Na inloggen/opstarten een echt team kiezen; een bewuste teamwissel verder behouden.
     setActiefTeamId(huidig => {
-      const nieuw = huidig && lijst.some(t => t.id === huidig) ? huidig : lijst.length === 1 ? lijst[0].id : null
+      const nieuw = kiesStartteam(lijst, huidig, bijInloggen)
       schrijf(OPSLAG, 'actief_team', nieuw)
       return nieuw
     })
@@ -85,7 +86,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!pb.authStore.isValid) return
     pb.collection('users').authRefresh()
-      .then(() => teamsLaden())
+      .then(() => teamsLaden(true))
       .catch(err => { if (err?.status === 401 || err?.status === 404) pb.authStore.clear() })
   }, [teamsLaden])
 
@@ -99,7 +100,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   const inloggen = async (email: string, wachtwoord: string) => {
     await pb.collection('users').authWithPassword(email.trim().toLowerCase(), wachtwoord)
-    await teamsLaden()
+    await teamsLaden(true)
   }
 
   const uitloggen = () => pb.authStore.clear()
