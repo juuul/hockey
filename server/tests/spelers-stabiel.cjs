@@ -47,11 +47,11 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await page.goto('http://127.0.0.1:5187/')
     await page.waitForSelector('.players-screen')
     await page.waitForFunction(() => typeof window.teamControle === 'function')
-    const gebaar = async (selector, eind = 'touchend', dx = 0) => page.evaluate(({ selector, eind, dx }) => {
+    const gebaar = async (selector, eind = 'touchend', dx = 0, dy = 400) => page.evaluate(({ selector, eind, dx, dy }) => {
       const el = document.querySelector(selector)
       const event = (type, x, y) => el.dispatchEvent(new TouchEvent(type, { bubbles: true, touches: type === 'touchstart' || type === 'touchmove' ? [new Touch({ identifier: 1, target: el, clientX: x, clientY: y })] : [] }))
-      event('touchstart', 30, 30); event('touchmove', 30 + dx, 430); event(eind, 30 + dx, 430)
-    }, { selector, eind, dx })
+      event('touchstart', 30, 30); event('touchmove', 30 + dx, 30 + dy); event(eind, 30 + dx, 30 + dy)
+    }, { selector, eind, dx, dy })
     const geenNavigatie = async () => { await new Promise(r => setTimeout(r, 350)); assert.equal(navigaties, 1) }
     // Een afgebroken of horizontaal gebaar mag nooit herladen.
     await gebaar('.spelvorm-kop', 'touchcancel')
@@ -62,7 +62,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await geenNavigatie()
     const scrollpositie = await page.$eval('.players-screen', el => { el.scrollTop = 220; return el.scrollTop })
     assert.ok(scrollpositie > 0)
-    await gebaar('.spelvorm-kop')
+    await gebaar('.spelvorm-kop', 'touchend', 0, 90)
     await geenNavigatie()
     await page.evaluate(() => window.teamControle())
     await geenNavigatie()
@@ -86,7 +86,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await page.waitForFunction(() => !document.querySelector('.modal.show'))
     await page.evaluate(() => { document.activeElement?.blur(); document.querySelector('.content').scrollTop = 0; document.querySelector('.players-screen').scrollTop = 0; window.spelersNode = document.querySelector('.players-screen') })
     const controlesVoor = teamvragen
-    await gebaar('.spelvorm-kop')
+    await gebaar('.spelvorm-kop', 'touchend', 0, 90)
     await geenNavigatie()
     assert.ok(teamvragen > controlesVoor, 'Bewust trekken haalt gegevens op zonder paginareload')
     assert.equal(await page.evaluate(() => window.spelersNode === document.querySelector('.players-screen')), true)

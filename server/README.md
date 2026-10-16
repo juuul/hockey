@@ -12,6 +12,12 @@ Productie en test hebben ieder een eigen PocketBase-proces, database, accounts e
 
 ## Test starten en bijwerken
 
+### Fictief MO11-1-voorbeeld
+
+`scripts/testteam-voorbeeld.py --database <bron-db> --bronteam <id> --doelteam <test-id> --output <nieuw-bestand>` opent de bron read-only en exporteert uitsluitend gesaneerde testdata. Geen spelersnamen/contacten/gebruikers/vrije teksten of privéadressen worden gelezen. De bronvolgorde van datums en taken wordt gekoppeld aan Demo-voornamen met nieuwe id’s. Het gegenereerde JSON-bestand hoort buiten git.
+
+`scripts/testteam-voorbeeld.pb.js` mag alleen als aparte lokale CLI-hook worden geladen (`--hooksDir`), met `HOCKEY_ENV=test`. De opdracht `testteam-voorbeeld <gesaneerd-bestand>` controleert het doelteam, vervangt binnen één transactie uitsluitend diens spelers, clubs, programma, historie en live stand, en behoudt het team en de leden/rechten. Nooit op productie mounten of als publieke API aanbieden. Eerst de testdatabase back-uppen en de import op een geïsoleerde kopie controleren. Na de import verschijnen records via de gewone gegevenssync; voor nieuwe frontendcode controleert het verversgebaar ook de gepubliceerde assetversie.
+
 Migratie `1790400029_rijden.js` voegt alleen het privé JSON-veld `programma.rijders` toe, onder de bestaande teamrechten. Geen bestaande taak- of teaminstellingen worden overschreven. Test: `tests/rijden.ts` bundelen; `tests/rijden.pb.js` uitsluitend als extra CLI-hook op een nieuwe geïsoleerde database mounten, `test-rijden-fixture` draaien en de server op localhost 8099 starten voor `node server/tests/rijden.mjs`. Beheer kan wijzigen, kijkers alleen lezen en anderen niets. Nooit de fixture op gewone test-/productiedata draaien.
 
 Vanuit de projectmap:

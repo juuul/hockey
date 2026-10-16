@@ -15,6 +15,7 @@ import { OPSLAG } from './opslag'
 import { useTerug } from './terug'
 import { heeftShootouts } from './types'
 import './App.css'
+import { herstelScrollNaUpdate, verversAppVersie } from './appVerversen'
 
 type Scherm = 'dashboard' | 'shootout' | 'players' | 'positions' | 'programma' | 'historie' | 'instellingen'
 
@@ -39,6 +40,7 @@ interface Navigatie {
 
 function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
+  useEffect(() => scrollVak.current ? herstelScrollNaUpdate(scrollVak.current) : undefined, [])
   const { sync, live, demo, clubs, wedstrijd, spelvorm, nuSynchroniseren } = useHockey()
   // Shoot-out alleen bij O10 en O9; bij een andere categorie terug naar het Dashboard
   const tabs = TABS.filter(t => t.id !== 'shootout' || heeftShootouts(spelvorm))
@@ -91,7 +93,10 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
         {screen === 'historie' && <Historie />}
         {screen === 'instellingen' && <Instellingen start={start} startGebruikt={startGebruikt} naarDashboard={() => setScreen('dashboard')} />}
       </div>
-      <Verversen scrollVak={scrollVak} onVervers={() => Promise.all([nuSynchroniseren(), teamsLaden(), aanvragenLaden()])} />
+      <Verversen scrollVak={scrollVak} onVervers={async () => {
+        await Promise.allSettled([nuSynchroniseren(), teamsLaden(), aanvragenLaden()])
+        if (scrollVak.current) await verversAppVersie(scrollVak.current)
+      }} />
       <OvernemenVraag />
     </div>
   )

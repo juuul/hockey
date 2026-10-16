@@ -1,7 +1,7 @@
 import { RefObject, useEffect, useRef, useState } from 'react'
 import './Verversen.css'
 
-const DREMPEL = 90
+const DREMPEL = 60
 
 // Eigen "trek omlaag om te verversen": html/body scrollen niet (alleen .content), dus het browsergebaar werkt hier niet
 export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObject<HTMLElement>; onVervers: () => Promise<unknown> }) {
@@ -19,6 +19,10 @@ export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObje
     let huidig = 0
     let gestopt = false
     let scrollVakken: HTMLElement[] = []
+    let negeerKlikTot = 0
+    const klik = (e: MouseEvent) => {
+      if (Date.now() < negeerKlikTot) { e.preventDefault(); e.stopPropagation() }
+    }
 
     const invoerOpen = () => !!document.querySelector('.modal.show, .reset-modal-overlay, dialog[open]') || !!document.activeElement?.matches('input, textarea, select, [contenteditable="true"]')
     const annuleer = () => {
@@ -29,7 +33,7 @@ export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObje
 
     const start = (e: TouchEvent) => {
       annuleer()
-      const interactief = (e.target as Element).closest('button, a, input, textarea, select, label, [contenteditable="true"]')
+      const interactief = (e.target as Element).closest('input, textarea, select, [contenteditable="true"]')
       scrollVakken = [vak]
       for (let el = e.target as HTMLElement; el && el !== vak; el = el.parentElement!) {
         if (el.scrollHeight > el.clientHeight && /auto|scroll/.test(getComputedStyle(el).overflowY)) scrollVakken.push(el)
@@ -43,13 +47,14 @@ export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObje
       if (invoerOpen() || e.touches.length !== 1 || scrollVakken.some(el => el.scrollTop > 0)) return annuleer()
       const dy = e.touches[0].clientY - startY
       const dx = Math.abs(e.touches[0].clientX - startX)
-      if (dy < -8 || dx > Math.max(16, dy)) return annuleer()
-      huidig = Math.max(0, dy * 0.5)
+      if (dy < -12 || dx > Math.max(24, dy * 1.5)) return annuleer()
+      huidig = Math.max(0, dy * 0.75)
       setAfstand(huidig)
     }
     const eind = () => {
       if (startY !== null && huidig >= DREMPEL && !invoerOpen()) {
         setLaden(true)
+        negeerKlikTot = Date.now() + 300
         bezig.current = true
         // Alleen gegevens bijwerken: behoud dezelfde scherm-/formuliernodes en scrollpositie.
         void Promise.resolve().then(() => actie.current()).catch(() => {}).finally(() => {
@@ -67,12 +72,14 @@ export default function Verversen({ scrollVak, onVervers }: { scrollVak: RefObje
     vak.addEventListener('touchmove', beweeg, { passive: true })
     vak.addEventListener('touchend', eind)
     vak.addEventListener('touchcancel', annuleer)
+    vak.addEventListener('click', klik, true)
     return () => {
       gestopt = true
       vak.removeEventListener('touchstart', start)
       vak.removeEventListener('touchmove', beweeg)
       vak.removeEventListener('touchend', eind)
       vak.removeEventListener('touchcancel', annuleer)
+      vak.removeEventListener('click', klik, true)
     }
   }, [scrollVak])
 
