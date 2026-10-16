@@ -16,7 +16,7 @@ import './Instellingen.css'
 export type LinkSoort = 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk' | 'aanvraag' | 'toegang'
 export type AccountStart = { soort: LinkSoort; token: string } | null
 
-type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden' } | { soort: 'gebruik' } | { soort: LinkSoort; token: string }
+type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden'; keuze: 'bestaand' | 'nieuw' } | { soort: 'gebruik' } | { soort: LinkSoort; token: string }
 
 const ROLLEN: Rol[] = ['beheerder', 'kijker']
 
@@ -38,7 +38,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
     weergave.soort === 'uitnodiging' ? 'Uitnodiging'
     : weergave.soort === 'wachtwoord' ? 'Nieuw wachtwoord'
     : weergave.soort === 'team' ? 'Leden'
-    : weergave.soort === 'aanmelden' ? 'Groep zoeken of maken'
+    : weergave.soort === 'aanmelden' ? 'Team kiezen'
     : weergave.soort === 'gebruik' ? 'Gebruik per team'
     : weergave.soort === 'aanmelding' ? 'Teamaanmelding'
     : weergave.soort === 'kijk' ? 'Meekijken'
@@ -58,15 +58,15 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'uitnodiging' && <UitnodigingAannemen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'wachtwoord' && <WachtwoordKiezen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
-        {weergave.soort === 'aanmelden' && <TeamAanmelden />}
+        {weergave.soort === 'aanmelden' && <TeamAanmelden startKeuze={weergave.keuze} />}
         {weergave.soort === 'gebruik' && <Gebruik />}
         {weergave.soort === 'aanmelding' && <AanmeldingBeoordelen token={weergave.token} />}
         {weergave.soort === 'aanvraag' && <ToegangAanvragen waarde={weergave.token} />}
         {weergave.soort === 'toegang' && <ToegangBeoordelen token={weergave.token} />}
         {weergave.soort === 'kijk' && <MeekijkenStart waarde={weergave.token} klaar={() => { terug(); naarDashboard() }} annuleer={terug} />}
         {weergave.soort === 'hoofd' && (gebruiker
-          ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={() => setWeergave({ soort: 'aanmelden' })} gebruik={() => setWeergave({ soort: 'gebruik' })} />
-          : <Inloggen aanmelden={() => setWeergave({ soort: 'aanmelden' })} />)}
+          ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze })} gebruik={() => setWeergave({ soort: 'gebruik' })} />
+          : <Inloggen aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze })} />)}
         {weergave.soort === 'hoofd' && <><Weergave /><p className="account-uitleg"><a href="./privacy.html" target="_blank" rel="noreferrer">Privacy</a> · <a href="./voorwaarden.html" target="_blank" rel="noreferrer">Gebruiksvoorwaarden</a></p></>}
       </div>
     </div>
@@ -105,7 +105,7 @@ function SyncRegel() {
   )
 }
 
-function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanmelden?: () => void }) {
+function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanmelden?: (keuze: 'bestaand' | 'nieuw') => void }) {
   const { inloggen } = useAccount()
   const [email, setEmail] = useState(startEmail)
   const [wachtwoord, setWachtwoord] = useState('')
@@ -157,19 +157,17 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
   return (
     <>
       <Kaart titel="Inloggen">
-        <p className="account-uitleg">Log in om met je team te delen: spelers, wedstrijden en de lopende wedstrijd live.</p>
         {formulier}
       </Kaart>
-      <Kaart titel="Nog geen account?">
-        <p className="account-uitleg"><strong>Zit je team al in de app?</strong> Zoek je club, team en bestaande groep. Je kunt zelf toegang aanvragen; na goedkeuring door de beheerder ontvang je een uitnodiging per e-mail.</p>
-        <p className="account-uitleg"><strong>Een eigen groep starten?</strong> Kies je club en team en maak een nieuwe groep als beheerder.</p>
-        <button className="btn btn-primary" type="button" onClick={aanmelden}>Groep zoeken of maken</button>
+      <Kaart titel="Je team">
+        <button className="btn btn-primary" type="button" onClick={() => aanmelden('bestaand')}>Aansluiten bij een team</button>
+        <button className="btn btn-secondary" type="button" onClick={() => aanmelden('nieuw')}>Nieuw team starten</button>
       </Kaart>
     </>
   )
 }
 
-function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Gebruiker; openTeam: (id: string) => void; aanmelden: () => void; gebruik: () => void }) {
+function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Gebruiker; openTeam: (id: string) => void; aanmelden: (keuze: 'bestaand' | 'nieuw') => void; gebruik: () => void }) {
   const { teams, teamsLaden, uitloggen, actiefTeamId, kiesTeam } = useAccount()
   const [fout, setFout] = useState<string | null>(null)
 
@@ -247,7 +245,8 @@ function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Geb
       </Kaart>
 
       <Kaart titel="Ander team">
-        <button className="btn btn-secondary" onClick={aanmelden}>Groep zoeken of maken</button>
+        <button className="btn btn-primary" onClick={() => aanmelden('bestaand')}>Aansluiten bij een team</button>
+        <button className="btn btn-secondary" onClick={() => aanmelden('nieuw')}>Nieuw team starten</button>
         <Melding tekst={fout} fout />
       </Kaart>
       {actief && (gebruiker.superadmin || actieveRol === 'beheerder') && <VerzamelenInstellen key={actief.id} team={actief} />}

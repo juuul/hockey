@@ -159,11 +159,11 @@ function OfficieelProgramma({ team }: { team: OfficieelTeam }) {
   </details>
 }
 
-export default function TeamAanmelden() {
+export default function TeamAanmelden({ startKeuze = 'bestaand' }: { startKeuze?: 'bestaand' | 'nieuw' }) {
   const { gebruiker, teamsLaden, kiesTeam } = useAccount()
   const [officieel, setOfficieel] = useState<OfficieelTeam | null>(null)
   const [omgevingen, setOmgevingen] = useState<Omgeving[]>([])
-  const [keuze, setKeuze] = useState<'bestaand' | 'nieuw'>('bestaand')
+  const [keuze, setKeuze] = useState<'bestaand' | 'nieuw'>(startKeuze)
   const [omgeving, setOmgeving] = useState('')
   const [omgevingNaam, setOmgevingNaam] = useState('')
   const [naam, setNaam] = useState(gebruiker?.name || '')
@@ -202,12 +202,7 @@ export default function TeamAanmelden() {
   }
   if (melding) return <p className="account-melding">{melding}</p>
   return <form className="account-form" onSubmit={e => { e.preventDefault(); versturen() }}>
-    <fieldset className="teamselectie-keuzes">
-      <legend>Wat wil je doen?</legend>
-      <label className="teamselectie-keuze"><input type="radio" name="groepskeuze" checked={keuze === 'bestaand'} onChange={() => setKeuze('bestaand')} /><span>Bestaande groep zoeken</span></label>
-      <label className="teamselectie-keuze"><input type="radio" name="groepskeuze" checked={keuze === 'nieuw'} onChange={() => setKeuze('nieuw')} /><span>Nieuwe eigen groep maken</span></label>
-    </fieldset>
-    <p className="account-uitleg">{keuze === 'bestaand' ? 'Zoek je club en team en kies de groep waarbij je wilt aansluiten. Je kunt zelf toegang aanvragen; na goedkeuring krijg je een uitnodiging per e-mail.' : 'Kies je club en officiële team om een eigen groep te maken. Elke groep heeft eigen spelers, leden en instellingen.'}</p>
+    <p className="account-uitleg">{keuze === 'bestaand' ? 'De teambeheerder keurt je aanvraag goed.' : 'Je wordt beheerder van je eigen teamgroep.'}</p>
     <TeamKiezer gekozen={officieel} kies={setOfficieel} />
     {officieel && <>
       {keuze === 'bestaand' && (laden ? <p className="account-uitleg">Groepen ophalen…</p> : !!omgevingen.length ? <fieldset className="teamselectie-keuzes">
@@ -217,8 +212,7 @@ export default function TeamAanmelden() {
           <span>{o.naam}{omgevingen.filter(andere => andere.naam === o.naam).length > 1 ? ` · groep ${o.id.slice(-5)}` : ''}</span>
         </label>)}
       </fieldset> : !fout && <div>
-        <p className="account-uitleg">Er zijn geen vindbare groepen bij dit team. Vraag de beheerder om een aanmeldlink als de groep afgeschermd is, of maak zelf een groep.</p>
-        <button className="btn btn-secondary" type="button" onClick={() => setKeuze('nieuw')}>Eigen groep maken</button>
+        <p className="account-uitleg">Geen openbare groep gevonden. Vraag je teambeheerder om een aanmeldlink.</p>
       </div>)}
       {keuze === 'nieuw' && <label className="account-label">Groepsnaam (openbaar, optioneel)
         <input className="modal-input" placeholder="Bijvoorbeeld begeleiding" maxLength={40} value={omgevingNaam} onChange={e => setOmgevingNaam(e.target.value)} />
@@ -227,10 +221,10 @@ export default function TeamAanmelden() {
         <label className="account-label">Je naam<input className="modal-input" autoComplete="name" required maxLength={60} value={naam} onChange={e => setNaam(e.target.value)} /></label>
         <label className="account-label">E-mail<input className="modal-input" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>
       </>}
-      {keuze === 'nieuw' && <p className="account-uitleg">Een nieuwe groep beheren geeft geen toegang tot andere groepen van dit team.</p>}
       {(keuze === 'nieuw' || !!omgevingen.length) && <button className="btn btn-primary" type="submit" disabled={bezig || laden || (keuze === 'bestaand' && !omgeving) || (!gebruiker && (!naam.trim() || !email.includes('@')))}>{keuze === 'nieuw' ? 'Eigen groep maken' : 'Toegang aanvragen bij deze groep'}</button>}
     </>}
     {fout && <p className="account-melding fout" role="alert">{fout}</p>}
+    <button className="btn btn-secondary" type="button" onClick={() => setKeuze(k => k === 'bestaand' ? 'nieuw' : 'bestaand')}>{keuze === 'bestaand' ? 'Nieuw team starten' : 'Aansluiten bij een team'}</button>
   </form>
 }
 

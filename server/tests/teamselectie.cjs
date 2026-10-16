@@ -7,6 +7,7 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
   try {
     const page = await browser.newPage()
     await page.setViewport({ width: 390, height: 844 })
+    await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }])
     let aanvraag
     let nieuweGroep
     let enkeleGroep = false
@@ -57,10 +58,15 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
       const element = await page.evaluateHandle(label => [...document.querySelectorAll('label')].find(l => l.firstChild?.textContent.trim() === label)?.querySelector('select'), label)
       await element.asElement().select(waarde)
     }
-    const openZoeker = async () => {
+    const openZoeker = async (actie = 'Aansluiten bij een team') => {
       await page.goto(process.env.TEST_URL || 'http://127.0.0.1:5187/', { waitUntil: 'networkidle0' })
       await page.click('button[aria-label="Instellingen"]')
-      await klik('Groep zoeken of maken')
+      assert.equal(await page.evaluate(() => [...document.querySelectorAll('.instellingen-kaart')].find(k => k.querySelector('h2')?.textContent === 'Je team').querySelectorAll('p').length), 0)
+      if (process.env.PREVIEW_PATH) {
+        const kaart = await page.evaluateHandle(() => [...document.querySelectorAll('.instellingen-kaart')].find(k => k.querySelector('h2')?.textContent === 'Je team'))
+        await kaart.asElement().screenshot({ path: process.env.PREVIEW_PATH })
+      }
+      await klik(actie)
       await page.waitForSelector('input[type="search"]')
     }
     const begin = async () => {
@@ -71,7 +77,8 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
       await page.waitForFunction(() => [...document.querySelectorAll('option')].some(o => o.value === 'team2'))
       const labels = await page.$$eval('label', nodes => nodes.map(n => n.firstChild?.textContent.trim()))
       assert.ok(!labels.includes('Klasse') && !labels.includes('Categorie'))
-      assert.ok(await page.evaluate(() => document.querySelector('input[name="groepskeuze"]').checked))
+      assert.equal(await page.$('input[name="groepskeuze"]'), null)
+      assert.ok(await page.evaluate(() => document.body.textContent.includes('De teambeheerder keurt je aanvraag goed.')))
     }
     await begin()
     await kies('Officieel team', 'team1')
@@ -85,12 +92,11 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
 
     await begin()
     await kies('Officieel team', 'team2')
-    await page.waitForFunction(() => document.body.textContent.includes('Er zijn geen vindbare groepen'))
+    await page.waitForFunction(() => document.body.textContent.includes('Geen openbare groep gevonden'))
     assert.equal(await page.$$eval('button[type="submit"]', nodes => nodes.length), 0)
-    await klik('Eigen groep maken')
+    await klik('Nieuw team starten')
     await page.waitForSelector('input[placeholder="Bijvoorbeeld begeleiding"]')
-    assert.ok(await page.evaluate(() => document.body.textContent.includes('Een nieuwe groep beheren geeft geen toegang')))
-    assert.equal(await page.$$eval('input[name="groepskeuze"]', nodes => nodes[1].checked), true)
+    assert.ok(await page.evaluate(() => document.body.textContent.includes('Je wordt beheerder van je eigen teamgroep.')))
     await page.type('input[autoComplete="name"]', 'Testouder')
     await page.type('input[type="email"]', 'test@example.invalid')
     await page.type('input[placeholder="Bijvoorbeeld begeleiding"]', 'Nieuwe testgroep')
@@ -104,6 +110,12 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
     await kies('Officieel team', 'team1')
     await page.waitForSelector('input[name="bestaande-groep"][value="groep1"]')
     assert.equal(await page.$eval('input[name="bestaande-groep"]', el => el.checked), true)
+
+    await openZoeker('Nieuw team starten')
+    assert.ok(await page.evaluate(() => document.body.textContent.includes('Je wordt beheerder van je eigen teamgroep.')))
+    assert.equal(await page.$('input[name="groepskeuze"]'), null)
+    await klik('Aansluiten bij een team')
+    assert.ok(await page.evaluate(() => document.body.textContent.includes('De teambeheerder keurt je aanvraag goed.')))
 
     // Eerste keer zonder cache: een laadfout is nooit een leeg zoekresultaat.
     await page.evaluate(() => localStorage.removeItem('hockey_test_catalogus_clubs'))
