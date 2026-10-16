@@ -293,6 +293,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
             Datum
             <DatumTijdKiezer soort="date" waarde={p.datum} onChange={datum => zet({ datum })} />
           </label>
+          {p.soort === 'wedstrijd' && <ProgrammaTijd item={p} bewaar={setP} bewerkbaar />}
           <div className="keuze-knoppen" role="radiogroup" aria-label="Soort">
             {(['wedstrijd', 'vrij'] as const).map(s => (
               <button key={s} role="radio" aria-checked={p.soort === s} className={`keuze-knop ${p.soort === s ? 'actief' : ''}`} onClick={() => zet({ soort: s })}>
@@ -336,7 +337,6 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
                   </button>
                 ))}
               </div>
-              <ProgrammaTijd item={p} bewaar={setP} bewerkbaar />
               <label className="prog-veld">Locatie
                 <input className="modal-input" maxLength={200} value={p.locatie || ''} onChange={e => zet({ locatie: e.target.value })} />
               </label>
