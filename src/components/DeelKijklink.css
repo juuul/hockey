@@ -4,6 +4,10 @@
   gap: 8px;
 }
 
+.kijklink-compact {
+  gap: 0;
+}
+
 .kijklink .btn {
   flex: 0 0 auto;
 }

@@ -16,18 +16,28 @@ import './Instellingen.css'
 export type LinkSoort = 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk' | 'aanvraag' | 'toegang'
 export type AccountStart = { soort: LinkSoort; token: string } | null
 
-type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden'; keuze: 'bestaand' | 'nieuw'; stap?: 1 | 2 | 3 } | { soort: 'gebruik' } | { soort: LinkSoort; token: string }
+type InstellingMenu = 'wisselen' | 'teaminstellingen' | 'verzamelen' | 'weergave' | 'account' | 'aanvragen' | 'beheer' | 'globaal' | 'planning'
+type Weergave = ({ soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden'; keuze: 'bestaand' | 'nieuw'; stap?: 1 | 2 | 3 } | { soort: 'gebruik' | InstellingMenu } | { soort: LinkSoort; token: string }) & { terugNaar?: InstellingMenu }
 
 const ROLLEN: Rol[] = ['beheerder', 'kijker']
 
 // Tabblad Instellingen: account, teams en alles rond inloggen. Links uit mails openen hier een eigen weergave
 export default function Instellingen({ start, startGebruikt, naarDashboard }: { start: AccountStart; startGebruikt: () => void; naarDashboard: () => void }) {
-  const { gebruiker } = useAccount()
+  const { gebruiker, actiefTeam } = useAccount()
   const [weergave, setWeergave] = useState<Weergave>(start ?? { soort: 'hoofd' })
   const terug = () => setWeergave(w => w.soort === 'aanmelden' && (w.stap ?? 1) > 1
     ? { ...w, stap: w.stap === 3 ? 2 : 1 }
-    : { soort: 'hoofd' })
+    : { soort: w.terugNaar ?? 'hoofd' })
   useTerug(weergave.soort !== 'hoofd', terug)
+  const openMenu = (soort: InstellingMenu) => setWeergave({ soort })
+  const beheert = !!gebruiker && !!actiefTeam && (gebruiker.superadmin || rolIn(actiefTeam, gebruiker.id) === 'beheerder')
+
+  useEffect(() => {
+    document.querySelector('.content')?.scrollTo(0, 0)
+  }, [weergave.soort])
+  useEffect(() => {
+    if (!gebruiker) setWeergave(w => ['team', 'gebruik', 'wisselen', 'teaminstellingen', 'verzamelen', 'account', 'aanvragen', 'beheer', 'globaal', 'planning'].includes(w.soort) ? { soort: 'hoofd' } : w)
+  }, [gebruiker?.id])
 
   // Een link uit een mail wordt één keer geopend (niet opnieuw bij de volgende keer dit tabblad)
   useEffect(() => {
@@ -46,6 +56,15 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
     : weergave.soort === 'kijk' ? 'Meekijken'
     : weergave.soort === 'aanvraag' ? 'Account aanvragen'
     : weergave.soort === 'toegang' ? 'Toegangsaanvraag'
+    : weergave.soort === 'wisselen' ? 'Team wisselen'
+    : weergave.soort === 'teaminstellingen' ? 'Teaminstellingen'
+    : weergave.soort === 'verzamelen' ? 'Verzameltijd'
+    : weergave.soort === 'weergave' ? 'Weergave'
+    : weergave.soort === 'account' ? 'Account'
+    : weergave.soort === 'aanvragen' ? 'Aanvragen'
+    : weergave.soort === 'beheer' ? 'Beheer'
+    : weergave.soort === 'globaal' ? 'Algemene verzameltijden'
+    : weergave.soort === 'planning' ? 'Planningsdocumenten'
     : null
 
   return (
@@ -61,15 +80,31 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'wachtwoord' && <WachtwoordKiezen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
         {weergave.soort === 'aanmelden' && <TeamAanmelden startKeuze={weergave.keuze} stap={weergave.stap ?? 1} naarStap={stap => setWeergave(w => w.soort === 'aanmelden' ? { ...w, stap } : w)} />}
-        {weergave.soort === 'gebruik' && <Gebruik />}
+        {weergave.soort === 'gebruik' && gebruiker?.superadmin && <Gebruik />}
+        {weergave.soort === 'wisselen' && gebruiker && <TeamWisselen gebruiker={gebruiker} gekozen={terug} aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze, terugNaar: 'wisselen' })} />}
+        {weergave.soort === 'teaminstellingen' && beheert && <TeamInstellingen />}
+        {weergave.soort === 'verzamelen' && beheert && <VerzamelenInstellen key={actiefTeam!.id} team={actiefTeam!} />}
+        {weergave.soort === 'weergave' && <Weergave />}
+        {weergave.soort === 'account' && gebruiker && <Account gebruiker={gebruiker} klaar={() => setWeergave({ soort: 'hoofd' })} />}
+        {weergave.soort === 'aanvragen' && gebruiker && <AanvragenKaart />}
+        {weergave.soort === 'globaal' && gebruiker?.superadmin && <VerzamelenInstellen />}
+        {weergave.soort === 'planning' && gebruiker?.superadmin && <PlanningDocumenten />}
+        {weergave.soort === 'beheer' && gebruiker?.superadmin && <div className="instellingen-menu">
+          <MenuRegel tekst="Algemene verzameltijden" open={() => setWeergave({ soort: 'globaal', terugNaar: 'beheer' })} />
+          <MenuRegel tekst="Planningsdocumenten" open={() => setWeergave({ soort: 'planning', terugNaar: 'beheer' })} />
+          <MenuRegel tekst="Gebruik per team" open={() => setWeergave({ soort: 'gebruik', terugNaar: 'beheer' })} />
+        </div>}
         {weergave.soort === 'aanmelding' && <AanmeldingBeoordelen token={weergave.token} />}
         {weergave.soort === 'aanvraag' && <ToegangAanvragen waarde={weergave.token} />}
         {weergave.soort === 'toegang' && <ToegangBeoordelen token={weergave.token} />}
         {weergave.soort === 'kijk' && <MeekijkenStart waarde={weergave.token} klaar={() => { terug(); naarDashboard() }} annuleer={terug} />}
         {weergave.soort === 'hoofd' && (gebruiker
-          ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze })} gebruik={() => setWeergave({ soort: 'gebruik' })} />
+          ? <Overzicht gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id })} openMenu={openMenu} />
           : <Inloggen aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze })} />)}
-        {weergave.soort === 'hoofd' && <><Weergave /><p className="account-uitleg"><a href="./privacy.html" target="_blank" rel="noreferrer">Privacy</a> · <a href="./voorwaarden.html" target="_blank" rel="noreferrer">Gebruiksvoorwaarden</a></p></>}
+        {weergave.soort === 'hoofd' && !gebruiker && <>
+          <div className="instellingen-menu"><MenuRegel tekst="Weergave" sub={THEMAS.find(t => t.id === leesThema())?.naam} open={() => openMenu('weergave')} /></div>
+          <p className="account-uitleg"><a href="./privacy.html" target="_blank" rel="noreferrer">Privacy</a> · <a href="./voorwaarden.html" target="_blank" rel="noreferrer">Gebruiksvoorwaarden</a></p>
+        </>}
       </div>
     </div>
   )
@@ -93,18 +128,11 @@ function Melding({ tekst, fout }: { tekst: string | null; fout?: boolean }) {
 function SyncRegel() {
   const { sync, live, nuSynchroniseren } = useHockey()
   if (!sync) return null
-  const tekst = sync.offline
-    ? `Geen verbinding${sync.wachtend ? `: ${sync.wachtend} wijziging${sync.wachtend > 1 ? 'en' : ''} wacht${sync.wachtend > 1 ? 'en' : ''}` : ''}. Wordt later verstuurd.`
-    : sync.fout ? `Versturen mislukt: ${sync.fout}`
-    : !sync.geladen ? 'Gegevens ophalen…'
-    : sync.wachtend ? 'Bezig met versturen…'
-    : 'Alles is opgeslagen op de server.'
-  const liveTekst = !live ? '' : !live.verbonden ? ' Live: geen verbinding.' : live.wachtend ? ' Live: bezig…' : ' Wedstrijd live gedeeld.'
-  return (
-    <button className={`account-sync ${sync.offline || sync.fout || (live && !live.verbonden) ? 'fout' : ''}`} onClick={nuSynchroniseren}>
-      {tekst}{liveTekst}
-    </button>
-  )
+  const fout = sync.offline || sync.fout || (live && !live.verbonden)
+  if (fout) return <button className="account-sync fout" onClick={nuSynchroniseren}>
+    {sync.offline ? sync.wachtend ? 'Geen verbinding. Wijzigingen wachten.' : 'Geen verbinding. Tik om opnieuw te proberen.' : 'Synchroniseren lukt niet. Tik om opnieuw te proberen.'}
+  </button>
+  return <p className="instellingen-status" role="status">{!sync.geladen ? 'Gegevens ophalen…' : sync.wachtend || live?.wachtend ? 'Bijwerken…' : 'Alles bijgewerkt'}</p>
 }
 
 function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanmelden?: (keuze: 'bestaand' | 'nieuw') => void }) {
@@ -169,103 +197,100 @@ function Inloggen({ email: startEmail = '', aanmelden }: { email?: string; aanme
   )
 }
 
-function Overzicht({ gebruiker, openTeam, aanmelden, gebruik }: { gebruiker: Gebruiker; openTeam: (id: string) => void; aanmelden: (keuze: 'bestaand' | 'nieuw') => void; gebruik: () => void }) {
-  const { teams, teamsLaden, uitloggen, actiefTeamId, kiesTeam } = useAccount()
-  const [fout, setFout] = useState<string | null>(null)
-
-  useEffect(() => { teamsLaden().catch(err => setFout(foutTekst(err))) }, [teamsLaden])
-
-  const actief = teams.find(t => t.id === actiefTeamId)
-  const actieveRol = actief ? rolIn(actief, gebruiker.id) : null
-
-  return (
-    <>
-      {gebruiker.gast ? (
-        <Kaart titel="Meekijken">
-          <div className="account-wie">
-            <span className="account-wie-naam">{actief?.naam ?? 'Team'}</span>
-            <span className="account-wie-sub">Je kijkt live mee via een link. Wijzigen kan niet.</span>
-          </div>
-          <DeelKijklink />
-          <button className="btn btn-secondary" onClick={() => { uitloggen(); tel('meekijken-gestopt') }}>Stoppen met meekijken</button>
-          <p className="account-uitleg">Heb je zelf een account? Stop dan met meekijken en log in.</p>
-        </Kaart>
-      ) : (
-      <>
-      <AanvragenKaart />
-      <Kaart titel="Account">
-        <div className="account-wie">
-          <span className="account-wie-naam">{gebruiker.name || gebruiker.email}</span>
-          {gebruiker.name && <span className="account-wie-sub">{gebruiker.email}</span>}
-          <span className="account-wie-sub">
-            {gebruiker.superadmin ? 'Superadmin' : actief ? `${actieveRol ? ROL_TEKST[actieveRol] : 'Lid'} van ${actief.naam}` : 'Niet in een team actief'}
-          </span>
-        </div>
-        <button className="btn btn-secondary" onClick={() => { uitloggen(); tel('uitgelogd') }}>Uitloggen</button>
-      </Kaart>
-
-      <Kaart titel="Werken met">
-        {teams.length === 0 && <p className="account-uitleg">Je zit nog in geen enkel team.</p>}
-        <div className="account-lijst">
-          {teams.map(t => {
-            const rol = rolIn(t, gebruiker.id)
-            const magBeheren = gebruiker.superadmin || rol === 'beheerder'
-            const isActief = t.id === actiefTeamId
-            return (
-              <div key={t.id} className={`account-team ${isActief ? 'actief' : ''}`}>
-                <button className="account-team-kies" onClick={() => { kiesTeam(t.id); tel('team-gekozen') }} aria-pressed={isActief}>
-                  <span className="account-team-vink" aria-hidden="true">{isActief ? '✓' : ''}</span>
-                  <span className="account-regel-tekst">
-                    <span className="account-regel-naam">{t.naam}</span>
-                    <span className="account-regel-sub">{rol ? ROL_TEKST[rol] : 'Superadmin'}</span>
-                  </span>
-                </button>
-                {magBeheren && <button className="account-team-beheer" onClick={() => openTeam(t.id)}>Leden</button>}
-              </div>
-            )
-          })}
-          {teams.length > 0 && (
-            <button className={`account-team-kies los ${actiefTeamId === null ? 'actief' : ''}`} onClick={() => { kiesTeam(null); tel('zonder-team') }} aria-pressed={actiefTeamId === null}>
-              <span className="account-team-vink" aria-hidden="true">{actiefTeamId === null ? '✓' : ''}</span>
-              <span className="account-regel-tekst">
-                <span className="account-regel-naam">Zonder team</span>
-                <span className="account-regel-sub">alleen op deze telefoon</span>
-              </span>
-            </button>
-          )}
-        </div>
-        <SyncRegel />
-        {actief?.officieelTeam && (gebruiker.superadmin || actieveRol === 'beheerder') && <label className="account-label">
-          <input type="checkbox" checked={!!actief.vindbaar} onChange={async e => {
-            try { await pb.collection('teams').update(actief.id, { vindbaar: e.target.checked }); await teamsLaden() }
-            catch (err) { setFout(foutTekst(err)) }
-          }} />
-          Omgevingsnaam vindbaar bij teamselectie (spelers en leden blijven privé)
-        </label>}
-        {actief && (gebruiker.superadmin || actieveRol === 'beheerder') && <TeamKoppelen id={actief.id} gekoppeld={actief.officieelTeam} />}
-          <DeelKijklink />
-      </Kaart>
-
-      <Kaart titel="Ander team">
-        <button className="btn btn-primary" onClick={() => aanmelden('bestaand')}>Aansluiten bij een team</button>
-        <button className="btn btn-secondary" onClick={() => aanmelden('nieuw')}>Nieuw team starten</button>
-        <Melding tekst={fout} fout />
-      </Kaart>
-      {actief && (gebruiker.superadmin || actieveRol === 'beheerder') && <VerzamelenInstellen key={actief.id} team={actief} />}
-      {gebruiker.superadmin && <VerzamelenInstellen />}
-      {gebruiker.superadmin && <PlanningDocumenten />}
-      {gebruiker.superadmin && (
-        <Kaart titel="Gebruik">
-          <button className="btn btn-secondary" onClick={gebruik}>📊 Gebruik per team</button>
-        </Kaart>
-      )}
-      </>
-      )}
-    </>
-  )
+function MenuRegel({ tekst, sub, open }: { tekst: string; sub?: string; open: () => void }) {
+  return <button className="instellingen-menuregel" type="button" onClick={open}>
+    <span>{tekst}{sub && <small>{sub}</small>}</span><span aria-hidden="true">›</span>
+  </button>
 }
 
-// Bovenaan Instellingen, alleen als er iets te beslissen is: ouders die toegang vragen (beheerders van dat team)
+function Overzicht({ gebruiker, openTeam, openMenu }: { gebruiker: Gebruiker; openTeam: (id: string) => void; openMenu: (menu: InstellingMenu) => void }) {
+  const { teamsLaden, actiefTeam, aanvragen, uitloggen } = useAccount()
+  const [fout, setFout] = useState<string | null>(null)
+  useEffect(() => { teamsLaden().catch(err => setFout(foutTekst(err))) }, [teamsLaden])
+  const rol = actiefTeam ? rolIn(actiefTeam, gebruiker.id) : null
+  const beheert = !!actiefTeam && (gebruiker.superadmin || rol === 'beheerder')
+  const aantal = aanvragen.toegang.length + aanvragen.teams.length
+  return <div className="instellingen-overzicht">
+    <section className="instellingen-teamoverzicht" aria-label="Je team">
+      <h2>Je team</h2>
+      <div className="instellingen-actief-team">
+        <span><strong>{actiefTeam?.naam ?? 'Zonder team'}</strong><small>{actiefTeam ? rol ? ROL_TEKST[rol] : gebruiker.superadmin ? 'Superadmin' : 'Lid' : 'Alleen op deze telefoon'}</small></span>
+        <span className="instellingen-actief-label">Actief</span>
+      </div>
+      <MenuRegel tekst="Team wisselen" open={() => openMenu('wisselen')} />
+      <SyncRegel />
+    </section>
+    <div className="instellingen-menu">
+      {aantal > 0 && <MenuRegel tekst={`Aanvragen (${aantal})`} open={() => openMenu('aanvragen')} />}
+      {beheert && <MenuRegel tekst="Leden" open={() => openTeam(actiefTeam!.id)} />}
+      <DeelKijklink compact />
+      {beheert && <MenuRegel tekst="Teaminstellingen" open={() => openMenu('teaminstellingen')} />}
+      {beheert && <MenuRegel tekst="Verzameltijd" sub="Automatisch berekend" open={() => openMenu('verzamelen')} />}
+      <MenuRegel tekst="Weergave" sub={THEMAS.find(t => t.id === leesThema())?.naam} open={() => openMenu('weergave')} />
+      <MenuRegel tekst="Account" open={() => openMenu('account')} />
+      {gebruiker.superadmin && <MenuRegel tekst="Beheer" open={() => openMenu('beheer')} />}
+    </div>
+    {gebruiker.gast && <button className="btn btn-secondary" onClick={() => { uitloggen(); tel('meekijken-gestopt') }}>Stoppen met meekijken</button>}
+    <Melding tekst={fout} fout />
+  </div>
+}
+
+function TeamWisselen({ gebruiker, gekozen, aanmelden }: { gebruiker: Gebruiker; gekozen: () => void; aanmelden: (keuze: 'bestaand' | 'nieuw') => void }) {
+  const { teams, actiefTeamId, kiesTeam } = useAccount()
+  const kies = (id: string | null) => { kiesTeam(id); tel(id ? 'team-gekozen' : 'zonder-team'); gekozen() }
+  return <>
+    <div className="instellingen-menu">
+      {teams.map(team => <button key={team.id} className="instellingen-menuregel" aria-pressed={team.id === actiefTeamId} onClick={() => kies(team.id)}>
+        <span>{team.naam}<small>{rolIn(team, gebruiker.id) === 'beheerder' ? 'Beheerder' : gebruiker.superadmin ? 'Superadmin' : 'Kijker'}</small></span>
+        {team.id === actiefTeamId && <span className="instellingen-actief-label">Actief</span>}
+      </button>)}
+      <button className="instellingen-menuregel" aria-pressed={actiefTeamId === null} onClick={() => kies(null)}>
+        <span>Zonder team<small>Alleen op deze telefoon</small></span>{actiefTeamId === null && <span className="instellingen-actief-label">Actief</span>}
+      </button>
+    </div>
+    <div className="account-form">
+      <button className="btn btn-primary" onClick={() => aanmelden('bestaand')}>Aansluiten bij een team</button>
+      <button className="btn btn-secondary" onClick={() => aanmelden('nieuw')}>Nieuw team starten</button>
+    </div>
+  </>
+}
+
+function TeamInstellingen() {
+  const { actiefTeam, teamsLaden } = useAccount()
+  const [fout, setFout] = useState<string | null>(null)
+  const [bezig, setBezig] = useState(false)
+  if (!actiefTeam) return null
+  return <>
+    <Kaart titel={actiefTeam.naam}>
+      {actiefTeam.officieelTeam && <label className="instellingen-schakelaar">
+        <input type="checkbox" checked={!!actiefTeam.vindbaar} disabled={bezig} onChange={async e => {
+          setBezig(true); setFout(null)
+          try { await pb.collection('teams').update(actiefTeam.id, { vindbaar: e.target.checked }); await teamsLaden() }
+          catch (err) { setFout(foutTekst(err)) }
+          finally { setBezig(false) }
+        }} />Vindbaar bij team zoeken
+      </label>}
+      {actiefTeam.officieelTeam && <p className="account-uitleg">Alleen de groepsnaam is openbaar. Spelers en leden blijven privé.</p>}
+      <TeamKoppelen id={actiefTeam.id} gekoppeld={actiefTeam.officieelTeam} />
+      <Melding tekst={fout} fout />
+    </Kaart>
+    <DeelKijklink />
+  </>
+}
+
+function Account({ gebruiker, klaar }: { gebruiker: Gebruiker; klaar: () => void }) {
+  const { uitloggen } = useAccount()
+  return <>
+    <Kaart titel="Je account">
+      <div className="account-wie"><span className="account-wie-naam">{gebruiker.name || gebruiker.email}</span>{gebruiker.name && <span className="account-wie-sub">{gebruiker.email}</span>}</div>
+      {gebruiker.superadmin && <p className="account-uitleg">Superadmin</p>}
+      <button className="btn btn-secondary" onClick={() => { uitloggen(); tel('uitgelogd'); klaar() }}>Uitloggen</button>
+    </Kaart>
+    <p className="account-uitleg"><a href="./privacy.html" target="_blank" rel="noreferrer">Privacy</a> · <a href="./voorwaarden.html" target="_blank" rel="noreferrer">Gebruiksvoorwaarden</a></p>
+  </>
+}
+
+// Eigen scherm via de teller in Instellingen: ouders die toegang vragen (beheerders van dat team)
 // en nieuwe teams (superadmin). Toelaten = als kijker; beheerder maken kan daarna bij Leden
 function AanvragenKaart() {
   const { aanvragen, aanvragenLaden, teamsLaden } = useAccount()

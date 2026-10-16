@@ -46,9 +46,9 @@ export default function VerzamelenInstellen({ team }: { team?: Team }) {
   }
   return <section className="instellingen-kaart">
     <h2 className="instellingen-kaart-titel">{team ? 'Verzameltijden voor dit team' : 'Verzameltijden · globale standaard'}</h2>
-    <p className="account-uitleg">Verzamelen = aanvang − voorbereiding − reistijd − buffer. Een bestaande verzameltijd verandert pas als je een nieuw voorstel overneemt.</p>
+    <p className="account-uitleg">Verzameltijd = aanvang − voorbereiding − reistijd − buffer.</p>
     {team && <label className="account-label"><input type="checkbox" checked={eigen} disabled={!geladen} onChange={e => { setEigen(e.target.checked); if (!e.target.checked) setWaarden(globaal) }} />Eigen standaard voor dit team</label>}
-    {team && <p className="account-uitleg">Een waarde aanpassen maakt automatisch een eigen standaard voor dit team. Zet Eigen standaard uit om de globale waarden te gebruiken.</p>}
+    {team && <p className="account-uitleg">Uit = algemene tijden. Een waarde aanpassen zet eigen tijden aan.</p>}
     <label className="account-label">Voorbereiding (minuten)<input className="account-input" type="number" inputMode="numeric" min="0" max="360" step="1" disabled={!geladen} value={Number.isNaN(waarden.voorbereidingMinuten) ? '' : waarden.voorbereidingMinuten} onChange={e => { if (team) setEigen(true); setWaarden({ ...waarden, voorbereidingMinuten: e.target.value === '' ? NaN : Number(e.target.value) }) }} /></label>
     <label className="account-label">Extra buffer (minuten)<input className="account-input" type="number" inputMode="numeric" min="0" max="360" step="1" disabled={!geladen} value={Number.isNaN(waarden.bufferMinuten) ? '' : waarden.bufferMinuten} onChange={e => { if (team) setEigen(true); setWaarden({ ...waarden, bufferMinuten: e.target.value === '' ? NaN : Number(e.target.value) }) }} /></label>
     {team && <label className="account-label">Vertrekadres<input className="account-input" maxLength={300} value={vertrekAdres} placeholder={clubAdres || 'Adres waar het team verzamelt'} onChange={e => setVertrekAdres(e.target.value)} /><span className="account-uitleg">Leeg laten gebruikt het clubadres, zodra dat bekend is. Deze keuze blijft privé binnen het team.</span></label>}

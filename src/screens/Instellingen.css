@@ -49,6 +49,116 @@
   padding: 10px 8px 24px;
 }
 
+.instellingen-overzicht {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.instellingen-teamoverzicht {
+  padding: 8px 4px;
+  color: var(--tekst);
+}
+
+.instellingen-teamoverzicht h2 {
+  font-size: var(--base-readable-size);
+  margin-bottom: 8px;
+}
+
+.instellingen-actief-team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.instellingen-actief-team > span:first-child,
+.instellingen-menuregel > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.instellingen-actief-team strong,
+.instellingen-actief-team small {
+  display: block;
+  font-size: var(--base-readable-size);
+}
+
+.instellingen-actief-team small,
+.instellingen-menuregel small {
+  color: var(--tekst-zacht);
+  font-size: max(22px, calc(var(--base-readable-size) * 0.92));
+}
+
+.instellingen-actief-label {
+  flex-shrink: 0;
+  color: var(--blauw-tekst);
+  background: var(--vlak-blauw);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 22px;
+}
+
+.instellingen-menu {
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.instellingen-menuregel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 12px;
+  border: 0;
+  background: var(--vlak);
+  color: var(--tekst);
+  font: inherit;
+  font-size: var(--base-readable-size);
+  text-align: left;
+  cursor: pointer;
+}
+
+.instellingen-menu > * + * {
+  border-top: 1px solid var(--rand);
+}
+
+.instellingen-menuregel small {
+  display: block;
+}
+
+.instellingen-menuregel:focus-visible {
+  outline: 3px solid var(--blauw-tekst);
+  outline-offset: -3px;
+}
+
+.instellingen-menuregel[aria-pressed='true'] {
+  background: var(--vlak-blauw);
+}
+
+.instellingen-status {
+  font-size: 22px;
+  color: var(--tekst-zacht);
+}
+
+.instellingen-schakelaar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  color: var(--tekst);
+  font-size: var(--base-readable-size);
+}
+
+.instellingen-schakelaar input {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
 .instellingen-teamkeuze .instellingen-kop {
   border-bottom-width: 1px;
 }

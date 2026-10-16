@@ -23,7 +23,7 @@ const TEKSTEN = {
   },
 }
 
-export default function DeelKijklink({ soort = 'kijk' }: { soort?: 'kijk' | 'aanvraag' }) {
+export default function DeelKijklink({ soort = 'kijk', compact = false }: { soort?: 'kijk' | 'aanvraag'; compact?: boolean }) {
   const t = TEKSTEN[soort]
   const { gebruiker, actiefTeam, teamsLaden } = useAccount()
   const [melding, setMelding] = useState<{ tekst: string; fout?: boolean } | null>(null)
@@ -67,12 +67,12 @@ export default function DeelKijklink({ soort = 'kijk' }: { soort?: 'kijk' | 'aan
   }
 
   return (
-    <div className="kijklink">
-      <button className="btn btn-primary" onClick={() => deel()} disabled={bezig}>{t.knop}</button>
-      <p className="kijklink-uitleg">{t.uitleg}</p>
+    <div className={`kijklink${compact ? ' kijklink-compact' : ''}`}>
+      <button className={compact ? 'instellingen-menuregel' : 'btn btn-primary'} onClick={() => deel()} disabled={bezig}>{compact ? <><span>Teamlink delen</span><span aria-hidden="true">↗</span></> : t.knop}</button>
+      {!compact && <p className="kijklink-uitleg">{t.uitleg}</p>}
       {melding && <p className={`kijklink-melding ${melding.fout ? 'fout' : ''}`} role="status">{melding.tekst}</p>}
       {link && <input className="modal-input kijklink-adres" readOnly value={link} onFocus={e => e.target.select()} />}
-      {beheert && <button className="btn btn-secondary" onClick={() => setVernieuwVraag(true)} disabled={bezig}>Nieuwe link maken</button>}
+      {beheert && !compact && <button className="btn btn-secondary" onClick={() => setVernieuwVraag(true)} disabled={bezig}>Nieuwe link maken</button>}
       {vernieuwVraag && (
         <ResetModal
           titel={t.vraag}
