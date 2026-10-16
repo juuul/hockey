@@ -12,5 +12,9 @@ export function autoPlekken(p: Pick<ProgrammaItem, 'thuis' | 'soort' | 'rijders'
 
 export function rijdenTekst(plekken: string[], naam: (id: string) => string): string {
   if (!plekken.length) return 'niet nodig'
-  return plekken.map((id, i) => `auto ${i + 1}: ${id && id !== NIET_NODIG && naam(id) ? `ouder ${naam(id)}` : 'nog te bepalen'}`).join(' · ')
+  const kinderen = plekken.map(id => id && id !== NIET_NODIG ? naam(id) : '').filter(Boolean)
+  const open = plekken.length - kinderen.length
+  if (!kinderen.length) return `${open} ${open === 1 ? 'chauffeur' : 'chauffeurs'} nog te bepalen`
+  const gekozen = `${kinderen.length === 1 ? 'ouder' : 'ouders'} van ${kinderen.join(', ')}`
+  return open ? `${gekozen} · nog ${open} ${open === 1 ? 'chauffeur' : 'chauffeurs'} nodig` : gekozen
 }
