@@ -24,7 +24,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 2. **Spelers**: categorie (O12+/O11/O10/O9 = 11/9/8/6 spelers, `CATEGORIE`), opstelling, wie doet mee, toevoegen/verwijderen.
 3. **Voorkeur**: per speler (ook keeper) 1e en 2e positie.
 4. **Historie**: compacte "Deze wedstrijd" (stand + Afsluiten), balans op één regel, één lijst **Spelers** (doelpunten + speeltijdbalk) en **Wedstrijden** met een filter op tegenstander (club wijzigen via het filter).
-5. **Programma** (`src/screens/Programma.tsx`): datums met fruit/spelbegeleiding, "Mijn kind", "Op het veld zetten".
+5. **Programma** (`src/screens/Programma.tsx`): datums met fruit/spelbegeleiding/rijbeurten, "Mijn kind", "Op het veld zetten".
    In Datum toevoegen/wijzigen staat de tijdknop direct onder Datum (alleen bij wedstrijden).
 6. **Shoot-out** (alleen O10/O9, `heeftShootouts`): wie nam er hoeveel, minst genomen bovenaan.
 7. **Instellingen** (`src/screens/Instellingen.tsx`): inloggen, teams, leden, links uit mails, weergave; superadmin ook "Gebruik per team".
@@ -63,6 +63,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Geen namen van echte speelsters in de repo** (openbaar); testnamen in `src/demo.ts`.
 
 ### Accounts en sync (kern)
+- **Programmataken**: spelbegeleiding standaard Nog te bepalen voor thuis én uit (expliciete teaminstellingen blijven gelden), met 🏑; rijden apart met 🚗. Uit: naar boven afgerond volledige spelerslijst / 4, inclusief wissels, auto’s standaard n.v.t.; thuis/vrij nul. `programma.rijders` is een privé JSON-array met speler-id’s/lege tekst/`-`; ontbrekend veld is veilig leeg. Mijn kind en taakfrequenties nemen rijden mee. Bestaande ingeplande ouders blijven bij kleinere teams behouden.
 - **Team na inloggen**: kies automatisch een beschikbaar echt team, ook als eerder een test-/demoteam actief was. Een eerder gekozen echt team blijft behouden. Expliciete test-/demonamen worden herkend; geen e-mailadressen hardcoderen. Alleen beschikbare teams uit de bevoegde serverlijst. Handmatig wisselen naar een testteam blijft mogelijk, periodiek verversen verandert die keuze niet.
 - **Instellingen-overzicht**: alleen actief team met label Actief, Team wisselen en compacte menuregels. Leden, Teaminstellingen en Verzameltijd alleen voor eigen beheerders/superadmin. Uitloggen en juridische links onder Account; weergave, teamwissel en uitgebreide instellingen op eigen schermen. Teamlink direct delen; Nieuwe link maken onder Teaminstellingen. Open aanvragen via een tellerregel; algemene verzameltijden, planningsdocumenten en gebruik onder Beheer (superadmin). Gezonde sync is één rustige regel Alles bijgewerkt; fouten blijven zichtbaar met opnieuw proberen. Elk subscherm ondersteunt telefoonterug.
 - **Verzameltijd instellen**: voorbereiding en buffer tonen direct de gebruikte waarden plus de algemene standaard. Geen vinkje voor eigen tijden: aanpassen maakt ze teamspecifiek, Herstel standaardwaarden zet beide terug op overerven. Opslaan bevestigt ook het herstel; het privévertrekadres blijft behouden en staat ingeklapt onder Ander/Eigen vertrekadres.

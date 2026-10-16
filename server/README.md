@@ -12,6 +12,8 @@ Productie en test hebben ieder een eigen PocketBase-proces, database, accounts e
 
 ## Test starten en bijwerken
 
+Migratie `1790400029_rijden.js` voegt alleen het privé JSON-veld `programma.rijders` toe, onder de bestaande teamrechten. Geen bestaande taak- of teaminstellingen worden overschreven. Test: `tests/rijden.ts` bundelen; `tests/rijden.pb.js` uitsluitend als extra CLI-hook op een nieuwe geïsoleerde database mounten, `test-rijden-fixture` draaien en de server op localhost 8099 starten voor `node server/tests/rijden.mjs`. Beheer kan wijzigen, kijkers alleen lezen en anderen niets. Nooit de fixture op gewone test-/productiedata draaien.
+
 Vanuit de projectmap:
 
 ```sh

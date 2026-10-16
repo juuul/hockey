@@ -38,7 +38,7 @@ export interface Team extends RecordModel {
 }
 // Standaard per team: bij een uit- of thuiswedstrijd is (geen) spelbegeleiding van ons nodig
 export interface TeamInstellingen { uitGeenBegeleiding: boolean; thuisGeenBegeleiding: boolean }
-export const STANDAARD_INSTELLINGEN: TeamInstellingen = { uitGeenBegeleiding: true, thuisGeenBegeleiding: false }
+export const STANDAARD_INSTELLINGEN: TeamInstellingen = { uitGeenBegeleiding: false, thuisGeenBegeleiding: false }
 
 export interface Uitnodiging extends RecordModel { team: string; email: string; rol: Rol }
 

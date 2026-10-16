@@ -1,5 +1,6 @@
 import ProgrammaTijd from '../components/ProgrammaTijd'
 import DatumTijdKiezer from '../components/DatumTijdKiezer'
+import { autoPlekken, rijdenTekst } from '../rijden'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
 import { navigatieLink } from '../verzamelen'
@@ -60,6 +61,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
     if (p.soort !== 'wedstrijd') return uit
     if (mijnKinderen.includes(p.fruit)) uit.push('fruit')
     if (mijnKinderen.includes(p.begeleider1) || mijnKinderen.includes(p.begeleider2)) uit.push('begeleiding')
+    if (autoPlekken(p, spelers.length).some(id => mijnKinderen.includes(id))) uit.push('rijden')
     return uit
   }
 
@@ -113,9 +115,12 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span aria-hidden="true">🍎</span><span>fruit: {naam(p.fruit) || '–'}</span>
         </div>
         <div className={`prog-regel ${mijn.includes('begeleiding') ? 'mijn' : ''}`}>
-          <span aria-hidden="true">🚗</span>
+          <span aria-hidden="true">🏑</span>
           <span>begeleiding: {begeleidingTekst(p, naam)}</span>
         </div>
+        {!p.thuis && <div className={`prog-regel ${mijn.includes('rijden') ? 'mijn' : ''}`}>
+          <span aria-hidden="true">🚗</span><span>rijden: {rijdenTekst(autoPlekken(p, spelers.length), naam)}</span>
+        </div>}
         {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''}</div>}
         {p.locatieAdres?.trim() ? <a className="btn btn-secondary" href={navigatieLink(p.locatieAdres)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a> : <button type="button" className="btn btn-secondary" disabled title="Wedstrijdadres nog niet bekend">Navigeer naar wedstrijd</button>}
         {p.locatie && <div className="prog-regel">📍 {p.locatie}</div>}
@@ -145,7 +150,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
             {alleenMijn ? '✓ Alleen mijn beurten' : 'Alleen mijn beurten'}
           </button>
         ) : (
-          <p className="prog-uitleg">Kies je kind: dan zie je meteen wanneer jij fruit meeneemt of begeleidt.</p>
+          <p className="prog-uitleg">Kies je kind: dan zie je wanneer jij fruit meeneemt, begeleidt of rijdt.</p>
         )}
       </section>
 
@@ -237,7 +242,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   const spelerKeuzes = [...spelers].sort((a, b) => a.naam.localeCompare(b.naam))
 
   const opslaan = () => {
-    let item = { ...p, reisMinuten: null }
+    let item = { ...p, reisMinuten: null, rijders: autoPlekken(p, spelers.length) }
     if (p.soort === 'wedstrijd' && nieuweClub !== null && nieuweClub.trim()) {
       const id = clubToevoegen(nieuweClub)
       item = { ...item, clubId: id, tegenstander: nieuweClub.trim() }
@@ -256,6 +261,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   const anderen = programma.filter(x => x.id !== p.id && x.soort === 'wedstrijd')
   const telFruit = (id: string) => anderen.filter(x => x.fruit === id).length
   const telBegeleiding = (id: string) => anderen.filter(x => x.begeleider1 === id || x.begeleider2 === id).length
+  const telRijden = (id: string) => anderen.reduce((n, x) => n + autoPlekken(x, spelers.length).filter(ouder => ouder === id).length, 0)
 
   const spelerSelect = (label: string, veld: 'fruit' | 'begeleider1' | 'begeleider2') => {
     const fruit = veld === 'fruit'
@@ -276,7 +282,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
           )}
           {keuzes.map(s => (
             <option key={s.id} value={s.id}>
-              {fruit ? s.naam : `Ouder van ${s.naam}`} · {fruit ? '🍎' : '🚗'} {tel(s.id)}×
+              {fruit ? s.naam : `Ouder van ${s.naam}`} · {fruit ? '🍎' : '🏑'} {tel(s.id)}×
             </option>
           ))}
         </select>
@@ -343,8 +349,24 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               <VerzameltijdBerekenen item={p} zet={zet} />
               {p.bronStatus && /cancel/i.test(p.bronStatus) && <p className="account-uitleg">Deze wedstrijd is volgens de officiële bron afgelast.</p>}
               {spelerSelect('🍎 Fruit', 'fruit')}
-              {spelerSelect('🚗 Spelbegeleiding 1', 'begeleider1')}
-              {spelerSelect('🚗 Spelbegeleiding 2', 'begeleider2')}
+              {spelerSelect('🏑 Spelbegeleiding 1', 'begeleider1')}
+              {spelerSelect('🏑 Spelbegeleiding 2', 'begeleider2')}
+              {!p.thuis && <>
+                <p className="account-uitleg">{spelers.length} kinderen · {Math.ceil(spelers.length / 4)} auto’s · 4 kinderen per auto</p>
+                {autoPlekken(p, spelers.length).map((id, i) => <label className="prog-veld" key={i}>
+                  🚗 Auto {i + 1}
+                  <select className="modal-input" value={id} onChange={e => {
+                    const rijders = autoPlekken(p, spelers.length)
+                    rijders[i] = e.target.value
+                    zet({ rijders })
+                  }}>
+                    <option value={NIET_NODIG}>Niet van toepassing</option>
+                    <option value="">Nog te bepalen</option>
+                    {[...spelerKeuzes].sort((a, b) => telRijden(a.id) - telRijden(b.id) || a.naam.localeCompare(b.naam)).map(s => <option key={s.id} value={s.id} disabled={s.id !== id && autoPlekken(p, spelers.length).includes(s.id)}>Ouder van {s.naam} · 🚗 {telRijden(s.id)}×</option>)}
+                    {id && id !== NIET_NODIG && !spelers.some(s => s.id === id) && <option value={id}>Eerder gekozen ouder (niet meer in team)</option>}
+                  </select>
+                </label>)}
+              </>}
               <label className="prog-veld">
                 Opmerking (mag leeg)
                 <input className="modal-input" value={p.notitie} onChange={e => zet({ notitie: e.target.value })} />
