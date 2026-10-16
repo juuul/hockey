@@ -1,0 +1,3022 @@
+[
+  {
+    "bronId": "bonds-0-veld-2026-2027",
+    "naam": "Heren hoofdklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-22",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-19",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-28",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-01-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-08",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-04-22",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-05-15",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "speeldag",
+        "omschrijving": "PO 1.2"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "PO 2.1"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "PD 1.1"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "PD 1.2"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-0-zaal-2026-2027",
+    "naam": "Heren hoofdklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Zaal",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-12-13",
+        "status": "speeldag",
+        "omschrijving": "Zaal 1"
+      },
+      {
+        "datum": "2027-01-03",
+        "status": "speeldag",
+        "omschrijving": "Zaal 2"
+      },
+      {
+        "datum": "2027-01-10",
+        "status": "speeldag",
+        "omschrijving": "Zaal 3"
+      },
+      {
+        "datum": "2027-01-17",
+        "status": "speeldag",
+        "omschrijving": "Zaal 4"
+      },
+      {
+        "datum": "2027-01-23",
+        "status": "speeldag",
+        "omschrijving": "Zaal 5"
+      },
+      {
+        "datum": "2027-01-30",
+        "status": "speeldag",
+        "omschrijving": "NK Zaal"
+      },
+      {
+        "datum": "2027-01-31",
+        "status": "speeldag",
+        "omschrijving": "NK Zaal"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-1-veld-2026-2027",
+    "naam": "Dames hoofdklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-10-08",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-12",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-01-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-15",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-04-29",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-05-15",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "speeldag",
+        "omschrijving": "PO 1.2"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "PO 2.1"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "PO 2.2"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "PD 1.1"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "PD 1.2"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-1-zaal-2026-2027",
+    "naam": "Dames hoofdklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Zaal",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-12-13",
+        "status": "speeldag",
+        "omschrijving": "Zaal 1"
+      },
+      {
+        "datum": "2027-01-03",
+        "status": "speeldag",
+        "omschrijving": "Zaal 2"
+      },
+      {
+        "datum": "2027-01-10",
+        "status": "speeldag",
+        "omschrijving": "Zaal 3"
+      },
+      {
+        "datum": "2027-01-17",
+        "status": "speeldag",
+        "omschrijving": "Zaal 4"
+      },
+      {
+        "datum": "2027-01-23",
+        "status": "speeldag",
+        "omschrijving": "Zaal 5"
+      },
+      {
+        "datum": "2027-01-30",
+        "status": "speeldag",
+        "omschrijving": "NK Zaal"
+      },
+      {
+        "datum": "2027-01-31",
+        "status": "speeldag",
+        "omschrijving": "NK Zaal"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-2-veld-2026-2027",
+    "naam": "Heren promotieklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-16",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "PO 1.2"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "PD 1.1"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "PD 1.2"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-3-veld-2026-2027",
+    "naam": "Dames promotieklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-16",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "PD 1.1"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "PD 1.2"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-4-veld-2026-2027",
+    "naam": "Heren overgangsklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-16",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "PO 1.2"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "PO 2.1"
+      },
+      {
+        "datum": "2027-06-12",
+        "status": "speeldag",
+        "omschrijving": "PD 1.1"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "PD 1.2"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-5-veld-2026-2027",
+    "naam": "Dames overgangsklasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-16",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "PO 2.1"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "PO 2.2"
+      },
+      {
+        "datum": "2027-06-12",
+        "status": "speeldag",
+        "omschrijving": "PD 1.1"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "PD 1.2"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-6-veld-2026-2027",
+    "naam": "Heren 1e klasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "PO 1.2"
+      },
+      {
+        "datum": "2027-06-12",
+        "status": "speeldag",
+        "omschrijving": "PO 2.1"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-7-veld-2026-2027",
+    "naam": "Dames 1e klasse",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-02",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "PO 1.1"
+      },
+      {
+        "datum": "2027-06-12",
+        "status": "speeldag",
+        "omschrijving": "PO 2.1"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "PO 2.2"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-8-veld-2026-2027",
+    "naam": "2e klasse en lager",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-02-28",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-06-19",
+        "status": "reserve",
+        "omschrijving": "R"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-9-veld-2026-2027",
+    "naam": "Senioren categorie II · poule 12",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-02-28",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-03-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-04-25",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-09",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-17",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "21"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "22"
+      },
+      {
+        "datum": "2027-06-19",
+        "status": "reserve",
+        "omschrijving": "R*"
+      },
+      {
+        "datum": "2027-06-20",
+        "status": "speeldag",
+        "omschrijving": "NK reserv"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-10-veld-2026-2027",
+    "naam": "Senioren categorie II · poule 10",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-11-veld-2026-2027",
+    "naam": "Senioren categorie II · poule 8",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-11",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "20"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "21"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-12-veld-2026-2027",
+    "naam": "Senioren categorie II · poule 6",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-27",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-18",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-25",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-11-01",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-08",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-15",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-29",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-07",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2027-03-14",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-03-21",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-04-04",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-04-11",
+        "status": "speeldag",
+        "omschrijving": "15"
+      },
+      {
+        "datum": "2027-04-18",
+        "status": "speeldag",
+        "omschrijving": "16"
+      },
+      {
+        "datum": "2027-05-23",
+        "status": "speeldag",
+        "omschrijving": "17"
+      },
+      {
+        "datum": "2027-05-30",
+        "status": "speeldag",
+        "omschrijving": "18"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "speeldag",
+        "omschrijving": "19"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "20"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-13-veld-2026-2027",
+    "naam": "Gold Cup heren",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-17",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-10-01",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-10-29",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-11-12",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2027-03-18",
+        "status": "speeldag",
+        "omschrijving": "HF*"
+      },
+      {
+        "datum": "2027-04-01",
+        "status": "speeldag",
+        "omschrijving": "Finale*"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-14-veld-2026-2027",
+    "naam": "Gold Cup dames",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-24",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-10-22",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-11-26",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2027-03-18",
+        "status": "speeldag",
+        "omschrijving": "HF*"
+      },
+      {
+        "datum": "2027-04-08",
+        "status": "speeldag",
+        "omschrijving": "Finale*"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-15-veld-2026-2027",
+    "naam": "Silver Cup heren",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-11",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-25",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-10-09",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-10-30",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-11-13",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-11-27",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-03-19",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2027-04-02",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-04-16",
+        "status": "speeldag",
+        "omschrijving": "HF"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "speeldag",
+        "omschrijving": "Finale"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-16-veld-2026-2027",
+    "naam": "Silver Cup dames",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-09-18",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-10-02",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-10-23",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-11-06",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-11-20",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2027-03-12",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-04-09",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-04-23",
+        "status": "speeldag",
+        "omschrijving": "HF"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "speeldag",
+        "omschrijving": "Finale"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-17-veld-2026-2027",
+    "naam": "O18 landelijk",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-08-29",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-05",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-12",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-19",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-09-26",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-03",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-31",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-11-07",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-11-14",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-11-21",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-11-28",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-02-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-06",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2027-03-13",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-03-20",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2027-04-03",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-04-10",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2027-04-17",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2027-04-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-08",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-06-12",
+        "status": "speeldag",
+        "omschrijving": "HF1"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "HF2"
+      },
+      {
+        "datum": "2027-06-19",
+        "status": "speeldag",
+        "omschrijving": "NK"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-18-veld-2026-2027",
+    "naam": "O18 super / subtop",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-08-29",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-05",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-12",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-19",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-09-26",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-03",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-04",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-31",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-11-07",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-11-14",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-11-21",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-11-28",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-02-27",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-06",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2027-03-13",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-03-20",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2027-04-03",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-04-10",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2027-04-17",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2027-04-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-08",
+        "status": "speeldag",
+        "omschrijving": "11"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "12"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "13"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "14"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-19-veld-2026-2027",
+    "naam": "O16 landelijk",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-08-29",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-05",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-12",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-19",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-09-26",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-03",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-10",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-31",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-07",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-14",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-21",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-11-28",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2027-03-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2027-03-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2027-04-03",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2027-04-10",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2027-04-17",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-04-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-08",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-06-12",
+        "status": "speeldag",
+        "omschrijving": "KF"
+      },
+      {
+        "datum": "2027-06-13",
+        "status": "speeldag",
+        "omschrijving": "HF"
+      },
+      {
+        "datum": "2027-06-19",
+        "status": "speeldag",
+        "omschrijving": "NK"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-20-veld-2026-2027",
+    "naam": "O16 super / subtop",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2026-08-29",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2026-09-05",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2026-09-12",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2026-09-19",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2026-09-26",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2026-10-03",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2026-10-10",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-10-31",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2026-11-07",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2026-11-14",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2026-11-21",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2026-11-22",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2026-11-28",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-03-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2027-03-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2027-03-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2027-04-03",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2027-04-10",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2027-04-17",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-04-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-08",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-21-veld-2026-2027",
+    "naam": "O14 super",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2027-03-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2027-03-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2027-03-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2027-04-03",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2027-04-10",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2027-04-17",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-04-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-08",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2027-06-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-06-19",
+        "status": "speeldag",
+        "omschrijving": "NK"
+      }
+    ]
+  },
+  {
+    "bronId": "bonds-22-veld-2026-2027",
+    "naam": "O14 IDC",
+    "seizoen": "2026-2027",
+    "district": "Landelijk",
+    "spelvorm": "Veld",
+    "doelgroep": "Bondscompetitie",
+    "bron": "https://media.static-hw.nl/media/bf01e0d8-1429-463f-aab7-a1006a373cd1/draft-26-27-land-speeldagenkalenders-def-v11.pdf",
+    "autoLeeftijden": [],
+    "dagen": [
+      {
+        "datum": "2027-03-06",
+        "status": "speeldag",
+        "omschrijving": "1"
+      },
+      {
+        "datum": "2027-03-13",
+        "status": "speeldag",
+        "omschrijving": "2"
+      },
+      {
+        "datum": "2027-03-20",
+        "status": "speeldag",
+        "omschrijving": "3"
+      },
+      {
+        "datum": "2027-04-03",
+        "status": "speeldag",
+        "omschrijving": "4"
+      },
+      {
+        "datum": "2027-04-10",
+        "status": "speeldag",
+        "omschrijving": "5"
+      },
+      {
+        "datum": "2027-04-17",
+        "status": "speeldag",
+        "omschrijving": "6"
+      },
+      {
+        "datum": "2027-04-24",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-06",
+        "status": "reserve",
+        "omschrijving": "R"
+      },
+      {
+        "datum": "2027-05-08",
+        "status": "speeldag",
+        "omschrijving": "7"
+      },
+      {
+        "datum": "2027-05-22",
+        "status": "speeldag",
+        "omschrijving": "8"
+      },
+      {
+        "datum": "2027-05-29",
+        "status": "speeldag",
+        "omschrijving": "9"
+      },
+      {
+        "datum": "2027-06-05",
+        "status": "speeldag",
+        "omschrijving": "10"
+      },
+      {
+        "datum": "2027-06-12",
+        "status": "reserve",
+        "omschrijving": "R"
+      }
+    ]
+  }
+]
