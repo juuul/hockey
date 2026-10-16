@@ -49,6 +49,22 @@
   padding: 10px 8px 24px;
 }
 
+.instellingen-teamkeuze .instellingen-kop {
+  border-bottom-width: 1px;
+}
+
+.instellingen-teamkeuze .instellingen-terug {
+  background: transparent;
+  color: var(--blauw-tekst);
+  padding: 0 8px;
+  font-weight: 400;
+}
+
+.instellingen-teamkeuze .instellingen-inhoud {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
 .instellingen-kaart {
   display: flex;
   flex-direction: column;

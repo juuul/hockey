@@ -16,7 +16,7 @@ import './Instellingen.css'
 export type LinkSoort = 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk' | 'aanvraag' | 'toegang'
 export type AccountStart = { soort: LinkSoort; token: string } | null
 
-type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden'; keuze: 'bestaand' | 'nieuw' } | { soort: 'gebruik' } | { soort: LinkSoort; token: string }
+type Weergave = { soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden'; keuze: 'bestaand' | 'nieuw'; stap?: 1 | 2 | 3 } | { soort: 'gebruik' } | { soort: LinkSoort; token: string }
 
 const ROLLEN: Rol[] = ['beheerder', 'kijker']
 
@@ -24,7 +24,9 @@ const ROLLEN: Rol[] = ['beheerder', 'kijker']
 export default function Instellingen({ start, startGebruikt, naarDashboard }: { start: AccountStart; startGebruikt: () => void; naarDashboard: () => void }) {
   const { gebruiker } = useAccount()
   const [weergave, setWeergave] = useState<Weergave>(start ?? { soort: 'hoofd' })
-  const terug = () => setWeergave({ soort: 'hoofd' })
+  const terug = () => setWeergave(w => w.soort === 'aanmelden' && (w.stap ?? 1) > 1
+    ? { ...w, stap: w.stap === 3 ? 2 : 1 }
+    : { soort: 'hoofd' })
   useTerug(weergave.soort !== 'hoofd', terug)
 
   // Een link uit een mail wordt één keer geopend (niet opnieuw bij de volgende keer dit tabblad)
@@ -47,7 +49,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
     : null
 
   return (
-    <div className="instellingen">
+    <div className={`instellingen${weergave.soort === 'aanmelden' ? ' instellingen-teamkeuze' : ''}`}>
       {titel && (
         <div className="instellingen-kop">
           <button className="instellingen-terug" onClick={terug}>‹ Terug</button>
@@ -58,7 +60,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'uitnodiging' && <UitnodigingAannemen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'wachtwoord' && <WachtwoordKiezen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
-        {weergave.soort === 'aanmelden' && <TeamAanmelden startKeuze={weergave.keuze} />}
+        {weergave.soort === 'aanmelden' && <TeamAanmelden startKeuze={weergave.keuze} stap={weergave.stap ?? 1} naarStap={stap => setWeergave(w => w.soort === 'aanmelden' ? { ...w, stap } : w)} />}
         {weergave.soort === 'gebruik' && <Gebruik />}
         {weergave.soort === 'aanmelding' && <AanmeldingBeoordelen token={weergave.token} />}
         {weergave.soort === 'aanvraag' && <ToegangAanvragen waarde={weergave.token} />}

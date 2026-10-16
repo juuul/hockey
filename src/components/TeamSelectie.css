@@ -2,10 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px;
-  border: 2px solid var(--rand);
-  border-radius: 12px;
-  background: var(--vlak);
   min-width: 0;
 }
 
@@ -18,35 +14,68 @@
 .teamselectie-resultaten {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
+  border: 1px solid var(--rand-sterk);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.teamselectie-resultaten:empty {
+  display: none;
+}
+
+.teamselectie-resultaten > .teamselectie-link {
+  padding-left: 12px;
+}
+
+.teamselectie-wizard .teamselectie-keuzes legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
 }
 
 .teamselectie-resultaat {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
   min-height: 60px;
   padding: 10px 12px;
-  background: var(--knop-grijs);
+  background: var(--vlak);
   color: var(--tekst);
-  border: 2px solid var(--rand);
-  border-radius: 10px;
+  border: 0;
   font: inherit;
   text-align: left;
   cursor: pointer;
   overflow-wrap: anywhere;
 }
 
+.teamselectie-resultaat + .teamselectie-resultaat {
+  border-top: 1px solid var(--rand-sterk);
+}
+
+.teamselectie-resultaat:hover,
+.teamselectie-resultaat[aria-pressed='true'] {
+  background: var(--vlak-blauw);
+}
+
+.teamselectie-resultaat > span:first-child {
+  min-width: 0;
+}
+
 .teamselectie-resultaat:focus-visible {
   outline: 3px solid var(--blauw-tekst);
+  outline-offset: -3px;
 }
 
 .teamselectie-resultaat small,
 .teamselectie-geselecteerd small {
   display: block;
   color: var(--tekst-2);
-  font-size: 0.85em;
+  font-size: max(22px, 0.92em);
 }
 
 .teamselectie-geselecteerd {
@@ -54,6 +83,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rand);
 }
 
 .teamselectie-geselecteerd span {
@@ -63,7 +94,7 @@
 
 .teamselectie-link {
   display: block;
-  min-height: 48px;
+  min-height: 60px;
   padding: 8px 0;
   border: 0;
   background: transparent;
@@ -76,9 +107,87 @@
 
 .teamselectie-filters summary {
   padding: 8px 0;
-  min-height: 48px;
+  min-height: 60px;
   cursor: pointer;
   color: var(--blauw-tekst);
+}
+
+.teamselectie-wizard {
+  min-height: min(620px, calc(100dvh - 170px));
+  font-size: var(--base-readable-size);
+}
+
+.teamselectie-voortgang {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  list-style: none;
+}
+
+.teamselectie-voortgang button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 60px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--blauw-tekst);
+  font: inherit;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.teamselectie-voortgang button:disabled {
+  color: var(--tekst-zacht);
+  cursor: default;
+}
+
+.teamselectie-voortgang button[aria-current='step'] {
+  color: var(--tekst);
+  font-weight: 700;
+}
+
+.teamselectie-stapnummer {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--rand-sterk);
+  border-radius: 50%;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+[aria-current='step'] .teamselectie-stapnummer {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+.teamselectie-vraag {
+  font-size: calc(var(--base-readable-size) * 1.1);
+  line-height: 1.25;
+  color: var(--tekst);
+}
+
+.teamselectie-vraag:focus {
+  outline: none;
+}
+
+.teamselectie-wissel {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--rand);
+}
+
+.teamselectie-wizard .teamselectie-filters {
+  align-self: flex-end;
+  width: 100%;
+}
+
+.teamselectie-wizard .teamselectie-filters summary {
+  text-align: right;
 }
 
 .teamselectie-filters .account-label {
