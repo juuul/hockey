@@ -1,3 +1,101 @@
+.teamselectie-stap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border: 2px solid var(--rand);
+  border-radius: 12px;
+  background: var(--vlak);
+  min-width: 0;
+}
+
+.teamselectie-stap h2 {
+  margin: 0;
+  color: var(--tekst);
+  font-size: var(--base-readable-size);
+}
+
+.teamselectie-resultaten {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teamselectie-resultaat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 12px;
+  background: var(--knop-grijs);
+  color: var(--tekst);
+  border: 2px solid var(--rand);
+  border-radius: 10px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.teamselectie-resultaat:focus-visible {
+  outline: 3px solid var(--blauw-tekst);
+}
+
+.teamselectie-resultaat small,
+.teamselectie-geselecteerd small {
+  display: block;
+  color: var(--tekst-2);
+  font-size: 0.85em;
+}
+
+.teamselectie-geselecteerd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.teamselectie-geselecteerd span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.teamselectie-link {
+  display: block;
+  min-height: 48px;
+  padding: 8px 0;
+  border: 0;
+  background: transparent;
+  color: var(--blauw-tekst);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.teamselectie-filters summary {
+  padding: 8px 0;
+  min-height: 48px;
+  cursor: pointer;
+  color: var(--blauw-tekst);
+}
+
+.teamselectie-filters .account-label {
+  margin: 8px 0;
+}
+
+.teamselectie-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .teamselectie-keuzes {
   display: flex;
   flex-direction: column;

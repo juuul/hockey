@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { useAccount } from '../context/AccountContext'
 import { appAdres, foutTekst, pb } from '../server'
 import { clubKomtOvereen } from '../clubzoeken'
@@ -21,12 +21,15 @@ function bewaardeClubs(): CatalogusClub[] {
 
 // Een club kiezen laadt alleen de teams van die club. Gegevens komen uit de eigen catalogus.
 export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; kies: (t: OfficieelTeam | null) => void }) {
+  const clubTitel = useId()
+  const teamTitel = useId()
   const [clubs, setClubs] = useState<CatalogusClub[]>(bewaardeClubs)
   const [clubsLaden, setClubsLaden] = useState(true)
   const [clubsGeladen, setClubsGeladen] = useState(false)
   const [clubsFout, setClubsFout] = useState('')
   const [clubPoging, setClubPoging] = useState(0)
   const [zoek, setZoek] = useState('')
+  const [alleResultaten, setAlleResultaten] = useState(false)
   const [clubId, setClubId] = useState('')
   const [teams, setTeams] = useState<OfficieelTeam[]>([])
   const [filters, setFilters] = useState<Record<string, string>>({})
@@ -84,31 +87,43 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
     const timer = setInterval(laad, 10_000)
     return () => { actief = false; clearInterval(timer) }
   }, [clubId, ververs, clubs])
-  const velden = [['seizoen', 'Seizoen'], ['geslacht', 'Meisjes, jongens of gemengd'], ['leeftijd', 'Leeftijd'], ['spelvorm', 'Veld of zaal']] as const
+  const velden = [['seizoen', 'Seizoen'], ['geslacht', 'Teamtype'], ['leeftijd', 'Leeftijd'], ['spelvorm', 'Veld of zaal']] as const
   const lijst = teams.filter(t => velden.every(([veld]) => !filters[veld] || t[veld] === filters[veld]))
-  const gevondenClubs = clubs.filter(c => clubKomtOvereen(c.naam, c.plaats, zoek))
+  const filterKeuzes = velden.map(([veld, label]) => ({ veld, label, waarden: [...new Set(teams.filter(t => velden.every(([ander]) => ander === veld || !filters[ander] || t[ander] === filters[ander])).map(t => t[veld]).filter(Boolean))].sort().reverse() }))
+    .filter(({ veld, waarden }) => waarden.length > 1 || filters[veld])
+  const gevondenClubs = clubs.filter(c => clubKomtOvereen(c.naam, c.plaats, zoek)).sort((a, b) =>
+    Number(!a.naam.toLowerCase().startsWith(zoek.trim().toLowerCase())) - Number(!b.naam.toLowerCase().startsWith(zoek.trim().toLowerCase())) || a.naam.localeCompare(b.naam, 'nl'))
   return <>
-    <label className="account-label">Zoek je club
-      <input className="modal-input" type="search" placeholder="Clubnaam, afkorting of plaats, bijvoorbeeld sc" value={zoek} onChange={e => setZoek(e.target.value)} />
-    </label>
-    {clubsLaden && <p className="account-uitleg" role="status">{clubs.length ? 'Clublijst bijwerken… Je kunt alvast zoeken.' : 'Clubs ophalen… Bij een verbindingsprobleem proberen we het automatisch opnieuw.'}</p>}
+    <section className="teamselectie-stap" aria-labelledby={clubTitel}>
+      <h2 id={clubTitel}>1. Club</h2>
+      {club ? <div className="teamselectie-geselecteerd">
+        <span><strong>{club.naam}</strong><small>{club.plaats}</small></span>
+        <button className="teamselectie-link" type="button" onClick={() => { setClubId(''); setTeams([]); setFilters({}); setFout(''); kies(null) }}>Wijzigen</button>
+      </div> : <>
+        <label className="account-label"><span className="teamselectie-sr">Zoek je club</span>
+          <input className="modal-input" type="search" placeholder="Clubnaam of plaats" value={zoek} onChange={e => { setZoek(e.target.value); setAlleResultaten(false) }} />
+        </label>
+        {!!zoek.trim() && !!gevondenClubs.length && <div className="teamselectie-resultaten" aria-label="Gevonden clubs">
+          {(alleResultaten ? gevondenClubs : gevondenClubs.slice(0, 6)).map(c => <button key={c.id} className="teamselectie-resultaat" type="button" onClick={() => { setClubId(c.id); setFilters({}); kies(null) }}>
+            <strong>{c.naam}</strong><small>{c.plaats}</small>
+          </button>)}
+          {!alleResultaten && gevondenClubs.length > 6 && <button className="teamselectie-link" type="button" onClick={() => setAlleResultaten(true)}>Meer clubs tonen ({gevondenClubs.length - 6})</button>}
+        </div>}
+      </>}
+    {clubsLaden && <p className="account-uitleg" role="status">{clubs.length ? 'Clublijst bijwerken…' : 'Clubs ophalen…'}</p>}
     {clubsFout && <div>
-      <p className="account-melding fout" role="alert">De clublijst kon niet worden opgehaald. {clubsFout}{clubs.length ? ' Je kunt de eerder opgehaalde clubs alvast doorzoeken. Voor teams en toegang aanvragen is verbinding nodig.' : ''}</p>
-      <button className="btn btn-secondary" type="button" onClick={() => setClubPoging(p => p + 1)}>Clubs opnieuw ophalen</button>
+      <p className="account-melding fout" role="alert">Clubs laden lukt niet.{clubs.length ? ' Bewaarde clubs blijven beschikbaar.' : ''}</p>
+      <button className="btn btn-secondary" type="button" onClick={() => setClubPoging(p => p + 1)}>Opnieuw proberen</button>
     </div>}
-    {clubsGeladen && !clubsLaden && !clubsFout && !!zoek.trim() && !gevondenClubs.length && <p className="account-uitleg" role="status">Geen clubs gevonden. Probeer een andere naam, afkorting of plaats.</p>}
-    <label className="account-label">Club
-      <select className="modal-input" disabled={!clubs.length} value={clubId} onChange={e => { setClubId(e.target.value); setFilters({}); kies(null) }}>
-        <option value="">Kies je club…</option>
-        {clubs.filter(c => c.id === clubId || gevondenClubs.includes(c)).map(c => <option key={c.id} value={c.id}>{c.naam} · {c.plaats}</option>)}
-      </select>
-    </label>
-    {club && <>
+    {!club && clubsGeladen && !clubsLaden && !clubsFout && !!zoek.trim() && !gevondenClubs.length && <p className="account-uitleg" role="status">Geen clubs gevonden.</p>}
+    </section>
+    {club && <section className="teamselectie-stap" aria-labelledby={teamTitel}>
+      <h2 id={teamTitel}>2. Team</h2>
       {laden && <p className="account-uitleg">Teams ophalen…</p>}
-      {!laden && !teams.length && <p className="account-uitleg">De teams van deze club worden opgehaald. Dit kan enkele minuten duren. Laat dit scherm open of probeer het later opnieuw.</p>}
-      {velden.map(([veld, label]) => {
-        const waarden = [...new Set(teams.filter(t => velden.every(([ander]) => ander === veld || !filters[ander] || t[ander] === filters[ander])).map(t => t[veld]).filter(Boolean))].sort().reverse()
-        if (!waarden.length) return null
+      {!laden && !teams.length && !fout && <p className="account-uitleg">Nog geen teams beschikbaar. Probeer het straks opnieuw.</p>}
+      {!!filterKeuzes.length && <details className="teamselectie-filters">
+        <summary>Teams filteren</summary>
+      {filterKeuzes.map(({ veld, label, waarden }) => {
         return <label key={veld} className="account-label">{label}
           <select className="modal-input" value={filters[veld] || ''} onChange={e => { setFilters(f => ({ ...f, [veld]: e.target.value })); kies(null) }}>
             <option value="">Alle {label.toLowerCase()}</option>
@@ -116,7 +131,8 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
           </select>
         </label>
       })}
-      {!!teams.length && <label className="account-label">Officieel team
+      </details>}
+      {!!teams.length && <label className="account-label">Kies je team
         <select className="modal-input" value={gekozen?.id || ''} onChange={e => {
           const t = teams.find(t => t.id === e.target.value) || null
           kies(t)
@@ -127,10 +143,9 @@ export function TeamKiezer({ gekozen, kies }: { gekozen: OfficieelTeam | null; k
         </select>
       </label>}
       {gekozen && <OfficieelProgramma key={gekozen.id} team={gekozen} />}
-      {gekozen && <p className="account-uitleg">Bron: KNHB Match Center. Gecontroleerd {new Date(gekozen.gecontroleerd).toLocaleDateString('nl-NL')}. Alleen gepubliceerde wedstrijden worden overgenomen.</p>}
-      <button type="button" className="btn btn-secondary" onClick={() => setVervers(v => v + 1)}>Gegevens opnieuw controleren</button>
-    </>}
-    {fout && <p className="account-melding fout" role="alert">{fout}</p>}
+      <button type="button" className="teamselectie-link" onClick={() => setVervers(v => v + 1)}>Teams vernieuwen</button>
+      {fout && <p className="account-melding fout" role="alert">Teams laden lukt niet. Probeer opnieuw.</p>}
+    </section>}
   </>
 }
 
@@ -148,8 +163,9 @@ function OfficieelProgramma({ team }: { team: OfficieelTeam }) {
     return () => { actief = false; clearInterval(interval) }
   }, [team.id])
   return <details>
-    <summary className="btn btn-secondary">Officieel wedstrijdprogramma bekijken</summary>
-    {!wedstrijden.length && !fout && <p className="account-uitleg">Er staan nog geen wedstrijden voor dit team in de catalogus. Ze verschijnen na een geslaagde broncontrole.</p>}
+    <summary className="teamselectie-link">Wedstrijdprogramma</summary>
+    <p className="account-uitleg">Bron: KNHB Match Center.</p>
+    {!wedstrijden.length && !fout && <p className="account-uitleg">Nog geen wedstrijden beschikbaar.</p>}
     {wedstrijden.map(w => <div key={w.id} className="account-wie">
       <span className="account-wie-sub">{new Date(w.datum + 'T12:00:00').toLocaleDateString('nl-NL')} · {w.spelen || 'tijd onbekend'}</span>
       <span className="account-wie-sub">{w.thuisNaam} – {w.uitNaam}</span>
@@ -188,14 +204,14 @@ export default function TeamAanmelden({ startKeuze = 'bestaand' }: { startKeuze?
     try {
       if (keuze === 'bestaand') {
         await pb.send(`/api/hockey/catalogus/omgeving/${omgeving}/aanvraag`, { method: 'POST', body: { naam: gebruiker?.name || naam, email: gebruiker?.email || email, terug: appAdres() } })
-        setMelding('Je aanvraag staat klaar voor de beheerder. Na goedkeuring krijg je een uitnodiging per e-mail. Tot die tijd blijven de teamgegevens privé.')
+        setMelding('Aanvraag verstuurd. Na goedkeuring ontvang je een e-mail.')
       } else if (gebruiker) {
         const r = await pb.send<{ id: string }>('/api/hockey/catalogus/omgeving', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam } })
         await teamsLaden(); kiesTeam(r.id)
-        setMelding('Je eigen groep is aangemaakt. Je bent beheerder en kunt nu bij Leden anderen uitnodigen.')
+        setMelding('Groep aangemaakt. Je kunt nu leden uitnodigen.')
       } else {
         await pb.send('/api/hockey/aanmelding', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam, naam, email, terug: appAdres() } })
-        setMelding(`Je krijgt een uitnodiging op ${email.trim()}. Open die om een wachtwoord te kiezen. Daarna ben je beheerder van je eigen groep.`)
+        setMelding(`Je krijgt een uitnodiging op ${email.trim()}.`)
       }
     } catch (e) { setFout(foutTekst(e)) }
     finally { setBezig(false) }
@@ -204,9 +220,10 @@ export default function TeamAanmelden({ startKeuze = 'bestaand' }: { startKeuze?
   return <form className="account-form" onSubmit={e => { e.preventDefault(); versturen() }}>
     <p className="account-uitleg">{keuze === 'bestaand' ? 'De teambeheerder keurt je aanvraag goed.' : 'Je wordt beheerder van je eigen teamgroep.'}</p>
     <TeamKiezer gekozen={officieel} kies={setOfficieel} />
-    {officieel && <>
+    {officieel && <section className="teamselectie-stap">
+      <h2>3. Groep</h2>
       {keuze === 'bestaand' && (laden ? <p className="account-uitleg">Groepen ophalen…</p> : !!omgevingen.length ? <fieldset className="teamselectie-keuzes">
-        <legend>Kies de bestaande groep</legend>
+        <legend>Kies je groep</legend>
         {omgevingen.map(o => <label key={o.id} className="teamselectie-keuze">
           <input type="radio" name="bestaande-groep" value={o.id} checked={omgeving === o.id} onChange={() => setOmgeving(o.id)} />
           <span>{o.naam}{omgevingen.filter(andere => andere.naam === o.naam).length > 1 ? ` · groep ${o.id.slice(-5)}` : ''}</span>
@@ -222,9 +239,9 @@ export default function TeamAanmelden({ startKeuze = 'bestaand' }: { startKeuze?
         <label className="account-label">E-mail<input className="modal-input" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>
       </>}
       {(keuze === 'nieuw' || !!omgevingen.length) && <button className="btn btn-primary" type="submit" disabled={bezig || laden || (keuze === 'bestaand' && !omgeving) || (!gebruiker && (!naam.trim() || !email.includes('@')))}>{keuze === 'nieuw' ? 'Eigen groep maken' : 'Toegang aanvragen bij deze groep'}</button>}
-    </>}
+    </section>}
     {fout && <p className="account-melding fout" role="alert">{fout}</p>}
-    <button className="btn btn-secondary" type="button" onClick={() => setKeuze(k => k === 'bestaand' ? 'nieuw' : 'bestaand')}>{keuze === 'bestaand' ? 'Nieuw team starten' : 'Aansluiten bij een team'}</button>
+    <button className="teamselectie-link" type="button" onClick={() => setKeuze(k => k === 'bestaand' ? 'nieuw' : 'bestaand')}>{keuze === 'bestaand' ? 'Nieuw team starten' : 'Aansluiten bij een team'}</button>
   </form>
 }
 

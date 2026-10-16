@@ -37,9 +37,9 @@
   font-size: var(--base-readable-size);
   font-weight: 700;
   color: var(--tekst);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .instellingen-inhoud {
