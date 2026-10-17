@@ -24,6 +24,9 @@ async function test() {
     assert.equal(page.listenerCount('response'), 0)
   }
   w = wachtOpBron(page, '/clubs/ABC1234', 100)
+  page.emit('response', { ...response(429), headers: () => ({ 'retry-after': '3600' }) })
+  await assert.rejects(w.antwoord, /bronWachtTot=\d+/)
+  w = wachtOpBron(page, '/clubs/ABC1234', 100)
   page.emit('response', response(401)); page.emit('response', response(401))
   await assert.rejects(w.antwoord, /HTTP 401/)
   w = wachtOpBron(page, '/clubs/ABC1234', 5)

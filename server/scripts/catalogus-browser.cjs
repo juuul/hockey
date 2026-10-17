@@ -17,14 +17,14 @@ function wachtOpBron(page, pad, timeout = 45000) {
       if (u.origin !== 'https://app.hockeyweerelt.nl' || response.request().method() === 'OPTIONS') return
       // Stop ook als registratie zelf wordt begrensd: niet wachten op meer verkeer.
       if (u.pathname === '/device/register' && response.status() === 429) {
-        return klaar(new Error('Bron HTTP 429; geen automatische herhaalpoging'))
+        return klaar(bronFout(response))
       }
       if (u.pathname !== pad || response.request().method() !== 'GET') return
       if (response.ok()) return klaar(null, response)
       // De officiële client vernieuwt na een eerste 401 zelf zijn anonieme
       // registratie en herhaalt het verzoek één keer. Alleen die ronde afwachten.
       if (response.status() === 401 && !eerste401) { eerste401 = true; return }
-      klaar(new Error(`Bron HTTP ${response.status()}; geen automatische herhaalpoging`))
+      klaar(bronFout(response))
     }
     function gesloten() { klaar(new Error('Bronbrowser gesloten')) }
     afmelden = () => {
@@ -36,6 +36,13 @@ function wachtOpBron(page, pad, timeout = 45000) {
     page.on('close', gesloten)
   })
   return { antwoord, stop: () => afmelden() }
+}
+
+function bronFout(response) {
+  const header = response.headers?.()['retry-after']
+  const tot = /^\d+$/.test(header || '') ? Date.now() + Number(header)*1000 : Date.parse(header || '')
+  const wacht = Number.isFinite(tot) && tot > Date.now() ? `; bronWachtTot=${Math.ceil(tot/1000)}` : ''
+  return new Error(`Bron HTTP ${response.status()}; geen automatische herhaalpoging${wacht}`)
 }
 
 module.exports = { wachtOpBron }
