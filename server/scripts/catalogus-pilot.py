@@ -13,7 +13,7 @@ ZONE = ZoneInfo('Europe/Amsterdam')
 BRONVELDEN = ('datum', 'spelen', 'thuisBronId', 'uitBronId', 'thuisNaam', 'uitNaam', 'locatie', 'locatieAdres', 'status')
 
 
-def geregistreerd(pad, vandaag=None):
+def geregistreerd(pad):
     with sqlite3.connect(pad.resolve().as_uri() + '?mode=ro', uri=True) as c:
         c.row_factory = sqlite3.Row
         rows = c.execute('''SELECT DISTINCT c.bronId AS teamBronId,c.clubBronId,c.seizoen,c.pouleId,c.spelvorm,
@@ -21,17 +21,11 @@ def geregistreerd(pad, vandaag=None):
             LEFT JOIN catalogus_taken k ON k.sleutel='team:'||c.bronId||':'||c.seizoen
             WHERE c.pouleId!='' ORDER BY c.bronId''').fetchall()
         poules = {}
-        vandaag = vandaag or datetime.now(ZONE).date().isoformat()
         for row in rows:
             t = dict(row)
             key = ':'.join((t['seizoen'], t['spelvorm'], t['pouleId']))
-            wedstrijd = bool(c.execute('''SELECT 1 FROM catalogus_wedstrijden WHERE seizoen=?
-                AND (thuisBronId=? OR uitBronId=?) AND datum=? LIMIT 1''',
-                (t['seizoen'], t['teamBronId'], t['teamBronId'], vandaag)).fetchone())
             if key not in poules:
-                poules[key] = {**t, 'id': t['id'] or '', 'sleutel': key, 'wedstrijdVandaag': wedstrijd}
-            else:
-                poules[key]['wedstrijdVandaag'] |= wedstrijd
+                poules[key] = {**t, 'id': t['id'] or '', 'sleutel': key}
         return list(poules.values())
 
 
@@ -62,23 +56,20 @@ class Pilot:
     def taken(self, poules, nu=None):
         nu = time.time() if nu is None else nu
         moment = datetime.fromtimestamp(nu, ZONE)
+        middernacht = moment.replace(hour=0,minute=0,second=0,microsecond=0).timestamp()
         for t in sorted(poules, key=lambda t: self.c.execute(
                 'SELECT coalesce(max(begonnen),0) FROM runs WHERE omgeving=? AND sleutel=?',
                 (self.omgeving,t['sleutel'])).fetchone()[0]):
             eerder = self.c.execute('SELECT 1 FROM runs WHERE omgeving=? AND sleutel=? LIMIT 1',
                                     (self.omgeving,t['sleutel'])).fetchone()
-            if moment.hour >= 20:
-                slot = 'avond:' + moment.date().isoformat()
-            elif 7 <= moment.hour < 9 and t['wedstrijdVandaag']:
-                slot = 'wedstrijdmorgen:' + moment.date().isoformat()
-            elif not eerder:
-                slot = 'eerste'
-            else:
+            # Ook een eerdere eerste opname of een oud avond-/ochtendslot telt
+            # mee: een roosterwijziging mag niet nog een dagcontrole veroorzaken.
+            gedaan = self.c.execute('''SELECT 1 FROM runs WHERE omgeving=? AND sleutel=?
+                AND (slot=? OR (begonnen>=? AND begonnen<=?)) LIMIT 1''',
+                (self.omgeving,t['sleutel'],'dag:'+moment.date().isoformat(),middernacht,nu)).fetchone()
+            if gedaan or ((moment.hour,moment.minute)<(0,20) and eerder):
                 continue
-            gedaan = self.c.execute('''SELECT 1 FROM runs WHERE omgeving=? AND sleutel=? AND slot=?
-                AND (status!='bezig' OR begonnen>?) LIMIT 1''', (self.omgeving,t['sleutel'],slot,nu-600)).fetchone()
-            if not gedaan:
-                return [{**t,'slot':slot}]
+            return [{**t,'slot':'dag:'+moment.date().isoformat()}]
         return []
 
     def cache(self, taak, nu=None):
