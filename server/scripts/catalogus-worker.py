@@ -56,7 +56,9 @@ for taak in taken:
     try:
         with tempfile.TemporaryDirectory(prefix='hockey-catalogus-') as d:
             Path(d).chmod(0o777)
-            subprocess.run(['docker', 'run', '--rm', '--network', 'host', '--cap-drop=ALL', '--security-opt=no-new-privileges:true', '-v', f'{ROOT / "scripts"}:/scripts:ro', '-v', f'{d}:/resultaat', 'zenika/alpine-chrome:with-puppeteer', 'node', '/scripts/catalogus-lees.cjs', taak['clubBronId'], taak['teamBronId'], taak['pouleId'], taak.get('seizoen', '')], check=True, timeout=150, capture_output=True)
+            browser_herstel = (['-e', 'HOCKEY_BRON_BROWSER_HERSTEL=1']
+                               if (ROOT / 'planning_documenten' / args.omgeving / 'catalogus-browser-herstel.actief').is_file() else [])
+            subprocess.run(['docker', 'run', '--rm', '--network', 'host', '--cap-drop=ALL', '--security-opt=no-new-privileges:true', *browser_herstel, '-v', f'{ROOT / "scripts"}:/scripts:ro', '-v', f'{d}:/resultaat', 'zenika/alpine-chrome:with-puppeteer', 'node', '/scripts/catalogus-lees.cjs', taak['clubBronId'], taak['teamBronId'], taak['pouleId'], taak.get('seizoen', '')], check=True, timeout=150, capture_output=True)
             p = Path(d) / 'catalogus.json'
             data = json.loads(p.read_text())
             if taak['id']:
