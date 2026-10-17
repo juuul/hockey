@@ -93,22 +93,22 @@ class PilotTest(unittest.TestCase):
         t={**poule(),'slot':'eerste'};now=tijd()
         self.assertTrue(self.p.mag_ophalen(now))
         ident=self.p.begin(t,'browser',now)
-        self.assertFalse(self.p.mag_ophalen(now+1.99))
+        self.assertFalse(self.p.mag_ophalen(now+4.99))
         self.p.resultaat(ident,t,fout='Bron HTTP 429; bronWachtTot='+str(int(now+50000)),nu=now+1)
         other=m.Pilot(self.pad,'productie');self.addCleanup(other.c.close)
         self.assertFalse(other.mag_ophalen(now+30000))
         self.assertTrue(other.mag_ophalen(now+50001))
 
-    def test_two_seconds_rest_after_completion_shared_between_environments(self):
+    def test_five_seconds_rest_after_completion_shared_between_environments(self):
         t={**poule(),'slot':'eerste'};now=tijd()
         ident=self.p.begin(t,'browser',now)
         self.p.resultaat(ident,t,data={'wedstrijden':[]},nu=now+30)
         other=m.Pilot(self.pad,'productie');self.addCleanup(other.c.close)
-        self.assertFalse(other.mag_ophalen(now+31.99))
-        self.assertTrue(other.mag_ophalen(now+32))
+        self.assertFalse(other.mag_ophalen(now+34.99))
+        self.assertTrue(other.mag_ophalen(now+35))
         # Cache-imports zijn geen bronbezoeken en verlengen de rust niet.
-        self.run_ok(t,now+33,bron='cache')
-        self.assertTrue(other.mag_ophalen(now+34))
+        self.run_ok(t,now+36,bron='cache')
+        self.assertTrue(other.mag_ophalen(now+37))
 
     def test_budget_24_browser_visits_per_local_day(self):
         now=tijd(uur='10:00');t={**poule(),'slot':'eerste'}

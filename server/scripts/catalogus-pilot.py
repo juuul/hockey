@@ -88,8 +88,8 @@ class Pilot:
         nu = time.time() if nu is None else nu
         grenzen = dict(self.c.execute('SELECT sleutel,waarde FROM grenzen'))
         laatste_klaar = self.c.execute("SELECT coalesce(max(klaar),0) FROM runs WHERE bron='browser'").fetchone()[0]
-        # Ook na een lang bronbezoek twee volle seconden rust, gedeeld tussen omgevingen.
-        if nu < grenzen.get('pauzeTot',0) or nu < max(grenzen.get('laatsteBezoek',0),laatste_klaar)+2:
+        # Ook na een lang bronbezoek vijf volle seconden rust, gedeeld tussen omgevingen.
+        if nu < grenzen.get('pauzeTot',0) or nu < max(grenzen.get('laatsteBezoek',0),laatste_klaar)+5:
             return False
         middernacht = datetime.fromtimestamp(nu,ZONE).replace(hour=0,minute=0,second=0,microsecond=0).timestamp()
         return self.c.execute("SELECT count(*) FROM runs WHERE bron='browser' AND begonnen>=?", (middernacht,)).fetchone()[0] < 24
