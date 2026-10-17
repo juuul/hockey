@@ -108,6 +108,13 @@ def controleer(c, register, basis, ophalen=download):
         c.commit()
 
 def stuur_mail(omgeving, ontvanger, onderwerp, inhoud):
+    # Document- en cataloguswerker gebruiken dezelfde tijdelijke CLI-bestanden.
+    # Serialiseer die ook tussen test en productie; geen verwisselde ontvangers/inhoud.
+    with open(ROOT / 'planning_documenten' / '.mail.lock', 'a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        return _stuur_mail(omgeving, ontvanger, onderwerp, inhoud)
+
+def _stuur_mail(omgeving, ontvanger, onderwerp, inhoud):
     container = 'hockey-pocketbase-test' if omgeving == 'test' else 'hockey-pocketbase'
     payload = json.dumps({'aan':[ontvanger],'onderwerp':onderwerp,'html':inhoud}).encode()
     hook = (ROOT / 'scripts' / 'planning-mail.pb.js').read_bytes()

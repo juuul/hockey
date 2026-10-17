@@ -4,9 +4,11 @@ Geen rechtstreeks schrijven naar sqlite, geen productiecredentials.
 """
 import argparse
 import fcntl
+import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import sqlite3
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +22,23 @@ try:
     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
 except BlockingIOError:
     raise SystemExit(0)
+
+spec = importlib.util.spec_from_file_location('catalogus_meldingen', ROOT / 'scripts' / 'catalogus-meldingen.py')
+notificaties = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(notificaties)
+bron_pad = ROOT / ('pb_test_data' if args.omgeving == 'test' else 'pb_data') / 'data.db'
+meldingen = (notificaties.Meldingen(ROOT / 'planning_documenten' / args.omgeving / 'catalogus-mails.db', args.omgeving)
+             if (ROOT / 'planning_documenten' / args.omgeving / 'catalogus-mails.actief').is_file() else None)
+
+def controleer_meldingen():
+    # Een restart na een geslaagde import mag geen update verliezen. Vergelijk ook
+    # zonder nieuwe taken de duurzame vorige snapshot met de huidige catalogus.
+    if meldingen:
+        meldingen.controleer(notificaties.lees_catalogus(bron_pad))
+        for taak in notificaties.lees_bronstatus(bron_pad):
+            meldingen.bronresultaat(taak, 'Broncontrole mislukt' if taak['status'] == 'fout' else None)
+
+controleer_meldingen()
 
 def pb(*cmd):
     # PocketBase leest de bestaande sleutel zelf uit de containeromgeving.
@@ -48,9 +67,25 @@ for taak in taken:
             if 'Catalogus bijgewerkt:' not in resultaat:
                 raise ValueError('Import niet bevestigd: ' + resultaat[-500:])
             print(resultaat.strip())
+            if meldingen:
+                meldingen.bronresultaat(taak)
     except (subprocess.SubprocessError, ValueError, OSError) as exc:
         if taak['id']:
             pb('catalogus-taakstatus', taak['id'], 'fout')
         print('Openbare import mislukt; bestaande gegevens blijven behouden:', str(exc))
         if isinstance(exc, subprocess.CalledProcessError) and exc.stderr:
             print(exc.stderr.decode(errors='replace')[-500:] if isinstance(exc.stderr, bytes) else exc.stderr[-500:])
+        fout = getattr(exc, 'stderr', '') or ''
+        if isinstance(fout, bytes):
+            fout = fout.decode(errors='replace')
+        if meldingen:
+            meldingen.bronresultaat(taak, fout or type(exc).__name__)
+
+controleer_meldingen()
+try:
+    if meldingen:
+        notificaties.verzend_geconfigureerd(meldingen)
+except (OSError, ValueError, KeyError, sqlite3.Error, subprocess.SubprocessError) as exc:
+    # Mailconfig/SMTP-uitval mag geslaagde imports niet ongedaan maken; de
+    # duurzame wachtrij wordt bij de volgende minuut opnieuw afgehandeld.
+    print('Catalogusmeldingen wachten:', type(exc).__name__)

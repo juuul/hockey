@@ -67,6 +67,16 @@ python3 server/scripts/catalogus-worker.py --omgeving test --clubs
 
 Voor productie bestaat dezelfde opdracht met `--omgeving productie`; pas inzetten na een gecontroleerde livegang. Bron-ID's voorkomen dubbele imports. Eigen verzameltijden, taken, opmerkingen en afwijkingen blijven behouden; bewust verwijderde bronwedstrijden blijven weg. CLI-imports sturen geen realtime-events tussen processen; de app haalt updates via zijn gewone periodieke sync op.
 
+### Wedstrijdbronmails
+
+`scripts/catalogus-meldingen.py` wordt door de bestaande minuutwerker aangeroepen. Activering per omgeving: maak het private markerbestand `server/planning_documenten/test/catalogus-mails.actief` aan; productie krijgt zijn eigen marker alleen bij uitdrukkelijk goedgekeurde livegang. Zonder marker blijven imports werken zonder de nieuwe notificaties. De eerste ronde legt de huidige openbare catalogus vast; bestaande fouttaken van gekoppelde teams worden direct gemeld. Volgende rondes signaleren nieuwe/toekomstige gewijzigde wedstrijden, ook wanneer de vorige import al vóór een procesherstart was voltooid. Een geslaagde import blijft de bestaande veilige synchronisatie gebruiken; geen directe SQLite-writes naar PocketBase.
+
+De private status staat in `planning_documenten/<omgeving>/catalogus-mails.db` (600), gescheiden van de PDF-controle en PocketBase. Alleen publieke team-/wedstrijdvelden worden gelezen; geen spelers, leden, e-mails of privéafspraken. Nieuwe wedstrijden en wijzigingen in datum, thuis/uit, tegenstander, aanvang, locatie en bronstatus geven één overzicht per team/ronde. Eén storingsmelding per bron/team/seizoen tot herstel. Ontvanger uit `planning_documenten/config.json`; echte verzending gebruikt de bestaande lokale mail-CLI, test uitsluitend Mailpit. Een gedeeld mail-lock voorkomt overlap met documentmails. Geen publiek mailendpoint en geen SMTP-/encryptiesleutels uitlezen.
+
+Elke mail bevat een kopieerbare chatopdracht voor broncontrole en veilige verwerking. Eigen waarden/taken/verwijderingen blijven beschermd; conflicten en codewijzigingen vragen overleg. Mislukte mails blijven duurzaam wachten, maximaal drie per ronde en na fouten één herpoging per uur. Zoals bij andere SMTP-wachtrijen is een dubbele mail mogelijk bij crash tussen verzenden en opslaan van de bevestiging. De wedstrijdbron zelf wordt niet vaker bezocht door de notificatiecontrole.
+
+Controle: `python3 server/tests/catalogus-meldingen.py` test baseline, verschilvelden, nieuwe/verplaatste/historische wedstrijden, herstart, storingsdeduplicatie/herstel, SMTP-herpogingen, HTML-escaping, omgeving en read-only bronselectie. Echte testverzending uitsluitend naar Mailpit. Productieactivering verandert geen bronkoppeling: een ontoegankelijke wedstrijdbron blijft beoordeling vragen, geen verzonnen gegevens of automatische alternatieve scraper.
+
 ## Controle en livegang
 
 ```sh
