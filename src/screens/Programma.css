@@ -169,14 +169,10 @@
   overflow-wrap: anywhere;
 }
 
-.prog-waar.thuis {
+.prog-waar.thuis,
+.prog-waar.uit {
   background: var(--groen-vlak);
   color: var(--groen-tekst);
-}
-
-.prog-waar.uit {
-  background: var(--vlak-blauw);
-  color: var(--blauw-tekst);
 }
 
 .prog-waar.onbekend {
