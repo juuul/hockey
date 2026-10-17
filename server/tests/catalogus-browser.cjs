@@ -1,11 +1,17 @@
 const assert = require('node:assert/strict')
 const { EventEmitter } = require('node:events')
 const { wachtOpBron } = require('../scripts/catalogus-browser.cjs')
+const { normaliseer } = require('../scripts/catalogus-normaliseer.cjs')
 function response(status, path = '/clubs/ABC1234', method = 'GET', origin = 'https://app.hockeyweerelt.nl') {
   return { status: () => status, ok: () => status >= 200 && status < 300,
     url: () => origin + path, request: () => ({ method: () => method }) }
 }
 async function test() {
+  const t = { id: 1, name: 'Voorbeeld MO11-1', federation_reference_id: 'ABC1234' }
+  for (const [status, tijd, verwacht] of [['announced', '00:00', ''], ['announced', '09:00', '09:00'], ['scheduled', '00:00', '00:00'], ['scheduled', '09:00', '09:00']]) {
+    const data = normaliseer(null, null, { data: { season_name: '2026-2027', poules: [{ matches: [{ id: 1, date: `2026-10-31T${tijd}:00+01:00`, status, home: t, away: { ...t, id: 2 } }] }] } })
+    assert.equal(data.wedstrijden[0].spelen, verwacht)
+  }
   const page = new EventEmitter()
   let w = wachtOpBron(page, '/clubs/ABC1234', 100)
   page.emit('response', response(401)); page.emit('response', response(200))

@@ -11,7 +11,10 @@ function normaliseer(clubs, club, detail, gecontroleerd = new Date().toISOString
     for (const w of poule.matches || []) {
       if (!w.home?.id || !w.away?.id || !/^\d{4}-\d\d-\d\dT/.test(w.date || '')) continue
       teamdata.set(String(w.home.id), w.home); teamdata.set(String(w.away.id), w.away)
-      matches.set(String(w.id), { bronId: String(w.id), seizoen, thuisBronId: String(w.home.id), uitBronId: String(w.away.id), datum: w.date.slice(0, 10), spelen: w.date.slice(11, 16), thuisNaam: w.home.name, uitNaam: w.away.name, locatie: [w.location?.facility?.name, w.location?.field?.name].filter(Boolean).join(' · '), locatieAdres: (w.location?.facility?.address || '').replace(/\s*\n\s*/g, ', '), status: w.status || '', uitslag: w.score || null, gecontroleerd })
+      // Een aangekondigde wedstrijd zonder planning krijgt van de bron 00:00.
+      // Dit is geen gepubliceerde aanvang; een echt ingeplande middernacht wel.
+      const spelen = w.status === 'announced' && w.date.slice(11, 16) === '00:00' ? '' : w.date.slice(11, 16)
+      matches.set(String(w.id), { bronId: String(w.id), seizoen, thuisBronId: String(w.home.id), uitBronId: String(w.away.id), datum: w.date.slice(0, 10), spelen, thuisNaam: w.home.name, uitNaam: w.away.name, locatie: [w.location?.facility?.name, w.location?.field?.name].filter(Boolean).join(' · '), locatieAdres: (w.location?.facility?.address || '').replace(/\s*\n\s*/g, ', '), status: w.status || '', uitslag: w.score || null, gecontroleerd })
     }
   }
   uit.wedstrijden = [...matches.values()]

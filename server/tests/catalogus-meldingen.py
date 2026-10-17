@@ -102,6 +102,8 @@ class MeldingenTest(unittest.TestCase):
         prompt = inhoud.split('<pre style="white-space:pre-wrap">', 1)[1]
         self.assertIn('09:00', prompt)
         self.assertIn('Melding van', prompt)
+        self.assertIn('Gebruik de SCHC-website nooit zonder mijn afzonderlijke expliciete toestemming', prompt)
+        self.assertNotIn('Controleer zo nodig ook de openbare clubwebsite', prompt)
 
     def test_readonly_source_and_only_linked_teams(self):
         bron = Path(self.tmp.name) / 'bron.db'

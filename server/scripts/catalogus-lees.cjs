@@ -24,15 +24,20 @@ async function lees(args = process.argv.slice(2)) {
         return await response.json()
       } finally { wacht.stop() }
     }
-    const pad = clubId ? `/clubs/${clubId}` : '/clubs'
-    const club = await bronLezen(pad, () => page.goto(`https://www.hockey.nl/match-center#/${clubId ? `club/${clubId}` : 'clubs'}`, { waitUntil: 'domcontentloaded', timeout: 45000 }))
-    let detail
-    if (teamId) {
+    let club, detail
+    if (teamId && process.env.HOCKEY_BRON_BROWSER_HERSTEL === '1') {
+      // Bezoek direct het gevraagde programma; geen onnodige club-/teamrondgang.
+      detail = await bronLezen(`/poules/${pouleId}/teams/${teamId}`, () => page.goto(`https://www.hockey.nl/match-center#/team/${teamId}|${pouleId}/program`, { waitUntil: 'domcontentloaded', timeout: 45000 }))
+    } else {
+      const pad = clubId ? `/clubs/${clubId}` : '/clubs'
+      club = await bronLezen(pad, () => page.goto(`https://www.hockey.nl/match-center#/${clubId ? `club/${clubId}` : 'clubs'}`, { waitUntil: 'domcontentloaded', timeout: 45000 }))
+    }
+    if (teamId && !detail) {
       // Eerst de club verversen: een nieuwe competitieperiode kan een andere poule hebben.
       const actuelePoule = String(club.data?.teams?.find(t => String(t.id) === teamId)?.recent_poule_id || pouleId)
       detail = await bronLezen(`/poules/${actuelePoule}/teams/${teamId}`, () => page.evaluate(hash => { location.hash = hash }, `/team/${teamId}|${actuelePoule}`))
-      if (verwachtSeizoen && detail?.data?.season_name !== verwachtSeizoen) throw new Error('De bron levert een ander seizoen; bestaande gegevens blijven behouden')
     }
+    if (teamId && verwachtSeizoen && detail?.data?.season_name !== verwachtSeizoen) throw new Error('De bron levert een ander seizoen; bestaande gegevens blijven behouden')
     fs.writeFileSync('/resultaat/catalogus.json', JSON.stringify(normaliseer(clubId ? null : club, clubId ? club : null, detail)))
   } finally { await browser.close() }
 }

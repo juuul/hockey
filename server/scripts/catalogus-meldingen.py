@@ -42,7 +42,8 @@ def lees_bronstatus(pad):
 def opdracht(omgeving, team, fout=False):
     doel = f"{team.get('naam') or 'club ' + team['clubBronId']} ({team.get('seizoen', '')}, bron-ID {team.get('teamBronId') or team.get('bronId') or team['clubBronId']})"
     return (f"Controleer het officiële wedstrijdprogramma van {doel} in omgeving {omgeving}. "
-            + ('Onderzoek waarom de wedstrijdbron niet bereikbaar is. Controleer zo nodig ook de openbare clubwebsite; omzeil geen toegangsbeperkingen. ' if fout else 'Vergelijk de gemelde wijzigingen met de actuele bron en de opgeslagen planning. ')
+            + ('Onderzoek waarom de wedstrijdbron niet bereikbaar is; omzeil geen toegangsbeperkingen. ' if fout else 'Vergelijk de gemelde wijzigingen met de actuele bron en de opgeslagen planning. ')
+            + 'Gebruik hockey.nl/KNHB Match Center en de gegevens die die pagina zelf ophaalt. Gebruik de SCHC-website nooit zonder mijn afzonderlijke expliciete toestemming. '
             + 'Werk eenduidige officiële wedstrijdgegevens waar mogelijk veilig bij via de bestaande import. '
             'Behoud spelers, leden, historie, eigen afwijkingen, fruit, begeleiding en rijbeurten; respecteer bewuste verwijderingen. '
             'Controleer tegenstander, datum, thuis/uit, aanvang, locatie en de berekende verzameltijd. '
