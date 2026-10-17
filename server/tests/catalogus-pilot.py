@@ -75,8 +75,19 @@ class PilotTest(unittest.TestCase):
         other=m.Pilot(self.pad,'productie');self.addCleanup(other.c.close)
         self.assertNotIn('taakId',other.cache(t,now+100))
         self.run_ok(t,now+300,bron='cache')
-        self.assertIsNone(other.cache(t,now+7300))
+        self.assertIsNotNone(other.cache(t,now+7300), 'Dezelfde kalenderdag: geen tweede bronbezoek')
+        self.assertIsNone(other.cache(t,tijd('2026-10-18','00:20')))
         self.assertIsNone(other.cache({**t,'sleutel':'2027-2028:Veld:123'},now+100))
+
+    def test_failed_shared_visit_does_not_block_other_poules_or_retry_same_day(self):
+        t=self.p.taken([poule()],tijd(uur='00:20'))[0]
+        ident=self.p.begin(t,'browser',tijd(uur='00:20'))
+        self.p.resultaat(ident,t,fout='Bron HTTP 429',nu=tijd(uur='00:21'))
+        other=m.Pilot(self.pad,'productie');self.addCleanup(other.c.close)
+        self.assertEqual(other.taken([poule()],tijd(uur='14:00')),[])
+        nieuw=poule('nieuwe-poule')
+        self.assertEqual(other.taken([poule(),nieuw],tijd(uur='14:00'))[0]['sleutel'],'nieuwe-poule')
+        self.assertTrue(other.taken([poule()],tijd('2026-10-18','00:20')))
 
     def test_global_gap_budget_and_cooldown(self):
         t={**poule(),'slot':'eerste'};now=tijd()

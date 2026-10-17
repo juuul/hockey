@@ -69,13 +69,19 @@ class Pilot:
                 (self.omgeving,t['sleutel'],'dag:'+moment.date().isoformat(),middernacht,nu)).fetchone()
             if gedaan or ((moment.hour,moment.minute)<(0,20) and eerder):
                 continue
+            gedeeld = self.c.execute("SELECT 1 FROM runs WHERE sleutel=? AND bron='browser' AND begonnen>=? AND begonnen<=? LIMIT 1", (t['sleutel'],middernacht,nu)).fetchone()
+            # Een andere omgeving heeft deze poule vandaag al geprobeerd.
+            # Gebruik haar broncache, of wacht na een mislukking tot morgen.
+            if gedeeld and self.cache(t,nu) is None:
+                continue
             return [{**t,'slot':'dag:'+moment.date().isoformat()}]
         return []
 
     def cache(self, taak, nu=None):
         nu = time.time() if nu is None else nu
+        middernacht = datetime.fromtimestamp(nu,ZONE).replace(hour=0,minute=0,second=0,microsecond=0).timestamp()
         row = self.c.execute('SELECT inhoud FROM cache WHERE sleutel=? AND opgehaald>=?',
-                             (taak['sleutel'],nu-7200)).fetchone()
+                             (taak['sleutel'],min(nu-7200,middernacht))).fetchone()
         return json.loads(row[0]) if row else None
 
     def mag_ophalen(self, nu=None):
