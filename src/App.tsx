@@ -156,7 +156,7 @@ function MetTeam() {
   }, [])
 
   return (
-    <HockeyProvider key={demo ? 'demo' : actiefTeamId ?? 'lokaal'} teamId={demo ? null : actiefTeamId} magBewerken={magBewerken} demo={demo} scoreBijhouden={teamInstellingen.scoreBijhouden} speeltijdBijhouden={teamInstellingen.speeltijdBijhouden}>
+    <HockeyProvider key={demo ? 'demo' : actiefTeamId ?? 'lokaal'} teamId={demo ? null : actiefTeamId} magBewerken={magBewerken} demo={demo} doelpuntenBijhouden={teamInstellingen.doelpuntenBijhouden} speeltijdBijhouden={teamInstellingen.speeltijdBijhouden}>
       <AppContent screen={screen} setScreen={setScreen} start={start} startGebruikt={() => setStart(null)} />
     </HockeyProvider>
   )

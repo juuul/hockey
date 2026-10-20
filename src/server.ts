@@ -37,8 +37,8 @@ export interface Team extends RecordModel {
   expand?: { beheerders?: Gebruiker[]; kijkers?: Gebruiker[] }
 }
 // Standaard per team: bij een uit- of thuiswedstrijd is (geen) spelbegeleiding van ons nodig
-export interface TeamInstellingen { uitGeenBegeleiding: boolean; thuisGeenBegeleiding: boolean; begeleidingThuis?: number | null; begeleidingUit?: number | null; begeleidingVeldjes?: 1 | 2; scoreBijhouden: boolean; speeltijdBijhouden: boolean }
-export const STANDAARD_INSTELLINGEN: TeamInstellingen = { uitGeenBegeleiding: false, thuisGeenBegeleiding: false, scoreBijhouden: false, speeltijdBijhouden: true }
+export interface TeamInstellingen { uitGeenBegeleiding: boolean; thuisGeenBegeleiding: boolean; begeleidingThuis?: number | null; begeleidingUit?: number | null; begeleidingVeldjes?: 1 | 2; doelpuntenBijhouden: boolean; speeltijdBijhouden: boolean }
+export const STANDAARD_INSTELLINGEN: TeamInstellingen = { uitGeenBegeleiding: false, thuisGeenBegeleiding: false, doelpuntenBijhouden: false, speeltijdBijhouden: true }
 
 export interface Uitnodiging extends RecordModel { team: string; email: string; rol: Rol }
 

@@ -9,7 +9,7 @@ import { opAlfabet } from '../opstelling'
 import './Players.css'
 
 export default function Players() {
-  const { scoreBijhouden } = useHockey()
+  const { doelpuntenBijhouden } = useHockey()
   const { spelers, addSpeler, deleteSpeler, zetMeedoen, doelpunten, spelvorm, opstelling, kiesOpstelling, timer, magBeheren: magBewerken } = useHockey()
   const [showAddModal, setShowAddModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -102,7 +102,7 @@ export default function Players() {
               <span className="player-info">
                 <span className="player-naamregel">
                   <span className="player-name">{player.naam}</span>
-                  {scoreBijhouden && doelpunten.includes(player.id) && (
+                  {doelpuntenBijhouden && doelpunten.includes(player.id) && (
                     <span className="player-goals" aria-label={`${doelpunten.filter(d => d === player.id).length} doelpunten`}>
                       ⚽ {doelpunten.filter(d => d === player.id).length}
                     </span>

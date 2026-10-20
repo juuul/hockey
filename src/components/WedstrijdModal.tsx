@@ -25,7 +25,7 @@ interface Props {
 // Een nieuwe club wordt pas bij Opslaan echt toegevoegd, zodat je geen losse clubs overhoudt na Annuleren
 export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, uitleg, stand: startStand, kandidaten = [], onOpslaan, onClose }: Props) {
   useTerug(true, onClose)
-  const { clubs, clubToevoegen } = useHockey()
+  const { clubs, clubToevoegen, doelpuntenBijhouden } = useHockey()
   const [datum, setDatum] = useState(start.datum ?? vandaag())
   const [thuis, setThuis] = useState(start.thuis)
   const [clubId, setClubId] = useState<string | null>(start.clubId)
@@ -107,11 +107,11 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
               <div className="wedstrijd-label">Stand</div>
               <div className="stand-rij">
                 <span className="stand-naam">Wij</span>
-                <button className="stand-knop" aria-label="Wij een eraf: kies welk doelpunt" disabled={stand.doelpunten.length === 0} onClick={() => setKiesDoelpunt('eraf')}>−</button>
+                <button className="stand-knop" aria-label={doelpuntenBijhouden ? 'Wij een eraf: kies welk doelpunt' : 'Wij een eraf'} disabled={stand.doelpunten.length === 0} onClick={() => doelpuntenBijhouden ? setKiesDoelpunt('eraf') : setStand({ ...stand, doelpunten: stand.doelpunten.slice(0, -1) })}>−</button>
                 <span className="stand-getal">{stand.doelpunten.length}</span>
-                <button className="stand-knop" aria-label="Wij een erbij: kies wie scoorde" onClick={() => setKiesDoelpunt('erbij')}>+</button>
+                <button className="stand-knop" aria-label={doelpuntenBijhouden ? 'Wij een erbij: kies wie scoorde' : 'Wij een erbij'} onClick={() => doelpuntenBijhouden ? setKiesDoelpunt('erbij') : doelpuntErbij(null, 'Onbekend')}>+</button>
               </div>
-              {scorers.length > 0 && (
+              {doelpuntenBijhouden && scorers.length > 0 && (
                 <p className="wedstrijd-uitleg">{scorers.map(sc => `${sc.naam}${sc.aantal > 1 ? ` ${sc.aantal}×` : ''}`).join(', ')}</p>
               )}
               <div className="stand-rij">
@@ -157,8 +157,8 @@ export default function WedstrijdModal({ titel, start, bevestig, clubVerplicht, 
             </>
           )}
         </div>
-        {kiesDoelpunt === 'eraf' && <KiesDoelpuntWeg scorers={scorers} onKies={doelpuntEraf} onClose={() => setKiesDoelpunt(null)} />}
-        {kiesDoelpunt === 'erbij' && (
+        {doelpuntenBijhouden && kiesDoelpunt === 'eraf' && <KiesDoelpuntWeg scorers={scorers} onKies={doelpuntEraf} onClose={() => setKiesDoelpunt(null)} />}
+        {doelpuntenBijhouden && kiesDoelpunt === 'erbij' && (
           <div className="modal show" onClick={() => setKiesDoelpunt(null)}>
             <div className="modal-content" onClick={e => e.stopPropagation()}>
               <div className="modal-title">Wie scoorde?</div>

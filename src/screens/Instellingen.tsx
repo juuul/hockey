@@ -261,7 +261,7 @@ function TeamInstellingen() {
   const [resetVraag, setResetVraag] = useState<'goals' | 'speeltijd' | null>(null)
   const [bezig, setBezig] = useState(false)
   const [fout, setFout] = useState<string | null>(null)
-  const verander = async (sleutel: 'scoreBijhouden' | 'speeltijdBijhouden') => {
+  const verander = async (sleutel: 'doelpuntenBijhouden' | 'speeltijdBijhouden') => {
     setBezig(true); setFout(null)
     try { await bewaarTeamInstellingen({ ...instellingen, [sleutel]: !instellingen[sleutel] }) }
     catch (err) { setFout(foutTekst(err)) }
@@ -272,13 +272,13 @@ function TeamInstellingen() {
   return <>
     <Kaart titel="Bijhouden voor dit team">
       <div className="team-opties">
-        {([['scoreBijhouden', 'Score bijhouden'], ['speeltijdBijhouden', 'Speeltijd per positie']] as const).map(([sleutel, tekst]) =>
+        {([['doelpuntenBijhouden', 'Doelpunten per speler'], ['speeltijdBijhouden', 'Speeltijd per positie']] as const).map(([sleutel, tekst]) =>
           <button key={sleutel} type="button" className="team-optie" role="switch" aria-label={tekst} aria-checked={instellingen[sleutel]} disabled={bezig} onClick={() => verander(sleutel)}>
             <span>{tekst}</span><span className="team-optie-waarde">{instellingen[sleutel] ? 'Aan' : 'Uit'}</span>
           </button>
         )}
       </div>
-      <p className="account-uitleg">Geldt voor iedereen in dit team. Eerdere gegevens blijven bewaard.</p>
+      <p className="account-uitleg">De stand houd je altijd bij. Deze opties gelden voor het hele team; eerdere gegevens blijven bewaard.</p>
       <Melding tekst={fout} fout />
     </Kaart>
     <Kaart titel="Gegevens resetten">

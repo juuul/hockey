@@ -15,11 +15,11 @@ for (const rol of ['beheer', 'kijker', 'ander']) {
 const headers = rol => ({ 'content-type': 'application/json', ...(tokens[rol] ? { authorization: tokens[rol] } : {}) })
 const team = `${base}/teams/records/rijtestteam0001`
 for (const rol of ['beheer', 'kijker', 'ander', 'anoniem']) {
-  const r = await fetch(team, { method: 'PATCH', headers: headers(rol), body: JSON.stringify({ instellingen: { scoreBijhouden: true, speeltijdBijhouden: false, begeleidingThuis: 2 } }) })
+  const r = await fetch(team, { method: 'PATCH', headers: headers(rol), body: JSON.stringify({ instellingen: { doelpuntenBijhouden: true, speeltijdBijhouden: false, begeleidingThuis: 2 } }) })
   assert.equal(r.status, rol === 'beheer' ? 200 : 404, rol)
 }
 const voorKijker = await fetch(team, { headers: headers('kijker') })
-assert.deepEqual((await voorKijker.json()).instellingen, { scoreBijhouden: true, speeltijdBijhouden: false, begeleidingThuis: 2 })
+assert.deepEqual((await voorKijker.json()).instellingen, { doelpuntenBijhouden: true, speeltijdBijhouden: false, begeleidingThuis: 2 })
 const wedstrijd = { id: 'teamoptiepot001', team: 'rijtestteam0001', datum: '2026-10-20', tegenstander: 'Voorbeeldclub', thuis: true, wij: 0, zij: 0, doelpunten: [], spelers: [], opstelling: '3-4-3', opgeslagenOp: Date.now() }
 const r = await fetch(`${base}/wedstrijden/records`, { method: 'POST', headers: headers('beheer'), body: JSON.stringify(wedstrijd) })
 assert.equal(r.status, 200, JSON.stringify(await r.clone().json()))

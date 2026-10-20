@@ -13,7 +13,7 @@ import './Historie.css'
 const UITSLAG_TEKST = { W: 'gewonnen', G: 'gelijk', V: 'verloren' }
 
 export default function Historie() {
-  const { scoreBijhouden, speeltijdBijhouden } = useHockey()
+  const { doelpuntenBijhouden, speeltijdBijhouden } = useHockey()
   const { spelers, clubs, wedstrijden, wijzigWedstrijd, verwijderWedstrijd, hernoemClub, verwijderClub, magBeheren: magBewerken } = useHockey()
   const [open, setOpen] = useState<GespeeldeWedstrijd | null>(null)
   const [wijzig, setWijzig] = useState<GespeeldeWedstrijd | null>(null)
@@ -32,7 +32,7 @@ export default function Historie() {
   const tegenstanders = perTegenstander(wedstrijden, clubs)
   const seizoen = speeltijdSeizoen(wedstrijden, spelers)
   // Eén lijst per speler: doelpunten en speeltijd samen (op alfabet; onbekende scorer onderaan)
-  const perSpeler = [...new Set([...spelers.map(s => s.id), ...scorers.map(s => s.id), ...seizoen.map(s => s.id)])]
+  const perSpeler = [...new Set([...spelers.map(s => s.id), ...(doelpuntenBijhouden ? scorers.map(s => s.id) : []), ...(speeltijdBijhouden ? seizoen.map(s => s.id) : [])])]
     .map(id => {
       const sc = scorers.find(s => s.id === id)
       const sz = seizoen.find(s => s.id === id)
@@ -77,11 +77,11 @@ export default function Historie() {
       <DezeWedstrijd />
       {totaal.gespeeld > 0 && (
         <p className="balans-regel">
-          {totaal.gespeeld} gespeeld{scoreBijhouden && <> · <span className="balans-W">{totaal.W}W</span> {totaal.G}G <span className="balans-V">{totaal.V}V</span> · doelpunten {totaal.voor} – {totaal.tegen}</>}
+          {totaal.gespeeld} gespeeld · <span className="balans-W">{totaal.W}W</span> {totaal.G}G <span className="balans-V">{totaal.V}V</span> · doelpunten {totaal.voor} – {totaal.tegen}
         </p>
       )}
 
-      {(speeltijdBijhouden || scoreBijhouden) && perSpeler.length > 0 && (
+      {(speeltijdBijhouden || doelpuntenBijhouden) && perSpeler.length > 0 && (
         <section>
           <h2 className="section-title">{speeltijdBijhouden ? 'Speeltijd per positie' : 'Doelpunten'}</h2>
           {speeltijdBijhouden && seizoen.length > 0 && (
@@ -94,11 +94,11 @@ export default function Historie() {
               <div
                 key={sp.id ?? 'onbekend'}
                 className="historie-regel speeltijd-regel"
-                aria-label={`${sp.naam}${scoreBijhouden ? `: ${sp.goals} doelpunten` : ''}${speeltijdBijhouden && sp.seizoen ? `, ${minuten(opVeld(sp.seizoen.tijd))} minuten in het veld; ${linieTekst(sp.seizoen.tijd)}` : ''}`}
+                aria-label={`${sp.naam}${doelpuntenBijhouden ? `: ${sp.goals} doelpunten` : ''}${speeltijdBijhouden && sp.seizoen ? `, ${minuten(opVeld(sp.seizoen.tijd))} minuten in het veld; ${linieTekst(sp.seizoen.tijd)}` : ''}`}
               >
                 <span className="speeltijd-kop">
                   <span className="regel-naam">{sp.naam}</span>
-                  {scoreBijhouden && <span className="regel-waarde">⚽ {sp.goals}</span>}
+                  {doelpuntenBijhouden && <span className="regel-waarde">⚽ {sp.goals}</span>}
                   {speeltijdBijhouden && <span className="regel-sub speler-min">{sp.seizoen ? `${minuten(opVeld(sp.seizoen.tijd))} min` : '0 min'}</span>}
                 </span>
                 {speeltijdBijhouden && verdeling(sp.seizoen?.tijd || {})}
@@ -121,7 +121,7 @@ export default function Historie() {
           {gekozen && (
             <div className="club-balans">
               <span className="regel-sub">
-                {gekozen.balans.gespeeld === 0 ? 'Nog niet tegen gespeeld' : scoreBijhouden ? `${gekozen.balans.W}W ${gekozen.balans.G}G ${gekozen.balans.V}V · ${gekozen.balans.voor} – ${gekozen.balans.tegen}` : `${gekozen.balans.gespeeld} gespeeld`}
+                {gekozen.balans.gespeeld === 0 ? 'Nog niet tegen gespeeld' : `${gekozen.balans.W}W ${gekozen.balans.G}G ${gekozen.balans.V}V · ${gekozen.balans.voor} – ${gekozen.balans.tegen}`}
               </span>
               {magBewerken && gekozen.bestaat && (
                 <button className="btn btn-secondary" onClick={() => { setClub({ id: gekozen.clubId, naam: gekozen.naam }); setNieuweNaam(gekozen.naam) }}>Club wijzigen</button>
@@ -135,7 +135,7 @@ export default function Historie() {
                   <span className="regel-naam">{clubNaam(w, clubs)}</span>
                   <span className="regel-sub">{datumTekst(w.datum)} · {w.thuis ? 'thuis' : 'uit'}</span>
                 </span>
-                {scoreBijhouden && (w.scoreNietBijgehouden ? <span className="regel-sub">Geen score</span> : <span className={`uitslag ${uitslag(w)}`} aria-label={UITSLAG_TEKST[uitslag(w)]}>{w.wij} – {w.zij}</span>)}
+                {w.scoreNietBijgehouden ? <span className="regel-sub">Geen score</span> : <span className={`uitslag ${uitslag(w)}`} aria-label={UITSLAG_TEKST[uitslag(w)]}>{w.wij} – {w.zij}</span>}
               </button>
             ))}
           </div>
@@ -148,11 +148,11 @@ export default function Historie() {
             <div className="modal-title">{clubNaam(open, clubs)}</div>
             <div className="modal-subtitle">{datumTekst(open.datum)} · {open.thuis ? 'thuis' : 'uit'}</div>
             <div className="detail">
-              {scoreBijhouden && (open.scoreNietBijgehouden ? <p className="detail-regel">Score niet bijgehouden</p> : <>
+              {open.scoreNietBijgehouden ? <p className="detail-regel">Score niet bijgehouden</p> : <>
                 <div className={`uitslag groot ${uitslag(open)}`}>{open.wij} – {open.zij}</div>
                 <p className="detail-regel">{UITSLAG_TEKST[uitslag(open)]}</p>
-                {open.doelpunten.length > 0 && <p className="detail-regel">⚽ {scorerRegels(open)}</p>}
-              </>)}
+                {doelpuntenBijhouden && open.doelpunten.length > 0 && <p className="detail-regel">⚽ {scorerRegels(open)}</p>}
+              </>}
               <p className="detail-regel">{open.spelers.length} speelsters · {opstellingTekst(open.opstelling)}</p>
               {speeltijdBijhouden && open.spelers.length > 0 && (
                 <div className="detail-speeltijd">
@@ -184,7 +184,7 @@ export default function Historie() {
           start={{ datum: wijzig.datum, clubId: wijzig.clubId, thuis: wijzig.thuis }}
           bevestig="Opslaan"
           clubVerplicht
-          stand={scoreBijhouden ? { zij: wijzig.zij, doelpunten: wijzig.doelpunten } : undefined}
+          stand={{ zij: wijzig.zij, doelpunten: wijzig.doelpunten }}
           kandidaten={kandidatenVoor(wijzig)}
           onOpslaan={(info, naam, stand) => { wijzigWedstrijd(wijzig.id, info, naam, stand); tel('wedstrijd-gewijzigd'); setWijzig(null) }}
           onClose={() => setWijzig(null)}
