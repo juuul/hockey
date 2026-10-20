@@ -82,7 +82,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'aanmelden' && <TeamAanmelden startKeuze={weergave.keuze} stap={weergave.stap ?? 1} naarStap={stap => setWeergave(w => w.soort === 'aanmelden' ? { ...w, stap } : w)} />}
         {weergave.soort === 'gebruik' && gebruiker?.superadmin && <Gebruik />}
         {weergave.soort === 'wisselen' && gebruiker && <TeamWisselen gebruiker={gebruiker} gekozen={terug} aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze, terugNaar: 'wisselen' })} />}
-        {weergave.soort === 'teaminstellingen' && beheert && <TeamInstellingen />}
+        {weergave.soort === 'teaminstellingen' && beheert && <TeamInstellingen key={actiefTeam?.id} />}
         {weergave.soort === 'verzamelen' && beheert && <VerzamelenInstellen key={actiefTeam!.id} team={actiefTeam!} />}
         {weergave.soort === 'weergave' && <Weergave />}
         {weergave.soort === 'account' && gebruiker && <Account gebruiker={gebruiker} klaar={() => setWeergave({ soort: 'hoofd' })} />}
@@ -257,6 +257,8 @@ function TeamWisselen({ gebruiker, gekozen, aanmelden }: { gebruiker: Gebruiker;
 
 function TeamInstellingen() {
   const { actiefTeam, teamInstellingen: instellingen, bewaarTeamInstellingen } = useAccount()
+  const { resetTeamRegistratie, wedstrijden, sync, live } = useHockey()
+  const [resetVraag, setResetVraag] = useState<'goals' | 'speeltijd' | null>(null)
   const [bezig, setBezig] = useState(false)
   const [fout, setFout] = useState<string | null>(null)
   const verander = async (sleutel: 'scoreBijhouden' | 'speeltijdBijhouden') => {
@@ -266,6 +268,7 @@ function TeamInstellingen() {
     finally { setBezig(false) }
   }
   if (!actiefTeam) return null
+  const wachtOpSync = !!(sync && (!sync.geladen || sync.offline || sync.fout || sync.wachtend)) || !!(live && (!live.verbonden || live.wachtend))
   return <>
     <Kaart titel="Bijhouden voor dit team">
       <div className="team-opties">
@@ -278,11 +281,33 @@ function TeamInstellingen() {
       <p className="account-uitleg">Geldt voor iedereen in dit team. Eerdere gegevens blijven bewaard.</p>
       <Melding tekst={fout} fout />
     </Kaart>
+    <Kaart titel="Gegevens resetten">
+      <button className="btn btn-gevaar" disabled={bezig || wachtOpSync} onClick={() => { setFout(null); setResetVraag('goals') }}>Scores en goals resetten</button>
+      <button className="btn btn-gevaar" disabled={bezig || wachtOpSync} onClick={() => { setFout(null); setResetVraag('speeltijd') }}>Speeltijd resetten</button>
+      <p className="account-uitleg">Voor de lopende wedstrijd én de hele historie van dit team.</p>
+      {wachtOpSync && <p className="account-uitleg">Wacht tot alles is bijgewerkt.</p>}
+    </Kaart>
     <Kaart titel={actiefTeam.naam}>
       {actiefTeam.officieelTeam && <p className="account-uitleg">Je groep is vindbaar. Spelers en leden blijven privé.</p>}
       <TeamKoppelen id={actiefTeam.id} gekoppeld={actiefTeam.officieelTeam} />
     </Kaart>
     <DeelKijklink />
+    {resetVraag && <ResetModal
+      titel={resetVraag === 'goals' ? 'Scores en goals resetten?' : 'Speeltijd resetten?'}
+      regels={[
+        { icoon: '👥', tekst: `${actiefTeam.naam}: de lopende wedstrijd en alle ${wedstrijden.length} opgeslagen wedstrijden.` },
+        { icoon: resetVraag === 'goals' ? '⚽' : '⏱', tekst: resetVraag === 'goals'
+          ? 'Alle scores en doelpunten worden gewist. Oude wedstrijden krijgen geen fictieve 0–0-uitslag.'
+          : 'Alle gemeten speeltijd per positie wordt gewist. Nieuwe metingen beginnen vanaf nu; de wedstrijdklok blijft staan.' },
+        { icoon: '⚠', tekst: 'Niet ongedaan te maken in de app. Spelers, opstelling, wissels en planning blijven behouden.' },
+      ]}
+      bevestig="Definitief resetten" gevaar
+      onCancel={() => setResetVraag(null)}
+      onConfirm={() => {
+        try { resetTeamRegistratie(resetVraag); setResetVraag(null) }
+        catch (err) { setFout(foutTekst(err)); setResetVraag(null) }
+      }}
+    />}
   </>
 }
 

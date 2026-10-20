@@ -63,6 +63,7 @@ interface HockeyContextType {
   opstelling: OpstellingNaam
   kiesOpstelling: (opstelling: OpstellingNaam) => void
   resetScore: () => void
+  resetTeamRegistratie: (soort: 'goals' | 'speeltijd') => void
   setVastePositie: (spelerId: string, keuze: number, positie: string | null) => void
   clubs: Club[]
   clubToevoegen: (naam: string) => string
@@ -483,6 +484,25 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     setDoelpunten([])
   }
 
+  // Teamreset: alleen na expliciete bevestiging; niet hetzelfde als Score 0–0
+  // voor één lopende wedstrijd. Historie behouden, alleen de gekozen registratie wissen.
+  const resetTeamRegistratie = (soort: 'goals' | 'speeltijd') => {
+    if (!magBewerken) throw new Error('Alleen beheerders mogen teamgegevens resetten.')
+    if (teamId && (!sync.geladen || sync.offline || sync.fout || sync.wachtend || !live.verbonden || live.wachtend)) {
+      throw new Error('Wacht tot alles is bijgewerkt voordat je reset.')
+    }
+    if (soort === 'goals') {
+      setScore({ wij: 0, zij: 0 })
+      setDoelpunten([])
+      setWedstrijden(ws => ws.map(w => ({ ...w, wij: 0, zij: 0, doelpunten: [], scoreNietBijgehouden: true })))
+    } else {
+      setSpeeltijdLog(wedstrijd.afgesloten ? [] : [{ t: klokMs(timer), g: speeltijdBijhouden ? indeling(spelers) : {} }])
+      setWedstrijden(ws => ws.map(w => ({ ...w, spelers: w.spelers.map(({ tijd: _tijd, ...speler }) => speler) })))
+    }
+    // Undo mag gewiste registratie niet uit een oude wedstrijdsnapshot terughalen.
+    setHistory([])
+  }
+
   // Eén doelpunt van ons weg bij deze scorer (de laatste van hem/haar); onbekend in de lijst → het laatste doelpunt
   const haalDoelpuntWeg = (scorerId: string | null) => {
     if (!scoreBijhouden) return
@@ -611,7 +631,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   }
 
   return (
-    <HockeyContext.Provider value={{ scoreBijhouden, speeltijdBijhouden, spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0 && !(spelvormVan(history[history.length - 1].opstelling) !== spelvorm && (timer.gestartOp !== null || timer.opgebouwd > 0)), setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, wisselsAltijdTellen, zetWisselsAltijdTellen, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, speeltijdLog, afgesloten, weerOpenen, nieuweWedstrijd, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken: magBewerken && !wedstrijd.afgesloten, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
+    <HockeyContext.Provider value={{ scoreBijhouden, speeltijdBijhouden, spelers, wisselingen, vastePosities, addSpeler, deleteSpeler, zetMeedoen, plaatsIn, wissel, resetWissels, nieuweOpstelling, verplaats, undo, canUndo: history.length > 0 && !(spelvormVan(history[history.length - 1].opstelling) !== spelvorm && (timer.gestartOp !== null || timer.opgebouwd > 0)), setVastePositie, score, scoor, haalDoelpuntWeg, resetScore, resetTeamRegistratie, doelpunten, shootouts, neemShootout, haalShootoutWeg, spelvorm, opstelling, kiesOpstelling, timer, wisselsAltijdTellen, zetWisselsAltijdTellen, startTimer, pauzeTimer, stopTimer, zetKlok, allesResetten, clubs, clubToevoegen, hernoemClub, verwijderClub, wedstrijd, zetWedstrijd, wedstrijden, wedstrijdAfsluiten, speeltijdLog, afgesloten, weerOpenen, nieuweWedstrijd, wijzigWedstrijd, verwijderWedstrijd, programma, bewaarProgramma, verwijderProgramma, teamId, magBewerken: magBewerken && !wedstrijd.afgesloten, magBeheren: magBewerken, demo, sync: teamId ? sync : null, live: teamId ? live : null, nuSynchroniseren, overnemenVraag, overnemen }}>
       {children}
     </HockeyContext.Provider>
   )
