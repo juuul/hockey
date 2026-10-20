@@ -22,7 +22,7 @@ export type Alles = Record<Soort, Records>
 const VELDEN: Record<Soort, string[]> = {
   spelers: ['id', 'naam', 'voorkeur1', 'voorkeur2'],
   clubs: ['id', 'naam', 'laatstGebruikt'],
-  wedstrijden: ['id', 'datum', 'clubId', 'tegenstander', 'thuis', 'wij', 'zij', 'doelpunten', 'spelers', 'opstelling', 'opgeslagenOp', 'shootouts'],
+  wedstrijden: ['id', 'datum', 'clubId', 'tegenstander', 'thuis', 'wij', 'zij', 'scoreNietBijgehouden', 'doelpunten', 'spelers', 'opstelling', 'opgeslagenOp', 'shootouts'],
   programma: ['id', 'datum', 'tot', 'soort', 'clubId', 'tegenstander', 'thuis', 'verzamelen', 'spelen', 'fruit', 'begeleider1', 'begeleider2', 'rijders', 'notitie', 'bronId', 'bronBasis', 'bronWijziging', 'locatie', 'bronStatus', 'bronPlanning', 'locatieAdres', 'verzamelDatum', 'reisMinuten', 'verzamelModus'],
 }
 
@@ -31,7 +31,7 @@ const TEKST = new Set(['voorkeur1', 'voorkeur2', 'clubId', 'tegenstander', 'opst
 
 export function schoon(soort: Soort, r: Record<string, unknown>): Record<string, unknown> {
   const uit: Record<string, unknown> = {}
-  for (const v of VELDEN[soort]) uit[v] = r[v] ?? (TEKST.has(v) ? '' : v === 'rijders' ? [] : v === 'thuis' ? false : null)
+  for (const v of VELDEN[soort]) uit[v] = r[v] ?? (TEKST.has(v) ? '' : v === 'rijders' ? [] : v === 'thuis' || v === 'scoreNietBijgehouden' ? false : null)
   return uit
 }
 

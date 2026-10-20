@@ -184,7 +184,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         <ResetModal
           titel="Nieuwe wedstrijd op het veld zetten?"
           regels={[
-            { icoon: '⚽', tekst: `Er staat nog een wedstrijd op het veld (${score.wij} – ${score.zij}). Sluit die eerst af in Historie als je hem wilt bewaren.` },
+            { icoon: '🏑', tekst: 'Er staat nog een wedstrijd op het veld. Sluit die eerst af in Historie als je hem wilt bewaren.' },
             { icoon: '🔀', tekst: 'De nieuwe wedstrijd begint met een geloote opstelling; wissels, score en timer op 0' },
           ]}
           bevestig="Ja, op het veld zetten"

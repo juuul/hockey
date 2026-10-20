@@ -125,6 +125,7 @@ export interface GespeeldeWedstrijd {
   thuis: boolean;
   wij: number;
   zij: number;
+  scoreNietBijgehouden?: boolean; // ontbreekt bij oudere wedstrijden: de uitslag is toen wel bijgehouden
   doelpunten: { spelerId: string | null; naam: string }[];
   spelers: { id: string; naam: string; wissels: number; tijd?: Partial<Record<'a' | 'm' | 'v' | 'k' | 'w', number>> }[]; // wie meedeed; tijd = seconden per linie (zie speeltijd.ts), ontbreekt bij oudere wedstrijden
   opstelling: OpstellingNaam;

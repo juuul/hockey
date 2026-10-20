@@ -20,6 +20,7 @@ export function balans(wedstrijden: GespeeldeWedstrijd[]): Balans {
   const b: Balans = { gespeeld: 0, W: 0, G: 0, V: 0, voor: 0, tegen: 0 }
   for (const w of wedstrijden) {
     b.gespeeld++
+    if (w.scoreNietBijgehouden) continue
     b[uitslag(w)]++
     b.voor += w.wij
     b.tegen += w.zij
@@ -35,6 +36,7 @@ export const sorteerWedstrijden = (wedstrijden: GespeeldeWedstrijd[]) =>
 export function topscorers(wedstrijden: GespeeldeWedstrijd[], spelers: Player[]): { id: string | null; naam: string; aantal: number }[] {
   const telling = new Map<string | null, { naam: string; aantal: number }>()
   for (const w of wedstrijden) {
+    if (w.scoreNietBijgehouden) continue
     for (const d of w.doelpunten) {
       const huidig = telling.get(d.spelerId)
       if (huidig) huidig.aantal++

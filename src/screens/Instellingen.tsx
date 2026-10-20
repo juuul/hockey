@@ -256,9 +256,28 @@ function TeamWisselen({ gebruiker, gekozen, aanmelden }: { gebruiker: Gebruiker;
 }
 
 function TeamInstellingen() {
-  const { actiefTeam } = useAccount()
+  const { actiefTeam, teamInstellingen: instellingen, bewaarTeamInstellingen } = useAccount()
+  const [bezig, setBezig] = useState(false)
+  const [fout, setFout] = useState<string | null>(null)
+  const verander = async (sleutel: 'scoreBijhouden' | 'speeltijdBijhouden') => {
+    setBezig(true); setFout(null)
+    try { await bewaarTeamInstellingen({ ...instellingen, [sleutel]: !instellingen[sleutel] }) }
+    catch (err) { setFout(foutTekst(err)) }
+    finally { setBezig(false) }
+  }
   if (!actiefTeam) return null
   return <>
+    <Kaart titel="Bijhouden voor dit team">
+      <div className="team-opties">
+        {([['scoreBijhouden', 'Score bijhouden'], ['speeltijdBijhouden', 'Speeltijd per positie']] as const).map(([sleutel, tekst]) =>
+          <button key={sleutel} type="button" className="team-optie" role="switch" aria-label={tekst} aria-checked={instellingen[sleutel]} disabled={bezig} onClick={() => verander(sleutel)}>
+            <span>{tekst}</span><span className="team-optie-waarde">{instellingen[sleutel] ? 'Aan' : 'Uit'}</span>
+          </button>
+        )}
+      </div>
+      <p className="account-uitleg">Geldt voor iedereen in dit team. Eerdere gegevens blijven bewaard.</p>
+      <Melding tekst={fout} fout />
+    </Kaart>
     <Kaart titel={actiefTeam.naam}>
       {actiefTeam.officieelTeam && <p className="account-uitleg">Je groep is vindbaar. Spelers en leden blijven privé.</p>}
       <TeamKoppelen id={actiefTeam.id} gekoppeld={actiefTeam.officieelTeam} />

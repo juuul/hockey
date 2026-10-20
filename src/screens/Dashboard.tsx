@@ -15,6 +15,7 @@ import './Dashboard.css'
 
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
+  const { scoreBijhouden, speeltijdBijhouden } = useHockey()
   const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd, speeltijdLog, timer, demo, wisselsAltijdTellen, zetWisselsAltijdTellen } = useHockey()
   const [showSubstituteModal, setShowSubstituteModal] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState<Position>('LW')
@@ -50,7 +51,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
     <div key={sub.id} className="substitute-item">
       <span className="name">
         {sub.naam}
-        {tijden[sub.id] && <span className="speeltijd">{minuten(opVeld(tijden[sub.id]))} min</span>}
+        {speeltijdBijhouden && tijden[sub.id] && <span className="speeltijd">{minuten(opVeld(tijden[sub.id]))} min</span>}
       </span>
       <span className="count">{sub.wisselCount}×</span>
     </div>
@@ -125,7 +126,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           <span aria-hidden="true">👤</span> Inloggen
         </button>
       )}
-      <div className="score-regel">
+      {scoreBijhouden && <div className="score-regel">
         <button className="score-min" onClick={wijEraf} disabled={!magBewerken || score.wij === 0} aria-label="Doelpunt wij eraf">−</button>
         <button className="score-team wij" onClick={() => setKiesScorer(true)} disabled={!magBewerken} aria-label={`Wij ${score.wij}, doelpunt erbij`}>
           <span className="score-naam">Wij</span>
@@ -136,12 +137,12 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           <span className="score-naam">Zij</span>
         </button>
         <button className="score-min" onClick={() => { scoor('zij', -1); tel('score-zij-min') }} disabled={!magBewerken || score.zij === 0} aria-label="Doelpunt zij eraf">−</button>
-      </div>
+      </div>}
       {/* Afgesloten: de uitslag blijft staan (voor iedereen) tot er een nieuwe wedstrijd begint */}
       {wedstrijd.afgesloten ? (
         <div className="afgelopen-regel">
           <span className="afgelopen-kop">🏁 Afgelopen{afgesloten?.tegenstander || clubs.find(c => c.id === wedstrijd.clubId)?.naam ? ` · tegen ${afgesloten?.tegenstander || clubs.find(c => c.id === wedstrijd.clubId)?.naam}` : ''}</span>
-          {huidigeScorers.length > 0 && (
+          {scoreBijhouden && huidigeScorers.length > 0 && (
             <span className="afgelopen-scorers">{huidigeScorers.map(s => `⚽ ${s.naam}${s.aantal > 1 ? ` ${s.aantal}` : ''}`).join(' · ')}</span>
           )}
         </div>
@@ -193,7 +194,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           <button className="btn btn-secondary" onClick={() => { undo(); tel('undo') }} disabled={!canUndo}>Undo</button>
           <button className="btn btn-secondary" onClick={() => setVraag('opstelling')}>Nieuwe opstelling</button>
           <button className="btn btn-secondary" onClick={() => setVraag('wissels')}>Reset wissels</button>
-          <button className="btn btn-secondary" onClick={() => { resetScore(); tel('score-reset') }} disabled={score.wij === 0 && score.zij === 0}>Score 0 – 0</button>
+          {scoreBijhouden && <button className="btn btn-secondary" onClick={() => { resetScore(); tel('score-reset') }} disabled={score.wij === 0 && score.zij === 0}>Score 0 – 0</button>}
         </>
       )}
       <Timer />
@@ -218,7 +219,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         />
       )}
 
-      {kiesWeg && (
+      {scoreBijhouden && kiesWeg && (
         <KiesDoelpuntWeg
           scorers={huidigeScorers}
           onKies={id => { haalDoelpuntWeg(id); tel('score-wij-min-gekozen'); setKiesWeg(false) }}
@@ -226,7 +227,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         />
       )}
 
-      {kiesScorer && (
+      {scoreBijhouden && kiesScorer && (
         <ScorerModal
           spelers={spelers}
           doelpunten={doelpunten}

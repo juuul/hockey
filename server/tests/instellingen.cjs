@@ -9,6 +9,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
   let page
   let syncFout = false
   let reisFout = false
+  let instellingenFout = false
   let wijzigingen = []
   const fouten = []
   try {
@@ -50,6 +51,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
         if (url.pathname.endsWith('/auth-refresh')) body = { token, record: gebruiker }
         else if (url.pathname.includes('/teams/records')) {
           if (req.method() === 'PATCH') {
+            if (instellingenFout) return req.respond({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ message: 'Instellingen niet opgeslagen' }) })
             const data = JSON.parse(req.postData()); wijzigingen.push({ pad: url.pathname, data })
             const team = teams.find(t => url.pathname.endsWith(t.id)); Object.assign(team, data); body = team
           } else body = lijst(teams)
@@ -108,6 +110,24 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await page.waitForFunction(() => document.body.textContent.includes('Je groep is vindbaar.'))
     assert.equal(await page.$('input[type="checkbox"]'), null)
     assert.equal(await heeftKnop('Nieuwe link maken'), true)
+    assert.deepEqual(await page.$$eval('.team-optie', ns => ns.map(n => n.getAttribute('aria-checked'))), ['false', 'true'])
+    await page.click('.team-optie[aria-label="Score bijhouden"]')
+    await page.waitForFunction(() => document.querySelector('.team-optie[aria-label="Score bijhouden"]').getAttribute('aria-checked') === 'true')
+    assert.equal(wijzigingen.at(-1).data.instellingen.speeltijdBijhouden, true)
+    await page.click('.team-optie[aria-label="Speeltijd per positie"]')
+    await page.waitForFunction(() => document.querySelector('.team-optie[aria-label="Speeltijd per positie"]').getAttribute('aria-checked') === 'false')
+    instellingenFout = true
+    await page.click('.team-optie[aria-label="Score bijhouden"]')
+    await page.waitForFunction(() => document.body.textContent.includes('Instellingen niet opgeslagen'))
+    assert.equal(await page.$eval('.team-optie[aria-label="Score bijhouden"]', n => n.getAttribute('aria-checked')), 'true')
+    instellingenFout = false
+    await page.setViewport({ width: 360, height: 640 })
+    assert.ok(await page.$$eval('.team-optie', ns => ns.every(n => parseFloat(getComputedStyle(n).fontSize) >= 22 && n.getBoundingClientRect().height >= 60)))
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
+    if (process.env.TEAM_PREVIEW_PATH) await page.screenshot({ path: process.env.TEAM_PREVIEW_PATH })
+    await terug()
+    await klik('Teaminstellingen')
+    assert.deepEqual(await page.$$eval('.team-optie', ns => ns.map(n => n.getAttribute('aria-checked'))), ['true', 'false'])
     await terug()
     await klik('Verzameltijd')
     await page.waitForSelector('input[type="number"]:not(:disabled)')

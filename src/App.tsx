@@ -129,7 +129,7 @@ function OvernemenVraag() {
 // Per team een eigen set gegevens: bij een ander team begint de app-state opnieuw (key).
 // Het gekozen tabblad staat hierboven, zodat je na inloggen of van team wisselen op dezelfde plek blijft
 function MetTeam() {
-  const { gebruiker, actiefTeamId, magBewerken } = useAccount()
+  const { gebruiker, actiefTeamId, magBewerken, teamInstellingen } = useAccount()
   const demo = !gebruiker
   // Na verversen op hetzelfde tabblad blijven (per browsertabblad; een nieuwe keer openen begint op het Dashboard)
   const [screen, zetScreen] = useState<Scherm>(() => {
@@ -156,7 +156,7 @@ function MetTeam() {
   }, [])
 
   return (
-    <HockeyProvider key={demo ? 'demo' : actiefTeamId ?? 'lokaal'} teamId={demo ? null : actiefTeamId} magBewerken={magBewerken} demo={demo}>
+    <HockeyProvider key={demo ? 'demo' : actiefTeamId ?? 'lokaal'} teamId={demo ? null : actiefTeamId} magBewerken={magBewerken} demo={demo} scoreBijhouden={teamInstellingen.scoreBijhouden} speeltijdBijhouden={teamInstellingen.speeltijdBijhouden}>
       <AppContent screen={screen} setScreen={setScreen} start={start} startGebruikt={() => setStart(null)} />
     </HockeyProvider>
   )

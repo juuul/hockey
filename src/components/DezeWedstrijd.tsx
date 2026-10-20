@@ -8,6 +8,7 @@ import './DezeWedstrijd.css'
 
 // De lopende wedstrijd (tabblad Historie), compact: tegenstander (tik = wijzigen), stand en afsluiten
 export default function DezeWedstrijd() {
+  const { scoreBijhouden } = useHockey()
   const { score, clubs, wedstrijd, zetWedstrijd, weerOpenen, magBeheren: magBewerken, programma, bewaarProgramma } = useHockey()
   const isAfgesloten = !!wedstrijd.afgesloten
   const uitProgramma = programma.find(p => p.id === wedstrijd.programmaId)
@@ -24,7 +25,7 @@ export default function DezeWedstrijd() {
       {uitProgramma && <ProgrammaTijd item={uitProgramma} bewaar={bewaarProgramma} bewerkbaar={magBewerken && !isAfgesloten} />}
       {/* Stand met de knop ernaast: afsluiten, of na afsluiten weer openen */}
       <div className="deze-wedstrijd-rij">
-        <span className="deze-wedstrijd-getal" aria-label={`Stand ${score.wij} tegen ${score.zij}`}>{score.wij} – {score.zij}</span>
+        {scoreBijhouden && <span className="deze-wedstrijd-getal" aria-label={`Stand ${score.wij} tegen ${score.zij}`}>{score.wij} – {score.zij}</span>}
         {magBewerken && !isAfgesloten && <WedstrijdAfsluitenKnop kort />}
         {magBewerken && isAfgesloten && <button className="btn btn-secondary" onClick={() => { weerOpenen(); tel('wedstrijd-heropend') }}>Weer openen</button>}
       </div>
@@ -44,14 +45,14 @@ export default function DezeWedstrijd() {
 
 // Wedstrijd afsluiten (beheerders): op het Dashboard (onder de vouw) en bij Historie → Deze wedstrijd
 export function WedstrijdAfsluitenKnop({ kort = false }: { kort?: boolean }) {
-  const { score, wedstrijd, wedstrijdAfsluiten } = useHockey()
+  const { score, wedstrijd, wedstrijdAfsluiten, scoreBijhouden } = useHockey()
   const [vraag, setVraag] = useState<'afsluiten' | null>(null)
   return (
     <>
       <button className="btn btn-primary" onClick={() => setVraag('afsluiten')}>{wedstrijd.bewerkt ? 'Opnieuw afsluiten' : kort ? 'Afsluiten' : 'Wedstrijd afsluiten'}</button>
       {vraag === 'afsluiten' && (
         <WedstrijdModal
-          titel={`${wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Afsluiten'}: ${score.wij} – ${score.zij}`}
+          titel={`${wedstrijd.bewerkt ? 'Opnieuw afsluiten' : 'Afsluiten'}${scoreBijhouden ? `: ${score.wij} – ${score.zij}` : ''}`}
           start={wedstrijd}
           bevestig="Opslaan"
           clubVerplicht
