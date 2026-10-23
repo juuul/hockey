@@ -2,6 +2,18 @@
 
 Uitgebreide beschrijving per scherm, regel en accountfunctie. Kort overzicht en werkafspraken: `CLAUDE.md`. Bij wijzigingen ook dit bestand bijwerken (huidige stand, geen logboek).
 
+## Gezamenlijke feedback
+
+Instellingen toont voor iedereen Feedback geven. Dit opent het centrale formulier op juliaan.eu met Hockey geselecteerd; test kiest `omgeving=test`. Er worden geen account-, team- of wedstrijdgegevens meegestuurd. Alleen app en bericht (3–5000 tekens) zijn verplicht; naam en e-mailadres zijn optioneel. Zonder account inzenden kan, teruglezen of wijzigen door bezoekers niet. Er is geen terugkijklink.
+
+De backend accepteert `website`, `hockey`, `finance` en `finance-web`. Beheer vereist de bestaande eigenaar: `users.superadmin` plus het id uit `FEEDBACK_ADMIN_ID`. Het mailontvangstadres verleent geen rechten. Alle directe collectierechten blijven vergrendeld. De portal bewaart een gewoon gebruikerstoken alleen in de browsersessie en biedt app-/statusfilters, paginering, contactgegevens, mailstatus, afhandelen/heropenen en verwijderen.
+
+Feedback en mailtaken worden atomair opgeslagen. Maximaal tien inzendingen per uur en drie per bezoeker per kwartier; een dagelijks met een privésleutel gehashte bezoeker vervangt een opgeslagen IP. Contacthashes beperken bevestigingen tot één per adres per dag. Limietgegevens verdwijnen na twee dagen; technische HTTP-logs kunnen wel IP-adressen bevatten. Een spamval, servervalidatie en unieke inzendcodes beperken misbruik en dubbele berichten.
+
+De eigen info@juliaan.eu-configuratie verzorgt meldingen aan de privé ingestelde ontvanger en, alleen bij een ingevuld e-mailadres, een korte ontvangstbevestiging zonder bezoekersinhoud. De melding krijgt het inzenderadres als Reply-To, de bevestiging het eigenaarsadres. Elke minuut worden maximaal drie taken geprobeerd, bij fouten na een uur opnieuw. Na tien minuten wordt een afgebroken taak vrijgegeven. Een crash na SMTP-acceptatie vóór opslag kan een dubbele mail veroorzaken. IMAP-kopieën wachten bij archiefuitval zonder SMTP opnieuw te versturen.
+
+Verwijderen vraagt bevestiging en wist het actieve bericht met gekoppelde mailtaken. Een lopende verzending blokkeert verwijderen kort. Reeds verstuurde mails, klaargezette archiefkopieën en bestaande back-ups worden niet teruggetrokken.
+
 ## Tabbladen
 1. **Dashboard** (het tabblad heet naar de klaargezette tegenstander, bv. "HC Heidebloem", lang afgekapt met …; zonder tegenstander "Wedstrijd")
    - Bovenaan de scoreregel: `[−] [Wij n] [Zij n] [−]`. Tik op **Wij** opent "Wie scoorde?" (veld van voor naar achter, dan keeper, dan wissels, of "Weet ik niet"). **Zij** telt direct +1. `−` bij Zij haalt er één af; `−` bij Wij vraagt "Welk doelpunt weghalen?" (scorers met aantal, `KiesDoelpuntWeg`), behalve als er maar één scorer is: dan meteen weg.

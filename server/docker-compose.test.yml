@@ -9,11 +9,12 @@ services:
         required: false
     environment:
       HOCKEY_ENV: test
-    command: ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--origins=https://hockey.juliaan.eu,http://localhost:5173,http://192.168.2.50:5173"]
+    command: ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--origins=https://hockey.juliaan.eu,https://juliaan.eu,http://localhost:5173,http://localhost:8799,http://192.168.2.50:5173"]
     ports:
       - "127.0.0.1:8091:8090"
     volumes:
       - ./pb_test_data:/pb/pb_data
+      - ./feedback-preview:/pb/feedback-preview:ro
       - ./planning_documenten/test:/pb/planning_documenten:ro
     read_only: true
     tmpfs: [/tmp]

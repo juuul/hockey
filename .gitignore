@@ -5,6 +5,7 @@ vite.config.js
 vite.config.d.ts
 .env
 .env.local
+/server/feedback-preview/
 .DS_Store
 *.log
 *.swp

@@ -8,7 +8,8 @@ RUN apk add --no-cache ca-certificates unzip wget python3 \
 COPY pb_migrations /pb/pb_migrations
 COPY pb_hooks /pb/pb_hooks
 COPY scripts/mail-verzonden.py /pb/scripts/mail-verzonden.py
+COPY scripts/feedback-mail.py /pb/scripts/feedback-mail.py
 USER pb
 WORKDIR /pb
 EXPOSE 8090
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--encryptionEnv=PB_ENCRYPTION_KEY", "--origins=https://hockey.juliaan.eu,https://juliaan.eu,http://192.168.2.50:5173,http://localhost:5173"]
+CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--migrationsDir=/pb/pb_migrations", "--hooksDir=/pb/pb_hooks", "--encryptionEnv=PB_ENCRYPTION_KEY", "--origins=https://hockey.juliaan.eu,https://juliaan.eu,https://prive.juliaan.eu,http://192.168.2.50:5173,http://localhost:5173"]
