@@ -2,6 +2,8 @@
 
 ## Gezamenlijke feedback
 
+Contactaanvragen staan in dezelfde opslag als feedback, met categorie `contact`. Migratie `1790400032_feedback_contact.js` breidt uitsluitend de appkeuze uit. De server vereist naam en e-mailadres voor contactaanvragen. Afzender, ontvanger en rechten blijven gelijk; de mail krijgt een apart onderwerp.
+
 Migratie `1790400031_feedback.js` maakt de vergrendelde collecties `feedback`, `feedback_mail` en `feedback_limieten`. Routes onder `/api/feedback` controleren validatie, limieten en eigenaarrechten. De productie-eigenaar is uitsluitend `FEEDBACK_ADMIN_ID` plus `superadmin`. Wijzig nooit `SMTP_*` voor deze functie: feedback gebruikt `FEEDBACK_SMTP_HOST`, `FEEDBACK_SMTP_PORT=465`, `FEEDBACK_SMTP_USER`, `FEEDBACK_SMTP_PASS`, `FEEDBACK_MAIL_FROM`, `FEEDBACK_MAIL_TO`, `FEEDBACK_IMAP_HOST`, `FEEDBACK_IMAP_PORT=993` en optioneel `FEEDBACK_IMAP_SENT_FOLDER`. `FEEDBACK_RATE_KEY` is een afzonderlijke willekeurige privésleutel. Alles staat uitsluitend in `server/.env`. Test gebruikt altijd Mailpit, zonder productie-instellingen.
 
 `FEEDBACK_MAIL_PAUSED=1` pauzeert de feedbackcron. Anders worden elke minuut maximaal drie taken verwerkt; fouten wachten een uur op de volgende poging. Tijdelijke payloads en archiefkopieën staan onder `pb_data/feedback-mail` en `pb_data/feedback-verzonden`, met bestandsrechten 600 en maprechten 700. De bestaande IMAP-werker wordt hergebruikt met aparte mailboxinstellingen. Productie krijgt nieuwe instellingen na `docker compose up -d --build`, na expliciet liveakkoord en een gecontroleerde SQLite-back-up. Backend en publieke pagina's horen samen live te gaan.

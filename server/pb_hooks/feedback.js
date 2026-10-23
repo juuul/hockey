@@ -1,4 +1,4 @@
-const APPS = { website: 'juliaan.eu', hockey: 'Hockey', finance: 'Finance Planner', 'finance-web': 'Finance Planner web-app' }
+const APPS = { website: 'juliaan.eu', hockey: 'Hockey', finance: 'Finance Planner', 'finance-web': 'Finance Planner web-app', contact: 'Website of app laten maken' }
 const datum = ms => new Date(ms).toISOString().replace('T', ' ')
 // countRecords gebruikt SQL-expressies; findRecordsByFilter gebruikt PocketBase-filters.
 const aantal = (app, collectie, filter, params) => app.countRecords(collectie, $dbx.exp(filter.replace(/&&/g, 'AND').replace(/\|\|/g, 'OR'), params || {}))
@@ -27,6 +27,7 @@ function inzenden(e) {
   if (naam.length > 100 || /[\r\n]/.test(naam) || email.length > 254 || (email && !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email))) {
     throw new BadRequestError('Controleer je naam en e-mailadres.')
   }
+  if (b.app === 'contact' && (!naam || !email)) throw new BadRequestError('Vul je naam en e-mailadres in, zodat Juliaan contact kan opnemen.')
   const sleutel = $os.getenv('FEEDBACK_RATE_KEY') || ($os.getenv('HOCKEY_ENV') === 'test' ? 'uitsluitend-test' : '')
   if (!sleutel) throw new BadRequestError('Het formulier is tijdelijk niet beschikbaar.')
   const nu = Date.now()
@@ -110,7 +111,7 @@ function verwerk(app) {
       if (!['wacht', 'fout'].includes(m.getString('status'))) return
       m.set('status', 'bezig'); m.set('pogingen', m.getInt('pogingen') + 1); tx.save(m)
       const r = tx.findRecordById('feedback', m.getString('feedback'))
-      claim = { id: m.id, soort: m.getString('soort'), app: APPS[r.getString('app')], bericht: r.getString('bericht'), naam: r.getString('naam'), email: r.getString('email'), datum: new Date().toISOString() }
+      claim = { id: m.id, soort: m.getString('soort'), app: APPS[r.getString('app')], contact: r.getString('app') === 'contact', bericht: r.getString('bericht'), naam: r.getString('naam'), email: r.getString('email'), datum: new Date().toISOString() }
     })
     if (!claim) continue
     const pad = map + '/' + claim.id + '.json'

@@ -19,6 +19,7 @@ Web-app om langs het veld (op een telefoon) de opstelling, wissels, score en tij
 Kort overzicht; alles in detail (per scherm, alle regels, accounts) staat in **`docs/functionaliteit.md`**: lees dat voordat je aan een scherm of regel werkt, en werk het bij als er iets verandert.
 
 ### Gezamenlijke feedback
+De startpagina heeft één algemene feedbackknop en Website of app laten maken. De informatiepagina gebruikt dezelfde privéopslag voor contactaanvragen (`contact`, migratie `1790400032_feedback_contact.js`), met verplichte naam en e-mail en een eigen mailonderwerp. Het beheer filtert ook op deze aanvragen.
 `pb_hooks/feedback*.js`, migratie `1790400031_feedback.js` en `scripts/feedback-mail.py` delen één inzendfunctie voor de apps op juliaan.eu. Formulier/beheer staan in `../juuul.github.io`. Alleen Hockey krijgt in de app knoppen Feedback geven en Juliaan.eu; Finance Planner en de Finance Planner-webapp blijven ongewijzigd. De hockeytestknop opent de feedbackpreview met de testbackend. Alleen de bestaande eigenaar (`users.superadmin` én privé `FEEDBACK_ADMIN_ID`) mag beheren. Aparte `FEEDBACK_`-mailinstellingen in `server/.env`; hockey-SMTP blijft intact. Wachtrij, limieten en testprocedure staan in `server/README.md` en `docs/functionaliteit.md`.
 
 ### Tabbladen

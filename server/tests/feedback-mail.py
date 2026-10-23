@@ -27,6 +27,14 @@ class FeedbackMail(unittest.TestCase):
         self.assertEqual(str(msg['Reply-To']), 'inzender@example.invalid')
         self.assertEqual(str(msg['To']), 'owner@example.invalid')
 
+    def test_contact_onderwerp_en_bevestiging(self):
+        env = {'HOCKEY_ENV': 'test'}
+        msg = module.bericht({**ITEM, 'contact': True}, env)
+        self.assertEqual(str(msg['Subject']), 'Aanvraag: website of app laten maken')
+        msg = module.bericht({**ITEM, 'contact': True, 'soort': 'bevestiging', 'email': 'test@example.invalid'}, env)
+        self.assertIn('aanvraag voor een website of app', msg.get_content())
+        self.assertNotIn(ITEM['bericht'], msg.get_content())
+
     def test_smtp_fout_geen_succes(self):
         def kapot(*args, **kwargs):
             raise ConnectionError('fictieve storing')

@@ -22,12 +22,12 @@ def bericht(item, env):
     msg['Date'] = datetime.fromisoformat(item['datum'].replace('Z', '+00:00'))
     msg['Message-ID'] = '<feedback-' + item['id'] + '@juliaan.eu>'
     if item['soort'] == 'bevestiging':
-        msg['Subject'] = 'Bedankt voor je feedback'
-        msg.set_content('Bedankt! Je feedback is ontvangen door Juliaan.\n\n'
+        msg['Subject'] = 'Bedankt voor je bericht' if item.get('contact') else 'Bedankt voor je feedback'
+        msg.set_content(('Bedankt! Je aanvraag voor een website of app is ontvangen door Juliaan.\n\n' if item.get('contact') else 'Bedankt! Je feedback is ontvangen door Juliaan.\n\n') +
                         'Je kunt op deze mail antwoorden als je iets wilt toevoegen.\n'
-                        'Heb je geen feedback ingestuurd? Dan kun je deze mail negeren.\n\nJuliaan')
+                        'Heb je geen bericht ingestuurd? Dan kun je deze mail negeren.\n\nJuliaan')
     else:
-        msg['Subject'] = 'Feedback: ' + item['app']
+        msg['Subject'] = 'Aanvraag: website of app laten maken' if item.get('contact') else 'Feedback: ' + item['app']
         msg.set_content('App: ' + item['app'] + '\nNaam: ' + (item['naam'] or 'Niet ingevuld') +
                         '\nE-mail: ' + (item['email'] or 'Niet ingevuld') + '\n\n' + item['bericht'] +
                         '\n\nBeheren: https://juliaan.eu/feedback-beheer.html\n')

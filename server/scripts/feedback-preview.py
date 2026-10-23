@@ -6,7 +6,7 @@ import shutil
 server = Path(__file__).resolve().parents[1]
 bron = server.parent.parent / 'juuul.github.io'
 doel = server / 'feedback-preview'
-bestanden = ['index.html', 'feedback.html', 'feedback-beheer.html', 'feedback.css',
+bestanden = ['index.html', 'informatie.html', 'feedback.html', 'feedback-beheer.html', 'feedback.css',
              'feedback.js', 'feedback-beheer.js', 'startpagina.js', 'juliaan-qr.svg']
 if not all((bron / naam).is_file() for naam in bestanden):
     raise SystemExit('Publieke bron ontbreekt; geen preview voorbereid.')
