@@ -105,11 +105,12 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
           <div className="instellingen-menu"><MenuRegel tekst="Weergave" sub={THEMAS.find(t => t.id === leesThema())?.naam} open={() => openMenu('weergave')} /></div>
           <p className="account-uitleg"><a href="./privacy.html" target="_blank" rel="noreferrer">Privacy</a> · <a href="./voorwaarden.html" target="_blank" rel="noreferrer">Gebruiksvoorwaarden</a></p>
         </>}
-        {weergave.soort === 'hoofd' && <p className="account-uitleg">
-          <a href={import.meta.env.MODE === 'test'
+        {weergave.soort === 'hoofd' && <div className="instellingen-menu">
+          <a className="instellingen-menuregel" href={import.meta.env.MODE === 'test'
             ? 'https://serverbot.taild1b3c5.ts.net/test/api/feedback/voorbeeld/feedback.html?app=hockey'
-            : 'https://juliaan.eu/feedback.html?app=hockey'}>Feedback geven</a>
-        </p>}
+            : 'https://juliaan.eu/feedback.html?app=hockey'}><span>Feedback geven</span><span aria-hidden="true">›</span></a>
+          <a className="instellingen-menuregel" href="https://juliaan.eu/"><span>Juliaan.eu</span><span aria-hidden="true">›</span></a>
+        </div>}
       </div>
     </div>
   )

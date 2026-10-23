@@ -4,7 +4,7 @@ Uitgebreide beschrijving per scherm, regel en accountfunctie. Kort overzicht en 
 
 ## Gezamenlijke feedback
 
-Instellingen toont voor iedereen Feedback geven. Dit opent het centrale formulier op juliaan.eu met Hockey geselecteerd; test kiest `omgeving=test`. Er worden geen account-, team- of wedstrijdgegevens meegestuurd. Alleen app en bericht (3–5000 tekens) zijn verplicht; naam en e-mailadres zijn optioneel. Zonder account inzenden kan, teruglezen of wijzigen door bezoekers niet. Er is geen terugkijklink.
+Instellingen toont voor iedereen twee knoppen: Feedback geven en Juliaan.eu. Feedback opent het centrale formulier met Hockey geselecteerd; test opent de eigen feedbackpreview, die uitsluitend de testbackend gebruikt. Juliaan.eu opent altijd `https://juliaan.eu/`. Alleen Hockey krijgt deze knoppen in de app; de website en webapp van Finance Planner blijven ongewijzigd. Op juliaan.eu blijven de feedbackknoppen naast alle apps staan. Er worden geen account-, team- of wedstrijdgegevens meegestuurd. Alleen app en bericht (3–5000 tekens) zijn verplicht; naam en e-mailadres zijn optioneel. Zonder account inzenden kan, teruglezen of wijzigen door bezoekers niet. Er is geen terugkijklink.
 
 De backend accepteert `website`, `hockey`, `finance` en `finance-web`. Beheer vereist de bestaande eigenaar: `users.superadmin` plus het id uit `FEEDBACK_ADMIN_ID`. Het mailontvangstadres verleent geen rechten. Alle directe collectierechten blijven vergrendeld. De portal bewaart een gewoon gebruikerstoken alleen in de browsersessie en biedt app-/statusfilters, paginering, contactgegevens, mailstatus, afhandelen/heropenen en verwijderen.
 
