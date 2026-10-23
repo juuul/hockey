@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 from email.message import EmailMessage
 from email.policy import SMTP
+from email.utils import formataddr, parseaddr
 import importlib.util
 import json
 import os
@@ -17,18 +18,29 @@ def bericht(item, env):
     ontvangen = 'feedback@example.invalid' if test else env['FEEDBACK_MAIL_TO']
     msg = EmailMessage(policy=SMTP)
     msg['From'] = 'Feedback TEST <feedback@example.invalid>' if test else env['FEEDBACK_MAIL_FROM']
+    if item.get('contact'):
+        adres = 'feedback@example.invalid' if test else parseaddr(env['FEEDBACK_MAIL_FROM'])[1]
+        msg.replace_header('From', formataddr(('Juliaan | Websites en apps', adres)))
     msg['To'] = item['email'] if item['soort'] == 'bevestiging' else ontvangen
     msg['Reply-To'] = ontvangen if item['soort'] == 'bevestiging' else (item['email'] or ontvangen)
     msg['Date'] = datetime.fromisoformat(item['datum'].replace('Z', '+00:00'))
     msg['Message-ID'] = '<feedback-' + item['id'] + '@juliaan.eu>'
     if item['soort'] == 'bevestiging':
-        msg['Subject'] = 'Bedankt voor je bericht' if item.get('contact') else 'Bedankt voor je feedback'
-        msg.set_content(('Bedankt! Je aanvraag voor een website of app is ontvangen door Juliaan.\n\n' if item.get('contact') else 'Bedankt! Je feedback is ontvangen door Juliaan.\n\n') +
+        if item.get('contact'):
+            msg['Subject'] = 'Leuk dat je jouw idee deelt!'
+            msg.set_content('Hallo,\n\n'
+                            'Bedankt voor je interesse! Je bericht over een website of app is goed aangekomen.\n\n'
+                            'Ik lees je idee en neem contact met je op om samen te kijken wat je nodig hebt en wat er mogelijk is.\n\n'
+                            'Wil je nog iets toevoegen of heb je al voorbeelden? Antwoord gerust op deze mail.\n\n'
+                            'Groet,\nJuliaan')
+            return msg
+        msg['Subject'] = 'Bedankt voor je feedback'
+        msg.set_content('Bedankt! Je feedback is ontvangen door Juliaan.\n\n' +
                         'Je kunt op deze mail antwoorden als je iets wilt toevoegen.\n'
                         'Heb je geen bericht ingestuurd? Dan kun je deze mail negeren.\n\nJuliaan')
     else:
         msg['Subject'] = 'Aanvraag: website of app laten maken' if item.get('contact') else 'Feedback: ' + item['app']
-        msg.set_content('App: ' + item['app'] + '\nNaam: ' + (item['naam'] or 'Niet ingevuld') +
+        msg.set_content(('Aanvraag: ' if item.get('contact') else 'App: ') + item['app'] + '\nNaam: ' + (item['naam'] or 'Niet ingevuld') +
                         '\nE-mail: ' + (item['email'] or 'Niet ingevuld') + '\n\n' + item['bericht'] +
                         '\n\nBeheren: https://juliaan.eu/feedback-beheer.html\n')
     return msg
@@ -53,7 +65,7 @@ def verstuur(pad, env=None, verbinden=None):
         mapje = Path(pad).parent.parent / 'feedback-verzonden'
         mapje.mkdir(mode=0o700, parents=True, exist_ok=True)
         kopie = {'id': item['id'], 'datum': item['datum'],
-                 'from': {'name': 'Juliaan - Feedback', 'address': env['FEEDBACK_SMTP_USER']},
+                 'from': {'name': parseaddr(str(msg['From']))[0], 'address': env['FEEDBACK_SMTP_USER']},
                  'to': [{'address': str(msg['To'])}], 'subject': str(msg['Subject']),
                  'text': msg.get_content(), 'headers': {'Reply-To': str(msg['Reply-To'])}}
         tijdelijk = mapje / (item['id'] + '.tmp')

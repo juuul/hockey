@@ -4,6 +4,8 @@ Uitgebreide beschrijving per scherm, regel en accountfunctie. Kort overzicht en 
 
 ## Gezamenlijke feedback
 
+Bij Bespreek je idee benoemen scherm en ontvangstmail het idee voor een website of app en dat Juliaan contact opneemt. De ontvangstmail heeft onderwerp Leuk dat je jouw idee deelt! en afzendernaam Juliaan | Websites en apps, ook in de kopie onder Verzonden. Feedbackberichten houden hun eigen tekst en afzender. Een appkeuze in de URL verandert nooit een contactformulier in een feedbackformulier.
+
 Juliaan.eu toont één algemene knop Feedback geven met een appkeuze in het formulier, plus Website of app laten maken. De informatiepagina bevat de afgesproken persoonlijke introductie en Bespreek je idee met een contactformulier. Deze aanvragen gebruiken categorie `contact` in dezelfde privéopslag; naam en e-mailadres zijn daarbij verplicht. Dezelfde eigenaar beheert en verwijdert ze. Melding en ontvangstbevestiging benoemen een contactaanvraag; SMTP, wachtrij en spamlimieten blijven gedeeld. De websites van Finance Planner krijgen geen wijzigingen.
 
 Instellingen toont voor iedereen twee knoppen: Feedback geven en Juliaan.eu. Feedback opent het centrale formulier met Hockey geselecteerd; test opent de eigen feedbackpreview, die uitsluitend de testbackend gebruikt. Juliaan.eu opent altijd `https://juliaan.eu/`. Alleen Hockey krijgt deze knoppen in de app; de website en webapp van Finance Planner blijven ongewijzigd. Op juliaan.eu blijven de feedbackknoppen naast alle apps staan. Er worden geen account-, team- of wedstrijdgegevens meegestuurd. Alleen app en bericht (3–5000 tekens) zijn verplicht; naam en e-mailadres zijn optioneel. Zonder account inzenden kan, teruglezen of wijzigen door bezoekers niet. Er is geen terugkijklink.

@@ -32,7 +32,10 @@ class FeedbackMail(unittest.TestCase):
         msg = module.bericht({**ITEM, 'contact': True}, env)
         self.assertEqual(str(msg['Subject']), 'Aanvraag: website of app laten maken')
         msg = module.bericht({**ITEM, 'contact': True, 'soort': 'bevestiging', 'email': 'test@example.invalid'}, env)
-        self.assertIn('aanvraag voor een website of app', msg.get_content())
+        self.assertEqual(str(msg['Subject']), 'Leuk dat je jouw idee deelt!')
+        self.assertIn('Ik lees je idee en neem contact met je op', msg.get_content())
+        self.assertNotIn('feedback', msg.get_content().lower())
+        self.assertIn('Juliaan | Websites en apps', str(msg['From']))
         self.assertNotIn(ITEM['bericht'], msg.get_content())
 
     def test_smtp_fout_geen_succes(self):
