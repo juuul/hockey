@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Player, Position, POSITIE_LABEL, VELD_VOLGORDE } from '../types'
 import './Modal.css'
 import { useTerug } from '../terug'
@@ -22,6 +22,8 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
     (a, b) => VELD_VOLGORDE.indexOf(a.positie) - VELD_VOLGORDE.indexOf(b.positie)
   )
   const [mode, setMode] = useState<'wissel' | 'verplaats'>(alleenVerplaatsen && !leegPlek ? 'verplaats' : 'wissel')
+  const directWisselen = !leegPlek && mode === 'wissel'
+  const uitgevoerd = useRef(false)
   const [selectedId, setSelectedId] = useState<string | null>(
     (leegPlek || !alleenVerplaatsen) && sortedSubs.length === 1 ? sortedSubs[0].id : null
   )
@@ -35,6 +37,12 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
     if (!selectedId) return
     if (leegPlek || mode === 'wissel') onSubstitute(selectedId)
     else onMove(selectedId)
+  }
+
+  const wisselDirect = (id: string) => {
+    if (uitgevoerd.current) return
+    uitgevoerd.current = true
+    onSubstitute(id)
   }
 
   return (
@@ -82,8 +90,8 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
                 {sortedSubs.map(sub => (
                   <button
                     key={sub.id}
-                    className={`modal-option ${selectedId === sub.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedId(sub.id)}
+                    className="modal-option"
+                    onClick={() => wisselDirect(sub.id)}
                   >
                     <span className="modal-option-name">{sub.naam}</span>
                     <span className="modal-option-count">{sub.wisselCount}×</span>
@@ -134,9 +142,9 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
 
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>Annuleren</button>
-          <button className="btn btn-primary" disabled={!selectedId} onClick={confirm}>
+          {!directWisselen && <button className="btn btn-primary" disabled={!selectedId} onClick={confirm}>
             Bevestig
-          </button>
+          </button>}
         </div>
       </div>
     </div>
