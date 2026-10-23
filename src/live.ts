@@ -19,7 +19,7 @@ export interface Stand {
   doelpunten: (string | null)[]
   opstelling: OpstellingNaam
   timer: { gestartOp: number | null; opgebouwd: number }
-  wisselsAltijdTellen?: boolean // oudere standen: standaard alleen tijdens speeltijd tellen
+  wisselsAltijdTellen?: boolean // alleen compatibiliteit: altijd true uitsturen voor oudere appversies
   wedstrijd: WedstrijdInfo
   shootouts?: Shootout[] // ontbreekt in standen van oudere versies
   speeltijd?: SpeeltijdMoment[] // indeling per moment op de wedstrijdklok; ontbreekt in standen van oudere versies
@@ -39,7 +39,7 @@ export function maakStand(d: Stand): Stand {
     doelpunten: [...d.doelpunten],
     opstelling: d.opstelling,
     timer: { gestartOp: d.timer.gestartOp, opgebouwd: d.timer.opgebouwd },
-    wisselsAltijdTellen: d.wisselsAltijdTellen === true,
+    wisselsAltijdTellen: true,
     wedstrijd: { datum: d.wedstrijd.datum, clubId: d.wedstrijd.clubId, thuis: d.wedstrijd.thuis, programmaId: d.wedstrijd.programmaId ?? '', afgesloten: d.wedstrijd.afgesloten ?? '', bewerkt: d.wedstrijd.bewerkt ?? '' },
     shootouts: (d.shootouts ?? []).map(s => ({ spelerId: s.spelerId })),
     speeltijd: (d.speeltijd ?? []).map(m => ({ t: m.t, g: Object.fromEntries(Object.keys(m.g).sort().map(id => [id, m.g[id]])) })),

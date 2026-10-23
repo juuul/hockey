@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { OPSTELLINGEN_PER_SPELVORM, SPELVORMEN, aantalSpelers, heeftKeeper, leesOpstelling, spelvormVan, veldPosities, type Player } from '../../src/types'
-import { schemaVoor, faseVan, wedstrijdDuur, wisselTelt } from '../../src/speelduur'
+import { schemaVoor, faseVan, wedstrijdDuur } from '../../src/speelduur'
 import { pasSpelvormAan } from '../../src/opstelling'
 import { maakStand } from '../../src/live'
 for (const vorm of SPELVORMEN) {
@@ -10,9 +10,6 @@ for (const vorm of SPELVORMEN) {
   assert.equal(veldPosities(naam).length+(heeftKeeper(vorm)?1:0),aantalSpelers(vorm))
  }
  const schema=schemaVoor(vorm);assert.equal(faseVan(wedstrijdDuur(schema),schema).deel,null)
- assert.equal(wisselTelt({gestartOp:1000,opgebouwd:0},vorm,false,false,2000),true)
- const rust=schema.findIndex(d=>d.soort==='rust')
- if(rust>=0)assert.equal(wisselTelt({gestartOp:1000,opgebouwd:schema.slice(0,rust).reduce((n,d)=>n+d.lengte,0)},vorm,false,false,2000),false)
 }
 assert.equal(schemaVoor('zaaljeugd6')[0].lengte,15*60000)
 assert.equal(schemaVoor('zaaljeugd6')[1].lengte,3*60000)

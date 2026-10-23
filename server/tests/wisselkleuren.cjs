@@ -12,6 +12,7 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
       localStorage.clear()
       localStorage.setItem('kleurfixture', 'ja')
       localStorage.setItem('hockey_test_backend', 'apart-v1')
+      localStorage.setItem('hockey_test_wissels_altijd_tellen', 'false')
       localStorage.setItem('hockey_test_spelers', JSON.stringify(Array.from({ length: 7 }, (_, i) => ({ id: String(i), naam: `Test ${i}`, positie: 'LW', inVeld: i < 6, meedoen: true, isKeeper: false, wisselCount: 2, inVolgorde: i < 5 ? i : 50 }))))
     })
     await page.setRequestInterception(true)
@@ -26,6 +27,12 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
         window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>type=>type;
         window.__vite_plugin_react_preamble_installed__=true;
         const {HockeyProvider,useHockey}=await import('/src/context/HockeyContext.tsx');
+        const {veldKleuren}=await import('/src/opstelling.ts');
+        const {schemaVoor,wedstrijdDuur}=await import('/src/speelduur.ts');
+        const {speeltijden,klokMs}=await import('/src/speeltijd.ts');
+        window.tijden=()=>speeltijden(window.hockey.speeltijdLog,klokMs(window.hockey.timer));
+        window.kleuren=()=>veldKleuren(window.hockey.spelers.filter(s=>s.inVeld&&!s.isKeeper));
+        window.schema=schemaVoor(11);window.eindtijd=wedstrijdDuur(window.schema);
         function Probe(){window.hockey=useHockey();return React.createElement('span',null,'klaar')}
         ReactDOM.createRoot(document.querySelector('#test')).render(React.createElement(HockeyProvider,{demo:false},React.createElement(Probe)));
       </script>` })
@@ -35,30 +42,49 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
     await page.waitForFunction(() => window.hockey?.spelers.length === 7, { timeout: 8000 }).catch(e => { throw Error(fouten.join('; ') || e.message) })
     await page.evaluate(() => window.hockey.wissel('4', '6', 'LW'))
     await page.waitForFunction(() => window.hockey.spelers.find(s => s.id === '6').inVeld)
-    const groen = await page.evaluate(() => ({ spelers: window.hockey.spelers, wisselingen: window.hockey.wisselingen }))
-    assert.equal(groen.spelers.find(s => s.id === '6').inVolgorde, 0)
-    assert.equal(groen.spelers.find(s => s.id === '4').wisselCount, 2)
-    assert.equal(groen.wisselingen.length, 0)
+    const eerste = await page.evaluate(() => ({ spelers: window.hockey.spelers, wisselingen: window.hockey.wisselingen }))
+    assert.equal(eerste.spelers.find(s => s.id === '6').inVolgorde, 51)
+    assert.equal(eerste.spelers.find(s => s.id === '4').wisselCount, 3)
+    assert.equal(eerste.wisselingen.length, 1)
+    assert.equal(await page.evaluate(() => window.kleuren()['6']), 'rood')
+    assert.deepEqual(await page.evaluate(() => window.hockey.timer), { gestartOp: null, opgebouwd: 0 })
+    assert.deepEqual(await page.evaluate(() => window.tijden()), {}, 'Wissels tellen bij stilstand, maar speeltijd niet')
+    await page.evaluate(() => window.hockey.wissel('4', '6', 'LW'))
+    assert.deepEqual(await page.evaluate(() => ({ spelers: window.hockey.spelers, wisselingen: window.hockey.wisselingen })), eerste, 'Dubbele wissel mag niet alleen de teller veranderen')
     await page.evaluate(() => window.hockey.zetKlok(1000, true))
     await page.waitForFunction(() => window.hockey.timer.gestartOp !== null)
+    assert.ok(await page.evaluate(() => Object.values(window.tijden()).some(t=>Object.values(t).some(sec=>sec>0))), 'Speeltijd blijft werken bij lopende klok')
     await page.evaluate(() => window.hockey.wissel('6', '4', 'LW'))
-    await page.waitForFunction(() => window.hockey.wisselingen.length === 1)
+    await page.waitForFunction(() => window.hockey.wisselingen.length === 2)
     assert.equal(await page.evaluate(() => window.hockey.spelers.find(s => s.id === '6').wisselCount), 3)
     assert.ok(await page.evaluate(() => window.hockey.spelers.find(s => s.id === '4').inVolgorde > 0))
     await page.evaluate(() => window.hockey.undo())
-    await page.waitForFunction(() => window.hockey.wisselingen.length === 0)
-    assert.deepEqual(await page.evaluate(() => window.hockey.spelers), groen.spelers)
+    await page.waitForFunction(() => window.hockey.wisselingen.length === 1)
+    assert.deepEqual(await page.evaluate(() => window.hockey.spelers), eerste.spelers)
     await page.evaluate(() => window.hockey.undo())
     await page.waitForFunction(() => !window.hockey.spelers.find(s => s.id === '6').inVeld)
     assert.equal(await page.evaluate(() => window.hockey.spelers.find(s => s.id === '6').inVolgorde), 50)
     await page.evaluate(() => window.hockey.pauzeTimer())
     await page.waitForFunction(() => window.hockey.timer.gestartOp === null)
     await page.evaluate(() => window.hockey.wissel('4', '6', 'LW'))
-    await page.waitForFunction(() => JSON.parse(localStorage.getItem('hockey_test_spelers')).find(s => s.id === '6').inVolgorde === 0)
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('hockey_test_spelers')).find(s => s.id === '6').inVolgorde === 51)
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.waitForFunction(() => window.hockey?.spelers.find(s => s.id === '6').inVeld)
-    assert.equal(await page.evaluate(() => window.hockey.spelers.find(s => s.id === '6').inVolgorde), 0)
+    assert.equal(await page.evaluate(() => window.hockey.spelers.find(s => s.id === '6').inVolgorde), 51)
+    // Iedere echte wissel telt, ook bij stilstand, pauze, rust en na de eindtijd.
+    const momenten = await page.evaluate(() => [20000, window.schema[0].lengte, window.schema.slice(0, 3).reduce((n,d)=>n+d.lengte,0), window.eindtijd])
+    for (const ms of momenten) {
+      await page.evaluate(ms => window.hockey.zetKlok(ms), ms)
+      const voor = await page.evaluate(() => {
+        const uit=window.hockey.spelers.find(s=>s.id==='4').inVeld?'4':'6'
+        return {uit, in:uit==='4'?'6':'4', aantal:window.hockey.wisselingen.length, teller:window.hockey.spelers.find(s=>s.id===uit).wisselCount}
+      })
+      await page.evaluate(v => window.hockey.wissel(v.uit,v.in,'LW'), voor)
+      await page.waitForFunction(v => window.hockey.wisselingen.length === v.aantal+1, {}, voor)
+      assert.equal(await page.evaluate(v=>window.hockey.spelers.find(s=>s.id===v.uit).wisselCount,voor),voor.teller+1)
+      assert.equal(await page.evaluate(v=>window.kleuren()[v.in],voor),'rood')
+    }
     assert.deepEqual(fouten, [])
-    console.log('WISSEL_PROVIDER_OK: niet-meetellen houdt teller/geschiedenis vast en maakt groen; echte wissel telt; Undo en verversen bewaren de juiste markering.')
+    console.log('WISSEL_PROVIDER_OK: teller, kleur en geschiedenis werken zonder klok, bij pauze/rust/einde; oude voorkeur genegeerd; Undo en verversen behouden de stand.')
   } finally { await browser.close() }
 })().catch(e => { console.error(e); process.exit(1) })

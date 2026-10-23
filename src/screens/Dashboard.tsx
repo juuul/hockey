@@ -16,7 +16,7 @@ import './Dashboard.css'
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
   const { doelpuntenBijhouden, speeltijdBijhouden } = useHockey()
-  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd, speeltijdLog, timer, demo, wisselsAltijdTellen, zetWisselsAltijdTellen } = useHockey()
+  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd, speeltijdLog, timer } = useHockey()
   const [showSubstituteModal, setShowSubstituteModal] = useState(false)
   const [selectedPosition, setSelectedPosition] = useState<Position>('LW')
   const [selectedPlayerName, setSelectedPlayerName] = useState('')
@@ -199,12 +199,6 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </>
       )}
       <Timer />
-      {!demo && magBewerken && (
-        <button className="btn btn-secondary wissels-tellen" role="switch" aria-checked={!wisselsAltijdTellen}
-          onClick={() => zetWisselsAltijdTellen(!wisselsAltijdTellen)}>
-          Wissels alleen tellen tijdens het spel: {wisselsAltijdTellen ? 'uit' : 'aan'}
-        </button>
-      )}
 
       {showSubstituteModal && (
         <SubstituteModal

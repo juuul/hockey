@@ -22,7 +22,7 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
         RefreshRuntime.injectIntoGlobalHook(window);window.$RefreshReg$=()=>{};window.$RefreshSig$=()=>type=>type;window.__vite_plugin_react_preamble_installed__=true;
         const {HockeyProvider,useHockey}=await import('/src/context/HockeyContext.tsx');
         const {speeltijden}=await import('/src/speeltijd.ts');window.speeltijden=speeltijden;
-        const {balans,topscorers}=await import('/src/historie.ts');window.balans=balans;window.topscorers=topscorers;
+        const {balans,topscorers,vandaag}=await import('/src/historie.ts');window.balans=balans;window.topscorers=topscorers;window.vandaag=vandaag;
         function Probe(){window.hockey=useHockey();return React.createElement('span',null,'klaar')}
         function Test(){const [opties,zet]=React.useState({});window.zetOpties=zet;return React.createElement(HockeyProvider,opties,React.createElement(Probe))}
         ReactDOM.createRoot(document.querySelector('#test')).render(React.createElement(Test));
@@ -56,7 +56,7 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
       window.clubId = id
     })
     await page.waitForFunction(() => hockey.clubs.some(c => c.id === window.clubId))
-    await page.evaluate(() => hockey.wedstrijdAfsluiten({ clubId: window.clubId, datum: '2026-10-20', thuis: true }, 'Voorbeeldclub'))
+    await page.evaluate(() => hockey.wedstrijdAfsluiten({ clubId: window.clubId, datum: window.vandaag(), thuis: true }, 'Voorbeeldclub'))
     await page.waitForFunction(() => hockey.wedstrijden.length === 1)
     const opgeslagen = await page.evaluate(() => ({ w: hockey.wedstrijden[0], balans: balans(hockey.wedstrijden), scorers: topscorers(hockey.wedstrijden, hockey.spelers) }))
     assert.equal(opgeslagen.w.spelers[0].tijd.a, 120, 'Uitgeschakelde twee minuten tellen niet mee')

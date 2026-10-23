@@ -51,13 +51,6 @@ export function faseVan(verstreken: number, schema: Deel[] = SCHEMA): Fase {
   return { index: schema.length, deel: null, inDeel: verstreken - begin, nog: 0 }
 }
 
-// Zonder inloggen of met de handmatige uitzondering telt elke wissel.
-export function wisselTelt(timer: { gestartOp: number | null; opgebouwd: number }, spelvorm: Spelvorm, altijd: boolean, demo: boolean, nu = Date.now()): boolean {
-  if (demo || altijd) return true
-  if (timer.gestartOp === null) return false
-  return faseVan(timer.opgebouwd + nu - timer.gestartOp, schemaVoor(spelvorm)).deel?.soort === 'kwart'
-}
-
 // Hele wedstrijd incl. pauzes en rust (ms): daarna stopt de klok
 export const wedstrijdDuur = (schema: Deel[] = SCHEMA) => schema.reduce((som, d) => som + d.lengte, 0)
 

@@ -1,6 +1,5 @@
 import assert from 'node:assert/strict'
 import { stempelInkomers, veldKleuren, resetTellers, verplaatsSpelers } from '../../src/opstelling'
-import { wisselTelt, schemaVoor, wedstrijdDuur } from '../../src/speelduur'
 import { maakStand, spelersStand, spelersMetStand } from '../../src/live'
 import type { Player } from '../../src/types'
 
@@ -24,28 +23,11 @@ assert.deepEqual(stempelInkomers(spelers, welGeteld), welGeteld)
 // Ook zonder oude markering komt een niet-meetellende invaller groen binnen.
 const zonderMarkering = spelers.map(s => s.id === '6' ? { ...s, inVolgorde: undefined } : s)
 assert.equal(kleuren(stempelInkomers(zonderMarkering, wissel(false), false))['6'], 'groen')
-// Dezelfde beslissing als de wisselteller: vóór de wedstrijd, bij stilstand, pauze/rust en na afloop groen.
-const schema = schemaVoor(11)
-const nu = 10_000
-for (const timer of [
-  { gestartOp: null, opgebouwd: 0 },
-  { gestartOp: null, opgebouwd: 20_000 },
-  { gestartOp: nu, opgebouwd: schema[0].lengte },
-  { gestartOp: nu, opgebouwd: schema.slice(0, 3).reduce((n, d) => n + d.lengte, 0) },
-  { gestartOp: nu, opgebouwd: wedstrijdDuur(schema) },
-]) {
-  const tellen = wisselTelt(timer, 11, false, false, nu)
-  assert.equal(tellen, false)
-  assert.equal(kleuren(wissel(tellen))['6'], 'groen')
-}
-for (const [altijd, demo] of [[true, false], [false, true]]) {
-  assert.equal(kleuren(wissel(wisselTelt({ gestartOp: null, opgebouwd: 0 }, 11, altijd, demo, nu)))['6'], 'rood')
-}
-assert.equal(wisselTelt({ gestartOp: nu, opgebouwd: 0 }, 11, false, false, nu), true)
 // Bestaande live-opslag bevat inVolgorde al: 0 blijft op een ander toestel groen.
-const stand = maakStand({ spelers: spelersStand(nietGeteld), wisselingen: [], score: { wij: 0, zij: 0 }, doelpunten: [], opstelling: '3-4-3', timer: { gestartOp: null, opgebouwd: 0 }, wedstrijd: { datum: null, clubId: null, thuis: true } })
+const stand = maakStand({ spelers: spelersStand(nietGeteld), wisselingen: [], score: { wij: 0, zij: 0 }, doelpunten: [], opstelling: '3-4-3', timer: { gestartOp: null, opgebouwd: 0 }, wedstrijd: { datum: null, clubId: null, thuis: true }, wisselsAltijdTellen: false })
+assert.equal(stand.wisselsAltijdTellen, true, 'Oude klokafhankelijke keuze wordt niet overgenomen')
 assert.equal(kleuren(spelersMetStand(spelers, stand.spelers))['6'], 'groen')
 assert.ok(Object.values(kleuren(resetTellers(welGeteld))).every(k => k === 'groen'))
 const verplaatst = verplaatsSpelers(spelers, '4', '6')
 assert.equal(verplaatst.find(s => s.id === '6')!.inVolgorde, spelers.find(s => s.id === '4')!.inVolgorde)
-console.log('WISSELKLEUREN_OK: niet-meetellend groen, meetellend rood, stilstand/pauze/rust/einde, uitzondering/demo, live-opslag, reset en verplaatsen.')
+console.log('WISSELKLEUREN_OK: invalvolgorde, live-opslag, compatibiliteit zonder klokkeuze, reset en verplaatsen.')
