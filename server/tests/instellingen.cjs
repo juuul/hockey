@@ -20,7 +20,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
       await page.setViewport({ width: 390, height: 844 })
       await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }])
       const gebruiker = { id: 'oudertest1234567', email: 'ouder@example.invalid', name: 'Testouder', superadmin }
-      const teams = [1, 2].map(n => ({ id: `testteam000000${n}`, naam: `Testteam ${n}`, beheerders: kijker ? [] : [gebruiker.id], kijkers: kijker ? [gebruiker.id] : [], officieelTeam: `officieel${n}`, vindbaar: true }))
+      const teams = [1, 2].map(n => ({ id: `testteam000000${n}`, naam: `Testteam ${n}`, beheerders: kijker ? [] : [gebruiker.id], kijkers: kijker ? [gebruiker.id] : [], officieelTeam: `officieel${n}`, vindbaar: true, expand: { officieelTeam: n === 1 ? { bronId: '46179', pouleId: '183769' } : { bronId: '123', pouleId: '456' } } }))
       const reistijden = {}
       await page.evaluateOnNewDocument(({ token, gebruiker, teams }) => {
         localStorage.clear()
@@ -89,12 +89,22 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     }
     const terug = async () => { await page.click('.instellingen-terug'); await page.waitForSelector('.instellingen-overzicht') }
     const heeftKnop = tekst => page.evaluate(tekst => [...document.querySelectorAll('button')].some(b => b.firstChild?.firstChild?.textContent.trim() === tekst || b.firstChild?.textContent.trim() === tekst || b.textContent.trim() === tekst), tekst)
+    const controleerBronLink = async verwacht => {
+      await page.click('.tab-btn[aria-label="Programma"]')
+      await page.waitForSelector('.programma')
+      const links = await page.$$eval('a', ns => ns.filter(n => n.textContent === 'Wedstrijdprogramma').map(n => ({ href: n.href, target: n.target, rel: n.rel })))
+      assert.deepEqual(links, verwacht ? [{ href: verwacht, target: '_blank', rel: 'noreferrer' }] : [])
+      assert.equal(await page.evaluate(() => [...document.querySelectorAll('a')].some(a => a.textContent.startsWith('Speelkalender'))), false)
+      await page.click('.tab-btn[aria-label="Instellingen"]')
+      await page.waitForSelector('.instellingen-overzicht')
+    }
 
     await open()
     await page.waitForFunction(() => document.body.textContent.includes('Alles bijgewerkt'), { timeout: 8000 }).catch(async e => {
       console.error(await page.evaluate(() => document.body.innerText), fouten)
       throw e
     })
+    await controleerBronLink('https://www.hockey.nl/match-center#/team/46179|183769/program')
     assert.equal(await page.$('input'), null)
     assert.equal(await heeftKnop('Uitloggen'), false)
     assert.equal(await heeftKnop('Nieuwe link maken'), false)
@@ -210,9 +220,11 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await klik('Team wisselen')
     await klik('Testteam 2')
     await page.waitForFunction(() => document.querySelector('.instellingen-actief-team strong')?.textContent === 'Testteam 2')
+    await controleerBronLink('https://www.hockey.nl/match-center#/team/123|456/program')
     await klik('Team wisselen')
     await klik('Zonder team')
     await page.waitForFunction(() => document.querySelector('.instellingen-actief-team strong')?.textContent === 'Zonder team')
+    await controleerBronLink(null)
     assert.equal(await heeftKnop('Teaminstellingen'), false)
     assert.equal(await heeftKnop('Verzameltijd'), false)
     assert.equal(await heeftKnop('Teamlink delen'), false)
