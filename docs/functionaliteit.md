@@ -142,6 +142,8 @@ interface Wissel { id: string; tijdstip: Date; inSpeler: string; uitSpeler: stri
 
 ## Openbare catalogus en bronupdates
 
+- **Bronlink bovenaan Programma**: Wedstrijdprogramma vervangt de losse Speelkalender-knoppen en opent in een nieuw tabblad `https://www.hockey.nl/match-center#/team/<bronId>|<pouleId>/program`. De teamlijst haalt de openbare officiële teamrelatie mee; de link volgt het actieve team en de daarin bekende poule. Alleen volledige numerieke team-/poule-id’s worden gebruikt; bij een ongekoppeld team of ontbrekende id’s verschijnt geen gegokte bronlink. Geen extra verzoek aan hockey.nl om de knop te tonen, en geen SCHC-site. De PDF-kalenders blijven beschikbaar bij Speeldagen plannen voor het plannen van voorlopige datums.
+
 - Collecties `catalogus_clubs`, `catalogus_teams` en `catalogus_wedstrijden` bevatten alleen openbare competitiegegevens. Normale gebruikers mogen lezen, niet schrijven. Privéomgevingen blijven in `teams`, met `officieelTeam` als relatie en onafhankelijke leden/spelers. Catalogusrecords zijn uniek op bron-ID (teams per seizoen).
 - Startbestand: 344 reguliere clubs; SCHC-teams en de gepubliceerde MO11-poule. Clubs zijn niet hetzelfde als alle actieve teams: teams van een geselecteerde club worden in de achtergrond opgehaald, geen bulkbezoek aan heel Nederland.
 - De achtergrondwerker bezoekt de openbare KNHB Match Center-pagina met een browser, zonder clublogin en zonder opgeslagen API-sleutels. Requests zijn begrensd, gededupliceerd en fouten veroorzaken geen automatische snelle herhaalpogingen. Alleen club- en wedstrijdvelden uit een expliciete whitelist worden geïmporteerd. Dit is een koppeling aan de publieke website, geen gegarandeerd ondersteund KNHB API-contract; bronwijzigingen kunnen onderhoud vereisen.

@@ -2,6 +2,7 @@ import ProgrammaTijd from '../components/ProgrammaTijd'
 import DatumTijdKiezer from '../components/DatumTijdKiezer'
 import { autoPlekken, rijdenTekst } from '../rijden'
 import { thuisUitBekend, thuisUitTekst } from '../programmaLocatie'
+import { programmaBronLink } from '../programmaBron'
 import { begeleidingProfiel, begeleidingStandaard, begeleidingPlekken, begeleidingAantal, kiesTaak } from '../begeleiding'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
@@ -77,7 +78,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
     p.soort !== 'wedstrijd' ? undefined
     : (afgesloten && p.id === wedstrijd.programmaId ? afgesloten : undefined)
       ?? (p.clubId ? wedstrijden.find(w => w.datum === p.datum && w.clubId === p.clubId) : undefined)
-  const kalenderLinks = [...new Set(programma.map(p => p.bronPlanning?.bron).filter((bron): bron is string => !!bron))]
+  const bronLink = programmaBronLink(actiefTeam?.expand?.officieelTeam)
   const volgendeId = komend.find(p => p.soort === 'wedstrijd' && !gespeeld(p))?.id
   const zichtbaar = (lijst: ProgrammaItem[]) => (alleenMijn ? lijst.filter(p => beurten(p).length > 0) : lijst)
 
@@ -157,7 +158,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         )}
       </section>
 
-      {kalenderLinks.length > 0 && <div className="prog-filters">{kalenderLinks.map((bron, i) => <a key={bron} className="btn btn-secondary" href={bron} target="_blank" rel="noreferrer">Speelkalender{kalenderLinks.length > 1 ? ` ${i + 1}` : ''}</a>)}</div>}
+      {bronLink && <div className="prog-filters"><a className="btn btn-secondary" href={bronLink} target="_blank" rel="noreferrer">Wedstrijdprogramma</a></div>}
       <div className="prog-filters">
         <button className={`prog-filter ${toonGeweest ? 'actief' : ''}`} onClick={() => setToonGeweest(!toonGeweest)} aria-pressed={toonGeweest}>
           ⇄ {toonGeweest ? 'Geweest' : 'Nog te spelen'}

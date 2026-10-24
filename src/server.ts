@@ -34,7 +34,7 @@ export interface Team extends RecordModel {
   kijkers: string[]
   kijklink?: string
   instellingen?: Partial<TeamInstellingen> | null
-  expand?: { beheerders?: Gebruiker[]; kijkers?: Gebruiker[] }
+  expand?: { beheerders?: Gebruiker[]; kijkers?: Gebruiker[]; officieelTeam?: { bronId: string; pouleId?: string } }
 }
 // Standaard per team: bij een uit- of thuiswedstrijd is (geen) spelbegeleiding van ons nodig
 export interface TeamInstellingen { uitGeenBegeleiding: boolean; thuisGeenBegeleiding: boolean; begeleidingThuis?: number | null; begeleidingUit?: number | null; begeleidingVeldjes?: 1 | 2; doelpuntenBijhouden: boolean; speeltijdBijhouden: boolean }

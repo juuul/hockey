@@ -57,7 +57,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
 
   const teamsLaden = useCallback(async (bijInloggen = false) => {
     if (!pb.authStore.isValid) return setTeams([])
-    const lijst = await pb.collection('teams').getFullList<Team>({ sort: 'naam', expand: 'beheerders,kijkers' })
+    const lijst = await pb.collection('teams').getFullList<Team>({ sort: 'naam', expand: 'beheerders,kijkers,officieelTeam' })
     const bewaard = lees<Team[]>(OPSLAG, 'teams', [])
     for (const oud of bewaard) if (!lijst.some(t => t.id === oud.id)) wisTeamCaches(oud.id)
     setTeams(lijst)
