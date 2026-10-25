@@ -6,20 +6,20 @@ import './DatumTijdKiezer.css'
 const isoDatum = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const datumTekst = (waarde: string) => new Date(`${waarde}T12:00:00`).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
 
-export default function DatumTijdKiezer({ soort, waarde, onChange, optioneel = false }: {
-  soort: 'date' | 'time'; waarde: string; onChange: (waarde: string) => void; optioneel?: boolean
+export default function DatumTijdKiezer({ soort, waarde, onChange, optioneel = false, titel }: {
+  soort: 'date' | 'time'; waarde: string; onChange: (waarde: string) => void; optioneel?: boolean; titel?: string
 }) {
   const [open, setOpen] = useState(false)
   return <>
     <button type="button" className="modal-input datumtijd-veld" aria-haspopup="dialog" onClick={() => setOpen(true)}>
       {waarde ? soort === 'date' ? datumTekst(waarde) : waarde : soort === 'date' ? 'Kies een datum' : 'Kies een tijd'}
     </button>
-    {open && <Kiezer soort={soort} waarde={waarde} optioneel={optioneel} onChange={onChange} dicht={() => setOpen(false)} />}
+    {open && <Kiezer soort={soort} waarde={waarde} optioneel={optioneel} onChange={onChange} dicht={() => setOpen(false)} titel={titel} />}
   </>
 }
 
-function Kiezer({ soort, waarde, optioneel, onChange, dicht }: {
-  soort: 'date' | 'time'; waarde: string; optioneel: boolean; onChange: (waarde: string) => void; dicht: () => void
+function Kiezer({ soort, waarde, optioneel, onChange, dicht, titel: eigenTitel }: {
+  soort: 'date' | 'time'; waarde: string; optioneel: boolean; onChange: (waarde: string) => void; dicht: () => void; titel?: string
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const [datum, setDatum] = useState(() => soort === 'date' && waarde ? waarde : isoDatum(new Date()))
@@ -40,7 +40,7 @@ function Kiezer({ soort, waarde, optioneel, onChange, dicht }: {
   }
   const dagen = new Date(maand.getFullYear(), maand.getMonth() + 1, 0).getDate()
   const leeg = (maand.getDay() + 6) % 7
-  const titel = soort === 'date' ? 'Datum kiezen' : 'Aanvang kiezen'
+  const titel = eigenTitel || (soort === 'date' ? 'Datum kiezen' : 'Aanvang kiezen')
   return createPortal(<dialog ref={dialog} className="datumtijd-dialog" aria-label={titel}
     onCancel={e => { e.preventDefault(); dicht() }} onClick={e => e.stopPropagation()}>
     <div className="datumtijd-inhoud">

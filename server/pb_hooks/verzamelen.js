@@ -5,6 +5,15 @@ function bereken(datum, tijd, minuten, instellingen) {
   return new Date(d.getTime() - (minuten + instellingen.voorbereidingMinuten + instellingen.bufferMinuten) * 60000).toISOString()
 }
 function pasAan(app, p) {
+  if (p.getString("soort") === "wedstrijd" && p.getString("verzamelModus") === "handmatig") {
+    const tijd = p.getString("verzamelen")
+    if (tijd && !/^([01]\d|2[0-3]):[0-5]\d$/.test(tijd)) throw new BadRequestError("Kies een geldige verzameltijd")
+    const datum = p.getString("verzamelDatum") || p.getString("datum")
+    const parsed = new Date(`${datum}T12:00:00Z`)
+    if (tijd && (!/^\d{4}-\d\d-\d\d$/.test(datum) || !Number.isFinite(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== datum)) throw new BadRequestError("Kies een geldige verzameldatum")
+    p.set("verzamelDatum", tijd ? datum : "")
+    return
+  }
   p.set("verzamelModus", "automatisch")
   let tijd = null
   if (p.getString("soort") === "wedstrijd") {

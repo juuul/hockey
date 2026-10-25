@@ -173,7 +173,7 @@ Bronnen: https://www.pdok.nl/pdok-locatieserver , https://github.com/Project-OSR
 
 ### Automatische verzameltijd
 
-`programma.verzamelModus` is altijd automatisch. Migratie 1790400027 zet ook eerder handmatige en gewiste tijden om. Recordhooks berekenen automatisch met de opgeslagen reistijd; de reiswerker werkt automatische programma-items elke minuut bij. Aanvang/adres onbekend betekent geen verzameltijd. Recordhooks overschrijven ook binnenkomende handmatige verzameltijden met de berekening. `verzamelen-bijwerken` is een lokale CLI voor direct herberekenen.
+`programma.verzamelModus` kiest automatisch of handmatig. De historische migratie 1790400027 blijft ongewijzigd; nieuwe eigen keuzes worden niet meer overschreven. Recordhooks behouden handmatige tijd/datum (ook een bewuste lege tijd), valideren HH:MM en kalenderdatum en vullen zonder eigen dag de wedstrijddag in. Alleen automatische programma-items worden door de reiswerker/herberekening bijgewerkt; onbekende aanvang/route levert daar geen fictieve verzameltijd. Automatisch berekenen in de popup herstelt de berekening na Opslaan. `verzamelen-bijwerken` herberekent uitsluitend automatische items. Geen nieuwe migratie of bulkoverschrijving; productiehooks pas bij goedgekeurde livegang bijwerken. Tests: handmatig-verzamelen.pb.js, handmatig-verzamelen.cjs en verzamelkeuze.ts.
 
 Controle: `server/tests/verzameltijden.pb.js` als tijdelijke hook op een geïsoleerde testkopie; `test-tijden` controleert thuis/uit, wijzigende aanvang, overschrijven van handmatige en gewiste keuzes, onbekende route en de vorige dag.
 
