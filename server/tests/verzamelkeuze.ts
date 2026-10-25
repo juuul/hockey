@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { verzamelKeuze } from '../../src/verzamelkeuze'
 import type { ProgrammaItem } from '../../src/types'
 const p = { datum: '2026-10-31', verzamelen: '09:10', verzamelModus: 'handmatig' } as ProgrammaItem
+assert.equal(verzamelKeuze({ ...p, verzamelen: '09:57' }, { tijd: '09:55', datum: p.datum }).verzamelen, '09:57', 'Eigen tijd blijft exact, ook na invoering van automatische afronding')
 assert.deepEqual(verzamelKeuze(p, { tijd: '09:55', datum: p.datum }), { verzamelen: '09:10', verzamelDatum: p.datum, verzamelModus: 'handmatig' })
 assert.deepEqual(verzamelKeuze({ ...p, verzamelDatum: '2026-10-30' }, null), { verzamelen: '09:10', verzamelDatum: '2026-10-30', verzamelModus: 'handmatig' })
 assert.deepEqual(verzamelKeuze({ ...p, verzamelen: '' }, null), { verzamelen: '', verzamelDatum: '', verzamelModus: 'handmatig' })
