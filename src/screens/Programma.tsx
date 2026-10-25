@@ -1,4 +1,8 @@
 import ProgrammaTijd from '../components/ProgrammaTijd'
+import TijdenVelden from '../components/TijdenVelden'
+import { useVerzameltijd } from '../components/useVerzameltijd'
+import { tijdenGeldig, tijdWaarde } from '../tijdinvoer'
+import { verzamelKeuze } from '../verzamelkeuze'
 import DatumTijdKiezer from '../components/DatumTijdKiezer'
 import { autoPlekken, rijdenTekst } from '../rijden'
 import { thuisUitBekend, thuisUitTekst } from '../programmaLocatie'
@@ -128,7 +132,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''}</div>}
         <WedstrijdLocatie locatie={p.locatie} adres={p.locatieAdres} />
         {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
-        {!!Object.keys(p.bronWijziging || {}).length && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
+        {Object.entries(p.bronWijziging || {}).some(([veld, waarde]) => (p[veld as keyof ProgrammaItem] ?? '') !== waarde) && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
         {p.notitie && <div className="prog-regel notitie">{p.notitie}</div>}
         {mijn.length > 0 && (
           <div className="prog-labels">{mijn.map(b => <span key={b} className="prog-label mijn">Jij: {b}</span>)}</div>
@@ -246,11 +250,13 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   const [wegVraag, setWegVraag] = useState(false)
   useTerug(wegVraag, () => setWegVraag(false))
   const bestaat = programma.some(x => x.id === start.id)
-  const zet = (velden: Partial<ProgrammaItem>) => setP({ ...p, ...velden })
+  const zet = (velden: Partial<ProgrammaItem>) => setP(huidig => ({ ...huidig, ...velden }))
+  const berekening = useVerzameltijd({ item: p, zet })
   const spelerKeuzes = [...spelers].sort((a, b) => a.naam.localeCompare(b.naam))
 
   const opslaan = () => {
-    let item = { ...p, reisMinuten: null, rijders: autoPlekken(p, spelers.length) }
+    if (!tijdenGeldig(p)) return
+    let item = { ...p, spelen: tijdWaarde(p.spelen) || '', ...verzamelKeuze(p, berekening.voorstel), reisMinuten: null, rijders: autoPlekken(p, spelers.length) }
     if (p.soort === 'wedstrijd' && nieuweClub !== null && nieuweClub.trim()) {
       const id = clubToevoegen(nieuweClub)
       item = { ...item, clubId: id, tegenstander: nieuweClub.trim() }
@@ -307,7 +313,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
             Datum
             <DatumTijdKiezer soort="date" waarde={p.datum} onChange={datum => zet({ datum })} />
           </label>
-          {p.soort === 'wedstrijd' && <ProgrammaTijd item={p} bewaar={setP} bewerkbaar />}
+          {p.soort === 'wedstrijd' && <TijdenVelden item={p} zet={zet} berekening={berekening} />}
           <div className="keuze-knoppen" role="radiogroup" aria-label="Soort">
             {(['wedstrijd', 'vrij'] as const).map(s => (
               <button key={s} role="radio" aria-checked={p.soort === s} className={`keuze-knop ${p.soort === s ? 'actief' : ''}`} onClick={() => zet({ soort: s })}>
@@ -354,7 +360,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               <label className="prog-veld">Locatie
                 <input className="modal-input" maxLength={200} value={p.locatie || ''} onChange={e => zet({ locatie: e.target.value })} />
               </label>
-              <VerzameltijdBerekenen item={p} zet={zet} />
+              <VerzameltijdBerekenen item={p} zet={zet} berekening={berekening} />
               {p.bronStatus && /cancel/i.test(p.bronStatus) && <p className="account-uitleg">Deze wedstrijd is volgens de officiële bron afgelast.</p>}
               {spelerSelect('🍎 Fruit', 'fruit')}
               <p className="account-uitleg">De eerste ouderkeuze vult ook fruit, benodigde begeleiding en bij uit de eerste auto in. Je kunt elke taak daarna apart aanpassen.</p>
@@ -379,7 +385,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
             </>
           )}
           {p.bronId && <p className="account-uitleg">Officiële wedstrijd. Verzameltijd en taken zijn eigen gegevens; handmatige wijzigingen blijven bij een bronupdate behouden.</p>}
-          {Object.entries(p.bronWijziging || {}).map(([veld, waarde]) => <div key={veld}>
+          {Object.entries(p.bronWijziging || {}).filter(([veld, waarde]) => veld !== 'spelen' && (p[veld as keyof ProgrammaItem] ?? '') !== waarde).map(([veld, waarde]) => <div key={veld}>
             <p className="account-uitleg">Officiële {({ datum: 'datum', spelen: 'aanvangstijd', thuis: 'thuis/uit', tegenstander: 'tegenstander', locatie: 'locatie', locatieAdres: 'wedstrijdadres' } as Record<string, string>)[veld]}: {typeof waarde === 'boolean' ? waarde ? 'thuis' : 'uit' : waarde}. Jouw aanpassing is behouden.</p>
             <button className="btn btn-secondary" onClick={async () => {
               try {
@@ -403,7 +409,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
         </div>
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>Annuleren</button>
-          <button className="btn btn-primary" onClick={opslaan}>Opslaan</button>
+          <button className="btn btn-primary" onClick={opslaan} disabled={!tijdenGeldig(p)}>Opslaan</button>
         </div>
 
         {wegVraag && (
