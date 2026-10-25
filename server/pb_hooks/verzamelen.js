@@ -2,7 +2,8 @@ function bereken(datum, tijd, minuten, instellingen) {
   if (!/^\d{4}-\d\d-\d\d$/.test(datum) || !/^([01]\d|2[0-3]):[0-5]\d$/.test(tijd) || !Number.isInteger(minuten) || minuten < 0) return null
   const d = new Date(`${datum}T${tijd}:00Z`)
   if (!Number.isFinite(d.getTime()) || d.toISOString().slice(0, 10) !== datum) return null
-  return new Date(d.getTime() - (minuten + instellingen.voorbereidingMinuten + instellingen.bufferMinuten) * 60000).toISOString()
+  const moment = d.getTime() - (minuten + instellingen.voorbereidingMinuten + instellingen.bufferMinuten) * 60000
+  return new Date(Math.floor(moment / 300000) * 300000).toISOString()
 }
 function pasAan(app, p) {
   if (p.getString("soort") === "wedstrijd" && p.getString("verzamelModus") === "handmatig") {
