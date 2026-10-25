@@ -124,7 +124,9 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         </div>
         <div className={`prog-regel ${mijn.includes('begeleiding') ? 'mijn' : ''}`}>
           <span aria-hidden="true">🏑</span>
-          <span>begeleiding: {!p.thuis && ['o9', 'o78'].includes(profiel) && metBegeleiding(p).begeleider1 === NIET_NODIG && metBegeleiding(p).begeleider2 === NIET_NODIG ? 'de thuisclub regelt dit' : begeleidingTekst(metBegeleiding(p), naam)}</span>
+          <span>begeleiding: {!p.thuis && metBegeleiding(p).begeleider1 === NIET_NODIG && metBegeleiding(p).begeleider2 === NIET_NODIG
+            ? profiel === 'o11' ? 'n.v.t.' : ['o9', 'o78'].includes(profiel) ? 'de thuisclub regelt dit' : begeleidingTekst(metBegeleiding(p), naam)
+            : begeleidingTekst(metBegeleiding(p), naam)}</span>
         </div>
         {!p.thuis && <div className={`prog-regel ${mijn.includes('rijden') ? 'mijn' : ''}`}>
           <span aria-hidden="true">🚗</span><span>rijden: {rijdenTekst(autoPlekken(p, spelers.length), naam)}</span>
@@ -438,6 +440,7 @@ function StandaardBegeleiding({ onClose }: { onClose: () => void }) {
   const uitleg = profiel === 'o9' ? 'O9: de thuisclub regelt één speelbegeleider. Bij uit regelt de tegenstander dit.'
     : profiel === 'o10' ? 'O10: elk team levert één speelbegeleider, thuis én uit.'
     : profiel === 'o78' ? 'O7/O8 veld: thuis één speelbegeleider per veldje, uit geen.'
+    : profiel === 'o11' ? 'O11 veld: bij uitwedstrijden is eigen spelbegeleiding n.v.t. Thuis blijven de ingestelde aantallen gelden.'
     : 'Voor deze categorie is hier geen vaste standaard bevestigd. Kies de aantallen volgens je club of district.'
   const keuze = (thuis: boolean) => {
     const sleutel = thuis ? 'begeleidingThuis' : 'begeleidingUit'
@@ -446,7 +449,7 @@ function StandaardBegeleiding({ onClose }: { onClose: () => void }) {
     return <label className="prog-veld">
       {thuis ? 'Eigen begeleiders bij thuis' : 'Eigen begeleiders bij uit'}
       <select className="modal-input" value={inst[sleutel] ?? (inst[oud] ? 0 : 'auto')} onChange={e => zetTeamInstellingen({ ...inst, [oud]: false, [sleutel]: e.target.value === 'auto' ? null : Number(e.target.value) })}>
-        <option value="auto">{standaard === null ? 'Nog te bepalen (2 plekken)' : `Volgens KNHB: ${standaard}`}</option>
+        <option value="auto">{standaard === null ? 'Nog te bepalen (2 plekken)' : `${profiel === 'o11' ? 'Teamstandaard' : 'Volgens KNHB'}: ${standaard}`}</option>
         {[0, 1, 2].map(n => <option key={n} value={n}>{n === 0 ? 'Geen' : n === 1 ? '1 begeleider' : '2 begeleiders'}</option>)}
       </select>
     </label>
@@ -462,7 +465,7 @@ function StandaardBegeleiding({ onClose }: { onClose: () => void }) {
       </label>}
       {keuze(true)}{keuze(false)}
       <p className="account-uitleg">Benodigde plekken beginnen op Nog te bepalen. Gekozen ouders blijven staan.</p>
-      <a href={profiel === 'zaal-o8' || String(spelvorm).startsWith('zaal') ? 'https://www.knhb.nl/competitie/zaalcompetitie/competitieaanbod/jongste-jeugd' : 'https://www.knhb.nl/competitie/veldcompetitie/competitieaanbod/jongste-jeugd'} target="_blank" rel="noreferrer">KNHB-regels</a>
+      <a href={profiel === 'o11' ? 'https://www.knhb.nl/app/uploads/2025/01/Spelregels-en-veldindeling-9x9-O11.pdf' : profiel === 'zaal-o8' || String(spelvorm).startsWith('zaal') ? 'https://www.knhb.nl/competitie/zaalcompetitie/competitieaanbod/jongste-jeugd' : 'https://www.knhb.nl/competitie/veldcompetitie/competitieaanbod/jongste-jeugd'} target="_blank" rel="noreferrer">KNHB-regels</a>
     </div>
     <div className="modal-actions"><button className="btn btn-primary" onClick={onClose}>Klaar</button></div>
   </div></div>
