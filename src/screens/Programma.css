@@ -206,6 +206,19 @@
   color: var(--tekst-zacht);
 }
 
+.prog-locatie {
+  align-items: center;
+  min-height: 60px;
+  padding: 6px 0;
+  color: var(--tekst);
+  text-decoration: none;
+}
+.prog-locatie > span:first-child { flex-shrink: 0; }
+.prog-locatie-naam { min-width: 0; overflow-wrap: anywhere; }
+a.prog-locatie { color: var(--blauw-tekst); }
+a.prog-locatie .prog-locatie-naam { text-decoration: underline; text-underline-offset: 3px; }
+a.prog-locatie:focus-visible { outline: 2px solid var(--rand-blauw); outline-offset: 2px; }
+
 .onbekend {
   color: var(--tekst-vaag);
   font-style: italic;

@@ -6,7 +6,7 @@ import { programmaBronLink } from '../programmaBron'
 import { begeleidingProfiel, begeleidingStandaard, begeleidingPlekken, begeleidingAantal, kiesTaak } from '../begeleiding'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
-import { navigatieLink } from '../verzamelen'
+import WedstrijdLocatie from '../components/WedstrijdLocatie'
 import Speeldagen from '../components/Speeldagen'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
@@ -126,8 +126,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
           <span aria-hidden="true">🚗</span><span>rijden: {rijdenTekst(autoPlekken(p, spelers.length), naam)}</span>
         </div>}
         {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''}</div>}
-        {p.locatieAdres?.trim() ? <a className="btn btn-secondary" href={navigatieLink(p.locatieAdres)} target="_blank" rel="noreferrer">Navigeer naar wedstrijd</a> : <button type="button" className="btn btn-secondary" disabled title="Wedstrijdadres nog niet bekend">Navigeer naar wedstrijd</button>}
-        {p.locatie && <div className="prog-regel">📍 {p.locatie}</div>}
+        <WedstrijdLocatie locatie={p.locatie} adres={p.locatieAdres} />
         {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
         {!!Object.keys(p.bronWijziging || {}).length && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
         {p.notitie && <div className="prog-regel notitie">{p.notitie}</div>}
