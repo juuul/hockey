@@ -1,0 +1,38 @@
+// Alleen een geïsoleerde lege database met test-rijden-fixture; geen echte teams.
+$app.rootCmd.addCommand(new Command({ use: 'test-handmatig-verzamelen', run: () => {
+  if ($os.getenv('HOCKEY_ENV') !== 'test' || $app.countRecords('teams') !== 1) throw new Error('Alleen de geïsoleerde fixture')
+  const check = (v, m) => { if (!v) throw new Error(m) }
+  $app.runInTransaction(tx => {
+    const team = tx.findRecordById('teams', 'rijtestteam0001')
+    check(team.getString('naam') === 'Voorbeeld', 'Onjuist fixtureteam')
+    team.set('reisInstellingen', { vertrekAdres: 'Voorbeeldstraat 1, Utrecht', voorbereidingMinuten: 30, bufferMinuten: 5 }); tx.save(team)
+    let p = tx.findRecordById('programma', 'rijtestpot00001')
+    p.set('datum', '2026-10-31'); p.set('spelen', '10:30'); p.set('locatieAdres', 'Voorbeeldstraat 1, Utrecht')
+    p.set('verzamelModus', 'automatisch'); tx.save(p)
+    check(p.getString('verzamelen') === '09:55', 'Automatisch berekenen blijft werken')
+    p.set('verzamelModus', 'handmatig'); p.set('verzamelen', '09:10'); p.set('verzamelDatum', ''); tx.save(p)
+    check(p.getString('verzamelen') === '09:10' && p.getString('verzamelDatum') === '2026-10-31', 'Handmatige tijd bewaren met wedstrijddag')
+    p.set('spelen', '11:30'); p.set('notitie', 'Fictieve wijziging'); tx.save(p)
+    require(`${__hooks}/verzamelen.js`).alle(tx)
+    p = tx.findRecordById('programma', p.id)
+    check(p.getString('verzamelen') === '09:10' && p.getString('verzamelModus') === 'handmatig', 'Aanvang/update/herberekening moet handmatige afspraak behouden')
+    p.set('verzamelDatum', '2026-10-30'); tx.save(p)
+    check(p.getString('verzamelDatum') === '2026-10-30', 'Eigen verzameldag behouden')
+    p.set('locatieAdres', 'Onbekend adres'); tx.save(p)
+    check(p.getString('verzamelen') === '09:10', 'Handmatig zonder route mogelijk')
+    p.set('verzamelen', ''); tx.save(p)
+    check(p.getString('verzamelDatum') === '' && p.getString('verzamelen') === '', 'Handmatig wissen behouden')
+    p.set('verzamelen', '25:00')
+    let geweigerd = false; try { tx.save(p) } catch (_) { geweigerd = true }
+    check(geweigerd, 'Ongeldige tijd weigeren')
+    p = tx.findRecordById('programma', p.id); p.set('verzamelen', '09:10'); p.set('verzamelDatum', '2026-02-30')
+    geweigerd = false; try { tx.save(p) } catch (_) { geweigerd = true }
+    check(geweigerd, 'Ongeldige datum weigeren')
+    p = tx.findRecordById('programma', p.id)
+    p.set('locatieAdres', 'Voorbeeldstraat 1, Utrecht'); p.set('verzamelModus', 'automatisch'); tx.save(p)
+    check(p.getString('verzamelen') === '10:55' && p.getString('verzamelModus') === 'automatisch', 'Herstel automatisch rekent opnieuw')
+    p.set('verzamelModus', 'wissen'); tx.save(p)
+    check(p.getString('verzamelen') === '10:55' && p.getString('verzamelModus') === 'automatisch', 'Oude wissenmodus compatibel')
+  })
+  console.log('HANDMATIG_NATIVE_OK: automatisch, eigen tijd/dag, updates/herberekening, onbekende route, wissen, validatie en terug naar automatisch.')
+} }))
