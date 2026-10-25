@@ -1,0 +1,5 @@
+.tijd-invoer { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) 60px; gap: 8px; align-items: end; }
+.tijd-invoer label { display: flex; flex-direction: column; min-width: 0; gap: 4px; font-size: var(--base-readable-size); }
+.tijd-invoer input { width: 100%; min-width: 0; text-align: center; padding: 8px 4px; }
+.tijd-invoer > span { align-self: end; line-height: 60px; }
+.tijd-invoer > button { min-width: 60px; min-height: 60px; padding: 8px; }

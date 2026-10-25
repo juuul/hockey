@@ -5,6 +5,7 @@ import { pb, foutTekst } from '../server'
 import { berekenVerzamelen } from '../verzamelen'
 import type { ProgrammaItem } from '../types'
 import type { ReisInfo } from './VerzamelenInstellen'
+import { tijdWaarde } from '../tijdinvoer'
 
 export function useVerzameltijd({ item, zet }: { item: ProgrammaItem; zet: (velden: Partial<ProgrammaItem>) => void }) {
   const { actiefTeam } = useAccount()
@@ -53,7 +54,12 @@ export function useVerzameltijd({ item, zet }: { item: ProgrammaItem; zet: (veld
     return () => { actief = false }
   }, [actiefTeam?.id, info, item.clubId, tegenstander, item.thuis, zaal, item.datum, item.locatieAdres])
   const reis = schatting?.bestemming === bestemming && schatting?.vertrek === vertrek && schatting?.team === actiefTeam?.id ? schatting.minuten : null
-  const voorstel = info && reis != null ? berekenVerzamelen(item.datum, item.spelen, reis, info.effectief) : null
+  const voorstel = info && reis != null ? berekenVerzamelen(item.datum, tijdWaarde(item.spelen) || '', reis, info.effectief) : null
+  useEffect(() => {
+    if (item.verzamelModus === 'handmatig' || item.soort !== 'wedstrijd') return
+    const tijd = voorstel?.tijd || '', datum = voorstel?.datum || ''
+    if (item.verzamelen !== tijd || (item.verzamelDatum || '') !== datum) zet({ verzamelen: tijd, verzamelDatum: datum, verzamelModus: 'automatisch' })
+  }, [voorstel?.tijd, voorstel?.datum, item.verzamelen, item.verzamelDatum, item.verzamelModus, item.soort])
   useEffect(() => {
     setSchatting(null); setFout(''); setBezig(false)
     if (!actiefTeam || !info || !vertrek || !bestemming) return

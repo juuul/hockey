@@ -1,15 +1,9 @@
-import { useEffect } from 'react'
 import { navigatieLink } from '../verzamelen'
 import type { ProgrammaItem } from '../types'
-import { useVerzameltijd } from './useVerzameltijd'
+import type { useVerzameltijd } from './useVerzameltijd'
 
-export default function VerzameltijdBerekenen({ item, zet }: { item: ProgrammaItem; zet: (velden: Partial<ProgrammaItem>) => void }) {
-  const { bestemming, reis, voorstel, fout, bezig, actiefTeam } = useVerzameltijd({ item, zet })
-  useEffect(() => {
-    if (item.verzamelModus === 'handmatig') return
-    const tijd = voorstel?.tijd || '', datum = voorstel?.datum || ''
-    if (item.verzamelen !== tijd || (item.verzamelDatum || '') !== datum) zet({ verzamelen: tijd, verzamelDatum: datum, verzamelModus: 'automatisch' })
-  }, [voorstel?.tijd, voorstel?.datum, item.verzamelen, item.verzamelDatum, item.verzamelModus])
+export default function VerzameltijdBerekenen({ item, zet, berekening }: { item: ProgrammaItem; zet: (velden: Partial<ProgrammaItem>) => void; berekening: ReturnType<typeof useVerzameltijd> }) {
+  const { bestemming, reis, fout, bezig, actiefTeam } = berekening
   if (!actiefTeam) return null
   return <div>
     <label className="prog-veld">Wedstrijdadres<input className="modal-input" maxLength={300} value={item.locatieAdres || ''} placeholder={bestemming || 'Straat, huisnummer, postcode en plaats'} onChange={e => zet({ locatieAdres: e.target.value })} /></label>
