@@ -34,7 +34,7 @@ class PilotTest(unittest.TestCase):
         ident=self.p.begin(taak,bron,nu)
         self.p.resultaat(ident,taak,data={'clubs':[],'teams':[],'wedstrijden':[],'taakId':'niet-delen'},nu=nu+1)
 
-    def test_daily_0020_and_no_extra_match_or_evening_check(self):
+    def test_daily_0500_and_no_extra_match_or_evening_check(self):
         t=poule();taken=self.p.taken([t],tijd(uur='13:00'))
         self.assertEqual(taken[0]['slot'],'dag:2026-10-17')
         self.run_ok(taken[0],tijd(uur='13:00'))
@@ -43,17 +43,20 @@ class PilotTest(unittest.TestCase):
         self.assertEqual(self.p.taken([t],tijd()),[])
         self.assertEqual(self.p.taken([t],tijd(uur='21:00')),[])
         self.assertEqual(self.p.taken([t],tijd('2026-10-18','00:19')),[])
-        nacht=self.p.taken([t],tijd('2026-10-18','00:20'))[0]
+        self.assertEqual(self.p.taken([t],tijd('2026-10-18','00:20')),[])
+        self.assertEqual(self.p.taken([t],tijd('2026-10-18','04:59')),[])
+        nacht=self.p.taken([t],tijd('2026-10-18','05:00'))[0]
         self.assertEqual(nacht['slot'],'dag:2026-10-18')
-        self.run_ok(nacht,tijd('2026-10-18','00:20'))
+        self.run_ok(nacht,tijd('2026-10-18','05:00'))
         self.assertEqual(self.p.taken([t],tijd('2026-10-18','07:00')),[])
         t['wedstrijdVandaag']=True
         self.assertEqual(self.p.taken([t],tijd('2026-10-18','07:00')),[])
 
-    def test_new_poule_before_0020_counts_for_same_day(self):
+    def test_new_poule_before_0500_counts_for_same_day(self):
         t=poule();job=self.p.taken([t],tijd(uur='00:05'))[0]
         self.run_ok(job,tijd(uur='00:05'))
         self.assertEqual(self.p.taken([t],tijd(uur='00:20')),[])
+        self.assertEqual(self.p.taken([t],tijd(uur='05:00')),[])
         self.assertEqual(len(self.p.taken([poule('nieuw')],tijd(uur='14:00'))),1)
 
     def test_catchup_after_downtime_and_previous_slot_migration(self):
@@ -62,12 +65,13 @@ class PilotTest(unittest.TestCase):
         self.assertEqual(len(self.p.taken([t],tijd('2026-10-18','11:00'))),1)
 
     def test_winter_time_does_not_duplicate_day_check(self):
-        t=poule();self.run_ok({**t,'slot':'dag:2026-10-24'},tijd('2026-10-24','00:20'))
+        t=poule();self.run_ok({**t,'slot':'dag:2026-10-24'},tijd('2026-10-24','05:00'))
         self.assertEqual(self.p.taken([t],tijd('2026-10-25','00:19')),[])
-        job=self.p.taken([t],tijd('2026-10-25','00:20'))[0]
-        self.run_ok(job,tijd('2026-10-25','00:20'))
         repeated=datetime.fromisoformat('2026-10-25T02:30:00').replace(tzinfo=m.ZONE)
         for fold in [0,1]:self.assertEqual(self.p.taken([t],repeated.replace(fold=fold).timestamp()),[])
+        job=self.p.taken([t],tijd('2026-10-25','05:00'))[0]
+        self.run_ok(job,tijd('2026-10-25','05:00'))
+        self.assertEqual(self.p.taken([t],tijd('2026-10-25','06:00')),[])
 
     def test_cache_shared_no_private_task_id_and_no_age_extension(self):
         t={**poule(),'slot':'eerste'};now=tijd()
@@ -87,7 +91,8 @@ class PilotTest(unittest.TestCase):
         self.assertEqual(other.taken([poule()],tijd(uur='14:00')),[])
         nieuw=poule('nieuwe-poule')
         self.assertEqual(other.taken([poule(),nieuw],tijd(uur='14:00'))[0]['sleutel'],'nieuwe-poule')
-        self.assertTrue(other.taken([poule()],tijd('2026-10-18','00:20')))
+        self.assertEqual(other.taken([poule()],tijd('2026-10-18','04:59')),[])
+        self.assertTrue(other.taken([poule()],tijd('2026-10-18','05:00')))
 
     def test_global_gap_budget_and_cooldown(self):
         t={**poule(),'slot':'eerste'};now=tijd()

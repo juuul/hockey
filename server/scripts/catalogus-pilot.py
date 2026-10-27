@@ -60,14 +60,14 @@ class Pilot:
         for t in sorted(poules, key=lambda t: self.c.execute(
                 'SELECT coalesce(max(begonnen),0) FROM runs WHERE omgeving=? AND sleutel=?',
                 (self.omgeving,t['sleutel'])).fetchone()[0]):
-            eerder = self.c.execute('SELECT 1 FROM runs WHERE omgeving=? AND sleutel=? LIMIT 1',
-                                    (self.omgeving,t['sleutel'])).fetchone()
+            eerder = self.c.execute('SELECT 1 FROM runs WHERE sleutel=? LIMIT 1',
+                                    (t['sleutel'],)).fetchone()
             # Ook een eerdere eerste opname of een oud avond-/ochtendslot telt
             # mee: een roosterwijziging mag niet nog een dagcontrole veroorzaken.
             gedaan = self.c.execute('''SELECT 1 FROM runs WHERE omgeving=? AND sleutel=?
                 AND (slot=? OR (begonnen>=? AND begonnen<=?)) LIMIT 1''',
                 (self.omgeving,t['sleutel'],'dag:'+moment.date().isoformat(),middernacht,nu)).fetchone()
-            if gedaan or ((moment.hour,moment.minute)<(0,20) and eerder):
+            if gedaan or ((moment.hour,moment.minute)<(5,0) and eerder):
                 continue
             gedeeld = self.c.execute("SELECT 1 FROM runs WHERE sleutel=? AND bron='browser' AND begonnen>=? AND begonnen<=? LIMIT 1", (t['sleutel'],middernacht,nu)).fetchone()
             # Een andere omgeving heeft deze poule vandaag al geprobeerd.
