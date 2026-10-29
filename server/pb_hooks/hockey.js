@@ -26,6 +26,7 @@ function vindUitnodiging(app, token) {
     throw new NotFoundError("Uitnodiging niet gevonden of al gebruikt")
   }
   const leeftijd = Date.now() - new Date(inv.getDateTime("created").string().replace(" ", "T")).getTime()
+  require(`${__hooks}/teamtoegang.js`).controleer(app, inv.getString("team"), inv.getString("email"))
   if (leeftijd > GELDIG_DAGEN * 24 * 3600 * 1000) throw new BadRequestError("Deze uitnodiging is verlopen. Vraag een nieuwe aan.")
   return inv
 }
@@ -202,6 +203,14 @@ function vindTeamMetAanvraaglink(app, waarde) {
 
 // Een toegangsaanvraag toelaten (als kijker of beheerder) of afwijzen
 function beslisAanvraag(app, a, besluit, makerId) {
+  if (besluit === "blokkeren") {
+    const team = app.findRecordById("teams", a.getString("team"))
+    require(`${__hooks}/teamtoegang.js`).blokkeer(app, team, a.getString("email"), a.getString("naam"), makerId)
+    return "geblokkeerd"
+  }
+  if (besluit === "gezien" && a.getBool("automatisch") && a.getString("status") === "toegelaten") {
+    a.set("gezien", true); app.save(a); return "toegelaten"
+  }
   if (a.getString("status") !== "nieuw") throw new BadRequestError("Deze aanvraag is al behandeld")
   if (besluit === "kijker" || besluit === "beheerder") {
     const kind = a.getString("kindId")
@@ -225,7 +234,7 @@ function beslisAanvraag(app, a, besluit, makerId) {
 
 function aanvraagInfo(app, a) {
   const team = app.findRecordById("teams", a.getString("team"))
-  return { team: team.getString("naam"), naam: a.getString("naam"), email: a.getString("email"), kind: a.getString("kindNaam"), status: a.getString("status"), created: a.getString("created") }
+  return { team: team.getString("naam"), naam: a.getString("naam"), email: a.getString("email"), kind: a.getString("kindNaam"), status: a.getString("status"), automatisch: a.getBool("automatisch"), created: a.getString("created") }
 }
 
 function vindAanmelding(app, token) {
@@ -316,27 +325,8 @@ function ruimUitnodigingenOp(app) {
 
 module.exports = { mailInstellen, mailInGeheugen, telMail, ruimUitnodigingenOp, beslisAanmelding, ROL_VELD, TOEGESTAAN, vindUitnodiging, stuurUitnodiging, escape, mail, nodigUit, vindAanmelding, beheerderEmails, vindTeamMetAanvraaglink, beslisAanvraag, aanvraagInfo }
 
-// Publieke aanvraag geeft nooit meteen toegang en bevat geen spelerslijst.
+// Aansluiten verstuurt direct een persoonlijke uitnodiging; e-mailbezit blijft vereist.
 function maakAanvraag(app, team, b) {
-  const naam = String(b.naam || "").trim().slice(0, 60)
-  const email = String(b.email || "").trim().toLowerCase().slice(0, 200)
-  const terug = String(b.terug || "")
-  if (!naam) throw new BadRequestError("Vul je naam in")
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new BadRequestError("Vul een geldig e-mailadres in")
-  if (!TOEGESTAAN.includes(terug)) throw new BadRequestError("Onbekend terugadres")
-  try {
-    app.findFirstRecordByFilter("toegangsaanvragen", "team = {:t} && email = {:e} && status = 'nieuw'", { t: team.id, e: email })
-    return { ok: true }
-  } catch (_) {}
-  const a = new Record(app.findCollectionByNameOrId("toegangsaanvragen"))
-  a.set("team", team.id); a.set("naam", naam); a.set("email", email)
-  a.set("kindNaam", String(b.kindNaam || "").trim().slice(0, 60))
-  a.set("terug", terug); a.set("token", $security.randomString(40)); a.set("status", "nieuw")
-  app.save(a)
-  try {
-    mail(app, beheerderEmails(app, team), "Toegang gevraagd tot " + team.getString("naam"),
-      "<p>" + escape(naam) + " vraagt toegang tot " + escape(team.getString("naam")) + ".</p><p>Behandel deze aanvraag in de app bij Instellingen → Aanvragen.</p>")
-  } catch (_) { /* De aanvraag staat veilig in de app; mail is alleen een herinnering. */ }
-  return { ok: true }
+  return require(`${__hooks}/teamtoegang.js`).aanmelden(app, team, b)
 }
 module.exports.maakAanvraag = maakAanvraag

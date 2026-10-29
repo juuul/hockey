@@ -220,7 +220,7 @@ export default function TeamAanmelden({ startKeuze = 'bestaand', stap, naarStap 
     try {
       if (keuze === 'bestaand') {
         await pb.send(`/api/hockey/catalogus/omgeving/${omgeving}/aanvraag`, { method: 'POST', body: { naam: gebruiker?.name || naam, email: gebruiker?.email || email, terug: appAdres() } })
-        setMelding('Aanvraag verstuurd. Na goedkeuring ontvang je een e-mail.')
+        setMelding('Je ontvangt direct een uitnodiging per e-mail. Open de link om aan te sluiten.')
       } else if (gebruiker) {
         const r = await pb.send<{ id: string }>('/api/hockey/catalogus/omgeving', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam } })
         await teamsLaden(); kiesTeam(r.id)
@@ -260,7 +260,7 @@ export default function TeamAanmelden({ startKeuze = 'bestaand', stap, naarStap 
       {keuze === 'nieuw' && <label className="account-label">Groepsnaam (openbaar, optioneel)
         <input className="modal-input" placeholder="Bijvoorbeeld begeleiding" maxLength={40} value={omgevingNaam} onChange={e => setOmgevingNaam(e.target.value)} />
       </label>}
-      {(keuze === 'nieuw' || !!omgevingen.length) && <p className="account-uitleg">{keuze === 'bestaand' ? 'Na goedkeuring krijg je toegang.' : 'Je wordt beheerder van deze groep.'}</p>}
+      {(keuze === 'nieuw' || !!omgevingen.length) && <p className="account-uitleg">{keuze === 'bestaand' ? 'Je ontvangt direct een uitnodiging per e-mail.' : 'Je wordt beheerder van deze groep.'}</p>}
       {!gebruiker && (keuze === 'nieuw' || !!omgevingen.length) && <>
         <label className="account-label">Je naam<input className="modal-input" autoComplete="name" required maxLength={60} value={naam} onChange={e => setNaam(e.target.value)} /></label>
         <label className="account-label">E-mail<input className="modal-input" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} /></label>

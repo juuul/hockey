@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { TeamAanmelding, useAccount } from '../context/AccountContext'
+import { TeamAanmelding, ToegangAanvraag, useAccount } from '../context/AccountContext'
 import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
 import { useTerug } from '../terug'
 import DeelKijklink from '../components/DeelKijklink'
 import ResetModal from '../components/ResetModal'
+import { NieuweLeden, GeblokkeerdeLeden } from '../components/ToegangBeheer'
 import { leesThema, Thema, zetThema } from '../thema'
 import PlanningDocumenten from '../components/PlanningDocumenten'
 import VerzamelenInstellen from '../components/VerzamelenInstellen'
@@ -352,9 +353,6 @@ function AanvragenKaart() {
       setBezig(false)
     }
   }
-  const beslisToegang = (id: string, besluit: 'kijker' | 'af', wie: string) =>
-    doe(() => pb.send(`/api/hockey/toegang-id/${id}`, { method: 'POST', body: { besluit } }).then(() => tel(`toegang-${besluit}`)),
-      besluit === 'af' ? `Aanvraag van ${wie} afgewezen.` : `${wie} is toegelaten en krijgt een mail om een wachtwoord te kiezen.`)
   const beslisTeam = (a: TeamAanmelding, besluit: 'goed' | 'af') => {
     const teamnaam = (teamnamen[a.id] ?? a.teamnaam).trim() || a.teamnaam
     return doe(() => pb.send(`/api/hockey/aanmelding-id/${a.id}`, { method: 'POST', body: { besluit, teamnaam } }).then(() => tel(besluit === 'goed' ? 'aanmelding-goedgekeurd' : 'aanmelding-afgewezen')),
@@ -364,17 +362,7 @@ function AanvragenKaart() {
   return (
     <Kaart titel={`Aanvragen (${toegang.length + teams.length})`}>
       <div className="account-lijst">
-        {toegang.map(a => (
-          <div key={a.id} className="account-aanvraag">
-            <span className="account-regel-naam">{a.naam}</span>
-            <span className="account-regel-sub">wil meekijken bij {a.expand?.team?.naam ?? 'het team'}{a.kindNaam ? ` · ouder van ${a.kindNaam}` : ''}</span>
-            <span className="account-regel-sub">{a.email}</span>
-            <div className="account-aanvraag-knoppen">
-              <button className="btn btn-primary" disabled={bezig} onClick={() => beslisToegang(a.id, 'kijker', a.naam)}>Toelaten</button>
-              <button className="btn btn-gevaar" disabled={bezig} onClick={() => beslisToegang(a.id, 'af', a.naam)}>Afwijzen</button>
-            </div>
-          </div>
-        ))}
+        <NieuweLeden aanvragen={toegang} ververs={async () => { await Promise.all([aanvragenLaden(), teamsLaden()]) }} />
         {teams.map(a => (
           <div key={a.id} className="account-aanvraag">
             <span className="account-regel-sub">Nieuw team</span>
@@ -388,7 +376,7 @@ function AanvragenKaart() {
           </div>
         ))}
       </div>
-      {toegang.length > 0 && <p className="account-uitleg">Toelaten = als kijker. Beheerder maken kan daarna bij Leden.</p>}
+      {toegang.length > 0 && <p className="account-uitleg">Nieuwe ouders krijgen direct een uitnodiging als kijker. Blokkeren kan hier of bij Leden.</p>}
       <Melding tekst={melding?.tekst ?? null} fout={melding?.fout} />
     </Kaart>
   )
@@ -417,18 +405,20 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
   useEffect(() => { uitnodigingenLaden().catch(() => {}) }, [id])
 
   // Open toegangsaanvragen van ouders (via de aanmeldlink)
-  const [aanvragen, setAanvragen] = useState<{ id: string; naam: string; email: string; kindNaam: string }[]>([])
-  const ververs = () => aanvragenLaden().catch(() => {})
+  const [aanvragen, setAanvragen] = useState<ToegangAanvraag[]>([])
   const lijstLaden = () =>
-    pb.collection('toegangsaanvragen').getFullList<{ id: string; naam: string; email: string; kindNaam: string }>({ filter: pb.filter("team = {:id} && status = 'nieuw'", { id }), sort: 'created' }).then(setAanvragen)
+    pb.collection('toegangsaanvragen').getFullList<ToegangAanvraag>({ filter: pb.filter("team = {:id} && (status = 'nieuw' || (status = 'toegelaten' && automatisch = true && gezien = false))", { id }), sort: 'created' }).then(setAanvragen)
   useEffect(() => { lijstLaden().catch(() => {}) }, [id])
-  const beslis = (aanvraagId: string, besluit: 'kijker' | 'beheerder' | 'af', wie: string) => doe(async () => {
-    await pb.send(`/api/hockey/toegang-id/${aanvraagId}`, { method: 'POST', body: { besluit } })
-    tel(`toegang-${besluit}`)
-    await lijstLaden()
-    await uitnodigingenLaden()
-    await ververs()
-  }, besluit === 'af' ? `Aanvraag van ${wie} afgewezen.` : `${wie} is toegelaten en krijgt een mail om een wachtwoord te kiezen.`)
+  const [blokVersie, setBlokVersie] = useState(0)
+  const verversLeden = async () => {
+    await Promise.all([lijstLaden(), uitnodigingenLaden(), teamsLaden(), aanvragenLaden()])
+    setBlokVersie(v => v + 1)
+  }
+  const blokkeer = (email: string, naam: string) => doe(async () => {
+    await pb.send(`/api/hockey/teamtoegang/${id}`, { method: 'POST', body: { actie: 'blokkeren', email, naam } })
+    await verversLeden()
+    setLid(null)
+  })
 
   if (!team) return <p className="account-uitleg">Team niet gevonden.</p>
 
@@ -505,6 +495,11 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
                 </span>
                 <button
                   className="account-weg"
+                  disabled={bezig}
+                  onClick={() => blokkeer(u.email, '')}
+                >Blokkeren</button>
+                <button
+                  className="account-weg"
                   aria-label={`Uitnodiging voor ${u.email} intrekken`}
                   onClick={() => setIntrekVraag(u)}
                 >
@@ -520,20 +515,13 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
         <>
           <h2 className="section-title">Aanvragen</h2>
           <div className="account-lijst">
-            {aanvragen.map(a => (
-              <div key={a.id} className="account-aanvraag">
-                <span className="account-regel-naam">{a.naam}</span>
-                <span className="account-regel-sub">ouder van {a.kindNaam} · {a.email}</span>
-                <div className="account-aanvraag-knoppen">
-                  <button className="btn btn-primary" disabled={bezig} onClick={() => beslis(a.id, 'kijker', a.naam)}>Toelaten</button>
-                  <button className="btn btn-gevaar" disabled={bezig} onClick={() => beslis(a.id, 'af', a.naam)}>Afwijzen</button>
-                </div>
-              </div>
-            ))}
+            <NieuweLeden aanvragen={aanvragen} ververs={verversLeden} />
           </div>
-          <p className="account-uitleg">Toelaten = als kijker. Maak iemand daarna bij Leden beheerder als dat nodig is.</p>
+          <p className="account-uitleg">Nieuwe ouders krijgen direct een uitnodiging als kijker.</p>
         </>
       )}
+
+      <GeblokkeerdeLeden team={id} ververs={verversLeden} versie={blokVersie} />
 
       <h2 className="section-title">Iemand uitnodigen</h2>
       <form className="account-form" onSubmit={e => { e.preventDefault(); nodigUit() }}>
@@ -565,7 +553,7 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
             </div>
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setLid(null)}>Annuleren</button>
-              <button className="btn btn-gevaar" disabled={bezig} onClick={() => { setEruitVraag(lid); setLid(null) }}>Uit team</button>
+              <button className="btn btn-gevaar" disabled={bezig} onClick={() => { setEruitVraag(lid); setLid(null) }}>Blokkeren</button>
             </div>
           </div>
         </div>
@@ -573,17 +561,17 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
 
       {eruitVraag && (
         <ResetModal
-          titel={eruitVraag.gast ? 'Meekijklink uitzetten?' : `${eruitVraag.name || eruitVraag.email} uit het team halen?`}
+          titel={eruitVraag.gast ? 'Meekijklink uitzetten?' : `${eruitVraag.name || eruitVraag.email} blokkeren?`}
           regels={eruitVraag.gast ? [
             { icoon: '🔗', tekst: `Wie de meekijklink heeft, kan ${team.naam} niet meer zien` },
             { icoon: '↩', tekst: 'Een nieuwe meekijklink maken kan altijd weer' },
           ] : [
             { icoon: '👤', tekst: `${eruitVraag.name || eruitVraag.email} kan ${team.naam} niet meer zien of bijhouden` },
-            { icoon: '↩', tekst: 'Terugzetten kan alleen met een nieuwe uitnodiging' },
+            { icoon: '↩', tekst: 'Je kunt dit herstellen bij Geblokkeerd' },
           ]}
-          bevestig={eruitVraag.gast ? 'Ja, link uitzetten' : 'Ja, uit het team'}
+          bevestig={eruitVraag.gast ? 'Ja, link uitzetten' : 'Blokkeren'}
           gevaar
-          onConfirm={() => { zetRol(eruitVraag.id, null); setEruitVraag(null) }}
+          onConfirm={() => { blokkeer(eruitVraag.email, eruitVraag.name); setEruitVraag(null) }}
           onCancel={() => setEruitVraag(null)}
         />
       )}
@@ -855,7 +843,7 @@ function AanmeldingBeoordelen({ token }: { token: string }) {
 // Geopend via een meekijklink (#kijk=<team>.<token>)
 function MeekijkenStart({ annuleer }: { waarde: string; klaar: () => void; annuleer: () => void }) {
   return <>
-    <p className="account-uitleg">Deze oude meekijklink geeft geen toegang meer. Vraag de beheerder om een aanmeldlink; na goedkeuring kun je met je eigen account meekijken.</p>
+    <p className="account-uitleg">Deze oude meekijklink geeft geen toegang meer. Vraag de beheerder om een teamlink en meld je aan met je eigen e-mailadres.</p>
     <button className="btn btn-secondary" onClick={annuleer}>Terug</button>
   </>
 }
@@ -903,7 +891,7 @@ function ToegangAanvragen({ waarde }: { waarde: string }) {
     return () => { actief = false }
   }, [url])
   if (!form) return fout ? <Melding tekst={fout} fout /> : <p className="account-uitleg">Even laden…</p>
-  if (verstuurd) return <p className="account-melding">Je aanvraag staat bij de beheerder van {form.team}. Na goedkeuring ontvang je een uitnodiging op {email.trim()}.</p>
+  if (verstuurd) return <p className="account-melding">Je aanvraag staat bij de beheerder van {form.team}. Je ontvangt direct een uitnodiging op {email.trim()}.</p>
   return <form className="account-form" onSubmit={async e => {
     e.preventDefault(); setBezig(true); setFout(null)
     try {
@@ -917,11 +905,11 @@ function ToegangAanvragen({ waarde }: { waarde: string }) {
     <label className="account-label">Je naam<input className="modal-input" required autoComplete="name" value={naam} onChange={e => setNaam(e.target.value)} /></label>
     <label className="account-label">E-mail<input className="modal-input" required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} /></label>
     <Melding tekst={fout} fout />
-    <button className="btn btn-primary" type="submit" disabled={bezig || !naam.trim() || !email.includes('@')}>Toegang aanvragen</button>
+    <button className="btn btn-primary" type="submit" disabled={bezig || !naam.trim() || !email.includes('@')}>Aansluiten</button>
   </form>
 }
 
-interface AanvraagInfo { team: string; naam: string; email: string; kind: string; status: 'nieuw' | 'toegelaten' | 'afgewezen' }
+interface AanvraagInfo { team: string; naam: string; email: string; kind: string; automatisch?: boolean; status: 'nieuw' | 'toegelaten' | 'afgewezen' | 'geblokkeerd' }
 
 // Beheerder opent de link uit de mail (#toegang=<token>)
 function ToegangBeoordelen({ token }: { token: string }) {
@@ -934,7 +922,7 @@ function ToegangBeoordelen({ token }: { token: string }) {
     pb.send<AanvraagInfo>(url, {}).then(setInfo).catch(err => setFout(foutTekst(err)))
   }, [url])
 
-  const beslis = async (besluit: 'kijker' | 'beheerder' | 'af') => {
+  const beslis = async (besluit: 'kijker' | 'beheerder' | 'af' | 'gezien' | 'blokkeren') => {
     setBezig(true)
     setFout(null)
     try {
@@ -963,9 +951,14 @@ function ToegangBeoordelen({ token }: { token: string }) {
           <button className="btn btn-gevaar" disabled={bezig} onClick={() => beslis('af')}>Afwijzen</button>
           <p className="account-uitleg">Kijker: ziet alles live, kan niets wijzigen. Beheerder: mag alles bijhouden en regelen.</p>
         </>
-      ) : (
+      ) : info.automatisch && info.status === 'toegelaten' ? <>
+        <p className="account-uitleg">De persoonlijke uitnodiging is verstuurd.</p>
+        <Melding tekst={fout} fout />
+        <button className="btn btn-primary" disabled={bezig} onClick={() => beslis('gezien')}>Bekeken</button>
+        <button className="btn btn-gevaar" disabled={bezig} onClick={() => beslis('blokkeren')}>Blokkeren</button>
+      </> : (
         <p className={`account-melding ${info.status === 'afgewezen' ? 'fout' : ''}`}>
-          {info.status === 'toegelaten' ? `${info.naam} is toegelaten en krijgt een mail om een wachtwoord te kiezen.` : 'Deze aanvraag is afgewezen.'}
+          {info.status === 'toegelaten' ? `${info.naam} is toegelaten en krijgt een mail om een wachtwoord te kiezen.` : info.status === 'geblokkeerd' ? 'Deze persoon is geblokkeerd. Deblokkeren kan bij Leden.' : 'Deze aanvraag is afgewezen.'}
         </p>
       )}
     </div>

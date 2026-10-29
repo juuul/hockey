@@ -25,7 +25,7 @@ interface AccountContextType {
 }
 
 // Wat een beheerder (toegang tot een team) of superadmin (nieuw team) nog moet goedkeuren
-export interface ToegangAanvraag { id: string; naam: string; email: string; kindNaam: string; team: string; expand?: { team?: { naam: string } } }
+export interface ToegangAanvraag { id: string; naam: string; email: string; kindNaam: string; team: string; automatisch?: boolean; gezien?: boolean; expand?: { team?: { naam: string } } }
 export interface TeamAanmelding { id: string; teamnaam: string; naam: string; email: string; bericht: string }
 export interface OpenAanvragen { toegang: ToegangAanvraag[]; teams: TeamAanmelding[] }
 const GEEN_AANVRAGEN: OpenAanvragen = { toegang: [], teams: [] }
@@ -168,7 +168,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     const wie = pb.authStore.record as Gebruiker | null
     if (!pb.authStore.isValid || !wie || wie.gast) return setAanvragen(GEEN_AANVRAGEN)
     const [toegang, teams] = await Promise.all([
-      pb.collection('toegangsaanvragen').getFullList<ToegangAanvraag>({ filter: "status = 'nieuw'", sort: 'created', expand: 'team' }),
+      pb.collection('toegangsaanvragen').getFullList<ToegangAanvraag>({ filter: "status = 'nieuw' || (status = 'toegelaten' && automatisch = true && gezien = false)", sort: 'created', expand: 'team' }),
       wie.superadmin || wie.teamaanmeldingen ? pb.collection('aanmeldingen').getFullList<TeamAanmelding>({ filter: "status = 'nieuw'", sort: 'created' }) : Promise.resolve([]),
     ])
     setAanvragen({ toegang, teams })
