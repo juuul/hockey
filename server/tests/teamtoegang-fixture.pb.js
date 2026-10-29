@@ -40,3 +40,14 @@ $app.rootCmd.addCommand(new Command({ use: "test-teamtoegang-voorbeeld", run: (c
   })
   console.log("TEAMTOEGANG_VOORBEELD_OK: één nieuw lid en één geblokkeerde ouder")
 } }))
+
+$app.rootCmd.addCommand(new Command({ use: "test-emailprivacy-fixture", run: () => {
+  if ($os.getenv("HOCKEY_ENV") !== "test" || $app.countRecords("teams") !== 2 || $app.countRecords("users") !== 2) throw new Error("Alleen de verse geïsoleerde teamtoegang-fixture")
+  const t = $app.findRecordById("teams", "toegangteam0001")
+  if (t.getString("naam") !== "Demo toegangteam0001") throw new Error("Geen QA-team")
+  const u = new Record($app.findCollectionByNameOrId("users"))
+  u.id = "privacykijker01"; u.setEmail("kijker@example.invalid"); u.setPassword("Fictief-Toegang-Test-123!")
+  u.setVerified(true); u.set("emailVisibility", true); u.set("name", "Demo kijker"); $app.save(u)
+  t.set("kijkers", [u.id]); $app.save(t)
+  console.log("EMAILPRIVACY_FIXTURE_OK")
+} }))
