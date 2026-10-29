@@ -16,7 +16,6 @@ function aanmelden(app, team, b) {
   if (!naam) throw new BadRequestError("Vul je naam in")
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) throw new BadRequestError("Vul een geldig e-mailadres in")
   if (!h.TOEGESTAAN.includes(String(b.terug || ""))) throw new BadRequestError("Onbekend terugadres")
-  let nieuw = false
   app.runInTransaction(tx => {
     controleer(tx, team.id, email)
     let user
@@ -33,14 +32,7 @@ function aanmelden(app, team, b) {
     a.set("status", "toegelaten"); a.set("automatisch", true); a.set("gezien", false)
     tx.save(a)
     h.nodigUit(tx, team.id, email, "kijker", b.terug, "", naam, [])
-    nieuw = true
   })
-  if (nieuw) {
-    try {
-      h.mail(app, h.beheerderEmails(app, team), "Nieuw lid bij " + team.getString("naam"),
-        "<p>" + h.escape(naam) + " (" + h.escape(email) + ") heeft zich aangemeld bij " + h.escape(team.getString("naam")) + ". De uitnodiging is direct verstuurd.</p><p>Bekijk de melding in de app bij Instellingen → Aanvragen. Daar kun je deze persoon blokkeren. Geblokkeerde personen staan bij Leden.</p>")
-    } catch (_) { /* De ongelezen melding blijft in de app staan. */ }
-  }
   return { ok: true }
 }
 function blokkeer(app, team, email, naam, maker) {

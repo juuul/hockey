@@ -141,6 +141,7 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
   let inv = h.vindUitnodiging(e.app, e.request.pathValue("token"))
   const email = inv.getString("email")
   let bestaat = true
+  let nieuwLid = null
 
   e.app.runInTransaction((tx) => {
     inv = tx.findRecordById("uitnodigingen", inv.id)
@@ -174,6 +175,7 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
       tx.save(user)
     }
     const team = tx.findRecordById("teams", inv.getString("team"))
+    const wasLid = [...team.getStringSlice("beheerders"), ...team.getStringSlice("kijkers")].includes(user.id)
     for (const veld of Object.values(h.ROL_VELD)) {
       team.set(veld, team.getStringSlice(veld).filter((id) => id !== user.id))
     }
@@ -182,8 +184,19 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
     if (!team.getStringSlice("beheerders").length && team.original().getStringSlice("beheerders").length) throw new BadRequestError("De laatste beheerder kan geen kijker worden; wijs eerst een andere beheerder aan")
     tx.save(team)
     tx.delete(inv)
+    if (!wasLid) nieuwLid = { team: team.id, naam: user.getString("name") || inv.getString("naam") || email }
   })
 
+  // Pas na de geslaagde transactie: de ontvanger heeft de mail bevestigd en is echt lid.
+  // Een opnieuw gebruikte link of een rolwijziging van een bestaand lid geeft geen tweede melding.
+  if (nieuwLid) {
+    try {
+      const team = e.app.findRecordById("teams", nieuwLid.team)
+      const aan = h.beheerderEmails(e.app, team).filter(adres => adres.toLowerCase() !== email.toLowerCase())
+      if (aan.length) h.mail(e.app, aan, "Nieuw lid bij " + team.getString("naam"),
+        "<p>" + h.escape(nieuwLid.naam) + " (" + h.escape(email) + ") heeft de uitnodiging geaccepteerd en is nu lid van " + h.escape(team.getString("naam")) + ".</p><p>Bekijk de leden in de app bij Instellingen → Leden. Daar kun je deze persoon blokkeren en geblokkeerde leden weer deblokkeren.</p>")
+    } catch (_) { e.app.logger().error("Beheerdersmail na geaccepteerde uitnodiging kon niet worden verstuurd") }
+  }
   return e.json(200, { email, bestaat })
 })
 
