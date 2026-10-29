@@ -251,8 +251,8 @@ routerAdd("POST", "/api/hockey/aanmelding", (e) => {
     throw new BadRequestError("De aanmelding kon niet worden gemaild. Probeer het later nog eens.")
   }
   try {
-    if (superadmins.length) h.mail(e.app, superadmins, "Nieuw team: " + teamnaam,
-      "<p>Er is een nieuw team aangemaakt in de Hockey Wissel-app. De aanvrager heeft een uitnodiging als beheerder gekregen.</p>" +
+    if (superadmins.length) h.mail(e.app, superadmins, "Nieuw team aangemaakt: " + teamnaam,
+      "<p>Er is een nieuwe teamomgeving aangemaakt in de Hockey Wissel-app. De uitnodiging als beheerder is verstuurd. De aanvrager krijgt pas toegang na het accepteren van die uitnodiging.</p>" +
       "<p><strong>Team:</strong> " + h.escape(teamnaam) + "<br><strong>Naam:</strong> " + h.escape(naam || "-") +
       "<br><strong>E-mail:</strong> " + h.escape(email) + "</p>" +
       (bericht ? "<p><strong>Bericht:</strong><br>" + h.escape(bericht).replace(/\n/g, "<br>") + "</p>" : ""))

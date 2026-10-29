@@ -83,10 +83,10 @@ def controleer(c, register, basis, ophalen=download):
             c.execute('update documenten set laatste=?,gecontroleerd=?,fout=null where id=?',(sha,nu(),d['id']))
             if status == 'beoordelen':
                 melding(c, d['id']+':'+sha, 'Nieuwe planningsdocumentversie gevonden: '+d['naam'],
-                    '<p>Een planningsbestand is gewijzigd. De bestaande planning is nog actief. Of datums inhoudelijk veranderd zijn, moet nog worden beoordeeld.</p>'
+                    '<p>Er is een nog niet goedgekeurde versie van een planningsdocument gevonden. De inhoud en eventuele datumwijzigingen moeten nog worden beoordeeld. De bestaande planning blijft behouden.</p>'
                     +'<p>'+html.escape(d['naam'])+' · '+html.escape(d['seizoen'])+'</p><p><a href="'+html.escape(d['url'],quote=True)+'">Open brondocument</a></p>'
                     +'<p>Vraag in de GPT-app: “Bekijk de nieuwe planningversie '+html.escape(d['id'])+' met SHA256 '+sha+', vergelijk met de vorige versie en zet de wijzigingen klaar.”</p>'
-                    +'<p>De PDF is op de server bewaard. Pas na jouw goedkeuring worden de centrale planning en teams bijgewerkt.</p>')
+                    +'<p>De PDF is op de server bewaard. Pas na jouw goedkeuring wordt deze versie als kalenderbron verwerkt.</p>')
         except (OSError, ValueError) as exc:
             c.execute('update documenten set gecontroleerd=?,fout=? where id=?',(nu(),type(exc).__name__,d['id']))
         c.commit()

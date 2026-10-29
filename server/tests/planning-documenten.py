@@ -17,6 +17,10 @@ class PlanningTest(unittest.TestCase):
    self.assertEqual(c.execute('select count(*) from meldingen').fetchone()[0],0)
    m.controleer(c,registry,root,lambda u:new);m.controleer(c,registry,root,lambda u:new)
    self.assertEqual(c.execute('select count(*) from meldingen').fetchone()[0],1)
+   mail=c.execute('select html from meldingen').fetchone()[0]
+   self.assertIn('nog niet goedgekeurde versie',mail)
+   self.assertIn('inhoud en eventuele datumwijzigingen moeten nog worden beoordeeld',mail)
+   self.assertIn('na jouw goedkeuring wordt deze versie als kalenderbron verwerkt',mail)
    self.assertEqual(c.execute('select geaccepteerd from documenten').fetchone()[0],hashlib.sha256(old).hexdigest())
    self.assertEqual(c.execute('select count(*) from versies').fetchone()[0],2)
    def fail(*args):raise OSError('fixture')
