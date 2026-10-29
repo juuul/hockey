@@ -49,6 +49,9 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Speelduur** per spelvorm in `src/speelduur.ts` (KNHB); klok stopt vanzelf aan het eind.
 - **Speeltijd per speler** (`src/speeltijd.ts`): per linie (aanval/middenveld/verdediging/keeper) plus wissel als eigen groep, gemeten op de wedstrijdklok; wie niet meedoet telt niet. Getoond op de wisseltegels (min), per wedstrijd en per seizoen in Historie.
 
+### Mailinhoud
+- Processtap, ontvanger en vervolgactie per mail staan in `docs/mailprocessen.md`. Uitnodiging/reminder: accepteren bevestigt e-mailbezit en geeft toegang; zeven dagen gerekend vanaf oorspronkelijke verzending. Geen onvoorwaardelijke teamverwijdering beloven. Nieuw team aangemaakt betekent uitnodiging verstuurd, niet account geactiveerd. Nieuw-lidmail pas na acceptatie. PDF-versie eerst beoordelen; evaluatiemail en kopieeropdracht gebruiken dezelfde werkelijke meetperiode. Standaard verificatie-/e-mailwijzigingsmails worden niet door de app gebruikt; OTP/inlogmeldingen staan uit.
+
 ### Vaste keuzes van de gebruiker
 - **Wedstrijdbronnen**: gebruik hockey.nl/KNHB Match Center en de gegevens die die pagina zelf ophaalt. De SCHC-website nooit bezoeken of gebruiken zonder afzonderlijke expliciete toestemming, ook niet als terugval bij een bronstoring. Voor MO11-1 is de opgegeven programmalink `https://www.hockey.nl/match-center#/team/46179|183769/program`.
 - Geen meldingen (toasts) na een bevestiging; bevestigingsvragen alleen bij resets, timer-stop, iemand uit het team halen en een uitnodiging intrekken.

@@ -45,11 +45,12 @@ function stuurUitnodiging(app, inv, herinnering) {
     to: [{ address: inv.getString("email") }],
     subject: (herinnering ? "Herinnering: uitnodiging voor " : "Uitnodiging voor ") + team.getString("naam") + " in de Hockey Wissel-app",
     html:
-      "<p>Hallo,</p>" +
-      (herinnering ? "<p>Je hebt je uitnodiging nog niet aangenomen.</p>" : "") +
+      "<p>Hallo" + (inv.getString("naam") ? " " + escape(inv.getString("naam")) : "") + ",</p>" +
+      (herinnering ? "<p>Deze uitnodiging is nog niet geaccepteerd.</p>" : "") +
       "<p>Je bent uitgenodigd voor <strong>" + escape(team.getString("naam")) + "</strong> als " + escape(rolTekst) + ".</p>" +
-      "<p><a href=\"" + escape(link) + "\">Uitnodiging openen</a></p>" +
-      (herinnering ? "<p>De link werkt nog een paar dagen; daarna vervalt de uitnodiging" + (inv.getString("rol") === "beheerder" ? " en wordt een nieuw, leeg team verwijderd" : "") + ".</p>" : "<p>De link is " + GELDIG_DAGEN + " dagen geldig.</p>"),
+      "<p>Open de link en accepteer de uitnodiging om je e-mailadres te bevestigen en aan te sluiten. Heb je nog geen account? Dan kies je daar een wachtwoord.</p>" +
+      "<p><a href=\"" + escape(link) + "\">Uitnodiging accepteren</a></p>" +
+      "<p>De link is " + GELDIG_DAGEN + " dagen na de oorspronkelijke verzending geldig. Werkt de link niet meer? Vraag om een nieuwe uitnodiging.</p>",
   })
   app.newMailClient().send(msg)
 }

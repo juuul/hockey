@@ -171,5 +171,16 @@ class PilotTest(unittest.TestCase):
         self.assertIn('Meetperiode:',prompt);self.assertIn('Geen pilotmetingen',prompt)
         self.assertIn('geen SCHC-site zonder mijn expliciete toestemming',prompt)
 
+    def test_delayed_evaluation_uses_same_actual_period_in_mail_and_prompt(self):
+        basis=self.root/'productie';basis.mkdir()
+        conf={'id':'vertraagd','vanaf':'2026-10-17T13:00:00+02:00','op':'2026-10-24T20:00:00+02:00'}
+        (basis/'catalogus-evaluatie.json').write_text(json.dumps(conf))
+        meld=n.Meldingen(basis/'mails.db','productie');self.addCleanup(meld.c.close)
+        nu=datetime.fromisoformat(conf['op']).timestamp()+3600
+        m.plan_evaluatie(meld,basis,self.pad,nu=nu)
+        inhoud=meld.c.execute('SELECT html FROM mails').fetchone()[0]
+        einde=datetime.fromtimestamp(nu,m.ZONE).isoformat()
+        self.assertEqual(inhoud.count('tot '+einde),2, 'Mail en kopieerbare opdracht moeten dezelfde gemeten periode benoemen')
+
 
 if __name__=='__main__':unittest.main()

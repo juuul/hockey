@@ -179,10 +179,11 @@ def plan_evaluatie(meldingen, basis, pilot_pad, nu=None, bron_pad=None):
               'Onderzoek geslaagde controles, fouten, wachttijden en bronwijzigingen. Adviseer of een kleine uitbreiding verantwoord is. '
               'Gebruik alleen hockey.nl/KNHB; geen SCHC-site zonder mijn expliciete toestemming. '
               'Wijzig de omvang of zet code niet live zonder mijn goedkeuring.')
+    tot = datetime.fromtimestamp(nu,ZONE).isoformat()
     inhoud = ('<p>De afgesproken evaluatie na een week. Er wordt niets automatisch uitgebreid.</p>'
-              + '<p>Meetperiode: '+html.escape(data['vanaf'])+' tot '+html.escape(datetime.fromtimestamp(nu,ZONE).isoformat())+'</p>'
+              + '<p>Meetperiode: '+html.escape(data['vanaf'])+' tot '+html.escape(tot)+'</p>'
               + rapport + '<h3>Kopieer deze opdracht naar de chat</h3><pre style="white-space:pre-wrap">'
-              + html.escape(prompt+'\n\nMeetperiode: '+data['vanaf']+' tot '+datum.isoformat()+'\n'+html.unescape(re.sub('<[^>]+>', '\n', rapport)))+'</pre>')
+              + html.escape(prompt+'\n\nMeetperiode: '+data['vanaf']+' tot '+tot+'\n'+html.unescape(re.sub('<[^>]+>', '\n', rapport)))+'</pre>')
     with c:
         meldingen.voeg_toe('Evaluatie hockey-app · geregistreerde poules uitbreiden?', inhoud)
         c.execute('INSERT INTO evaluaties VALUES(?,?)',(data['id'],nu))
