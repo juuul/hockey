@@ -6,18 +6,18 @@ import ResetModal from './ResetModal'
 import './DeelKijklink.css'
 
 // Delen van een link van het actieve team:
-// - 'kijk': teamlink (beheerders en kijkers), toegang blijft afhankelijk van goedkeuring
+// - 'kijk': teamlink (beheerders en kijkers), aansluiten via een persoonlijke uitnodiging
 // - 'aanvraag': aanmeldlink voor ouders (alleen beheerders), ouders vragen toegang aan
 const TEKSTEN = {
   kijk: {
     knop: '🔗 Teamlink delen',
-    uitleg: 'Via deze link vraag je toegang aan. De beheerder keurt de aanvraag goed voordat je kunt meekijken.',
+    uitleg: 'Via deze link ontvang je direct een uitnodiging per e-mail. Nieuwe ouders verschijnen bij Aanvragen.',
     vraag: 'Nieuwe teamlink?',
-    regels: [{ icoon: '🔗', tekst: 'De oude link werkt dan niet meer' }, { icoon: '👀', tekst: 'Goedgekeurde leden behouden hun toegang' }],
+    regels: [{ icoon: '🔗', tekst: 'De oude link werkt dan niet meer' }, { icoon: '👀', tekst: 'Bestaande leden behouden hun toegang' }],
   },
   aanvraag: {
     knop: '🔗 Aanmeldlink voor ouders delen',
-    uitleg: 'Via deze link vragen ouders en begeleiders toegang aan. Jij keurt de aanvragen goed voordat zij een uitnodiging ontvangen.',
+    uitleg: 'Ouders ontvangen direct een persoonlijke uitnodiging. Jij krijgt een melding en kunt iemand blokkeren.',
     vraag: 'Nieuwe aanmeldlink?',
     regels: [{ icoon: '🔗', tekst: 'De oude aanmeldlink werkt dan niet meer' }, { icoon: '📨', tekst: 'Al verstuurde aanvragen blijven staan' }],
   },

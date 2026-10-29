@@ -26,9 +26,9 @@ $app.rootCmd.addCommand(new Command({ use: 'test-vindbaarheid-controle', run: ()
   for (const id of ['testgroep000001', 'testgroep000002']) {
     const team = $app.findRecordById('teams', id)
     const aanvraag = $app.findFirstRecordByData('toegangsaanvragen', 'team', id)
-    check(aanvraag.getString('status') === 'nieuw', 'Aanvraag moet op goedkeuring wachten')
+    check(aanvraag.getString('status') === 'toegelaten' && aanvraag.getBool('automatisch') && !aanvraag.getBool('gezien'), 'Directe uitnodiging met ongelezen beheerdersmelding')
     check(!team.getStringSlice('kijkers').length && !team.getStringSlice('beheerders').length, 'Aanvragen mogen geen lidmaatschap maken')
   }
-  check($app.countRecords('uitnodigingen') === 0, 'Nog geen uitnodigingen zonder goedkeuring')
-  console.log('VINDBAARHEID_GOEDKEURING_OK')
+  check($app.countRecords('uitnodigingen') === 2, 'Beide aanmeldingen hebben direct een uitnodiging')
+  console.log('VINDBAARHEID_AANSLUITEN_OK')
 } }))

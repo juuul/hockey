@@ -144,6 +144,7 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
 
   e.app.runInTransaction((tx) => {
     inv = tx.findRecordById("uitnodigingen", inv.id)
+    require(`${__hooks}/teamtoegang.js`).controleer(tx, inv.getString("team"), email)
     let user
     try {
       user = tx.findAuthRecordByEmail("users", email)
