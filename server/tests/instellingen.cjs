@@ -11,6 +11,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
   let reisFout = false
   let instellingenFout = false
   let wijzigingen = []
+  let kindKeuze = ['kind-a', 'kind-b']
   const fouten = []
   try {
     const open = async ({ kijker = false, superadmin = false, aanvragen = false } = {}) => {
@@ -20,7 +21,8 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
       await page.setViewport({ width: 390, height: 844 })
       await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }])
       const gebruiker = { id: 'oudertest1234567', email: 'ouder@example.invalid', name: 'Testouder', superadmin }
-      const teams = [1, 2].map(n => ({ id: `testteam000000${n}`, naam: `Testteam ${n}`, beheerders: kijker ? [] : [gebruiker.id], kijkers: kijker ? [gebruiker.id] : [], officieelTeam: `officieel${n}`, vindbaar: true, expand: { officieelTeam: n === 1 ? { bronId: '46179', pouleId: '183769' } : { bronId: '123', pouleId: '456' } } }))
+      const ouder = { id: 'ouderkindtest01', name: 'Andere testouder', email: 'andere-ouder@example.invalid', kinderen: { testteam0000001: kindKeuze, testteam0000002: ['kind-anders'] } }
+      const teams = [1, 2].map(n => ({ id: `testteam000000${n}`, naam: `Testteam ${n}`, beheerders: kijker ? [] : [gebruiker.id], kijkers: kijker ? [gebruiker.id] : n === 1 ? [ouder.id] : [], officieelTeam: `officieel${n}`, vindbaar: true, expand: { beheerders: kijker ? [] : [gebruiker], kijkers: kijker ? [gebruiker] : n === 1 ? [ouder] : [], officieelTeam: n === 1 ? { bronId: '46179', pouleId: '183769' } : { bronId: '123', pouleId: '456' } } }))
       const reistijden = {}
       await page.evaluateOnNewDocument(({ token, gebruiker, teams }) => {
         localStorage.clear()
@@ -54,9 +56,10 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
             if (instellingenFout) return req.respond({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ message: 'Instellingen niet opgeslagen' }) })
             const data = JSON.parse(req.postData()); wijzigingen.push({ pad: url.pathname, data })
             const team = teams.find(t => url.pathname.endsWith(t.id)); Object.assign(team, data); body = team
-          } else body = lijst(teams)
+          } else { ouder.kinderen.testteam0000001 = kindKeuze; body = lijst(teams) }
         }
         else if (url.pathname.includes('/spelers/records') && syncFout) return req.abort('connectionfailed')
+        else if (url.pathname.includes('/spelers/records') && url.searchParams.get('fields') === 'id,naam') body = lijst([{ id: 'kind-a', naam: 'Demo A' }, { id: 'kind-b', naam: 'Demo B' }])
         else if (url.pathname.includes('/standen/records/')) body = { id: teams[0].id, versie: 0 }
         else if (url.pathname.includes('/toegangsaanvragen/records') && aanvragen) body = lijst([{ id: 'aanvraagtest', naam: 'Testaanvrager', email: 'aanvrager@example.invalid', team: teams[0].id }])
         else if (url.pathname.includes('/verzamelinstellingen')) {
@@ -210,6 +213,15 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await terug()
     await klik('Leden')
     await page.waitForFunction(() => document.querySelector('.instellingen-kop-titel').textContent === 'Leden')
+    await page.waitForFunction(() => document.querySelector('.account-lid-kinderen') && document.body.textContent.includes('Ouder van Demo A, Demo B'))
+    assert.ok(!await page.$eval('body', e => e.textContent.includes('kind-anders')))
+    assert.ok(await page.$eval('body', e => e.textContent.includes('Geen kind gekozen')))
+    kindKeuze = ['kind-b']
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+    await page.waitForFunction(() => document.body.textContent.includes('Ouder van Demo B') && !document.body.textContent.includes('Ouder van Demo A'))
+    kindKeuze = []
+    await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
+    await page.waitForFunction(() => [...document.querySelectorAll('.account-lid-kinderen')].every(e => e.textContent === 'Geen kind gekozen'))
     await terug()
 
     await klik('Weergave')

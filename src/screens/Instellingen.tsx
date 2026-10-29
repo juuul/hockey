@@ -385,6 +385,25 @@ function AanvragenKaart() {
 function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; weg: () => void }) {
   const { teams, teamsLaden, aanvragenLaden } = useAccount()
   const team = teams.find(t => t.id === id)
+  const [kindSpelers, setKindSpelers] = useState<{ team: string; spelers: { id: string; naam: string }[] } | null>(null)
+  const [kindFout, setKindFout] = useState(false)
+  useEffect(() => {
+    let actief = true
+    setKindFout(false)
+    pb.collection('spelers').getFullList<{ id: string; naam: string }>({ filter: pb.filter('team = {:id}', { id }), fields: 'id,naam' })
+      .then(spelers => { if (actief) setKindSpelers({ team: id, spelers }) })
+      .catch(() => { if (actief) setKindFout(true) })
+    return () => { actief = false }
+  }, [id, team])
+  const kindTekst = (lid: Gebruiker) => {
+    const keuze = (lid.id === gebruiker.id ? gebruiker : lid).kinderen?.[id]
+    const ids = Array.isArray(keuze) ? [...new Set(keuze)] : []
+    if (!ids.length) return 'Geen kind gekozen'
+    if (kindFout) return 'Kindkeuze laden lukt niet'
+    if (kindSpelers?.team !== id) return 'Kinderen laden…'
+    const namen = ids.map(kind => kindSpelers.spelers.find(s => s.id === kind)?.naam).filter(Boolean)
+    return namen.length ? `Ouder van ${namen.join(', ')}` : 'Gekozen kind niet meer in de spelerslijst'
+  }
   const [uitnodigingen, setUitnodigingen] = useState<Uitnodiging[]>([])
   const [email, setEmail] = useState('')
   const [rol, setRol] = useState<Rol>('kijker')
@@ -477,6 +496,7 @@ function TeamBeheer({ id, gebruiker, weg }: { id: string; gebruiker: Gebruiker; 
             <span className="account-regel-tekst">
               <span className="account-regel-naam">{g.gast ? '🔗 Meekijklink' : g.name || g.email}</span>
               <span className="account-regel-sub">{g.gast ? 'iedereen met de link' : g.name ? g.email : ''}</span>
+              {!g.gast && <span className="account-regel-sub account-lid-kinderen">{kindTekst(g)}</span>}
             </span>
             <span className="account-regel-sub">{ROL_TEKST[r]}</span>
           </button>
