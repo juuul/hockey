@@ -4,13 +4,19 @@ const puppeteer = require('/usr/src/app/node_modules/puppeteer')
 const fs = require('fs')
 const { normaliseer } = require('/scripts/catalogus-normaliseer.cjs')
 const { wachtOpBron } = require('/scripts/catalogus-browser.cjs')
+const { meetBron } = require('/scripts/catalogus-bronmeting.cjs')
 async function lees(args = process.argv.slice(2)) {
   const [clubId, teamId, pouleId, verwachtSeizoen] = args
   if (clubId && !/^[A-Z0-9]{7}$/.test(clubId)) throw new Error('Ongeldige clubcode')
   if (teamId && (!/^\d+$/.test(teamId) || !/^\d+$/.test(pouleId))) throw new Error('Ongeldig team of poule')
-  const browser = await puppeteer.launch({ executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] })
+  fs.rmSync('/resultaat/catalogus.json', { force: true })
+  const sessie = process.env.HOCKEY_BRON_SESSIE === '1'
+  const browser = await puppeteer.launch({ executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'],
+    ...(sessie ? { userDataDir: '/bronprofiel' } : {}) })
+  let meting
   try {
     const page = await browser.newPage()
+    if (sessie) meting = meetBron(page)
     const bronLezen = async (pad, navigeer) => {
       if (process.env.HOCKEY_BRON_BROWSER_HERSTEL !== '1') {
         const antwoord = page.waitForResponse(r => r.request().method() === 'GET' && new URL(r.url()).origin === 'https://app.hockeyweerelt.nl' && new URL(r.url()).pathname === pad, { timeout: 45000 })
@@ -38,8 +44,15 @@ async function lees(args = process.argv.slice(2)) {
       detail = await bronLezen(`/poules/${actuelePoule}/teams/${teamId}`, () => page.evaluate(hash => { location.hash = hash }, `/team/${teamId}|${actuelePoule}`))
     }
     if (teamId && verwachtSeizoen && detail?.data?.season_name !== verwachtSeizoen) throw new Error('De bron levert een ander seizoen; bestaande gegevens blijven behouden')
+    if (sessie && !teamId && clubId && (!Array.isArray(club?.data?.teams) || club.data.federation_reference_id !== clubId)) {
+      throw new Error('Bron levert geen volledige clubteams; bestaande gegevens blijven behouden')
+    }
     fs.writeFileSync('/resultaat/catalogus.json', JSON.stringify(normaliseer(clubId ? null : club, clubId ? club : null, detail)))
-  } finally { await browser.close() }
+  } finally {
+    try {
+      if (meting) fs.writeFileSync('/resultaat/bronmeting.json', JSON.stringify(meting()), { mode: 0o600 })
+    } finally { await browser.close() }
+  }
 }
 if (require.main === module) lees().catch(e => { console.error(e.message); process.exit(1) })
 module.exports = { lees }

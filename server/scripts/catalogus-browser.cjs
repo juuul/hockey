@@ -1,6 +1,8 @@
+const { route, retryTot } = require('./catalogus-bronmeting.cjs')
 // Observeer uitsluitend de verzoeken die de publieke website zelf verstuurt.
 // Geen zelfgemaakte headers, gekopieerde tokens of eigen netwerkherpogingen.
 function wachtOpBron(page, pad, timeout = 45000) {
+  const metSessiemeting = process.env.HOCKEY_BRON_SESSIE === '1'
   let afmelden
   const antwoord = new Promise((resolve, reject) => {
     let eerste401 = false
@@ -15,8 +17,9 @@ function wachtOpBron(page, pad, timeout = 45000) {
     function ontvangen(response) {
       const u = new URL(response.url())
       if (u.origin !== 'https://app.hockeyweerelt.nl' || response.request().method() === 'OPTIONS') return
-      // Stop ook als registratie zelf wordt begrensd: niet wachten op meer verkeer.
-      if (u.pathname === '/device/register' && response.status() === 429) {
+      // Iedere bron-429 telt, ook wanneer een nevenverzoek wordt begrensd.
+      if ((response.status() === 429 && (metSessiemeting || u.pathname === '/device/register')) ||
+          (metSessiemeting && u.pathname === '/device/register' && response.status() === 403)) {
         return klaar(bronFout(response))
       }
       if (u.pathname !== pad || response.request().method() !== 'GET') return
@@ -39,10 +42,10 @@ function wachtOpBron(page, pad, timeout = 45000) {
 }
 
 function bronFout(response) {
-  const header = response.headers?.()['retry-after']
-  const tot = /^\d+$/.test(header || '') ? Date.now() + Number(header)*1000 : Date.parse(header || '')
-  const wacht = Number.isFinite(tot) && tot > Date.now() ? `; bronWachtTot=${Math.ceil(tot/1000)}` : ''
-  return new Error(`Bron HTTP ${response.status()}; geen automatische herhaalpoging${wacht}`)
+  const tot = retryTot(response)
+  const wacht = tot ? `; bronWachtTot=${tot}` : ''
+  const pad = process.env.HOCKEY_BRON_SESSIE === '1' ? `; bronRoute=${route(response.url())}` : ''
+  return new Error(`Bron HTTP ${response.status()}; geen automatische herhaalpoging${pad}${wacht}`)
 }
 
 module.exports = { wachtOpBron }

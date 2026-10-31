@@ -44,10 +44,16 @@ bron_pad = ROOT / ('pb_test_data' if args.omgeving == 'test' else 'pb_data') / '
 spec = importlib.util.spec_from_file_location('catalogus_clubs', ROOT / 'scripts' / 'catalogus-clubs.py')
 club_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(club_module)
+spec = importlib.util.spec_from_file_location('catalogus_bron', ROOT / 'scripts' / 'catalogus-bron.py')
+bron_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(bron_module)
+meting_pad = ROOT / 'planning_documenten' / 'catalogus-bronmetingen.db'
 # Oude productie-images blijven het oude protocol gebruiken tot de migratie expliciet is uitgerold.
 club_schema = club_module.beschikbaar(bron_pad)
 limiter = pilot or (pilot_module.Pilot(pilot_pad, args.omgeving) if club_schema and args.clubs and (basis / 'catalogus-pilot.actief').is_file() else None)
 club_herstel = limiter is not None and club_schema
+# Expliciet per omgeving én alleen met gedeelde bronbegrenzing activeren.
+sessie_opties = bron_module.sessie_opties(basis) if limiter else []
 def publiceer_status():
     if club_herstel:
         club_module.publiceer(basis / 'catalogus-status.json', limiter.volgende_poging())
@@ -81,10 +87,14 @@ if pilot:
     if club_herstel:
         clubs = club_module.taken(bron_pad)
     taken = pilot.taken(pilot_module.geregistreerd(bron_pad)) + clubs[:1]
+    if not taken and sessie_opties and (basis / 'catalogus-clubopbouw.actief').is_file():
+        taken = bron_module.opbouw_taken(bron_pad, pilot, meting_pad)
 if args.clubs:
     taken = [{'id': '', 'clubBronId': '', 'teamBronId': '', 'pouleId': '', 'sleutel': 'clublijst', 'slot': 'expliciet-clublijst'}]
 for taak in taken:
-    data = limiter.cache(taak) if limiter else None
+    data = taak.get('cacheData')
+    if data is None and not taak.get('opbouw'):
+        data = limiter.cache(taak) if limiter else None
     if club_herstel and data is None and taak['id'] and not taak['teamBronId']:
         vanaf = limiter.club_vanaf(taak['sleutel'])
         if vanaf > time.time():
@@ -95,6 +105,7 @@ for taak in taken:
     meting = limiter.begin(taak, 'cache' if data is not None else 'browser') if limiter else None
     if taak['id']:
         pb('catalogus-taakstatus', taak['id'], 'bezig')
+    bron_bezocht, bron_meting, bron_status = False, {}, 'fout'
     try:
         with tempfile.TemporaryDirectory(prefix='hockey-catalogus-') as d:
             Path(d).chmod(0o777)
@@ -102,7 +113,19 @@ for taak in taken:
             if data is None:
                 browser_herstel = (['-e', 'HOCKEY_BRON_BROWSER_HERSTEL=1']
                                    if pilot or (basis / 'catalogus-browser-herstel.actief').is_file() else [])
-                subprocess.run(['docker', 'run', '--rm', '--network', 'host', '--cap-drop=ALL', '--security-opt=no-new-privileges:true', *browser_herstel, '-v', f'{ROOT / "scripts"}:/scripts:ro', '-v', f'{d}:/resultaat', 'zenika/alpine-chrome:with-puppeteer', 'node', '/scripts/catalogus-lees.cjs', taak['clubBronId'], taak['teamBronId'], taak['pouleId'], taak.get('seizoen', '')], check=True, timeout=150, capture_output=True)
+                bron_bezocht = True
+                browser_naam = 'hockey-catalogus-bron-' + args.omgeving
+                try:
+                    subprocess.run(['docker', 'run', '--rm', *(['--name', browser_naam] if sessie_opties else []), '--network', 'host', '--cap-drop=ALL', '--security-opt=no-new-privileges:true', *browser_herstel, *sessie_opties, '-v', f'{ROOT / "scripts"}:/scripts:ro', '-v', f'{d}:/resultaat', 'zenika/alpine-chrome:with-puppeteer', 'node', '/scripts/catalogus-lees.cjs', taak['clubBronId'], taak['teamBronId'], taak['pouleId'], taak.get('seizoen', '')], check=True, timeout=150, capture_output=True)
+                except subprocess.TimeoutExpired:
+                    # Een afgebroken docker-client mag geen Chrome met het vaste profiel achterlaten.
+                    if sessie_opties:
+                        subprocess.run(['docker', 'rm', '-f', browser_naam], timeout=15, capture_output=True)
+                    raise
+                finally:
+                    if sessie_opties:
+                        bron_meting = bron_module.lees_meting(Path(d) / 'bronmeting.json')
+                bron_module.controleer_meting(bron_meting)
                 data = json.loads(p.read_text())
             aantal = pilot_module.wijzigingen(bron_pad, data) if pilot else 0
             data.pop('taakId', None)
@@ -118,6 +141,7 @@ for taak in taken:
                 meldingen.bronresultaat(taak)
             if limiter:
                 limiter.resultaat(meting, taak, data=data, aantal=aantal)
+            bron_status = 'klaar'
     except (subprocess.SubprocessError, ValueError, OSError) as exc:
         print('Openbare import mislukt; bestaande gegevens blijven behouden:', str(exc))
         if isinstance(exc, subprocess.CalledProcessError) and exc.stderr:
@@ -125,6 +149,8 @@ for taak in taken:
         fout = getattr(exc, 'stderr', '') or ''
         if isinstance(fout, bytes):
             fout = fout.decode(errors='replace')
+        if isinstance(exc, ValueError) and str(exc).startswith('Bron HTTP '):
+            fout = str(exc)
         if meldingen:
             meldingen.bronresultaat(taak, fout or type(exc).__name__)
         if limiter:
@@ -137,6 +163,12 @@ for taak in taken:
             else:
                 pb('catalogus-taakstatus', taak['id'], 'fout')
     finally:
+        if bron_bezocht and sessie_opties:
+            soort = 'opbouw' if taak.get('opbouw') else 'poule' if taak['teamBronId'] else 'club' if taak['clubBronId'] else 'clublijst'
+            try:
+                bron_module.bewaar_meting(meting_pad, soort, bron_status, bron_meting, omgeving=args.omgeving)
+            except (OSError, sqlite3.Error) as exc:
+                print('Bronmeting niet opgeslagen:', type(exc).__name__)
         publiceer_status()
 
 controleer_meldingen()
