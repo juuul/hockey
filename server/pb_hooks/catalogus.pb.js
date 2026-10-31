@@ -6,7 +6,8 @@ $app.rootCmd.addCommand(new Command({ use: "catalogus-import", run: (cmd, args) 
   require(`${__hooks}/catalogus.js`).importeer($app, data)
   if (data.taakId) {
     const t = $app.findRecordById("catalogus_taken", data.taakId)
-    t.set("status", "klaar"); t.set("fout", ""); $app.save(t)
+    t.set("status", "klaar"); t.set("fout", "")
+    t.set("opnieuwNa", ""); t.set("pogingen", 0); $app.save(t)
   }
   console.log("Catalogus bijgewerkt: " + data.clubs.length + " clubs, " + data.teams.length + " teams, " + data.wedstrijden.length + " wedstrijden")
 } }))
@@ -33,8 +34,27 @@ $app.rootCmd.addCommand(new Command({ use: "catalogus-taken", run: () => {
 } }))
 $app.rootCmd.addCommand(new Command({ use: "catalogus-taakstatus", run: (cmd, args) => {
   const t = $app.findRecordById("catalogus_taken", args[0])
-  t.set("status", args[1]); t.set("fout", args[1] === "fout" ? "Bron tijdelijk niet bereikbaar; probeer later opnieuw." : ""); $app.save(t)
+  t.set("status", args[1]); t.set("fout", args[1] === "fout" ? "Bron tijdelijk niet bereikbaar; probeer later opnieuw." : "")
+  if (!t.getString("teamBronId")) {
+    if (args[1] === "bezig") t.set("pogingen", t.getInt("pogingen") + 1)
+    t.set("opnieuwNa", args[1] === "fout" ? String(args[2] || "") : "")
+  }
+  $app.save(t)
 } }))
+// Alleen openbare ophaalstatus; nooit taak-id's, ruwe fouten of privéteamgegevens.
+routerAdd("GET", "/api/hockey/catalogus/club/{id}/status", e => {
+  const club = e.app.findRecordById("catalogus_clubs", e.request.pathValue("id"))
+  let taak
+  try { taak = e.app.findFirstRecordByData("catalogus_taken", "sleutel", "club:" + club.getString("bronId")) } catch (_) {}
+  let vanaf = Date.parse(taak?.getString("opnieuwNa") || "") || 0
+  if (taak && taak.getString("status") !== "klaar") {
+    try {
+      const info = JSON.parse(toString($os.readFile("/pb/planning_documenten/catalogus-status.json")))
+      vanaf = Math.max(vanaf, Date.parse(info.bronOpnieuwNa || "") || 0)
+    } catch (_) {}
+  }
+  return e.json(200, { status: taak?.getString("status") || "nieuw", opnieuwNa: vanaf > Date.now() ? new Date(vanaf).toISOString() : null, gecontroleerd: club.getString("gecontroleerd") })
+})
 routerAdd("POST", "/api/hockey/catalogus/club/{id}/ververs", (e) => {
   const c = e.app.findRecordById("catalogus_clubs", e.request.pathValue("id"))
   require(`${__hooks}/catalogus.js`).zetTaak(e.app, c)

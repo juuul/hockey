@@ -136,6 +136,8 @@ function zetTaak(app, club, team) {
   const sleutel = team ? "team:" + team.getString("bronId") + ":" + team.getString("seizoen") : "club:" + club.getString("bronId")
   let taak
   try { taak = app.findFirstRecordByData("catalogus_taken", "sleutel", sleutel) } catch (_) {}
+  // Mislukte clubtaken blijven in de automatische herhaalwachtrij. Klikken reset de wachttijd niet.
+  if (!team && taak?.getString("status") === "fout" && taak.getString("opnieuwNa")) return
   if (taak && ["nieuw", "bezig"].includes(taak.getString("status"))) return
   if (taak && Date.now() - new Date(taak.getString("updated")).getTime() < 3600000) return
   upsert(app, "catalogus_taken", "sleutel = {:s}", { s: sleutel }, { sleutel, clubBronId: club.getString("bronId"), teamBronId: team ? team.getString("bronId") : "", pouleId: team ? team.getString("pouleId") : "", status: "nieuw", fout: "" })
