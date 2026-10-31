@@ -10,6 +10,7 @@ from pathlib import Path
 import subprocess
 import sqlite3
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
@@ -40,6 +41,17 @@ try:
 except BlockingIOError:
     raise SystemExit(0)
 bron_pad = ROOT / ('pb_test_data' if args.omgeving == 'test' else 'pb_data') / 'data.db'
+spec = importlib.util.spec_from_file_location('catalogus_clubs', ROOT / 'scripts' / 'catalogus-clubs.py')
+club_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(club_module)
+# Oude productie-images blijven het oude protocol gebruiken tot de migratie expliciet is uitgerold.
+club_schema = club_module.beschikbaar(bron_pad)
+limiter = pilot or (pilot_module.Pilot(pilot_pad, args.omgeving) if club_schema and args.clubs and (basis / 'catalogus-pilot.actief').is_file() else None)
+club_herstel = limiter is not None and club_schema
+def publiceer_status():
+    if club_herstel:
+        club_module.publiceer(basis / 'catalogus-status.json', limiter.volgende_poging())
+publiceer_status()
 meldingen = (notificaties.Meldingen(ROOT / 'planning_documenten' / args.omgeving / 'catalogus-mails.db', args.omgeving)
              if (ROOT / 'planning_documenten' / args.omgeving / 'catalogus-mails.actief').is_file() else None)
 
@@ -66,14 +78,21 @@ if pilot:
     # Alleen automatisch wedstrijdprogramma's van gekoppelde poules ophalen.
     clubs = [{**t,'sleutel':'club:'+t['clubBronId'],'slot':'expliciet:'+t['id']}
              for t in taken if not t['teamBronId'] and t['clubBronId']]
+    if club_herstel:
+        clubs = club_module.taken(bron_pad)
     taken = pilot.taken(pilot_module.geregistreerd(bron_pad)) + clubs[:1]
 if args.clubs:
-    taken = [{'id': '', 'clubBronId': '', 'teamBronId': '', 'pouleId': ''}]
+    taken = [{'id': '', 'clubBronId': '', 'teamBronId': '', 'pouleId': '', 'sleutel': 'clublijst', 'slot': 'expliciet-clublijst'}]
 for taak in taken:
-    data = pilot.cache(taak) if pilot else None
-    if pilot and data is None and not pilot.mag_ophalen():
+    data = limiter.cache(taak) if limiter else None
+    if club_herstel and data is None and taak['id'] and not taak['teamBronId']:
+        vanaf = limiter.club_vanaf(taak['sleutel'])
+        if vanaf > time.time():
+            pb('catalogus-taakstatus', taak['id'], 'fout', club_module.iso(vanaf))
+            continue
+    if limiter and data is None and not limiter.mag_ophalen():
         continue
-    meting = pilot.begin(taak, 'cache' if data is not None else 'browser') if pilot else None
+    meting = limiter.begin(taak, 'cache' if data is not None else 'browser') if limiter else None
     if taak['id']:
         pb('catalogus-taakstatus', taak['id'], 'bezig')
     try:
@@ -97,11 +116,9 @@ for taak in taken:
             print(resultaat.strip())
             if meldingen:
                 meldingen.bronresultaat(taak)
-            if pilot:
-                pilot.resultaat(meting, taak, data=data, aantal=aantal)
+            if limiter:
+                limiter.resultaat(meting, taak, data=data, aantal=aantal)
     except (subprocess.SubprocessError, ValueError, OSError) as exc:
-        if taak['id']:
-            pb('catalogus-taakstatus', taak['id'], 'fout')
         print('Openbare import mislukt; bestaande gegevens blijven behouden:', str(exc))
         if isinstance(exc, subprocess.CalledProcessError) and exc.stderr:
             print(exc.stderr.decode(errors='replace')[-500:] if isinstance(exc.stderr, bytes) else exc.stderr[-500:])
@@ -110,8 +127,17 @@ for taak in taken:
             fout = fout.decode(errors='replace')
         if meldingen:
             meldingen.bronresultaat(taak, fout or type(exc).__name__)
-        if pilot:
-            pilot.resultaat(meting, taak, fout=fout or type(exc).__name__)
+        if limiter:
+            limiter.resultaat(meting, taak, fout=fout or type(exc).__name__)
+        if taak['id']:
+            if club_herstel and not taak['teamBronId']:
+                opnieuw = club_module.herpoging(taak.get('pogingen', 0) + 1, fout, limiter.volgende_poging())
+                limiter.wacht_club(taak['sleutel'], club_module.timestamp(opnieuw))
+                pb('catalogus-taakstatus', taak['id'], 'fout', opnieuw)
+            else:
+                pb('catalogus-taakstatus', taak['id'], 'fout')
+    finally:
+        publiceer_status()
 
 controleer_meldingen()
 try:

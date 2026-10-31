@@ -1,5 +1,5 @@
 """Begrensde poulepilot. Leest PocketBase alleen; schrijft eigen meet-/cachegegevens."""
-from datetime import datetime
+from datetime import datetime, timedelta
 import html
 import json
 import os
@@ -51,7 +51,16 @@ class Pilot:
                 begonnen REAL,klaar REAL,status TEXT,bron TEXT,code INTEGER,wijzigingen INTEGER DEFAULT 0);
             CREATE TABLE IF NOT EXISTS cache(sleutel TEXT PRIMARY KEY,opgehaald REAL,inhoud TEXT);
             CREATE TABLE IF NOT EXISTS grenzen(sleutel TEXT PRIMARY KEY,waarde REAL);
+            CREATE TABLE IF NOT EXISTS club_wachttijd(sleutel TEXT PRIMARY KEY,vanaf REAL);
         ''')
+
+    def club_vanaf(self, sleutel):
+        r = self.c.execute('SELECT vanaf FROM club_wachttijd WHERE sleutel=?', (sleutel,)).fetchone()
+        return r[0] if r else 0
+
+    def wacht_club(self, sleutel, vanaf):
+        with self.c:
+            self.c.execute('INSERT OR REPLACE INTO club_wachttijd VALUES(?,?)', (sleutel, max(vanaf, self.club_vanaf(sleutel))))
 
     def taken(self, poules, nu=None):
         nu = time.time() if nu is None else nu
@@ -86,13 +95,18 @@ class Pilot:
 
     def mag_ophalen(self, nu=None):
         nu = time.time() if nu is None else nu
+        return self.volgende_poging(nu) <= nu
+
+    def volgende_poging(self, nu=None):
+        nu = time.time() if nu is None else nu
         grenzen = dict(self.c.execute('SELECT sleutel,waarde FROM grenzen'))
         laatste_klaar = self.c.execute("SELECT coalesce(max(klaar),0) FROM runs WHERE bron='browser'").fetchone()[0]
         # Ook na een lang bronbezoek vijf volle seconden rust, gedeeld tussen omgevingen.
-        if nu < grenzen.get('pauzeTot',0) or nu < max(grenzen.get('laatsteBezoek',0),laatste_klaar)+5:
-            return False
-        middernacht = datetime.fromtimestamp(nu,ZONE).replace(hour=0,minute=0,second=0,microsecond=0).timestamp()
-        return self.c.execute("SELECT count(*) FROM runs WHERE bron='browser' AND begonnen>=?", (middernacht,)).fetchone()[0] < 24
+        vanaf = max(grenzen.get('pauzeTot',0), max(grenzen.get('laatsteBezoek',0),laatste_klaar)+5)
+        middernacht = datetime.fromtimestamp(nu,ZONE).replace(hour=0,minute=0,second=0,microsecond=0)
+        if self.c.execute("SELECT count(*) FROM runs WHERE bron='browser' AND begonnen>=?", (middernacht.timestamp(),)).fetchone()[0] >= 24:
+            vanaf = max(vanaf, (middernacht + timedelta(days=1)).timestamp())
+        return vanaf
 
     def begin(self, taak, bron, nu=None):
         nu = time.time() if nu is None else nu
@@ -114,6 +128,8 @@ class Pilot:
             if not fout and data is not None and browser:
                 self.c.execute('INSERT OR REPLACE INTO cache VALUES(?,?,?)',
                                (taak['sleutel'],nu,json.dumps({k:v for k,v in data.items() if k != 'taakId'})))
+            if not fout and data is not None and taak['sleutel'].startswith('club:'):
+                self.c.execute('DELETE FROM club_wachttijd WHERE sleutel=?', (taak['sleutel'],))
             if code in (401,403,429):
                 uitstel = re.search(r'bronWachtTot=(\d+)', fout)
                 tot = max(nu + (21600 if code == 429 else 3600), int(uitstel[1]) if uitstel else 0)

@@ -14,8 +14,10 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     let enkeleGroep = false
     let toonExtraTeams = false
     let clubStoringen = 0
+    let teamStoring = false, legeTeams = false
+    let bronStatus = { status: 'klaar', opnieuwNa: null }
     const clubs = [{ id: 'club1', bronId: 'SCHC123', naam: 'SCHC', plaats: 'Bilthoven' }]
-    const teams = [1, 2].map(n => ({ id: `team${n}`, bronId: String(n), naam: `SCHC MO11-${n}`, seizoen: '2026-2027', geslacht: 'Meisjes', leeftijd: 'O11', categorie: 'Jeugd', spelvorm: 'Veld', klasse: n === 1 ? '5e klasse' : '', gecontroleerd: '2026-10-15T12:00:00Z' }))
+    const teams = [1, 2].map(n => ({ id: `team${n}`, bronId: String(n), clubBronId: 'SCHC123', naam: `SCHC MO11-${n}`, seizoen: '2026-2027', geslacht: 'Meisjes', leeftijd: 'O11', categorie: 'Jeugd', spelvorm: 'Veld', klasse: n === 1 ? '5e klasse' : '', gecontroleerd: '2026-10-15T12:00:00Z' }))
     const omgevingen = [{ id: 'groep1', naam: 'MO11-1 ouders' }, { id: 'groep2', naam: 'MO11-1 begeleiding' }]
     await page.setRequestInterception(true)
     page.on('request', req => {
@@ -30,6 +32,9 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
           }
           body = lijst(clubs)
         }
+        else if (url.pathname.endsWith('/club1/status')) body = bronStatus
+        else if (url.pathname.includes('catalogus_teams/records') && teamStoring) return req.abort('connectionfailed')
+        else if (url.pathname.includes('catalogus_teams/records') && legeTeams) body = lijst([])
         else if (url.pathname.includes('catalogus_teams/records')) body = lijst(toonExtraTeams ? [...teams, { ...teams[0], id: 'team3', naam: 'SCHC MO12-1', leeftijd: 'O12', spelvorm: 'Zaal' }] : teams)
         else if (url.pathname.includes('catalogus_wedstrijden/records')) body = lijst([])
         else if (url.pathname.endsWith('/team1/omgevingen')) body = enkeleGroep ? omgevingen.slice(0, 1) : omgevingen
@@ -109,7 +114,7 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     await page.type('input[type="email"]', 'test@example.invalid')
     if (process.env.GROUP_PREVIEW_PATH) await page.screenshot({ path: process.env.GROUP_PREVIEW_PATH })
     await klik('Toegang aanvragen')
-    await page.waitForFunction(() => document.body.textContent.includes('Aanvraag verstuurd.'))
+    await page.waitForFunction(() => document.body.textContent.includes('Je ontvangt direct een uitnodiging per e-mail.'))
     assert.equal(aanvraag.email, 'test@example.invalid')
     await page.click('.instellingen-terug')
     await page.waitForFunction(() => document.body.textContent.includes('Je team'))
@@ -201,6 +206,20 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     await page.click('input[type="search"]', { clickCount: 3 })
     await page.type('input[type="search"]', 'zzzzzz')
     await page.waitForFunction(() => document.body.textContent.includes('Geen clubs gevonden'))
+    // Opgeslagen teams blijven zichtbaar bij netwerkuitval; bronfouten tonen de echte stap.
+    teamStoring = true
+    await begin()
+    await page.waitForFunction(() => document.body.textContent.includes('Teams laden lukt niet.') && document.body.textContent.includes('Bewaarde teams blijven beschikbaar.'))
+    assert.ok(await page.$$eval('[aria-label="Gevonden teams"] button', ns => ns.some(n => n.textContent.includes('SCHC MO11-1')) && ns.some(n => n.textContent.includes('SCHC MO11-2'))))
+    teamStoring = false; legeTeams = true
+    bronStatus = { status: 'fout', opnieuwNa: '2099-01-01T21:46:00Z' }
+    await openZoeker(); await page.type('input[type="search"]', 'sc'); await kiesClub()
+    await page.waitForFunction(() => document.body.textContent.includes('Volgende poging vanaf'))
+    assert.ok(await page.$eval('body', el => el.textContent.includes('Teams ophalen tijdelijk niet mogelijk.')))
+    assert.ok(!await page.$eval('body', el => el.textContent.includes('geen teams beschikbaar')))
+    legeTeams = false; bronStatus = { status: 'klaar', opnieuwNa: null }
+    await page.waitForSelector('input[placeholder="Zoek een team"]', { timeout: 15000 })
+    await openZoeker(); await page.type('input[type="search"]', 'sc')
     // Smalle telefoons houden de volledige titel en inhoud binnen het scherm.
     await page.setViewport({ width: 320, height: 640 })
     await page.waitForFunction(() => document.querySelector('.instellingen-kop-titel').scrollWidth <= document.querySelector('.instellingen-kop-titel').clientWidth)

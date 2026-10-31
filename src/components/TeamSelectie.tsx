@@ -13,6 +13,12 @@ interface CatalogusClub { id: string; bronId: string; naam: string; plaats: stri
 interface OfficieleWedstrijd { id: string; datum: string; spelen: string; thuisNaam: string; uitNaam: string; uitslag?: { home: number; away: number } | null }
 interface Omgeving { id: string; naam: string; omgevingNaam: string }
 type Stap = 1 | 2 | 3
+interface OphaalStatus { status: 'nieuw' | 'bezig' | 'fout' | 'klaar'; opnieuwNa: string | null }
+const TEAMVELDEN = ['id', 'bronId', 'clubBronId', 'naam', 'seizoen', 'geslacht', 'leeftijd', 'categorie', 'spelvorm', 'klasse', 'gecontroleerd'] as const
+function bewaardeTeams(club: string): OfficieelTeam[] {
+  const lijst = lees<unknown>(OPSLAG, `catalogus_teams_${club}`, [])
+  return Array.isArray(lijst) ? lijst.filter(t => t && t.clubBronId === club && typeof t.id === 'string' && typeof t.naam === 'string') : []
+}
 
 function bewaardeClubs(): CatalogusClub[] {
   const lijst = lees<unknown>(OPSLAG, 'catalogus_clubs', [])
@@ -38,6 +44,7 @@ export function TeamKiezer({ gekozen, kies, stap, naarStap }: { gekozen: Officie
   const [laden, setLaden] = useState(false)
   const [fout, setFout] = useState('')
   const [ververs, setVervers] = useState(0)
+  const [ophaalStatus, setOphaalStatus] = useState<OphaalStatus | null>(null)
   useEffect(() => {
     let actief = true
     let controller: AbortController | undefined
@@ -76,18 +83,32 @@ export function TeamKiezer({ gekozen, kies, stap, naarStap }: { gekozen: Officie
   useEffect(() => {
     if (!club) return
     let actief = true
-    setTeams([]); setLaden(true); setFout('')
+    let bezig = false
+    let controller: AbortController | undefined
+    setTeams(bewaardeTeams(club.bronId)); setLaden(true); setFout(''); setOphaalStatus(null)
     const laad = async () => {
+      if (bezig) return
+      bezig = true
+      controller = new AbortController()
+      const timeout = setTimeout(() => controller?.abort(), 10_000)
       try {
-        const lijst = await pb.collection('catalogus_teams').getFullList<OfficieelTeam>({ filter: pb.filter('clubBronId = {:id} && actief = true', { id: club.bronId }), sort: '-seizoen,naam' })
-        if (actief) { setTeams(lijst); setLaden(false) }
+        const [lijst, status] = await Promise.all([
+          pb.collection('catalogus_teams').getFullList<OfficieelTeam>({ filter: pb.filter('clubBronId = {:id} && actief = true', { id: club.bronId }), sort: '-seizoen,naam', signal: controller.signal }),
+          pb.send<OphaalStatus>(`/api/hockey/catalogus/club/${club.id}/status`, { signal: controller.signal }).catch(() => null),
+        ])
+        if (actief) {
+          setTeams(lijst); setLaden(false); setFout('')
+          setOphaalStatus(status && ['nieuw','bezig','fout','klaar'].includes(status.status) ? status : null)
+          schrijf(OPSLAG, `catalogus_teams_${club.bronId}`, lijst.map(t => Object.fromEntries(TEAMVELDEN.map(k => [k, t[k] ?? '']))))
+        }
       } catch (e) { if (actief) { setFout(foutTekst(e)); setLaden(false) } }
+      finally { bezig = false; clearTimeout(timeout) }
     }
     laad()
     // Een importverzoek is begrensd en hergebruikbaar; de achtergrondimport leest de openbare bron.
     pb.send(`/api/hockey/catalogus/club/${club.id}/ververs`, { method: 'POST' }).catch(e => { if (actief) setFout(foutTekst(e)) })
     const timer = setInterval(laad, 10_000)
-    return () => { actief = false; clearInterval(timer) }
+    return () => { actief = false; controller?.abort(); clearInterval(timer) }
   }, [clubId, ververs, clubs])
   const velden = [['seizoen', 'Seizoen'], ['geslacht', 'Teamtype'], ['leeftijd', 'Leeftijd'], ['spelvorm', 'Veld of zaal']] as const
   const lijst = teams.filter(t => teamKomtOvereen(t.naam, teamZoek) && velden.every(([veld]) => !filters[veld] || t[veld] === filters[veld]))
@@ -132,7 +153,15 @@ export function TeamKiezer({ gekozen, kies, stap, naarStap }: { gekozen: Officie
         <input className="modal-input" type="search" placeholder="Zoek een team" value={teamZoek} onChange={e => setTeamZoek(e.target.value)} />
       </label>}
       {laden && <p className="account-uitleg">Teams ophalen…</p>}
-      {!laden && !teams.length && !fout && <p className="account-uitleg">Nog geen teams beschikbaar. Probeer het straks opnieuw.</p>}
+      {!laden && !fout && (!teams.length || ophaalStatus?.status === 'fout') && <p className="account-uitleg" role="status">
+        {ophaalStatus?.status === 'fout' ? 'Teams ophalen tijdelijk niet mogelijk.'
+          : ophaalStatus?.status === 'klaar' ? 'De bron heeft voor deze club nog geen teams beschikbaar.'
+          : ophaalStatus?.status === 'bezig' ? 'Teams worden opgehaald…' : 'Teams staan klaar om opgehaald te worden.'}
+        {ophaalStatus?.status !== 'klaar' && <> {ophaalStatus?.opnieuwNa
+          ? `Volgende poging vanaf ${new Date(ophaalStatus.opnieuwNa).toLocaleString('nl-NL', { timeZone: 'Europe/Amsterdam', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}.`
+          : 'Dit gebeurt automatisch.'}</>}
+        {!!teams.length && ' Bewaarde teams blijven beschikbaar.'}
+      </p>}
       {!!filterKeuzes.length && <details className="teamselectie-filters">
         <summary>Filters</summary>
       {filterKeuzes.map(({ veld, label, waarden }) => {
@@ -155,7 +184,7 @@ export function TeamKiezer({ gekozen, kies, stap, naarStap }: { gekozen: Officie
       </div>
       {gekozen && !stap && <OfficieelProgramma key={gekozen.id} team={gekozen} />}
       {(fout || (!laden && !teams.length)) && <button type="button" className="teamselectie-link" onClick={() => setVervers(v => v + 1)}>Opnieuw proberen</button>}
-      {fout && <p className="account-melding fout" role="alert">Teams laden lukt niet.</p>}
+      {fout && <p className="account-melding fout" role="alert">Teams laden lukt niet.{teams.length ? ' Bewaarde teams blijven beschikbaar.' : ''}</p>}
     </section>}
   </>
 }
