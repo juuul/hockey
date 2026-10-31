@@ -44,15 +44,25 @@ const url = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     await page.goBack()
     await page.waitForFunction(() => !document.querySelector('.modal.show'))
     assert.deepEqual(await snapshot(), voor)
-    // Verplaatsen behoudt de bestaande selectie + bevestiging.
+    // Verplaatsen voert de keuze ook direct uit; Undo herstelt de stand.
     await page.click('.player-slot:not(.keeper):not(.leeg)')
     await page.waitForSelector('.modal-mode-btn')
     await page.click('.modal-mode-btn')
-    await page.waitForSelector('.modal-actions .btn-primary')
+    await page.waitForSelector('.modal-option')
+    assert.equal(await page.$('.modal-actions .btn-primary'), null)
     await page.click('.modal-option')
-    assert.ok(await page.$('.modal.show'))
-    assert.deepEqual(await snapshot(), voor)
-    await page.click('.modal-actions .btn-secondary')
+    await page.waitForFunction(() => !document.querySelector('.modal.show'))
+    assert.notDeepEqual((await snapshot()).spelers, voor.spelers)
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Undo').click())
+    await page.waitForFunction(v => JSON.stringify(JSON.parse(localStorage.getItem('hockey_test_spelers'))) === JSON.stringify(v), {}, voor.spelers)
+    // Ook de keeperkeuze is direct, zonder bevestiging.
+    await page.click('.player-slot.keeper')
+    await page.waitForSelector('.modal-option')
+    assert.equal(await page.$('.modal-actions .btn-primary'), null)
+    await page.click('.modal-option')
+    await page.waitForFunction(() => !document.querySelector('.modal.show'))
+    await page.evaluate(() => [...document.querySelectorAll('button')].find(b => b.textContent.trim() === 'Undo').click())
+    await page.waitForFunction(v => JSON.stringify(JSON.parse(localStorage.getItem('hockey_test_spelers'))) === JSON.stringify(v), {}, voor.spelers)
     // Eén kandidaat is nooit automatisch een wissel: tik blijft nodig.
     await page.evaluate(() => {
       const p = JSON.parse(localStorage.getItem('hockey_test_spelers'))
@@ -69,7 +79,7 @@ const url = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     await page.click('.modal-option')
     await page.waitForFunction(() => !document.querySelector('.modal.show'))
     assert.equal((await snapshot()).wisselingen.length, een.wisselingen.length + 1)
-    // Een lege veldplek houdt haar expliciete bevestiging.
+    // Een lege veldplek vullen gaat direct na één tik op een naam.
     await page.evaluate(() => {
       const p = JSON.parse(localStorage.getItem('hockey_test_spelers'))
       p.find(s => s.inVeld && !s.isKeeper).inVeld = false
@@ -78,10 +88,13 @@ const url = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     await page.reload({ waitUntil: 'domcontentloaded' })
     await page.waitForSelector('.player-slot.leeg')
     await page.click('.player-slot.leeg')
-    await page.waitForSelector('.modal-actions .btn-primary')
+    await page.waitForSelector('.modal-option')
+    assert.equal(await page.$('.modal-actions .btn-primary'), null)
+    const invaller = await page.$eval('.modal-option-name', e => e.textContent)
     await page.click('.modal-option')
-    assert.ok(await page.$('.modal.show'))
+    await page.waitForFunction(() => !document.querySelector('.modal.show'))
+    assert.ok((await snapshot()).spelers.find(s => s.naam === invaller).inVeld)
     assert.deepEqual(fouten, [])
-    console.log('WISSEL_DIRECT_OK: tik wisselt direct, geen dubbele telling, Undo, annuleren/terug, één kandidaat; verplaatsen en lege plek behouden bevestiging.')
+    console.log('WISSEL_DIRECT_OK: tik wisselt direct, geen dubbele telling, Undo, annuleren/terug, één kandidaat; ook verplaatsen, keeper en lege plek direct.')
   } finally { await browser.close() }
 })().catch(e => { console.error(e); process.exit(1) })
