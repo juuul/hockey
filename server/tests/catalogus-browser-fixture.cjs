@@ -26,7 +26,9 @@ puppeteer.launch = async options => {
           const bron='https://app.hockeyweerelt.nl';
           addEventListener('hashchange',()=>fetch(bron+'/poules/200/teams/46179'));
           const pad=location.hash.includes('/team/')?'/poules/200/teams/46179':'/clubs/HH11PD0';
-          (async()=>{const r=await fetch(bron+pad);if(r.status===401){
+          (async()=>{if(${JSON.stringify(scenario)}==='sessie' && !localStorage.getItem('fixture-bezoeker')){
+            await fetch(bron+'/device/register',{method:'POST'}); localStorage.setItem('fixture-bezoeker','bekend');
+          }const r=await fetch(bron+pad);if(r.status===401){
             const herstel=await fetch(bron+'/device/register',{method:'POST'});
             if(herstel.ok) await fetch(bron+pad);
           }})();</script>` })
@@ -36,6 +38,8 @@ puppeteer.launch = async options => {
       const json = (status, data) => req.respond({ status, headers, contentType: 'application/json', body: JSON.stringify(data) })
       if (u.pathname === '/clubs/HH11PD0') {
         telling.clubs++
+        if (scenario === 'onvolledig') return json(200, { data: { ...club.data, teams: undefined } })
+        if (scenario === 'lege-club') return json(200, { data: { ...club.data, teams: [] } })
         if (scenario === 'verboden') return json(403, {})
         if (telling.clubs === 1) return json(401, {})
         return json(200, club)
@@ -47,7 +51,7 @@ puppeteer.launch = async options => {
       if (u.pathname === '/poules/200/teams/46179') {
         telling.detail++
         if (scenario === 'verboden') return json(403, {})
-        if (telling.detail === 1) return json(401, {})
+        if (telling.detail === 1 && scenario !== 'sessie') return json(401, {})
         return json(200, detail)
       }
       return req.abort()
@@ -58,6 +62,7 @@ puppeteer.launch = async options => {
 }
 ;(async () => {
   process.env.HOCKEY_BRON_BROWSER_HERSTEL = '1'
+  process.env.HOCKEY_BRON_SESSIE = '1'
   await lees(['HH11PD0', '46179', '200', '2026-2027'])
   const resultaat = JSON.parse(fs.readFileSync('/resultaat/catalogus.json'))
   assert.deepEqual(telling, { clubs: 0, registratie: 1, detail: 2 })
@@ -74,10 +79,25 @@ puppeteer.launch = async options => {
     assert.equal(telling.clubs, 0)
     assert.equal(telling.detail, 1)
     assert.ok(!fs.existsSync('/resultaat/catalogus.json'))
+    const meting = JSON.parse(fs.readFileSync('/resultaat/bronmeting.json'))
+    assert.ok(meting.antwoorden.some(r => r.status === code && r.route === (code === 429 ? 'bezoekersregistratie' : 'teamprogramma')))
   }
   scenario = 'herstel'
   detail.data.season_name = '2025-2026'
   await assert.rejects(lees(['HH11PD0', '46179', '200', '2026-2027']), /ander seizoen/)
   assert.ok(!fs.existsSync('/resultaat/catalogus.json'))
-  console.log('CATALOGUS_BROWSER_FIXTURE_OK: direct programmapagina zonder clubverzoek, websiteherstel, onbekende tijd, publieke export, 403/429 en seizoenbescherming; geen externe bron bezocht.')
+  scenario = 'sessie'; detail.data.season_name = '2026-2027'
+  await lees(['HH11PD0', '46179', '200', '2026-2027'])
+  assert.equal(telling.registratie, 1)
+  await lees(['HH11PD0', '46179', '200', '2026-2027'])
+  assert.equal(telling.registratie, 0, 'Volgend browserbezoek hergebruikt de bezoekerregistratie')
+  assert.equal(telling.detail, 1)
+  assert.equal(JSON.parse(fs.readFileSync('/resultaat/bronmeting.json')).antwoorden.some(r => r.route === 'bezoekersregistratie'), false)
+  scenario = 'onvolledig'
+  await assert.rejects(lees(['HH11PD0', '', '', '']), /geen volledige clubteams/)
+  assert.ok(!fs.existsSync('/resultaat/catalogus.json'), 'Geen oud resultaat bij een onvolledig bronantwoord')
+  scenario = 'lege-club'
+  await lees(['HH11PD0', '', '', ''])
+  assert.deepEqual(JSON.parse(fs.readFileSync('/resultaat/catalogus.json')).teams, [])
+  console.log('CATALOGUS_BROWSER_FIXTURE_OK: direct programma, websiteherstel, publieke export, 403/429 met veilige meting, seizoenbescherming en sessiehergebruik; geen externe bron bezocht.')
 })().catch(e => { console.error(e); process.exit(1) })
