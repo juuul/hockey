@@ -22,27 +22,12 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
     (a, b) => VELD_VOLGORDE.indexOf(a.positie) - VELD_VOLGORDE.indexOf(b.positie)
   )
   const [mode, setMode] = useState<'wissel' | 'verplaats'>(alleenVerplaatsen && !leegPlek ? 'verplaats' : 'wissel')
-  const directWisselen = !leegPlek && mode === 'wissel'
   const uitgevoerd = useRef(false)
-  const [selectedId, setSelectedId] = useState<string | null>(
-    (leegPlek || !alleenVerplaatsen) && sortedSubs.length === 1 ? sortedSubs[0].id : null
-  )
-
-  const switchMode = (next: 'wissel' | 'verplaats') => {
-    setMode(next)
-    setSelectedId(next === 'wissel' && sortedSubs.length === 1 ? sortedSubs[0].id : null)
-  }
-
-  const confirm = () => {
-    if (!selectedId) return
-    if (leegPlek || mode === 'wissel') onSubstitute(selectedId)
-    else onMove(selectedId)
-  }
-
-  const wisselDirect = (id: string) => {
+  const kiesDirect = (id: string) => {
     if (uitgevoerd.current) return
     uitgevoerd.current = true
-    onSubstitute(id)
+    if (leegPlek || mode === 'wissel') onSubstitute(id)
+    else onMove(id)
   }
 
   return (
@@ -58,8 +43,8 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
                 {sortedSubs.map(p => (
                   <button
                     key={p.id}
-                    className={`modal-option ${selectedId === p.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedId(p.id)}
+                    className="modal-option"
+                    onClick={() => kiesDirect(p.id)}
                   >
                     <span className="modal-option-name">{p.naam}</span>
                     <span className="modal-option-count">{p.wisselCount}×</span>
@@ -68,8 +53,8 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
                 {position === 'K' && sortedField.map(p => (
                   <button
                     key={p.id}
-                    className={`modal-option ${selectedId === p.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedId(p.id)}
+                    className="modal-option"
+                    onClick={() => kiesDirect(p.id)}
                   >
                     <span className="modal-option-name">{p.naam}</span>
                     <span className="modal-option-place">{POSITIE_LABEL[p.positie]}</span>
@@ -91,7 +76,7 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
                   <button
                     key={sub.id}
                     className="modal-option"
-                    onClick={() => wisselDirect(sub.id)}
+                    onClick={() => kiesDirect(sub.id)}
                   >
                     <span className="modal-option-name">{sub.naam}</span>
                     <span className="modal-option-count">{sub.wisselCount}×</span>
@@ -100,7 +85,7 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
               </div>
             )}
 
-            <button className="btn btn-secondary modal-mode-btn" onClick={() => switchMode('verplaats')}>
+            <button className="btn btn-secondary modal-mode-btn" onClick={() => setMode('verplaats')}>
               ⇄ Verplaatsen
             </button>
           </>
@@ -113,8 +98,8 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
               {sortedField.map(p => (
                 <button
                   key={p.id}
-                  className={`modal-option ${selectedId === p.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedId(p.id)}
+                  className="modal-option"
+                  onClick={() => kiesDirect(p.id)}
                 >
                   <span className="modal-option-name">{p.naam}</span>
                   <span className="modal-option-place">{POSITIE_LABEL[p.positie]}</span>
@@ -123,8 +108,8 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
               {sortedSubs.map(p => (
                 <button
                   key={p.id}
-                  className={`modal-option ${selectedId === p.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedId(p.id)}
+                  className="modal-option"
+                  onClick={() => kiesDirect(p.id)}
                 >
                   <span className="modal-option-name">{p.naam}</span>
                   <span className="modal-option-place">wissel</span>
@@ -133,7 +118,7 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
             </div>
 
             {!alleenVerplaatsen && (
-              <button className="btn btn-secondary modal-mode-btn" onClick={() => switchMode('wissel')}>
+              <button className="btn btn-secondary modal-mode-btn" onClick={() => setMode('wissel')}>
                 ← Terug naar wissel
               </button>
             )}
@@ -142,9 +127,6 @@ export default function SubstituteModal({ playerName, position, substitutes, fie
 
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>Annuleren</button>
-          {!directWisselen && <button className="btn btn-primary" disabled={!selectedId} onClick={confirm}>
-            Bevestig
-          </button>}
         </div>
       </div>
     </div>
