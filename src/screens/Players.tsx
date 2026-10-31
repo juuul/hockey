@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { speelduurTekst } from '../speelduur'
+import { SPELREGELS } from '../spelregels'
 import { CATEGORIE, OPSTELLINGEN_PER_SPELVORM, SPELVORMEN, isZaal, heeftKeeper, aantalSpelers, opstellingTekst, Player } from '../types'
 import AddPlayerModal from '../components/AddPlayerModal'
 import DeletePlayerModal from '../components/DeletePlayerModal'
@@ -65,6 +66,9 @@ export default function Players() {
       </div>
       {['mini3','zaalmini3','zaalmini4','hockey5'].includes(String(spelvorm)) && <p className="spelvorm-uitleg">Wedstrijdduur kan per district of toernooi verschillen; dit is de gekozen standaard.</p>}
       <div className="spelvorm-uitleg">{aantalSpelers(spelvorm)} spelers {heeftKeeper(spelvorm) ? 'met keeper' : 'zonder keeper'} · {speelduurTekst(spelvorm)}</div>
+      <nav className="spelregels-links" aria-label="Spelregels van deze categorie">
+        {SPELREGELS[spelvorm].map(regel => <a key={regel.url} href={regel.url} target="_blank" rel="noopener noreferrer">{regel.tekst} ↗</a>)}
+      </nav>
       {(timer.gestartOp !== null || timer.opgebouwd > 0) && <p className="spelvorm-uitleg">Begin een nieuwe wedstrijd om veld/zaal of categorie te veranderen.</p>}
       <div className="spelvorm" role="radiogroup" aria-label="Opstelling">
         {OPSTELLINGEN_PER_SPELVORM[spelvorm].map(naam => (
