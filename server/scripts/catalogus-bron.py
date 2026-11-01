@@ -1,6 +1,7 @@
 """Private bronmetingen, een vaste browsersessie en begrensde opbouw van clubteams."""
 from contextlib import closing
 from datetime import datetime
+import html
 import json
 import os
 from pathlib import Path
@@ -9,7 +10,8 @@ import time
 from zoneinfo import ZoneInfo
 
 ZONE = ZoneInfo('Europe/Amsterdam')
-ROUTES = {'bezoekersregistratie', 'clublijst', 'clubteams', 'teamprogramma', 'poule', 'overig'}
+ROUTES = {'bezoekersregistratie', 'clublijst', 'clubteams', 'teamprogramma', 'poule', 'overig',
+          'standaardfavorieten', 'standaardwedstrijden'}
 METHODES = {'GET', 'POST', 'OPTIONS', 'HEAD'}
 
 
@@ -19,8 +21,11 @@ def sessie_opties(basis):
     profiel = basis / 'catalogus-browser-profiel'
     profiel.mkdir(mode=0o700, parents=True, exist_ok=True)
     profiel.chmod(0o700)
-    return ['--user', f'{os.getuid()}:{os.getgid()}', '-e', 'HOCKEY_BRON_SESSIE=1',
-            '-e', 'HOCKEY_BRON_BROWSER_HERSTEL=1', '-v', f'{profiel}:/bronprofiel']
+    opties = ['--user', f'{os.getuid()}:{os.getgid()}', '-e', 'HOCKEY_BRON_SESSIE=1',
+              '-e', 'HOCKEY_BRON_BROWSER_HERSTEL=1', '-v', f'{profiel}:/bronprofiel']
+    if (basis / 'catalogus-poule-licht.actief').is_file():
+        opties += ['-e', 'HOCKEY_BRON_POULE_LICHT=1']
+    return opties
 
 
 def lees_meting(pad):
@@ -33,6 +38,7 @@ def lees_meting(pad):
     def getal(v):
         return min(max(v, 0), 10**12) if type(v) is int else 0
     uit = {k: getal(d.get(k)) for k in ['verzoeken', 'bronverzoeken', 'duurMs']}
+    uit['werkwijze'] = 'licht' if d.get('werkwijze') == 'licht' else 'website'
     uit['afgekapt'] = d.get('afgekapt') is True
     uit['antwoorden'], uit['volgorde'] = [], []
     for veld in ['antwoorden', 'volgorde']:
@@ -137,3 +143,47 @@ def opbouw_taken(pad, pilot, meting_pad, nu=None):
     _, _, club, data = min(kandidaten, key=lambda k: (k[0], k[1], k[2]))
     return [{'id': '', 'clubBronId': club, 'teamBronId': '', 'pouleId': '', 'seizoen': seizoen,
              'sleutel': 'club:' + club, 'slot': 'opbouw:' + seizoen, 'opbouw': True, 'cacheData': data}]
+
+
+def plan_lichte_evaluatie(meldingen, basis, meting_pad, nu=None):
+    """Eén op verzoek ingepland meetoverzicht, via de bestaande mailwachtrij."""
+    config = basis / 'catalogus-licht-evaluatie.json'
+    if not config.exists():
+        return
+    d = json.loads(config.read_text())
+    vanaf, op = datetime.fromisoformat(d['vanaf']), datetime.fromisoformat(d['op'])
+    if vanaf.utcoffset() is None or op.utcoffset() is None or op < vanaf:
+        raise ValueError('Evaluatie vereist een geldige periode met tijdzone')
+    nu = time.time() if nu is None else nu
+    if nu < op.timestamp():
+        return
+    sleutel = 'lichte-poule:' + str(d['id'])
+    c = meldingen.c
+    c.execute('CREATE TABLE IF NOT EXISTS evaluaties(id TEXT PRIMARY KEY,ingepland REAL)')
+    if c.execute('SELECT 1 FROM evaluaties WHERE id=?', (sleutel,)).fetchone():
+        return
+    regels = []
+    if meting_pad.exists():
+        with closing(sqlite3.connect(meting_pad.resolve().as_uri() + '?mode=ro', uri=True)) as bron:
+            rows = bron.execute("SELECT tijd,status,meting,omgeving FROM bezoeken WHERE soort='poule' AND tijd>=? AND tijd<=? ORDER BY tijd", (vanaf.timestamp(), nu)).fetchall()
+        for tijd, status, tekst, omgeving in rows:
+            meting = json.loads(tekst)
+            if meting.get('werkwijze') != 'licht':
+                continue
+            regels.append(f"{datetime.fromtimestamp(tijd, ZONE).strftime('%d-%m %H:%M:%S')} · {omgeving} · {'import geslaagd' if status == 'klaar' else 'controle mislukt'} · {meting.get('verzoeken', 0)} webverzoeken, waarvan {meting.get('bronverzoeken', 0)} aan de wedstrijdbron")
+            for r in meting.get('antwoorden', []):
+                if r.get('route') in ROUTES and r.get('methode') in METHODES and type(r.get('status')) is int:
+                    regels.append(f"  {r['route']} · {r['methode']} · HTTP {r['status']} · {r.get('aantal', 0)} keer")
+    uitleg = '\n'.join(regels) if regels else 'Nog geen lichte broncontrole gemeten in deze periode. Er is geen extra bronverzoek gestart voor deze evaluatie; bronpauzes en planning blijven gelden.'
+    periode = vanaf.isoformat() + ' tot ' + datetime.fromtimestamp(nu, ZONE).isoformat()
+    prompt = ('Beoordeel de lichte poulecontrole van de hockey-app aan de hand van deze metingen. '
+              'Controleer bronstatus, bezoekersregistraties, aantal verzoeken en bevestigde imports. '
+              'Vergelijk met de eerdere websitecontrole. Een geslaagde controle bewijst nog niet dat 429 definitief is opgelost. '
+              'Respecteer bronpauzes, behouden eigen planning en gebruik alleen hockey.nl/KNHB; geen SCHC-site zonder mijn expliciete toestemming. '
+              'Wijzig code of ophaallimieten niet zonder mijn opdracht.\n\nMeetperiode: ' + periode + '\n' + uitleg)
+    inhoud = ('<p>Het ingeplande overzicht van de lichte programmacontrole. Test en productie delen bronbezoeken en cache; hieronder staan alleen echte bronbezoeken.</p><p>Meetperiode: '
+              + html.escape(periode) + '</p><pre style="white-space:pre-wrap">' + html.escape(uitleg)
+              + '</pre><h3>Kopieer deze opdracht naar de chat</h3><pre style="white-space:pre-wrap">' + html.escape(prompt) + '</pre>')
+    with c:
+        meldingen.voeg_toe('Evaluatie hockey-app · lichte programmacontrole', inhoud)
+        c.execute('INSERT INTO evaluaties VALUES(?,?)', (sleutel, nu))

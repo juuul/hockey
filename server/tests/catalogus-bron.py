@@ -14,6 +14,7 @@ def module(naam):
 
 m = module('catalogus-bron.py')
 p = module('catalogus-pilot.py')
+n = module('catalogus-meldingen.py')
 
 
 class BronTest(unittest.TestCase):
@@ -51,14 +52,18 @@ class BronTest(unittest.TestCase):
         self.assertEqual(args, m.sessie_opties(self.root))
         self.assertTrue((profiel/'bestaande-sessie').exists())
         self.assertEqual(profiel.stat().st_mode & 0o777, 0o700)
+        (self.root/'catalogus-poule-licht.actief').touch()
+        self.assertIn('HOCKEY_BRON_POULE_LICHT=1',m.sessie_opties(self.root))
+        self.assertTrue((profiel/'bestaande-sessie').exists(), 'Geen nieuw profiel bij overschakelen')
 
     def test_metrics_whitelist_permissions_and_retention(self):
         f = self.root/'bronmeting.json'
-        f.write_text(json.dumps({'token':'GEHEIM', 'verzoeken':5, 'bronverzoeken':2,
+        f.write_text(json.dumps({'token':'GEHEIM', 'werkwijze':'licht', 'verzoeken':5, 'bronverzoeken':2,
           'antwoorden':[{'route':'clubteams', 'methode':'GET', 'status':429, 'aantal':1, 'retryNa':123, 'headers':{'authorization':'GEHEIM'}},
                         {'route':'/email/GEHEIM', 'methode':'POST', 'status':200}],
           'volgorde':[{'route':'clubteams', 'methode':'GET', 'status':429, 'verzoek':2, 'body':'GEHEIM'}]}))
         d = m.lees_meting(f)
+        self.assertEqual(d['werkwijze'],'licht')
         self.assertNotIn('GEHEIM', json.dumps(d)); self.assertEqual(len(d['antwoorden']), 1)
         self.assertEqual(d['volgorde'][0]['verzoek'], 2)
         m.bewaar_meting(self.metingen, 'club', 'fout', d, self.now-31*86400)
@@ -143,6 +148,49 @@ class BronTest(unittest.TestCase):
         self.pilot.c.commit()
         self.assertEqual(self.taken()[0]['seizoen'], '2027-2028')
         self.assertIsNone(self.taken()[0]['cacheData'])
+
+    def test_one_evaluation_mail_after_due_time_with_shared_real_measurements(self):
+        basis=self.root/'productie';basis.mkdir()
+        (basis/'catalogus-licht-evaluatie.json').write_text(json.dumps({
+            'id':'morgen','vanaf':datetime.fromtimestamp(self.now-600,m.ZONE).isoformat(),
+            'op':datetime.fromtimestamp(self.now+60,m.ZONE).isoformat()}))
+        mails=n.Meldingen(basis/'mails.db','test');self.addCleanup(mails.c.close)
+        m.bewaar_meting(self.metingen,'poule','klaar',{'werkwijze':'licht','verzoeken':9,'bronverzoeken':2,
+            'antwoorden':[{'route':'teamprogramma','methode':'GET','status':200,'aantal':1}]},self.now,omgeving='test')
+        m.plan_lichte_evaluatie(mails,basis,self.metingen,self.now)
+        self.assertEqual(mails.c.execute('SELECT count(*) FROM mails').fetchone()[0],0)
+        m.plan_lichte_evaluatie(mails,basis,self.metingen,self.now+60)
+        m.plan_lichte_evaluatie(mails,basis,self.metingen,self.now+120)
+        rows=mails.c.execute('SELECT onderwerp,html FROM mails').fetchall()
+        self.assertEqual(len(rows),1)
+        for tekst in ['import geslaagd','9 webverzoeken','2 aan de wedstrijdbron','HTTP 200','Kopieer deze opdracht','test']:
+            self.assertIn(tekst,rows[0][1])
+
+    def test_evaluation_without_visit_does_not_claim_success_or_fetch_source(self):
+        basis=self.root/'productie';basis.mkdir()
+        (basis/'catalogus-licht-evaluatie.json').write_text(json.dumps({
+            'id':'geen','vanaf':datetime.fromtimestamp(self.now-600,m.ZONE).isoformat(),
+            'op':datetime.fromtimestamp(self.now,m.ZONE).isoformat()}))
+        mails=n.Meldingen(basis/'mails.db','test');self.addCleanup(mails.c.close)
+        m.plan_lichte_evaluatie(mails,basis,self.metingen,self.now)
+        self.assertFalse(self.metingen.exists())
+        tekst=mails.c.execute('SELECT html FROM mails').fetchone()[0]
+        self.assertIn('Nog geen lichte broncontrole',tekst)
+        self.assertNotIn('import geslaagd',tekst)
+
+    def test_evaluation_includes_failure_statuses_and_rejects_naive_dates(self):
+        basis=self.root/'productie';basis.mkdir()
+        cfg=basis/'catalogus-licht-evaluatie.json'
+        cfg.write_text(json.dumps({'id':'fout','vanaf':'2026-10-31T00:00:00','op':'2026-10-31T10:00:00'}))
+        mails=n.Meldingen(basis/'mails.db','test');self.addCleanup(mails.c.close)
+        with self.assertRaisesRegex(ValueError,'tijdzone'):m.plan_lichte_evaluatie(mails,basis,self.metingen,self.now)
+        cfg.write_text(json.dumps({'id':'fout','vanaf':datetime.fromtimestamp(self.now-60,m.ZONE).isoformat(),
+            'op':datetime.fromtimestamp(self.now,m.ZONE).isoformat()}))
+        m.bewaar_meting(self.metingen,'poule','fout',{'werkwijze':'licht','verzoeken':4,'bronverzoeken':2,
+            'antwoorden':[{'route':'teamprogramma','methode':'GET','status':429,'aantal':1}]},self.now)
+        m.plan_lichte_evaluatie(mails,basis,self.metingen,self.now)
+        tekst=mails.c.execute('SELECT html FROM mails').fetchone()[0]
+        self.assertIn('controle mislukt',tekst);self.assertIn('HTTP 429',tekst)
 
 
 if __name__ == '__main__': unittest.main()

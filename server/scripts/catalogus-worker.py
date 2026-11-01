@@ -175,6 +175,7 @@ controleer_meldingen()
 try:
     if meldingen:
         pilot_module.plan_evaluatie(meldingen, basis, pilot_pad, bron_pad=bron_pad)
+        bron_module.plan_lichte_evaluatie(meldingen, basis, meting_pad)
         notificaties.verzend_geconfigureerd(meldingen)
 except (OSError, ValueError, KeyError, sqlite3.Error, subprocess.SubprocessError) as exc:
     # Mailconfig/SMTP-uitval mag geslaagde imports niet ongedaan maken; de

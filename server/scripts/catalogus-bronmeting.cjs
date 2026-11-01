@@ -5,6 +5,8 @@ function route(url) {
   if (u.origin !== BRON) return null
   if (u.pathname === '/device/register') return 'bezoekersregistratie'
   if (u.pathname === '/clubs') return 'clublijst'
+  if (u.pathname === '/favorites/defaults') return 'standaardfavorieten'
+  if (u.pathname === '/favorites/defaults/matches') return 'standaardwedstrijden'
   if (/^\/clubs\/[A-Z0-9]{7}$/.test(u.pathname)) return 'clubteams'
   if (/^\/poules\/\d+\/teams\/\d+$/.test(u.pathname)) return 'teamprogramma'
   if (/^\/poules\/\d+$/.test(u.pathname)) return 'poule'
@@ -15,9 +17,9 @@ function retryTot(response, nu = Date.now()) {
   const tot = /^\d+$/.test(waarde || '') ? nu + Number(waarde) * 1000 : Date.parse(waarde || '')
   return Number.isFinite(tot) && tot > nu ? Math.ceil(tot / 1000) : null
 }
-function meetBron(page) {
+function meetBron(page, werkwijze = 'website') {
   const begin = Date.now(), nummers = new WeakMap()
-  const data = { versie: 1, verzoeken: 0, bronverzoeken: 0, antwoorden: [], volgorde: [], afgekapt: false }
+  const data = { versie: 2, werkwijze, verzoeken: 0, bronverzoeken: 0, antwoorden: [], volgorde: [], afgekapt: false }
   function verzoek(req) {
     data.verzoeken++
     if (route(req.url()) !== null) nummers.set(req, ++data.bronverzoeken)
