@@ -25,6 +25,8 @@ def sessie_opties(basis):
               '-e', 'HOCKEY_BRON_BROWSER_HERSTEL=1', '-v', f'{profiel}:/bronprofiel']
     if (basis / 'catalogus-poule-licht.actief').is_file():
         opties += ['-e', 'HOCKEY_BRON_POULE_LICHT=1']
+    if (basis / 'catalogus-clubs-licht.actief').is_file():
+        opties += ['-e', 'HOCKEY_BRON_CLUBS_LICHT=1']
     return opties
 
 

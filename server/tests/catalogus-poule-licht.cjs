@@ -40,6 +40,14 @@ puppeteer.launch = async opts => {
           return json(scenario === 'registratie-429' ? 429 : scenario === 'registratie-403' ? 403 : 201,
             { token: 'fixture-anonieme-bezoeker' })
         }
+        if (u.pathname === '/clubs' || u.pathname === '/clubs/ABC1234') {
+          calls.clubs = (calls.clubs || 0) + 1
+          if (!req.headers()['x-hapi-authorization']) return json(401, {})
+          if (scenario === 'club-429') return json(429, {})
+          const club = { type: 'regular', federation_reference_id: 'ABC1234', name: 'Voorbeeldclub', teams: [team] }
+          if (u.pathname === '/clubs') return json(200, { data: [club, { type: 'business', federation_reference_id: 'XYZ0000' }] })
+          return json(200, { data: { ...club, ...(scenario === 'verkeerde-club' ? { federation_reference_id: 'XXX0000' } : {}) } })
+        }
         if (u.pathname === '/poules/200/teams/46179') {
           calls.programma++
           if (!req.headers()['x-hapi-authorization']) return json(401, {})
@@ -93,5 +101,21 @@ async function run(naam, error) {
     assert.ok(calls.programma <= 2)
     assert.ok(calls.registratie <= 1)
   }
+  process.env.HOCKEY_BRON_CLUBS_LICHT = '1'; scenario = 'goed'
+  await lees(['ABC1234','','',''])
+  let d = JSON.parse(fs.readFileSync('/resultaat/catalogus.json'))
+  assert.equal(d.clubs.length,1);assert.equal(d.teams.length,1);assert.deepEqual(d.wedstrijden,[])
+  assert.equal(calls.programma,0);assert.equal(calls.overig,0)
+  await lees(['','','',''])
+  d = JSON.parse(fs.readFileSync('/resultaat/catalogus.json'))
+  assert.equal(d.clubs.length,1,'Zakelijke clubs worden niet als hockeyclub geïmporteerd')
+  assert.equal(calls.clubs,1);assert.equal(calls.programma,0);assert.equal(calls.overig,0)
+  scenario='verkeerde-club'
+  await assert.rejects(lees(['ABC1234','','','']),/Onvolledig clubantwoord/)
+  assert.ok(!fs.existsSync('/resultaat/catalogus.json'))
+  scenario='club-429'
+  await assert.rejects(lees(['ABC1234','','','']),/HTTP 429/)
+  assert.equal(calls.clubs,1);assert.equal(calls.programma,0)
+  assert.ok(!fs.existsSync('/resultaat/catalogus.json'))
   console.log('POULE_LICHT_OK: officiële client, koude/warme sessie, één herstel, 401/403/429, gewijzigde modules, nevenverzoeken, seizoen en veilige export; zonder externe bronverzoeken.')
 })().catch(e => { console.error(e); process.exit(1) })

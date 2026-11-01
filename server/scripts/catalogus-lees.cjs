@@ -5,14 +5,14 @@ const fs = require('fs')
 const { normaliseer } = require('/scripts/catalogus-normaliseer.cjs')
 const { wachtOpBron } = require('/scripts/catalogus-browser.cjs')
 const { meetBron } = require('/scripts/catalogus-bronmeting.cjs')
-const { leesPouleLicht } = require('/scripts/catalogus-poule-licht.cjs')
+const { leesPouleLicht, leesClubsLicht } = require('/scripts/catalogus-poule-licht.cjs')
 async function lees(args = process.argv.slice(2)) {
   const [clubId, teamId, pouleId, verwachtSeizoen] = args
   if (clubId && !/^[A-Z0-9]{7}$/.test(clubId)) throw new Error('Ongeldige clubcode')
   if (teamId && (!/^\d+$/.test(teamId) || !/^\d+$/.test(pouleId))) throw new Error('Ongeldig team of poule')
   fs.rmSync('/resultaat/catalogus.json', { force: true })
   const sessie = process.env.HOCKEY_BRON_SESSIE === '1'
-  const licht = sessie && !!teamId && process.env.HOCKEY_BRON_POULE_LICHT === '1'
+  const licht = sessie && (teamId ? process.env.HOCKEY_BRON_POULE_LICHT === '1' : process.env.HOCKEY_BRON_CLUBS_LICHT === '1')
   const browser = await puppeteer.launch({ executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'],
     ...(sessie ? { userDataDir: '/bronprofiel' } : {}) })
   let meting
@@ -33,8 +33,10 @@ async function lees(args = process.argv.slice(2)) {
       } finally { wacht.stop() }
     }
     let club, detail
-    if (licht) {
+    if (licht && teamId) {
       detail = await leesPouleLicht(page, teamId, pouleId)
+    } else if (licht) {
+      club = await leesClubsLicht(page, clubId)
     } else if (teamId && process.env.HOCKEY_BRON_BROWSER_HERSTEL === '1') {
       // Bezoek direct het gevraagde programma; geen onnodige club-/teamrondgang.
       detail = await bronLezen(`/poules/${pouleId}/teams/${teamId}`, () => page.goto(`https://www.hockey.nl/match-center#/team/${teamId}|${pouleId}/program`, { waitUntil: 'domcontentloaded', timeout: 45000 }))

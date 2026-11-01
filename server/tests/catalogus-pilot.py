@@ -121,6 +121,16 @@ class PilotTest(unittest.TestCase):
         self.assertFalse(self.p.mag_ophalen(now+24*120))
         self.assertTrue(self.p.mag_ophalen(tijd('2026-10-18','10:00')))
 
+    def test_explicit_backfill_budget_and_normal_budget_after_completion(self):
+        now=tijd(uur='10:00');t={**poule(),'slot':'aanvulling:ronde'}
+        for i in range(30):self.run_ok(t,now+i*10)
+        self.assertTrue(self.p.mag_ophalen(now+400),'Campagnebezoeken verbruiken geen gewoon budget na afronden')
+        for i in range(24):self.run_ok({**t,'slot':'dag'},now+500+i*10)
+        self.assertFalse(self.p.mag_ophalen(now+900))
+        actief=m.Pilot(self.pad,'productie',dagbudget=288);self.addCleanup(actief.c.close)
+        self.assertTrue(actief.mag_ophalen(now+900))
+        with self.assertRaises(ValueError):m.Pilot(self.root/'ongeldig.db','test',dagbudget=289)
+
     def test_failed_slot_waits_for_next_schedule(self):
         now=tijd();t=self.p.taken([poule()],now)[0]
         ident=self.p.begin(t,'browser',now)
@@ -133,11 +143,17 @@ class PilotTest(unittest.TestCase):
         self.assertIn('Geen pilotmetingen',self.p.rapport(now,now+100))
         for i in range(6):self.run_ok(t,now+i,bron='cache')
         self.assertIn('Nog niet uitbreiden',self.p.rapport(now,now+100))
+
         for i in range(5):self.run_ok(t,now+10+i)
         self.assertIn('kleine uitbreiding',self.p.rapport(now,now+100))
         self.assertIn('Nog niet uitbreiden',self.p.rapport(now,now+100,verwacht=['andere-poule']))
         ident=self.p.begin(t,'browser',now+20);self.p.resultaat(ident,t,fout='Bron HTTP 429',nu=now+21)
         self.assertIn('Nog niet uitbreiden',self.p.rapport(now,now+100))
+
+    def test_clublist_is_not_counted_as_registered_poule(self):
+        now=tijd();self.run_ok({'sleutel':'clublijst','slot':'aanvulling:ronde'},now)
+        self.assertIn('Geen pilotmetingen',self.p.rapport(now,now+100))
+        self.assertIn('Geobserveerde geregistreerde poules in deze omgeving: 0',self.p.rapport(now,now+100))
 
     def test_registered_only_deduplicated_and_readonly(self):
         bron=self.root/'bron.db'
