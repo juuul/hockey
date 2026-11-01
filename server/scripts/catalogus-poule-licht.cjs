@@ -6,9 +6,8 @@ const ORIGIN = 'https://www.hockey.nl'
 const CDN = 'https://mc.static-hw.nl/v2/'
 const API = 'https://app.hockeyweerelt.nl'
 
-async function leesPouleLicht(page, team, poule) {
-  if (!/^\d+$/.test(team) || !/^\d+$/.test(poule)) throw new Error('Ongeldige poule of team')
-  const pad = `/poules/${poule}/teams/${team}`
+async function leesBronLicht(page, pad) {
+  if (!/^(?:\/clubs(?:\/[A-Z0-9]{7})?|\/poules\/\d+\/teams\/\d+)$/.test(pad)) throw new Error('Ongeldige bronroute')
   const aantallen = { registratie: 0, programma: 0 }
   const preflights = new Map()
   let afgebroken = false, onverwacht = false, moduleFout
@@ -96,9 +95,7 @@ async function leesPouleLicht(page, team, poule) {
       if (onverwacht) throw new Error('Onverwacht bronverzoek; bestaande gegevens blijven behouden')
     }
     const [, response] = await Promise.all([start(), antwoord])
-    const data = await response.json()
-    if (!data?.data || !Array.isArray(data.data.poules)) throw new Error('Onvolledig pouleantwoord')
-    return data
+    return await response.json()
   } catch (e) {
     throw moduleFout || e
   } finally {
@@ -109,4 +106,20 @@ async function leesPouleLicht(page, team, poule) {
     // een afgebroken initialisatie geen late bronverzoeken kan starten.
   }
 }
-module.exports = { leesPouleLicht }
+
+async function leesPouleLicht(page, team, poule) {
+  if (!/^\d+$/.test(team) || !/^\d+$/.test(poule)) throw new Error('Ongeldige poule of team')
+  const data = await leesBronLicht(page, `/poules/${poule}/teams/${team}`)
+  if (!data?.data || !Array.isArray(data.data.poules)) throw new Error('Onvolledig pouleantwoord')
+  return data
+}
+
+async function leesClubsLicht(page, club) {
+  if (club && !/^[A-Z0-9]{7}$/.test(club)) throw new Error('Ongeldige club')
+  const data = await leesBronLicht(page, club ? `/clubs/${club}` : '/clubs')
+  if (club ? !Array.isArray(data?.data?.teams) || data.data.federation_reference_id !== club : !Array.isArray(data?.data)) {
+    throw new Error('Onvolledig clubantwoord')
+  }
+  return data
+}
+module.exports = { leesPouleLicht, leesClubsLicht }

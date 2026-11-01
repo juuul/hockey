@@ -32,7 +32,16 @@ pilot_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pilot_module)
 pilot_pad = ROOT / 'planning_documenten' / 'catalogus-pilot.db'
 basis = ROOT / 'planning_documenten' / args.omgeving
-pilot = pilot_module.Pilot(pilot_pad, args.omgeving) if (basis / 'catalogus-pilot.actief').is_file() and not args.clubs else None
+spec = importlib.util.spec_from_file_location('catalogus_aanvulling', ROOT / 'scripts' / 'catalogus-aanvulling.py')
+aanvulling_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(aanvulling_module)
+aanvulconfig = aanvulling_module.configuratie(basis)
+aanvulling = (aanvulling_module.Aanvulling(ROOT / 'planning_documenten' / 'catalogus-aanvulling.db', args.omgeving, aanvulconfig)
+              if aanvulconfig else None)
+# Alleen de expliciet aangevraagde vijfminutenronde krijgt dit eigen budget.
+# Het is geen bekend KNHB-quotum. Zonder actieve ronde blijft de pilot op 24.
+dagbudget = 288 if aanvulling and aanvulling.actief else 24
+pilot = pilot_module.Pilot(pilot_pad, args.omgeving, dagbudget=dagbudget) if (basis / 'catalogus-pilot.actief').is_file() and not args.clubs else None
 # Test en productie bezoeken nooit tegelijkertijd de wedstrijdbron.
 (ROOT / 'planning_documenten').mkdir(parents=True, exist_ok=True, mode=0o700)
 bron_lock = open(ROOT / 'planning_documenten' / '.catalogus-bron.lock', 'a')
@@ -50,13 +59,15 @@ spec.loader.exec_module(bron_module)
 meting_pad = ROOT / 'planning_documenten' / 'catalogus-bronmetingen.db'
 # Oude productie-images blijven het oude protocol gebruiken tot de migratie expliciet is uitgerold.
 club_schema = club_module.beschikbaar(bron_pad)
-limiter = pilot or (pilot_module.Pilot(pilot_pad, args.omgeving) if club_schema and args.clubs and (basis / 'catalogus-pilot.actief').is_file() else None)
+limiter = pilot or (pilot_module.Pilot(pilot_pad, args.omgeving, dagbudget=dagbudget) if club_schema and args.clubs and (basis / 'catalogus-pilot.actief').is_file() else None)
 club_herstel = limiter is not None and club_schema
 # Expliciet per omgeving én alleen met gedeelde bronbegrenzing activeren.
 sessie_opties = bron_module.sessie_opties(basis) if limiter else []
 def publiceer_status():
     if club_herstel:
         club_module.publiceer(basis / 'catalogus-status.json', limiter.volgende_poging())
+    if aanvulling:
+        aanvulling.publiceer(basis / 'catalogus-aanvulling-status.json')
 publiceer_status()
 meldingen = (notificaties.Meldingen(ROOT / 'planning_documenten' / args.omgeving / 'catalogus-mails.db', args.omgeving)
              if (ROOT / 'planning_documenten' / args.omgeving / 'catalogus-mails.actief').is_file() else None)
@@ -87,13 +98,15 @@ if pilot:
     if club_herstel:
         clubs = club_module.taken(bron_pad)
     taken = pilot.taken(pilot_module.geregistreerd(bron_pad)) + clubs[:1]
-    if not taken and sessie_opties and (basis / 'catalogus-clubopbouw.actief').is_file():
+    if not taken and sessie_opties and aanvulling:
+        taken = aanvulling.taken(pilot)
+    elif not taken and sessie_opties and (basis / 'catalogus-clubopbouw.actief').is_file():
         taken = bron_module.opbouw_taken(bron_pad, pilot, meting_pad)
 if args.clubs:
     taken = [{'id': '', 'clubBronId': '', 'teamBronId': '', 'pouleId': '', 'sleutel': 'clublijst', 'slot': 'expliciet-clublijst'}]
 for taak in taken:
     data = taak.get('cacheData')
-    if data is None and not taak.get('opbouw'):
+    if data is None and not (taak.get('opbouw') or taak.get('aanvulling')):
         data = limiter.cache(taak) if limiter else None
     if club_herstel and data is None and taak['id'] and not taak['teamBronId']:
         vanaf = limiter.club_vanaf(taak['sleutel'])
@@ -127,6 +140,8 @@ for taak in taken:
                         bron_meting = bron_module.lees_meting(Path(d) / 'bronmeting.json')
                 bron_module.controleer_meting(bron_meting)
                 data = json.loads(p.read_text())
+            if taak.get('aanvulling'):
+                aanvulling.valideer(taak, data, bron_pad)
             aantal = pilot_module.wijzigingen(bron_pad, data) if pilot else 0
             data.pop('taakId', None)
             if taak['id']:
@@ -141,8 +156,10 @@ for taak in taken:
                 meldingen.bronresultaat(taak)
             if limiter:
                 limiter.resultaat(meting, taak, data=data, aantal=aantal)
+            if taak.get('aanvulling'):
+                aanvulling.resultaat(taak, data=data)
             bron_status = 'klaar'
-    except (subprocess.SubprocessError, ValueError, OSError) as exc:
+    except (subprocess.SubprocessError, ValueError, OSError, sqlite3.Error) as exc:
         print('Openbare import mislukt; bestaande gegevens blijven behouden:', str(exc))
         if isinstance(exc, subprocess.CalledProcessError) and exc.stderr:
             print(exc.stderr.decode(errors='replace')[-500:] if isinstance(exc.stderr, bytes) else exc.stderr[-500:])
@@ -155,6 +172,8 @@ for taak in taken:
             meldingen.bronresultaat(taak, fout or type(exc).__name__)
         if limiter:
             limiter.resultaat(meting, taak, fout=fout or type(exc).__name__)
+        if taak.get('aanvulling'):
+            aanvulling.resultaat(taak, fout=fout or type(exc).__name__, bron_vanaf=limiter.volgende_poging())
         if taak['id']:
             if club_herstel and not taak['teamBronId']:
                 opnieuw = club_module.herpoging(taak.get('pogingen', 0) + 1, fout, limiter.volgende_poging())
@@ -174,6 +193,8 @@ for taak in taken:
 controleer_meldingen()
 try:
     if meldingen:
+        if aanvulling:
+            aanvulling.meld_gereed(meldingen, bron_pad)
         pilot_module.plan_evaluatie(meldingen, basis, pilot_pad, bron_pad=bron_pad)
         bron_module.plan_lichte_evaluatie(meldingen, basis, meting_pad)
         notificaties.verzend_geconfigureerd(meldingen)

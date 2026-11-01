@@ -64,7 +64,7 @@ class WorkerHerstel(unittest.TestCase):
    root=Path(tmp);(root/'scripts').mkdir();(root/'pb_test_data').mkdir()
    basis=root/'planning_documenten'/'test';basis.mkdir(parents=True);(basis/'catalogus-pilot.actief').touch()
    (basis/'catalogus-browser-sessie.actief').touch()
-   for naam in ['catalogus-worker.py','catalogus-clubs.py','catalogus-pilot.py','catalogus-meldingen.py','catalogus-bron.py']:
+   for naam in ['catalogus-worker.py','catalogus-clubs.py','catalogus-pilot.py','catalogus-meldingen.py','catalogus-bron.py','catalogus-aanvulling.py']:
     shutil.copy(Path(__file__).parents[1]/'scripts'/naam,root/'scripts'/naam)
    db=root/'pb_test_data'/'data.db'
    with sqlite3.connect(db) as c:

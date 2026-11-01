@@ -41,7 +41,10 @@ def wijzigingen(pad, data):
 
 
 class Pilot:
-    def __init__(self, pad, omgeving):
+    def __init__(self, pad, omgeving, dagbudget=24):
+        if type(dagbudget) is not int or not 1 <= dagbudget <= 288:
+            raise ValueError('Ongeldig bronbudget')
+        self.dagbudget = dagbudget
         pad.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         self.omgeving = omgeving
         self.c = sqlite3.connect(pad)
@@ -104,7 +107,12 @@ class Pilot:
         # Ook na een lang bronbezoek vijf volle seconden rust, gedeeld tussen omgevingen.
         vanaf = max(grenzen.get('pauzeTot',0), max(grenzen.get('laatsteBezoek',0),laatste_klaar)+5)
         middernacht = datetime.fromtimestamp(nu,ZONE).replace(hour=0,minute=0,second=0,microsecond=0)
-        if self.c.execute("SELECT count(*) FROM runs WHERE bron='browser' AND begonnen>=?", (middernacht.timestamp(),)).fetchone()[0] >= 24:
+        totaal = self.c.execute("SELECT count(*) FROM runs WHERE bron='browser' AND begonnen>=?", (middernacht.timestamp(),)).fetchone()[0]
+        # De eenmalige aanvulling mag na afronden het gewone dagbudget niet
+        # opgebruikt laten lijken. De gezamenlijke bovengrens blijft wel 288.
+        gewoon = (self.c.execute("SELECT count(*) FROM runs WHERE bron='browser' AND slot NOT LIKE 'aanvulling:%' AND begonnen>=?", (middernacht.timestamp(),)).fetchone()[0]
+                  if self.dagbudget == 24 else totaal)
+        if totaal >= 288 or gewoon >= self.dagbudget:
             vanaf = max(vanaf, (middernacht + timedelta(days=1)).timestamp())
         return vanaf
 
@@ -139,11 +147,11 @@ class Pilot:
 
     def rapport(self, vanaf, tot, verwacht=None):
         rows = self.c.execute('''SELECT status,bron,code,wijzigingen FROM runs
-            WHERE omgeving=? AND sleutel NOT LIKE 'club:%' AND begonnen>=? AND begonnen<=?''', (self.omgeving,vanaf,tot)).fetchall()
+            WHERE omgeving=? AND sleutel NOT LIKE 'club:%' AND sleutel!='clublijst' AND begonnen>=? AND begonnen<=?''', (self.omgeving,vanaf,tot)).fetchall()
         goed = sum(r[0]=='klaar' for r in rows)
         fouten = sum(r[0]=='fout' for r in rows)
         beperkt = sum(r[2] in (401,403,429) for r in rows)
-        gedeeld = self.c.execute("SELECT status,code FROM runs WHERE bron='browser' AND sleutel NOT LIKE 'club:%' AND begonnen>=? AND begonnen<=?", (vanaf,tot)).fetchall()
+        gedeeld = self.c.execute("SELECT status,code FROM runs WHERE bron='browser' AND sleutel NOT LIKE 'club:%' AND sleutel!='clublijst' AND begonnen>=? AND begonnen<=?", (vanaf,tot)).fetchall()
         bron_goed = sum(r[0]=='klaar' for r in gedeeld)
         bron_fout = sum(r[0]=='fout' for r in gedeeld)
         dekking = dict(self.c.execute("SELECT sleutel,count(*) FROM runs WHERE omgeving=? AND status='klaar' AND begonnen>=? AND begonnen<=? GROUP BY sleutel", (self.omgeving,vanaf,tot)))
@@ -161,7 +169,7 @@ class Pilot:
                   f'Controles met toegangs-/limietfout: {beperkt}',
                   f'Gewijzigde/toegevoegde wedstrijdrecords bij geslaagde imports: {sum(r[3] for r in rows if r[0]=="klaar")}',
                   advies]
-        poules = self.c.execute("SELECT count(DISTINCT sleutel) FROM runs WHERE omgeving=? AND sleutel NOT LIKE 'club:%' AND begonnen>=? AND begonnen<=?", (self.omgeving,vanaf,tot)).fetchone()[0]
+        poules = self.c.execute("SELECT count(DISTINCT sleutel) FROM runs WHERE omgeving=? AND sleutel NOT LIKE 'club:%' AND sleutel!='clublijst' AND begonnen>=? AND begonnen<=?", (self.omgeving,vanaf,tot)).fetchone()[0]
         duur = self.c.execute("SELECT avg(klaar-begonnen),max(klaar-begonnen) FROM runs WHERE bron='browser' AND status='klaar' AND begonnen>=? AND begonnen<=?", (vanaf,tot)).fetchone()
         regels.insert(0,f'Geobserveerde geregistreerde poules in deze omgeving: {poules}')
         if verwacht is not None:
