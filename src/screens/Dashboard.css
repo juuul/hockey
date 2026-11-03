@@ -465,3 +465,7 @@
 .substitute-item:focus-visible,
 .veld-modus button:focus-visible,
 .player-slot:focus-visible { outline: 4px solid #60a5fa; outline-offset: 7px; }
+
+.substitutes-section .veld-modus { margin-top: 6px; }
+.substitutes-section .substitutes-list:empty { display: none; }
+.substitutes-section .substitutes-list:empty + .veld-modus { margin-top: 0; }
