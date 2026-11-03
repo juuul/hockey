@@ -2,7 +2,7 @@
 $app.rootCmd.addCommand(new Command({ use: 'testteam-voorbeeld', run: (cmd, args) => {
   if ($os.getenv('HOCKEY_ENV') !== 'test' || args.length !== 1) throw new Error('Alleen de testomgeving, met een gesaneerd exportbestand')
   const data = JSON.parse(toString($os.readFile(args[0])))
-  if (!data.doelteam || !Array.isArray(data.spelers) || !data.spelers.length || !data.spelers.every(s => /^Demo /.test(s.naam))) throw new Error('Ongeldige fictieve spelers')
+  if (!data.doelteam || !Array.isArray(data.spelers) || !data.spelers.length || !data.spelers.every(s => /^(?:T|Demo) /.test(s.naam))) throw new Error('Ongeldige fictieve spelers')
   const team = $app.findRecordById('teams', data.doelteam)
   const officieel = $app.findRecordById('catalogus_teams', team.getString('officieelTeam'))
   if (officieel.getString('bronId') !== '46179') throw new Error('Doelteam is niet het bedoelde SCHC MO11-1-testteam')

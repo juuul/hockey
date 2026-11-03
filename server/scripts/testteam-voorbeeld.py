@@ -20,7 +20,7 @@ def exporteer(database, bronteam, doelteam):
         raise ValueError('Onverwachte teamgrootte')
     ids = {s['id']: nieuw('speler', s['id']) for s in spelers}
     kinderen = ['Amber', 'Bo', 'Cleo', 'Dina', 'Elin', 'Fenne', 'Gwen', 'Hanna', 'Ilse', 'Jade', 'Kiki', 'Lena', 'Mina', 'Nina']
-    fake = [{**s, 'id': ids[s['id']], 'naam': 'Demo ' + (kinderen[i] if i < len(kinderen) else str(i + 1))} for i, s in enumerate(spelers)]
+    fake = [{**s, 'id': ids[s['id']], 'naam': 'T ' + (kinderen[i] if i < len(kinderen) else str(i + 1))} for i, s in enumerate(spelers)]
     clubs = rows('clubs', 'id, naam')
     clubids = {c['id']: nieuw('club', c['id']) for c in clubs}
     clubs = [{**c, 'id': clubids[c['id']], 'laatstGebruikt': 0} for c in clubs]
