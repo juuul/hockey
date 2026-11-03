@@ -16,7 +16,7 @@ import './Dashboard.css'
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
   const { gebruiker } = useAccount()
   const { doelpuntenBijhouden, speeltijdBijhouden } = useHockey()
-  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd, speeltijdLog, timer } = useHockey()
+  const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd, speeltijdLog, timer } = useHockey()
   const [modus, setModus] = useState<'wissel' | 'verplaats'>('wissel')
   type Selectie = { id: string; positie: Position; inVeld: boolean } | { leeg: Position }
   const [selectie, setSelectie] = useState<Selectie | null>(null)
@@ -32,7 +32,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
       : spelers.some(s => s.id === gekozen.id && s.meedoen && s.inVeld === gekozen.inVeld && s.positie === gekozen.positie)
     if (!geldig || !magBewerken) kies(null)
   }, [spelers, magBewerken])
-  const [vraag, setVraag] = useState<'wissels' | 'opstelling' | 'alles' | null>(null)
+  const [vraag, setVraag] = useState<'wissels' | 'opstelling' | null>(null)
   const [kiesScorer, setKiesScorer] = useState(false)
   const [kiesWeg, setKiesWeg] = useState(false)
   const huidigeScorers = scorersVan(doelpunten.map(id => ({ spelerId: id, naam: spelers.find(s => s.id === id)?.naam ?? 'Onbekend' })))
@@ -117,9 +117,8 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
 
   const bevestigVraag = () => {
     if (vraag === 'wissels') resetWissels()
-    else if (vraag === 'alles') allesResetten()
     else nieuweOpstelling()
-    tel(vraag === 'wissels' ? 'reset' : vraag === 'alles' ? 'alles-resetten' : 'nieuwe-opstelling')
+    tel(vraag === 'wissels' ? 'reset' : 'nieuwe-opstelling')
     setVraag(null)
   }
 
@@ -226,10 +225,8 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
       )}
       {!magBeheren && <p className="kijker-melding">Je kijkt live mee. Alleen beheerders kunnen de wedstrijd bijhouden.</p>}
       {magBewerken && <WedstrijdAfsluitenKnop />}
-      {magBewerken && <button className="btn btn-gevaar" onClick={() => setVraag('alles')}>Alles resetten</button>}
       {magBewerken && (
         <>
-          <button className="btn btn-secondary" onClick={() => { undo(); tel('undo') }} disabled={!canUndo}>Undo</button>
           <button className="btn btn-secondary" onClick={() => setVraag('opstelling')}>Nieuwe opstelling</button>
           <button className="btn btn-secondary" onClick={() => setVraag('wissels')}>Reset wissels</button>
           <button className="btn btn-secondary" onClick={() => { resetScore(); tel('score-reset') }} disabled={score.wij === 0 && score.zij === 0}>Score 0 – 0</button>
@@ -251,21 +248,6 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           doelpunten={doelpunten}
           onKies={id => { scoor('wij', 1, id); tel(id ? 'score-wij' : 'score-wij-onbekend'); setKiesScorer(false) }}
           onClose={() => setKiesScorer(false)}
-        />
-      )}
-
-      {vraag === 'alles' && (
-        <ResetModal
-          titel="Alles resetten?"
-          regels={[
-            { icoon: '🔀', tekst: 'Nieuwe opstelling geloot' },
-            { icoon: '↺', tekst: 'Wissels: veld 0, bank 1' },
-            { icoon: '⚽', tekst: 'Score 0 – 0, scorers gewist' },
-            { icoon: '⏱', tekst: 'Timer 0:00 en gestopt' },
-          ]}
-          bevestig="Ja, alles resetten"
-          onConfirm={bevestigVraag}
-          onCancel={() => setVraag(null)}
         />
       )}
 
