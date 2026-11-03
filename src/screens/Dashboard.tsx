@@ -191,25 +191,25 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
           } as React.CSSProperties}
         >
           {OPSTELLINGEN[opstelling].map(rij => (
-            <div key={rij.join()} className={`field-row rij-${rij.length}`}>{rij.map(slot)}</div>
+            <div key={rij.join()} className={`field-row rij-${rij.length}`} style={{ '--kolommen': rij.length } as React.CSSProperties}>{rij.map(slot)}</div>
           ))}
           {heeftKeeper(spelvorm) && <div className="field-row single">{slot('K')}</div>}
         </div>
       </div>
 
       {/* Wisselspelers */}
-      {(wisselsInBeeld.length > 0 || magBewerken) && (
+      {wisselsInBeeld.length > 0 && (
         <div className="substitutes-section">
           <div className="substitutes-list">{wisselsInBeeld.map(wisselTegel)}</div>
-          {magBewerken && <div className="veld-modus" role="group" aria-label="Spelers aanpassen">
-            <button type="button" aria-pressed={modus === 'wissel'} onClick={() => { setModus('wissel'); kies(null) }}>Wisselen</button>
-            <button type="button" aria-pressed={modus === 'verplaats'} onClick={() => { setModus('verplaats'); kies(null) }}>Alleen verplaatsen</button>
-          </div>}
-
         </div>
       )}
 
     </div>
+
+    {magBewerken && <div className="veld-modus wissel-modus-eronder" role="group" aria-label="Spelers aanpassen">
+      <button type="button" aria-pressed={modus === 'wissel'} onClick={() => { setModus('wissel'); kies(null) }}>Wisselen</button>
+      <button type="button" aria-pressed={modus === 'verplaats'} onClick={() => { setModus('verplaats'); kies(null) }}>Alleen verplaatsen</button>
+    </div>}
 
     {/* Bewust onder de vouw: alleen bereikbaar door te scrollen, zodat je er niet per ongeluk op tikt */}
     {wisselsEronder.length > 0 && (

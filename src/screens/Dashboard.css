@@ -158,11 +158,13 @@
 .player-slot {
   --size: max(44px, min(calc(86cqw / var(--breedste, 3)), calc(84cqh / var(--rijen, 4)), 140px));
   position: relative;
-  width: var(--size);
-  height: var(--size);
+  width: max-content;
+  max-width: calc(94cqw / var(--kolommen, 3));
+  height: auto;
+  aspect-ratio: 1;
   min-width: var(--size);
   min-height: var(--size);
-  padding: 4px;
+  padding: 6px;
   border: 2px solid #72aa89;
   border-radius: 50%;
   background: #2b6046;
@@ -187,13 +189,12 @@
 }
 
 .player-slot .name {
-  width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: max(18px, min(var(--base-readable-size), calc(var(--size) * .26)));
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: max(16px, min(var(--base-readable-size), calc(var(--size) * .24)));
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.05;
 }
 .player-slot .count {
   line-height: 1;
@@ -473,3 +474,9 @@
 .substitutes-section { border-radius: 14px; padding: 6px; }
 .substitute-item { border-radius: 12px; border-width: 1px; }
 .substitute-item .count { background: transparent; padding: 4px 0; color: var(--tekst-zacht); }
+
+/* Meteen na het eerste scherm: een klein stukje scrollen maakt de keuze zichtbaar. */
+.wissel-modus-eronder {
+  flex: 0 0 auto;
+  margin: 6px;
+}
