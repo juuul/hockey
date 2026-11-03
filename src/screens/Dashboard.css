@@ -419,3 +419,49 @@
   color: var(--tekst-zacht);
   line-height: 1.1;
 }
+
+.veld-modus {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+  background: var(--vlak-zacht);
+}
+.veld-modus button {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--tekst-2);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.veld-modus button[aria-pressed="true"] {
+  background: #1e40af;
+  color: white;
+}
+.veld-modus button:last-child[aria-pressed="true"] {
+  background: #fcd34d;
+  color: #422006;
+}
+.player-slot.geselecteerd,
+.substitute-item.geselecteerd {
+  outline: 4px solid #60a5fa;
+  outline-offset: 7px;
+}
+.substitute-item {
+  width: 100%;
+  min-width: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.substitute-item:disabled { cursor: default; }
+.substitute-item:focus-visible,
+.veld-modus button:focus-visible,
+.player-slot:focus-visible { outline: 4px solid #60a5fa; outline-offset: 7px; }
