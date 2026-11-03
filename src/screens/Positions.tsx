@@ -1,5 +1,5 @@
 import { useHockey } from '../context/HockeyContext'
-import { POSITIE_LABEL, Position, veldPosities } from '../types'
+import { POSITIE_LABEL, Position, veldPosities, heeftKeeper } from '../types'
 import { tel } from '../statistiek'
 import { opAlfabet } from '../opstelling'
 import './Positions.css'
@@ -7,9 +7,10 @@ import './Positions.css'
 const KEUZE_NAAM = ['1e keuze', '2e keuze']
 
 export default function Positions() {
-  const { spelers, vastePosities, setVastePositie, opstelling, magBeheren: magBewerken } = useHockey()
+  const { spelers, vastePosities, setVastePositie, opstelling, spelvorm, magBeheren: magBewerken } = useHockey()
   // Ook de keeper: haal je haar uit het doel, dan is haar voorkeur er nog
   const fieldPlayers = opAlfabet(spelers)
+  const posities: Position[] = [...veldPosities(opstelling), ...(heeftKeeper(spelvorm) ? ['K' as Position] : [])]
 
   const handleSetPosition = (spelerId: string, keuze: number, positie: Position | null) => {
     setVastePositie(spelerId, keuze, positie)
@@ -19,7 +20,7 @@ export default function Positions() {
   return (
     <div className="positions-screen">
       <h2>Voorkeursposities</h2>
-      <p className="help-text">Bij "Nieuwe opstelling" wordt eerst geloot wie begint. Wie begint, krijgt zo mogelijk de 1e keuze, anders de 2e. Hebben meerdere spelers dezelfde keuze, dan wordt geloot wie hem krijgt.</p>
+      <p className="help-text">Bij "Nieuwe opstelling" wordt eerst geloot wie begint. Wie begint, krijgt zo mogelijk de 1e keuze, anders de 2e. Hebben meerdere spelers dezelfde keuze, dan wordt geloot wie hem krijgt.{heeftKeeper(spelvorm) && ' Keeper kun je als voorkeur bewaren; wie op doel staat kies je op het veld.'}</p>
 
       <div className="positions-list">
         {fieldPlayers.map(player => (
@@ -46,7 +47,8 @@ export default function Positions() {
                       onChange={(e) => handleSetPosition(player.id, keuze, e.target.value ? (e.target.value as Position) : null)}
                     >
                       <option value="">Geen {KEUZE_NAAM[keuze]}</option>
-                      {veldPosities(opstelling).map(pos => {
+                      {waarde === 'K' && !heeftKeeper(spelvorm) && <option value="K" disabled>keeper (bewaard, deze spelvorm heeft geen keeper)</option>}
+                      {posities.map(pos => {
                         const ook = fieldPlayers.filter(p => p.id !== player.id && vastePosities[p.id]?.includes(pos)).map(p => p.naam)
                         return (
                           <option key={pos} value={pos}>
