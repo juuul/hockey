@@ -156,15 +156,14 @@
 }
 
 .player-slot {
-  --size: max(44px, min(calc(86cqw / var(--breedste, 3)), calc(84cqh / var(--rijen, 4)), 140px));
+  --size: max(44px, min(calc(90cqw / var(--breedste, 3)), calc(90cqh / var(--rijen, 4)), 150px));
   position: relative;
   width: max-content;
   max-width: calc(94cqw / var(--kolommen, 3));
   height: auto;
-  aspect-ratio: 1;
   min-width: var(--size);
   min-height: var(--size);
-  padding: 6px;
+  padding: 6px 10px;
   border: 2px solid #72aa89;
   border-radius: 50%;
   background: #2b6046;
@@ -480,3 +479,6 @@
   flex: 0 0 auto;
   margin: 6px;
 }
+
+/* Op volle rijen blijft zoveel mogelijk breedte over voor de volledige naam. */
+.field-row.rij-4 .player-slot { padding: 4px; }
