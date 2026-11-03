@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+  <meta name="color-scheme" content="light">
+  <title>Drie voorstellen · spelers wisselen</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f1f2ed;color:#17241f;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid #71aaff;outline-offset:4px}button:disabled{cursor:default}a{color:inherit}svg{display:inline-block;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}header{max-width:1290px;margin:auto;padding:45px 28px 23px}.eyebrow{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:750;letter-spacing:2px;text-transform:uppercase;color:#5b6c61}.brand{display:grid;place-items:center;width:29px;height:29px;background:#1e4f3c;color:#efffec;border-radius:8px}.eyebrow .badge{margin-left:auto;letter-spacing:0;text-transform:none;font-size:12px;font-weight:650;border:1px solid #ccd5ca;border-radius:30px;padding:7px 12px;color:#4c5d52}h1{font-size:clamp(30px,4vw,51px);line-height:1.12;letter-spacing:-2px;margin:19px 0 12px;font-weight:760}header>p{font-size:17px;line-height:1.6;color:#5b6c61;margin:0;max-width:810px}.variant-nav{display:flex;gap:8px;max-width:1290px;margin:auto;padding:8px 28px 24px}.variant-nav button{border:1px solid #cfd7cc;border-radius:30px;padding:10px 17px;background:transparent;font-size:14px;font-weight:650;color:#43574a}.variant-nav button.current{background:#1d4938;color:#fff;border-color:#1d4938}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;max-width:1290px;padding:0 28px 26px;margin:auto}.variant{min-width:0}.variant-title{display:flex;align-items:center;gap:9px;margin:0 0 7px;font-size:23px;letter-spacing:-.6px}.number{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:8px;background:#dce4d9;color:#355240;font-size:14px;letter-spacing:0}.recommend{font-size:10px;text-transform:uppercase;letter-spacing:.8px;background:#dbecc8;color:#356127;border-radius:5px;padding:5px 6px;white-space:nowrap;margin-left:auto}.variant-deck{font-size:14px;line-height:1.5;margin:0 0 17px;color:#667568;min-height:42px}.phone{background:#111c2d;border:1px solid #27384d;border-radius:29px;overflow:hidden;box-shadow:0 18px 35px -22px #17281f88,0 3px 4px #17281f0b;color:#f0f4f7;position:relative;isolation:isolate}.status{height:29px;padding:10px 20px 3px;display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.4px}.status .signals{display:flex;gap:6px;align-items:center}.status .battery{width:20px;height:9px;border:1px solid #b7c6d5;border-radius:3px;position:relative}.battery:before{content:"";position:absolute;inset:1px 3px 1px 1px;background:#dcebdc;border-radius:1px}.app-tabs{display:flex;align-items:center;justify-content:space-around;height:57px;padding:4px 8px 0;border-bottom:1px solid #2c3a4a;background:#182438}.tab{height:52px;display:flex;align-items:center;flex-direction:column;justify-content:center;gap:3px;position:relative;color:#7b8b9e;width:46px}.tab svg{width:22px;height:22px}.tab.active{color:#a3c6ff}.tab.active:after{content:"";position:absolute;bottom:0;width:32px;height:3px;border-radius:4px;background:#71a8ff}.tab small{font-size:10px;letter-spacing:.1px}.app-top{padding:12px 14px 10px}.match-label{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#a9b6c5;margin:0 2px 9px}.live{display:flex;align-items:center;gap:4px;font-size:10px;letter-spacing:.7px;color:#92cba7}.live:before{content:"";width:5px;height:5px;border-radius:50%;background:#93d5a6}.score{height:54px;display:grid;grid-template-columns:35px 1fr 1fr 35px;gap:5px}.score .minus{display:grid;place-items:center;border:1px solid #344257;border-radius:10px;color:#a8b7ca;font-size:23px}.team-score{display:flex;justify-content:space-between;align-items:center;padding:0 13px;border-radius:10px;background:#234bb5;font-size:17px;font-weight:650}.team-score.away{background:#793644}.team-score b{font-size:29px;font-variant-numeric:tabular-nums;letter-spacing:-1px}.clock{margin:9px 0 0;display:flex;gap:7px;justify-content:center;color:#bbc6d2;font-size:12px;font-variant-numeric:tabular-nums}.clock .dot{color:#718395}.work-area{padding:0 12px 0}.control-area{height:95px;position:relative;display:flex;flex-direction:column;justify-content:center;gap:6px}.instruction{display:flex;align-items:center;justify-content:space-between;gap:5px}.instruction h3{font-size:20px;font-weight:700;letter-spacing:-.5px;margin:0}.instruction p{margin:5px 0 0;font-size:13px;line-height:1.4;color:#a6b9ce}.cancel{border:1px solid #3b4d63;border-radius:50%;width:30px;height:30px;flex:none;color:#b5c6d8;background:#1c2c41;font-size:19px;display:grid;place-items:center}.chosen-tag{display:inline-flex;align-items:center;gap:5px;color:#aacbff;font-size:12px;font-weight:650}.chosen-tag:before{content:"";width:6px;height:6px;border-radius:50%;background:#83b4ff}.modes{display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:12px;border:1px solid #34445a;background:#162538;gap:4px}.mode-button{height:36px;border:none;background:none;color:#9eafc5;border-radius:8px;font-size:14px;font-weight:650}.mode-button.active{background:#c0d4ff;color:#14396a;box-shadow:0 2px 5px #0002}.mode-button[data-mode="correctie"].active{background:#f0d49f;color:#5c4216}.mode-note{font-size:12px;color:#f1d3a0;text-align:center}.pitch{height:354px;position:relative;container-type:inline-size;overflow:hidden;border-radius:16px;background:repeating-linear-gradient(0deg,#1d4935 0px,#1d4935 44px,#204e39 44px,#204e39 88px);box-shadow:inset 0 0 35px #0d2e2388;border:1px solid #38644b}.pitch-lines{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);stroke:#a9c9b755;stroke-width:1.15;pointer-events:none}.position{position:absolute;transform:translate(-50%,-50%);z-index:2;padding:0;width:clamp(65px,21cqw,77px);height:clamp(65px,21cqw,77px);border:2px solid #65967b;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;background:#2b6046;color:#f3fbf5;box-shadow:0 4px 10px #0a211e66;touch-action:manipulation;transition:box-shadow .16s,background .16s}.position .name{font-size:20px;font-weight:700;letter-spacing:-.7px;line-height:1.15}.position .count{font-size:14px;font-weight:550;color:#d2e4d5;line-height:1}.position.red{background:#633f43;border-color:#af7476}.position.orange{background:#69533c;border-color:#b79b68}.position.keeper{background:#193c35;border-color:#8aa87d}.position.empty{background:#12342570;border:1.5px dashed #84b29c;color:#bed7c7;box-shadow:none}.position.empty .name{font-size:26px;font-weight:400}.position.empty .count{font-size:12px}.position.selected{outline:3px solid #a8caff;outline-offset:4px;box-shadow:0 0 0 9px #91bbff1c,0 6px 17px #071a2ca1}.position.selected:after{content:"✓";position:absolute;top:-7px;right:-5px;width:21px;height:21px;display:grid;place-items:center;border-radius:50%;background:#bed6ff;border:2px solid #27456c;color:#0c355f;font-size:12px;font-weight:800}.position.target:not(.selected){border-color:#aec9d5;border-style:dashed}.position.target .count{color:#deedf0;font-size:12px}.position.drop-hover{outline:4px solid #d4eaaa;outline-offset:5px;box-shadow:0 0 0 11px #d7f4b52a}.position.dim{opacity:.43}.bench-head{display:flex;justify-content:space-between;align-items:center;padding:13px 1px 8px;color:#dae3ed;font-size:14px;font-weight:650}.bench-head small{color:#8095ac;font-size:11px;font-weight:450}.bench{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}.bench-player{border:1px solid #40516a;background:#223247;border-radius:12px;min-height:79px;padding:9px 3px 8px;color:#f2f5f9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;touch-action:manipulation;position:relative}.bench-player .name{font-size:19px;font-weight:650;letter-spacing:-.4px}.bench-player .count{font-size:12px;color:#b4c4d6}.bench-player .intent{font-size:11px;color:#c4dcad;display:flex;align-items:center;gap:3px;font-weight:650}.bench-player.selected{border:2px solid #a8caff;background:#2b476a;padding:8px 2px 7px}.bench-player.target{border-color:#9fb8d7}.bench-player .intent.correctie{color:#eed1a3}.bench-player.drop-hover{outline:3px solid #d2e9b0;outline-offset:2px}.action-strip{min-height:49px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:7px 1px 8px}.text-action{font-size:12px;background:none;border:none;color:#a6bbd4;padding:7px 0;display:flex;gap:5px;align-items:center}.text-action:disabled{opacity:.35}.correctie-pill{background:#463b29;border:1px solid #b89960;border-radius:5px;padding:3px 6px;color:#f4dcae;font-size:10px;white-space:nowrap}.home-indicator{height:15px;display:flex;justify-content:center;align-items:flex-start}.home-indicator:after{content:"";width:97px;height:4px;border-radius:4px;background:#718194;opacity:.7}.screen-feedback{background:#193c33;border:1px solid #437459;color:#c3e5cf;border-radius:10px;padding:10px 12px;position:absolute;left:11px;right:11px;bottom:20px;font-size:13px;line-height:1.5;z-index:12;box-shadow:0 10px 30px #0009;display:none}.screen-feedback.visible{display:block}.screen-feedback b{font-weight:700;color:#effff2}.screen-feedback .feedback-undo{background:none;border:none;color:#b9d0ff;text-decoration:underline;padding:4px 0 0;font-size:12px;font-weight:650}.drag-guide{position:absolute;inset:0;pointer-events:none;z-index:4}.drag-arrow{position:absolute;inset:0;width:100%;height:100%;overflow:visible;color:#d9efb7;filter:drop-shadow(0 1px 3px #0c271d)}.drag-ghost{position:absolute;left:43%;top:27%;width:73px;height:73px;border-radius:50%;border:2px solid #d5ecb2;background:#6d8c3c;color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 10px 24px #081c2199;transform:rotate(-9deg);font-size:20px;font-weight:750}.drag-ghost small{font-size:12px;font-weight:500;margin-top:3px}.drag-hand{position:absolute;left:56%;top:39%;color:#f5f8ee;filter:drop-shadow(0 2px 3px #0008)}.drag-caption{display:flex;align-items:center;justify-content:space-between;background:#29442c;border:1px solid #698551;color:#dff0be;border-radius:9px;padding:7px 10px;font-size:12px;margin-top:2px}.drag-caption b{font-weight:700}.floating-player{position:fixed;z-index:100;pointer-events:none;width:76px;height:76px;border-radius:50%;background:#315e42;border:3px solid #d8efb7;color:white;box-shadow:0 8px 28px #0008;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:750;transform:translate(-50%,-50%) rotate(-6deg)}.phone[data-option="3"] .position,.phone[data-option="3"] .bench-player{touch-action:none}.method{padding-top:17px}.method .how{display:flex;align-items:center;gap:6px;color:#284b39;font-size:14px;font-weight:750;line-height:1.5}.method .how svg{width:16px;height:16px;flex:none}.method p{font-size:13px;line-height:1.65;color:#6c786c;margin:8px 0 0}.demo-links{display:flex;gap:12px;margin-top:11px}.demo-links button{background:none;border:none;border-bottom:1px solid #aebfae;color:#4c6552;padding:0 0 3px;font-size:11px;font-weight:650}.principles{max-width:1234px;margin:6px auto 35px;padding:22px 24px;background:#e5eadf;border:1px solid #d5decf;border-radius:14px;display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:24px}.principles div{font-size:13px;line-height:1.65;color:#56694f}.principles strong{display:block;color:#30482f;font-size:14px;margin-bottom:5px}.footer{max-width:1290px;margin:auto;padding:0 28px 35px;font-size:11px;color:#798576;line-height:1.7}.svg-defs{position:absolute;width:0;height:0;overflow:hidden}.correction-state .pitch{border-color:#b49563}.correction-state .instruction p{color:#f0d39a}.reset-note{min-height:20px;font-size:11px;color:#7a897d;text-align:center;margin-top:11px}body.screenshot-mode header{padding-top:28px}body.screenshot-mode .variant-nav{padding-bottom:18px}body.screenshot-mode .demo-links{display:none}body.screenshot-mode .footer{padding-bottom:22px}
+    @media(min-width:801px){.phone{max-width:390px;margin:auto}.variant{max-width:390px}.gallery{justify-content:center}.variant-nav button.current{background:#dde8d4;color:#31513a;border-color:#c4d5b9}}
+    @media(max-width:1000px) and (min-width:801px){.gallery{gap:15px;padding:0 18px 24px}.variant-title{font-size:19px}.recommend{display:none}.position .name{font-size:18px}.pitch{height:335px}.bench-player .name{font-size:17px}.variant-deck{min-height:62px}}
+    @media(max-width:800px){header{padding:26px 19px 17px}.eyebrow{font-size:10px;letter-spacing:1.4px}.eyebrow .badge{font-size:10px;padding:6px 8px}h1{letter-spacing:-1px;font-size:35px;max-width:320px}header>p{font-size:15px}.variant-nav{position:sticky;top:0;z-index:25;background:#f1f2edf5;backdrop-filter:blur(14px);padding:12px 16px 14px;gap:5px;justify-content:center}.variant-nav button{font-size:12px;padding:10px 12px;white-space:nowrap}.gallery{display:block;padding:6px 17px 24px;max-width:425px}.variant:not(.mobile-active){display:none}.variant-title{font-size:24px}.variant-deck{min-height:0;font-size:14px;margin-bottom:17px}.phone{border-radius:24px}.method .how{font-size:15px}.method p{font-size:14px}.demo-links button{font-size:12px;padding:4px 0}.principles{display:block;margin:0 17px 23px;padding:20px}.principles div+div{margin-top:17px}.footer{padding:0 19px 28px}.pitch{height:355px}.recommend{font-size:9px}.gallery[data-isolated="true"] .variant{display:block}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+<svg class="svg-defs" aria-hidden="true"><defs>
+  <symbol id="i-hockey" viewBox="0 0 24 24"><path d="m15 3-7.5 15c-1.5 3-5.5 1.5-4-1.5l1-2.2M11 11l4 2M14.5 4l3 1.5"/><circle cx="19" cy="19" r="2"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><path d="M3 20v-3a6 6 0 0 1 12 0v3m2-16a3 3 0 0 1 0 6m2 10v-3a5 5 0 0 0-3-4"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M4 10h16M8 3v4m8-4v4m-8 7h2m4 0h2m-8 3h2"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 3v18h17M8 17v-5m5 5V6m5 11V9"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="m10 3-.5 2-2 .9L5.5 5 3 9l1.5 1.5v3L3 15l2.5 4 2-.9 2 .9.5 2h4l.5-2 2-.9 2 .9 2.5-4-1.5-1.5v-3L21 9l-2.5-4-2 .9-2-.9L14 3z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4-4-4 4 4 4"/></symbol>
+  <symbol id="i-move" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M8 7l4-4 4 4M8 17l4 4 4-4M7 8l-4 4 4 4m10-8 4 4-4 4"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="m8 4-5 5 5 5M3 9h10a7 7 0 0 1 0 14"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 32 40"><path d="M12 22V6c0-4 5-4 5 0v12-5c0-4 5-4 5 0v6-3c0-4 5-4 5 0v5-2c0-4 5-4 5 0v11c0 6-5 9-11 9h-4c-3 0-5-2-7-5L3 24c-2-4 2-6 5-3l4 4" fill="#eaf0e2" stroke="#243e34" stroke-width="1.5"/></symbol>
+</defs></svg>
+<header>
+  <div class="eyebrow"><span class="brand"><svg width="19" height="19"><use href="#i-swap"/></svg></span> Hockey · ontwerpvoorstellen <span class="badge">Mockups · fictieve spelers</span></div>
+  <h1>Wisselen zonder twijfel.</h1>
+  <p>Een speler kiezen moet vanzelf spreken. Drie manieren om op het veld te ruilen, met een duidelijk verschil tussen een wissel en een correctie.</p>
+</header>
+<nav class="variant-nav" aria-label="Kies een voorstel">
+  <button class="current" data-tab="1">1 · Tik & tik</button><button data-tab="2">2 · Kies de actie</button><button data-tab="3">3 · Sleep of tik</button>
+</nav>
+<main class="gallery" id="gallery">
+  <article class="variant mobile-active" id="optie-1" data-variant="1">
+    <h2 class="variant-title"><span class="number">01</span> Tik & tik <span class="recommend">Mijn voorkeur</span></h2>
+    <p class="variant-deck">Kies een speler. Tik direct op degene met wie je wilt ruilen.</p>
+    <div class="phone" data-option="1"></div>
+    <div class="method"><div class="how"><svg width="18" height="18"><use href="#i-swap"/></svg> Twee tikken. Het veld blijft in beeld.</div><p>Veld ↔ veld verplaatst de spelers. Veld ↔ bank telt als wissel. Een bewuste correctie krijgt een aparte keuze.</p><div class="demo-links"><button data-demo="1:reset">Opnieuw proberen</button><button data-demo="1:empty">Toon een lege plek</button></div></div>
+  </article>
+  <article class="variant" id="optie-2" data-variant="2">
+    <h2 class="variant-title"><span class="number">02</span> Kies de actie</h2>
+    <p class="variant-deck">Eerst kiezen wat je wilt doen. Daarna twee spelers aantikken.</p>
+    <div class="phone" data-option="2"></div>
+    <div class="method"><div class="how"><svg width="18" height="18"><use href="#i-move"/></svg> Vooraf duidelijk wat wel en niet telt.</div><p>Wisselen telt mee; posities aanpassen telt niet. Het scherm toont alleen passende bestemmingen. Na de actie terug naar Wisselen.</p><div class="demo-links"><button data-demo="2:reset">Opnieuw proberen</button><button data-demo="2:empty">Toon een lege plek</button></div></div>
+  </article>
+  <article class="variant" id="optie-3" data-variant="3">
+    <h2 class="variant-title"><span class="number">03</span> Sleep of tik</h2>
+    <p class="variant-deck">Pak een speler vast en sleep. Twee keer tikken kan ook.</p>
+    <div class="phone" data-option="3"></div>
+    <div class="method"><div class="how"><svg width="18" height="18"><use href="#i-move"/></svg> Direct op het veld, zoals je verwacht.</div><p>Tijdens het slepen zie je de bestemming en of de actie als wissel telt. Loslaten voert uit; loslaten buiten een plek annuleert.</p><div class="demo-links"><button data-demo="3:reset">Opnieuw proberen</button><button data-demo="3:empty">Toon een lege plek</button></div></div>
+  </article>
+</main>
+<aside class="principles">
+  <div><strong>Een bankwissel telt mee.</strong>Bij een gewone ruil tussen veld en bank krijgt de uitgaande speler +1. Ook als de wedstrijdklok stilstaat.</div>
+  <div><strong>Een positie wijzigen telt niet mee.</strong>Veldspelers ruilen of een speler naar een lege veldplek verplaatsen verandert de wisselteller niet.</div>
+  <div><strong>Een correctie kies je bewust.</strong>Veld en bank corrigeren zonder teller? Kies Correctie. Geen bevestigingsvraag; Ongedaan maken blijft beschikbaar.</div>
+</aside>
+<footer class="footer">Klikbare ontwerpmockups. Namen, score en tellers zijn fictief. Deze pagina haalt geen teamgegevens op en slaat niets op. De echte wedstrijdapp wordt hier niet aangepast. <a href="overzicht.png" target="_blank" rel="noopener">Bekijk alle drie als afbeelding</a>.</footer>
+<script>
+  const icon=(id,size=17)=>`<svg width="${size}" height="${size}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+  const coords=[[17,15],[50,15],[83,15],[32,39],[68,39],[17,64],[50,64],[83,64],[50,88]];
+  const names=['Noor','Tess','Jade','Zoë','Isa','Fien','Elin','Pip','Emma','Mila','Eva','Lotte'];
+  const initialCounts={Noor:0,Tess:1,Jade:0,'Zoë':2,Isa:1,Fien:1,Elin:0,Pip:1,Emma:0,Mila:1,Eva:2,Lotte:1};
+  function initial(i){return {i,slots:names.slice(0,9),bench:names.slice(9),counts:{...initialCounts},arrivals:['Pip','Elin','Noor','Jade','Isa','Fien','Tess','Zoë'],selected:i===3?{kind:'bench',index:0}:{kind:'field',index:0},mode:i===2?'correctie':'auto',dragDemo:i===3,history:[],feedback:null}};
+  const states={1:initial(1),2:initial(2),3:initial(3)};
+  const get=(s,p)=>p.kind==='field'?s.slots[p.index]:s.bench[p.index];
+  function resultType(s,a,b){
+    if(!get(s,b))return 'plaats';
+    if(s.mode==='correctie'||a.kind==='field'&&a.index===8||b.kind==='field'&&b.index===8)return 'verplaats';
+    return a.kind!==b.kind?'wissel':'verplaats';
+  }
+  function eligible(s,p){
+    const a=s.selected;if(!a)return !!get(s,p);
+    if(a.kind===p.kind&&a.index===p.index)return true;
+    if(a.kind==='bench'&&p.kind==='bench')return false;
+    if(s.i===2&&s.mode!=='correctie'&&a.kind===p.kind)return false;
+    return true;
+  }
+  function colour(s,name){const field=s.slots.slice(0,8).filter(Boolean);const order=field.filter(n=>!s.arrivals.includes(n)).concat(s.arrivals.filter(n=>field.includes(n)));const n=order.indexOf(name),len=order.length;return n<0?'':n>=len-2?'red':n>=len-4?'orange':''};
+  function verb(s,p){if(!s.selected)return '';const t=resultType(s,s.selected,p);return t==='wissel'?'Wissel +1':t==='plaats'?'Verplaats': 'Verplaats'};
+  function render(i){
+    const s=states[i],phone=document.querySelector(`.phone[data-option="${i}"]`),a=s.selected,name=a?get(s,a):null;
+    phone.classList.toggle('correction-state',s.mode==='correctie');
+    const title=s.feedback?s.feedback.title:s.mode==='correctie'?'Posities aanpassen':s.dragDemo?'Mila komt erin':name?`${name} gekozen`:'Kies een speler';
+    const hint=s.feedback?s.feedback.text:s.mode==='correctie'?'Ruil of verplaats · telt niet als wissel.':s.i===3?'Sleep een speler of tik om te kiezen.':name?'Tik op een andere speler om te ruilen.':'Tik op het veld of op de bank.';
+    phone.innerHTML=`
+      <div class="status"><span>10:24</span><span class="signals"><svg width="12" height="10" viewBox="0 0 12 10"><path d="M1 9V7m3 2V5m3 4V3m3 6V1"/></svg><span>5G</span><span class="battery"></span></span></div>
+      <div class="app-tabs">${['hockey','users','star','calendar','chart','settings'].map((t,n)=>`<div class="tab ${n===0?'active':''}">${icon(t,22)}${n===0?'<small>Wedstrijd</small>':''}</div>`).join('')}</div>
+      <div class="app-top"><div class="match-label"><span>MO11 · Voorbeeldwedstrijd</span><span class="live">LIVE</span></div><div class="score"><span class="minus">−</span><span class="team-score">Wij <b>2</b></span><span class="team-score away"><b>1</b> Zij</span><span class="minus">−</span></div><div class="clock"><span>17:24</span><span class="dot">·</span><span>2e kwart</span></div></div>
+      <div class="work-area"><div class="control-area" aria-live="polite">
+      ${i===2?`<div class="modes"><button class="mode-button ${s.mode!=='correctie'?'active':''}" data-mode="auto">${icon('swap',15)} Wisselen</button><button class="mode-button ${s.mode==='correctie'?'active':''}" data-mode="correctie">${icon('move',15)} Posities</button></div><div class="instruction"><div><p>${s.feedback?s.feedback.text:(name?name+' gekozen · ':'')+(s.mode==='correctie'?'telt niet als wissel':'kies wie er uitgaat')}</p></div>${a?'<button class="cancel" data-cancel aria-label="Selectie annuleren">×</button>':''}</div>`:
+      `<div class="instruction"><div><h3>${title}</h3><p>${hint}</p></div>${a?'<button class="cancel" data-cancel aria-label="Selectie annuleren">×</button>':''}</div>${s.dragDemo?'<div class="drag-caption"><span><b>Mila ↔ Noor</b></span><span>Wissel · +1 bij Noor</span></div>':name?`<span class="chosen-tag">${s.mode==='correctie'?'Correctie · telt niet mee':a.kind==='bench'?'Bank ↔ veld · wissel +1':'Veld: verplaatsen · bank: wissel +1'}</span>`:''}`}
+      </div>
+      <div class="pitch"><svg class="pitch-lines" viewBox="0 0 320 338" preserveAspectRatio="none" aria-hidden="true"><rect x="3" y="3" width="314" height="332" rx="2"/><path d="M3 169h314M132 3v-4h56v4M132 335v4h56v-4M68 3a92 84 0 0 0 184 0M68 335a92 84 0 0 1 184 0"/><circle cx="160" cy="169" r="32"/></svg>
+      ${s.slots.map((n,j)=>{const p={kind:'field',index:j},sel=a&&a.kind==='field'&&a.index===j,target=a&&!sel&&eligible(s,p);return `<button data-kind="field" data-index="${j}" class="position ${j===8?'keeper':''} ${n?colour(s,n):'empty'} ${sel?'selected':''} ${target?'target':''} ${a&&!eligible(s,p)?'dim':''}" style="left:${coords[j][0]}%;top:${coords[j][1]}%" aria-label="${n||'Lege plek'}${target?': '+verb(s,p):''}"><span class="name">${n||'+'}</span><span class="count">${!n?'Lege plek':j===8?'Keeper':s.counts[n]+'×'}</span></button>`}).join('')}
+      ${s.dragDemo?`<div class="drag-guide"><svg class="drag-arrow" viewBox="0 0 330 354"><path d="M61 334C-6 225 217 156 66 72" stroke="#d5eab5" stroke-width="2" stroke-dasharray="5 7"/><path d="m66 84 0-12 12 3" stroke="#d5eab5" stroke-width="2"/></svg><div class="drag-ghost">Mila<small>erin</small></div><svg class="drag-hand" width="33" height="40" viewBox="0 0 32 40"><use href="#i-hand"/></svg></div>`:''}</div>
+      <div class="bench-head"><span>Op de bank</span><small>${a?'Tik om te ruilen':'Ook hier kun je beginnen'}</small></div><div class="bench">${s.bench.map((n,j)=>{const p={kind:'bench',index:j},sel=a&&a.kind==='bench'&&a.index===j,target=a&&!sel&&eligible(s,p),intent=target?verb(s,p):null;return `<button class="bench-player ${sel?'selected':''} ${target?'target':''}" data-kind="bench" data-index="${j}" aria-label="${n}${intent?': '+intent:''}"><span class="name">${n}</span><span class="count">${s.counts[n]}× gewisseld</span>${intent?`<span class="intent ${intent==='Verplaats'?'correctie':''}">${icon('swap',12)} ${intent==='Wissel +1'?'+1 bij '+get(s,a):intent}</span>`:sel?'<span class="intent">Gekozen</span>':''}</button>`}).join('')}</div>
+      <div class="action-strip"><button class="text-action" data-correction>${icon('move',13)} ${s.mode==='correctie'?'Terug naar wisselen':'Opstelling corrigeren'}${s.mode==='correctie'?'<span class="correctie-pill">Telt niet mee</span>':''}</button><button class="text-action" data-undo ${s.history.length?'':'disabled'}>${icon('undo',13)} Herstel</button></div></div><div class="home-indicator"></div>
+      `;
+    phone.onclick=e=>{
+      if(Date.now()<(s.ignoreClickUntil||0))return;
+      const slot=e.target.closest('[data-kind]');
+      if(slot){select(i,{kind:slot.dataset.kind,index:+slot.dataset.index});return}
+      if(e.target.closest('[data-cancel]')){s.selected=null;s.dragDemo=false;s.feedback=null;render(i)}
+      if(e.target.closest('[data-undo]')){undo(i)}
+      const mode=e.target.closest('[data-mode]');if(mode){s.mode=mode.dataset.mode;s.selected=null;s.dragDemo=false;s.feedback=null;render(i)}
+      if(e.target.closest('[data-correction]')){s.mode=s.mode==='correctie'?'auto':'correctie';s.dragDemo=false;s.feedback=null;render(i)}
+    };
+  }
+  function select(i,p){const s=states[i];s.dragDemo=false;s.feedback=null;
+    if(!s.selected){if(get(s,p))s.selected=p;render(i);return}
+    if(s.selected.kind===p.kind&&s.selected.index===p.index){s.selected=null;render(i);return}
+    if(!eligible(s,p))return;
+    execute(i,s.selected,p);
+  }
+  function execute(i,a,b){const s=states[i],nameA=get(s,a),nameB=get(s,b);if(!nameA||a.kind===b.kind&&a.index===b.index||a.kind==='bench'&&b.kind==='bench')return;
+    const type=resultType(s,a,b);
+    s.history.push(JSON.stringify({slots:s.slots,bench:s.bench,counts:s.counts,arrivals:s.arrivals}));
+    if(s.history.length>20)s.history.shift();
+    if(type==='wissel'){const out=a.kind==='field'?nameA:nameB,inside=a.kind==='bench'?nameA:nameB;s.counts[out]++;s.arrivals=s.arrivals.filter(n=>n!==inside);s.arrivals.push(inside)}
+    (a.kind==='field'?s.slots:s.bench)[a.index]=nameB;
+    (b.kind==='field'?s.slots:s.bench)[b.index]=nameA;
+    s.selected=null;s.dragDemo=false;s.mode='auto';
+    s.feedback=type==='wissel'?{title:`${a.kind==='bench'?nameA:nameB} erin, ${a.kind==='field'?nameA:nameB} eruit`,text:`Wissel geteld · +1 bij ${a.kind==='field'?nameA:nameB}.`}:{title:nameB?`${nameA} en ${nameB} verplaatst`:`${nameA} op de lege plek`,text:'Geen wissel geteld.'};
+    render(i);
+  }
+  function undo(i){const s=states[i];if(!s.history.length)return;Object.assign(s,JSON.parse(s.history.pop()));s.selected=null;s.feedback=null;s.dragDemo=false;s.mode='auto';render(i)}
+  function reset(i,empty=false){states[i]=initial(i);if(empty){states[i].slots[7]=null;states[i].bench.push('Pip');states[i].mode='correctie';states[i].dragDemo=false}else{states[i].selected=null;states[i].dragDemo=false;states[i].mode='auto'}render(i)}
+  for(const i of [1,2,3])render(i);
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{
+    const id=+b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(n=>n.classList.toggle('current',n===b));document.querySelectorAll('.variant').forEach(n=>n.classList.toggle('mobile-active',+n.dataset.variant===id));
+    history.replaceState(null,'',`#optie-${id}`);
+    if(innerWidth>800)document.querySelector(`#optie-${id}`).scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+  document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=()=>{const[i,type]=b.dataset.demo.split(':');reset(+i,type==='empty')});
+  if(location.hash.match(/^#optie-[123]$/))document.querySelector(`[data-tab="${location.hash.slice(-1)}"]`).click();
+  let drag=null;
+  document.addEventListener('pointerdown',e=>{
+    const slot=e.target.closest('.phone[data-option="3"] [data-kind]');if(!slot)return;
+    const p={kind:slot.dataset.kind,index:+slot.dataset.index},s=states[3];if(!get(s,p))return;
+    drag={pointerId:e.pointerId,source:p,startX:e.clientX,startY:e.clientY,active:false,slot,ghost:null,target:null};
+  });
+  document.addEventListener('pointermove',e=>{
+    if(!drag||drag.pointerId!==e.pointerId)return;
+    if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<9)return;
+    e.preventDefault();const s=states[3];
+    if(!drag.active){drag.active=true;document.querySelector('.phone[data-option="3"]').setPointerCapture(e.pointerId);s.selected=drag.source;s.dragDemo=false;s.feedback=null;render(3);drag.ghost=document.createElement('div');drag.ghost.className='floating-player';drag.ghost.textContent=get(s,drag.source);document.body.append(drag.ghost)}
+    drag.ghost.style.left=e.clientX+'px';drag.ghost.style.top=e.clientY+'px';
+    document.querySelectorAll('.drop-hover').forEach(n=>n.classList.remove('drop-hover'));
+    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.phone[data-option="3"] [data-kind]');
+    drag.target=target?{kind:target.dataset.kind,index:+target.dataset.index}:null;
+    if(target&&eligible(s,drag.target)){target.classList.add('drop-hover');const label=document.querySelector('.phone[data-option="3"] .instruction p');label.textContent=`${get(s,drag.source)} → ${get(s,drag.target)||'lege plek'} · ${verb(s,drag.target)}`}
+  },{passive:false});
+  document.addEventListener('pointerup',e=>{
+    if(!drag||drag.pointerId!==e.pointerId)return;
+    const d=drag;drag=null;if(!d.active)return;
+    states[3].ignoreClickUntil=Date.now()+450;d.ghost?.remove();document.querySelectorAll('.drop-hover').forEach(n=>n.classList.remove('drop-hover'));
+    if(d.target&&eligible(states[3],d.target))execute(3,d.source,d.target);else{states[3].selected=null;render(3)}
+  });
+  document.addEventListener('pointercancel',()=>{if(!drag)return;drag.ghost?.remove();drag=null;states[3].selected=null;states[3].dragDemo=false;render(3)});
+  window.mockups={states,reset,render,select};
+</script>
+</body>
+</html>

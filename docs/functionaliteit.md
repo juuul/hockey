@@ -2,6 +2,10 @@
 
 Uitgebreide beschrijving per scherm, regel en accountfunctie. Kort overzicht en werkafspraken: `CLAUDE.md`. Bij wijzigingen ook dit bestand bijwerken (huidige stand, geen logboek).
 
+## Ontwerpvoorstellen, nog niet in de app
+
+De aparte testpagina `/test/ontwerpen/spelerwissels/` bevat drie klikbare voorstellen voor spelers kiezen op het veld: direct Tik & tik, vooraf Wisselen/Posities kiezen en Sleep of tik. Ze maken zichtbaar wanneer veld/bank-ruilen een wissel telt en wanneer posities of een bewuste correctie niet tellen. Dit zijn zelfstandige HTML-mockups met fictieve namen, zonder API-verzoeken of opslag; ze wijzigen het echte Dashboard, de wissellogica en productie niet. De gebruiker kiest eerst een voorstel voordat implementatie volgt. Afbeeldingen en verdere uitleg staan in `public/ontwerpen/spelerwissels/`.
+
 ## Gezamenlijke feedback
 
 Bij Bespreek je idee benoemen scherm en ontvangstmail het idee voor een website of app en dat Juliaan contact opneemt. De ontvangstmail heeft onderwerp Leuk dat je jouw idee deelt! en afzendernaam Juliaan | Websites en apps, ook in de kopie onder Verzonden. Feedbackberichten houden hun eigen tekst en afzender. Een appkeuze in de URL verandert nooit een contactformulier in een feedbackformulier.

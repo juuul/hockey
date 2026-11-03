@@ -24,6 +24,9 @@ De startpagina heeft één algemene feedbackknop en Website of app laten maken. 
 `pb_hooks/feedback*.js`, migratie `1790400031_feedback.js` en `scripts/feedback-mail.py` delen één inzendfunctie voor de apps op juliaan.eu. Formulier/beheer staan in `../juuul.github.io`. Alleen Hockey krijgt in de app knoppen Feedback geven en Juliaan.eu; Finance Planner en de Finance Planner-webapp blijven ongewijzigd. De hockeytestknop opent de feedbackpreview met de testbackend. Alleen de bestaande eigenaar (`users.superadmin` én privé `FEEDBACK_ADMIN_ID`) mag beheren. Aparte `FEEDBACK_`-mailinstellingen in `server/.env`; hockey-SMTP blijft intact. Wachtrij, limieten en testprocedure staan in `server/README.md` en `docs/functionaliteit.md`.
 
 ### Tabbladen
+
+Ontwerpvoorstellen voor spelerselectie staan los van de app in `public/ontwerpen/spelerwissels/`: drie klikbare mockups met fictieve namen, zonder serververbinding of opslag. Alleen beoordelen via de aparte testpagina; niet naar productie meenemen of het echte Dashboard aanpassen zonder keuze/opdracht. `README.md` in die map beschrijft Tik & tik, Kies de actie en Sleep of tik.
+
 Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tabblad blijft staan na inloggen, teamwissel en verversen (`sessionStorage`). ⚠ op het tandwiel bij een echt sync-probleem, rood bolletje bij open aanvragen.
 1. **Dashboard** (`src/screens/Dashboard.tsx`): score (Wij → "Wie scoorde?"), veld + keeper, tik op speler = Wissel/Verplaatsen, één rij wissels, klokregel. **Onder de vouw** (bewust uit het zicht): extra wissels, Wedstrijd afsluiten, resets, Undo, timer.
 2. **Spelers**: categorie (O12+/O11/O10/O9 = 11/9/8/6 spelers, `CATEGORIE`), opstelling, wie doet mee, toevoegen/verwijderen.
