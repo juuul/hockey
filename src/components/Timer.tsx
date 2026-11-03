@@ -39,7 +39,7 @@ export function useKlok() {
 
 // Onder de score: resterende tijd van dit deel, met directe bediening.
 export function KlokRegel() {
-  const { startTimer, pauzeTimer, zetKlok, magBewerken } = useHockey()
+  const { startTimer, pauzeTimer, zetKlok, magBewerken, undo, canUndo } = useHockey()
   const { loopt, verstreken, schema, fase, inPauze, naam } = useKlok()
   const spring = (index: number) => {
     if (!magBewerken || index < 0 || index > schema.length) return
@@ -72,6 +72,11 @@ export function KlokRegel() {
         <button type="button" className="klok-sprong" disabled={!fase.deel}
           aria-label="Volgend deel" title={fase.deel ? `Volgend deel: ${deelNaam(schema[volgende] ?? null, schema)}` : 'Volgend deel'}
           onClick={() => spring(volgende)}><span aria-hidden="true">▶|</span></button>
+        <button type="button" className="klok-undo" disabled={!canUndo}
+          aria-label="Undo" title="Laatste actie ongedaan maken"
+          onClick={() => { if (magBewerken && canUndo) { undo(); tel('undo') } }}>
+          <span aria-hidden="true">↶</span>
+        </button>
       </div>}
     </div>
   )

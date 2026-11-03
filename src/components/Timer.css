@@ -151,9 +151,9 @@
 .klok-regel-tekst { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .klok-regel-deel { font-size: max(14px, calc(var(--base-readable-size) * .65)); line-height: 1.1; }
 .klok-regel-tekst strong { font-size: var(--base-readable-size); line-height: 1.1; white-space: nowrap; }
-.klok-bediening { display: flex; flex: 0 0 auto; gap: 5px; }
+.klok-bediening { display: flex; flex: 0 0 auto; gap: 4px; }
 .klok-bediening button {
-  width: 46px;
+  width: 44px;
   min-height: 48px;
   border: 0;
   border-radius: 9px;
@@ -206,4 +206,12 @@
 .timer-bijstellen .btn {
   white-space: nowrap;
   padding: 10px 2px;
+}
+
+.klok-bediening .klok-undo {
+  margin-left: 8px;
+  border: 1px solid var(--rand);
+  background: transparent;
+  color: var(--tekst-2);
+  font-size: 28px;
 }
