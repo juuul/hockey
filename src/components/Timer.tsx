@@ -27,7 +27,7 @@ export function useKlok() {
 
   const schema = schemaVoor(spelvorm)
   // Nooit verder dan het einde van de wedstrijd (de context zet de klok daar ook stil)
-  const verstreken = Math.min(wedstrijdDuur(schema), stand.opgebouwd + (loopt ? nu - stand.gestartOp! : 0))
+  const verstreken = Math.min(wedstrijdDuur(schema), stand.opgebouwd + (loopt ? Math.max(0, nu - stand.gestartOp!) : 0))
   // Kwart, pauze of rust volgt vanzelf uit de verstreken tijd. Pauze/rust telt af (naar boven afgerond)
   const fase = faseVan(verstreken, schema)
   const inPauze = !!fase.deel && fase.deel.soort !== 'kwart'
@@ -37,23 +37,42 @@ export function useKlok() {
   return { loopt, verstreken, schema, fase, inPauze, naam, groot, rechts, delen: voortgang(verstreken, schema) }
 }
 
-// Onder de score: altijd in beeld, zonder te scrollen. Met een startknop als de klok stilstaat,
-// en in een pauze of de rust om het volgende deel meteen te laten beginnen (als de scheidsrechter fluit)
+// Onder de score: resterende tijd van dit deel, met directe bediening.
 export function KlokRegel() {
-  const { startTimer, zetKlok, magBewerken } = useHockey()
-  const { loopt, verstreken, schema, fase, inPauze, naam, groot, rechts } = useKlok()
-  const knop = !magBewerken || !fase.deel ? null
-    : !loopt ? { tekst: verstreken === 0 ? '▶ Start' : '▶ Verder', doe: () => { startTimer(); tel('timer-start-boven') } }
-    : inPauze ? { tekst: `▶ ${speelNaam(fase.deel.kwart, schema)}`, doe: () => { zetKlok(beginVan(fase.index + 1, schema), true); tel('timer-volgende-boven') } }
-    : null
+  const { startTimer, pauzeTimer, zetKlok, magBewerken } = useHockey()
+  const { loopt, verstreken, schema, fase, inPauze, naam } = useKlok()
+  const spring = (index: number) => {
+    if (!magBewerken || index < 0 || index > schema.length) return
+    // Een stilstaande klok blijft stilstaan; een lopende klok loopt verder.
+    zetKlok(beginVan(index, schema))
+    tel('timer-deel-boven')
+  }
+  const schakel = () => {
+    if (!magBewerken || !fase.deel) return
+    if (loopt) { pauzeTimer(); tel('timer-pauze-boven') }
+    else { startTimer(); tel('timer-start-boven') }
+  }
+  const actie = loopt ? 'Pauzeren' : verstreken === 0 ? 'Starten' : 'Verdergaan'
+  const vorige = fase.index - 1
+  const volgende = fase.index + 1
   return (
-    <div className={`klok-regel ${loopt ? 'loopt' : ''} ${inPauze ? 'in-pauze' : ''} ${knop ? 'met-knop' : ''}`}>
-      <span className="klok-regel-tekst">
-        <span aria-hidden="true">{inPauze ? '☕' : '⏱'}</span>
-        <strong>{naam} {groot}</strong>
-        {!knop && <span className="klok-regel-nog">· {rechts}</span>}
+    <div className={`klok-regel ${loopt ? 'loopt' : ''} ${inPauze ? 'in-pauze' : ''}`}>
+      <span className="klok-regel-tekst" aria-live="off">
+        <span className="klok-regel-deel">{naam}</span>
+        <strong>{fase.deel ? `nog ${formatteer(Math.max(0, fase.nog) + 999)}` : '0:00'}</strong>
       </span>
-      {knop && <button className="btn timer-start klok-regel-knop" onClick={knop.doe}>{knop.tekst}</button>}
+      {magBewerken && <div className="klok-bediening" role="group" aria-label="Wedstrijdklok">
+        <button type="button" className="klok-sprong" disabled={vorige < 0}
+          aria-label="Vorig deel" title={vorige >= 0 ? `Vorig deel: ${deelNaam(schema[vorige], schema)}` : 'Vorig deel'}
+          onClick={() => spring(vorige)}><span aria-hidden="true">|◀</span></button>
+        <button type="button" className={loopt ? 'timer-pauze' : 'timer-start'} disabled={!fase.deel}
+          aria-label={actie} title={actie} onClick={schakel}>
+          <span aria-hidden="true">{loopt ? 'Ⅱ' : '▶'}</span>
+        </button>
+        <button type="button" className="klok-sprong" disabled={!fase.deel}
+          aria-label="Volgend deel" title={fase.deel ? `Volgend deel: ${deelNaam(schema[volgende] ?? null, schema)}` : 'Volgend deel'}
+          onClick={() => spring(volgende)}><span aria-hidden="true">▶|</span></button>
+      </div>}
     </div>
   )
 }
