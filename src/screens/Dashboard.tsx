@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useHockey } from '../context/HockeyContext'
 import { useAccount } from '../context/AccountContext'
 import { OPSTELLINGEN, heeftKeeper, Position, POSITIE_LABEL } from '../types'
-import SubstituteModal from '../components/SubstituteModal'
+import { useTerug } from '../terug'
 import ResetModal from '../components/ResetModal'
 import Timer, { KlokRegel } from '../components/Timer'
 import ScorerModal from '../components/ScorerModal'
@@ -17,9 +17,21 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
   const { gebruiker } = useAccount()
   const { doelpuntenBijhouden, speeltijdBijhouden } = useHockey()
   const { spelers, wisselingen, wissel, resetWissels, nieuweOpstelling, verplaats, plaatsIn, undo, canUndo, score, scoor, haalDoelpuntWeg, resetScore, doelpunten, spelvorm, opstelling, allesResetten, magBewerken, magBeheren, afgesloten, wedstrijd, clubs, weerOpenen, nieuweWedstrijd, speeltijdLog, timer } = useHockey()
-  const [showSubstituteModal, setShowSubstituteModal] = useState(false)
-  const [selectedPosition, setSelectedPosition] = useState<Position>('LW')
-  const [selectedPlayerName, setSelectedPlayerName] = useState('')
+  const [modus, setModus] = useState<'wissel' | 'verplaats'>('wissel')
+  type Selectie = { id: string; positie: Position; inVeld: boolean } | { leeg: Position }
+  const [selectie, setSelectie] = useState<Selectie | null>(null)
+  const selectieRef = useRef<Selectie | null>(null)
+  const kies = (waarde: Selectie | null) => { selectieRef.current = waarde; setSelectie(waarde) }
+  useTerug(!!selectie, () => kies(null))
+  // Wis een keuze zodra een andere beheerder de gekozen speler of lege plek wijzigt.
+  useEffect(() => {
+    const gekozen = selectieRef.current
+    if (!gekozen) return
+    const geldig = 'leeg' in gekozen
+      ? !spelers.some(s => s.inVeld && s.positie === gekozen.leeg)
+      : spelers.some(s => s.id === gekozen.id && s.meedoen && s.inVeld === gekozen.inVeld && s.positie === gekozen.positie)
+    if (!geldig || !magBewerken) kies(null)
+  }, [spelers, magBewerken])
   const [vraag, setVraag] = useState<'wissels' | 'opstelling' | 'alles' | null>(null)
   const [kiesScorer, setKiesScorer] = useState(false)
   const [kiesWeg, setKiesWeg] = useState(false)
@@ -49,42 +61,56 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
   const klok = klokMs(timer)
   const tijden = klok > 0 ? speeltijden(speeltijdLog, klok) : {}
   const wisselTegel = (sub: typeof substitutes[number]) => (
-    <div key={sub.id} className="substitute-item">
+    <button key={sub.id} type="button"
+      className={`substitute-item ${selectie && 'id' in selectie && selectie.id === sub.id ? 'geselecteerd' : ''}`}
+      aria-pressed={!!selectie && 'id' in selectie && selectie.id === sub.id}
+      disabled={!magBewerken} onClick={() => tik(sub.id)}>
+
       <span className="name">
         {sub.naam}
         {speeltijdBijhouden && tijden[sub.id] && <span className="speeltijd">{minuten(opVeld(tijden[sub.id]))} min</span>}
       </span>
       <span className="count">{sub.wisselCount}×</span>
-    </div>
+    </button>
   )
 
   const getPlayerByPosition = (pos: Position) =>
     pos === 'K' ? keeper : fieldPlayers.find(p => p.positie === pos)
 
-  const handlePlayerClick = (position: Position) => {
-    setSelectedPosition(position)
-    setSelectedPlayerName(getPlayerByPosition(position)?.naam ?? '')
-    setShowSubstituteModal(true)
-  }
-
-  const handleSubstitute = (inPlayerId: string) => {
-    const outPlayer = getPlayerByPosition(selectedPosition)
-    if (outPlayer) {
-      wissel(outPlayer.id, inPlayerId, selectedPosition)
+  const tik = (id?: string, leeg?: Position) => {
+    if (!magBewerken) return
+    const gekozen = selectieRef.current
+    const speler = spelers.find(s => s.id === id && s.meedoen)
+    if (!gekozen) {
+      if (speler) kies({ id: speler.id, positie: speler.positie, inVeld: speler.inVeld })
+      else if (leeg) kies({ leeg })
+      return
+    }
+    if ('leeg' in gekozen) {
+      kies(null)
+      if (speler) { plaatsIn(speler.id, gekozen.leeg); tel('lege-plek-gevuld') }
+      return
+    }
+    const bron = spelers.find(s => s.id === gekozen.id && s.meedoen && s.inVeld === gekozen.inVeld && s.positie === gekozen.positie)
+    kies(null)
+    if (!bron || bron.id === speler?.id) return
+    if (!speler) {
+      if (leeg) { plaatsIn(bron.id, leeg); tel('lege-plek-gevuld') }
+      return
+    }
+    // Twee reserves kiezen verandert alleen de selectie, nooit de opstelling.
+    if (!bron.inVeld && !speler.inVeld) {
+      kies({ id: speler.id, positie: speler.positie, inVeld: false })
+      return
+    }
+    if (modus === 'wissel' && bron.inVeld !== speler.inVeld && !bron.isKeeper && !speler.isKeeper) {
+      const uit = bron.inVeld ? bron : speler
+      const invaller = bron.inVeld ? speler : bron
+      wissel(uit.id, invaller.id, uit.positie)
       tel('wissel')
     } else {
-      plaatsIn(inPlayerId, selectedPosition)
-      tel('lege-plek-gevuld')
-    }
-    setShowSubstituteModal(false)
-  }
-
-  const handleMove = (otherPlayerId: string) => {
-    const player = getPlayerByPosition(selectedPosition)
-    if (player) {
-      verplaats(player.id, otherPlayerId)
-      tel(selectedPosition === 'K' ? 'keeper-verplaatst' : 'verplaats')
-      setShowSubstituteModal(false)
+      verplaats(bron.id, speler.id)
+      tel(bron.isKeeper || speler.isKeeper ? 'keeper-verplaatst' : 'verplaats')
     }
   }
 
@@ -101,8 +127,9 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
     return (
       <button
         key={pos}
-        className={`player-slot ${pos === 'K' ? 'keeper' : ''} ${player ? kleuren[player.id] ?? '' : 'leeg'}`}
-        onClick={() => handlePlayerClick(pos)}
+        className={`player-slot ${pos === 'K' ? 'keeper' : ''} ${player ? kleuren[player.id] ?? '' : 'leeg'} ${selectie && ('id' in selectie ? selectie.id === player?.id : selectie.leeg === pos) ? 'geselecteerd' : ''}`}
+        onClick={() => tik(player?.id, player ? undefined : pos)}
+        aria-pressed={!!selectie && ('id' in selectie ? selectie.id === player?.id : selectie.leeg === pos)}
         disabled={!magBewerken}
         aria-label={player ? undefined : `Lege plek ${POSITIE_LABEL[pos]}: iemand erin zetten`}
       >
@@ -149,6 +176,10 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </div>
       ) : <KlokRegel />}
 
+      {magBewerken && <div className="veld-modus" role="group" aria-label="Spelers aanpassen">
+        <button type="button" aria-pressed={modus === 'wissel'} onClick={() => { setModus('wissel'); kies(null) }}>Wisselen</button>
+        <button type="button" aria-pressed={modus === 'verplaats'} onClick={() => { setModus('verplaats'); kies(null) }}>Alleen verplaatsen</button>
+      </div>}
       <div className="field-container">
         {/* Rondjes schalen mee met de breedste rij en het aantal rijen (11 spelers: rijen van 4 en een laatste man) */}
         <div
@@ -199,20 +230,6 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </>
       )}
       <Timer />
-
-      {showSubstituteModal && (
-        <SubstituteModal
-          playerName={selectedPlayerName}
-          position={selectedPosition}
-          substitutes={substitutes}
-          fieldPlayers={fieldPlayers.filter(p => p.positie !== selectedPosition)}
-          onSubstitute={handleSubstitute}
-          onMove={handleMove}
-          onClose={() => setShowSubstituteModal(false)}
-          leegPlek={!getPlayerByPosition(selectedPosition)}
-          alleenVerplaatsen={selectedPosition === 'K'}
-        />
-      )}
 
       {doelpuntenBijhouden && kiesWeg && (
         <KiesDoelpuntWeg
