@@ -208,7 +208,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
               onClick={() => { setModus(modus === 'wissel' ? 'verplaats' : 'wissel'); kies(null) }}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 {modus === 'wissel'
-                  ? <path transform="rotate(80 12 12)" d="M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4" />
+                  ? <path d="m3 8 4-4 4 4M7 4v16m6-4 4 4 4-4M17 20V4" />
                   : <path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3" />}
               </svg>
             </button>}
