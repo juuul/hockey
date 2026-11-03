@@ -88,14 +88,14 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
     }
     if ('leeg' in gekozen) {
       kies(null)
-      if (speler) { plaatsIn(speler.id, gekozen.leeg); tel('lege-plek-gevuld') }
+      if (speler) { plaatsIn(speler.id, gekozen.leeg); setModus('wissel'); tel('lege-plek-gevuld') }
       return
     }
     const bron = spelers.find(s => s.id === gekozen.id && s.meedoen && s.inVeld === gekozen.inVeld && s.positie === gekozen.positie)
     kies(null)
     if (!bron || bron.id === speler?.id) return
     if (!speler) {
-      if (leeg) { plaatsIn(bron.id, leeg); tel('lege-plek-gevuld') }
+      if (leeg) { plaatsIn(bron.id, leeg); setModus('wissel'); tel('lege-plek-gevuld') }
       return
     }
     // Twee reserves kiezen verandert alleen de selectie, nooit de opstelling.
@@ -112,6 +112,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
       verplaats(bron.id, speler.id)
       tel(bron.isKeeper || speler.isKeeper ? 'keeper-verplaatst' : 'verplaats')
     }
+    setModus('wissel')
   }
 
   const bevestigVraag = () => {
@@ -176,10 +177,6 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         </div>
       ) : <KlokRegel />}
 
-      {magBewerken && <div className="veld-modus" role="group" aria-label="Spelers aanpassen">
-        <button type="button" aria-pressed={modus === 'wissel'} onClick={() => { setModus('wissel'); kies(null) }}>Wisselen</button>
-        <button type="button" aria-pressed={modus === 'verplaats'} onClick={() => { setModus('verplaats'); kies(null) }}>Alleen verplaatsen</button>
-      </div>}
       <div className="field-container">
         {/* Rondjes schalen mee met de breedste rij en het aantal rijen (11 spelers: rijen van 4 en een laatste man) */}
         <div
@@ -197,9 +194,14 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
       </div>
 
       {/* Wisselspelers */}
-      {wisselsInBeeld.length > 0 && (
+      {(wisselsInBeeld.length > 0 || magBewerken) && (
         <div className="substitutes-section">
           <div className="substitutes-list">{wisselsInBeeld.map(wisselTegel)}</div>
+          {magBewerken && <div className="veld-modus" role="group" aria-label="Spelers aanpassen">
+            <button type="button" aria-pressed={modus === 'wissel'} onClick={() => { setModus('wissel'); kies(null) }}>Wisselen</button>
+            <button type="button" aria-pressed={modus === 'verplaats'} onClick={() => { setModus('verplaats'); kies(null) }}>Alleen verplaatsen</button>
+          </div>}
+
         </div>
       )}
 
