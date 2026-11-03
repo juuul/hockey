@@ -197,18 +197,26 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
       </div>
 
       {/* Wisselspelers */}
-      {wisselsInBeeld.length > 0 && (
+      {(wisselsInBeeld.length > 0 || magBewerken) && (
         <div className="substitutes-section">
-          <div className="substitutes-list">{wisselsInBeeld.map(wisselTegel)}</div>
+          <div className={`substitutes-list ${magBewerken ? 'met-modus' : ''}`}>
+            {wisselsInBeeld.map(wisselTegel)}
+            {magBewerken && <button type="button" className="wissel-modus-icoon"
+              aria-pressed={modus === 'verplaats'}
+              aria-label={modus === 'verplaats' ? 'Alleen verplaatsen actief, terug naar wisselen' : 'Wisselen actief, één keer verplaatsen'}
+              title={modus === 'verplaats' ? 'Alleen verplaatsen (eenmalig)' : 'Wisselen; tik voor één keer verplaatsen'}
+              onClick={() => { setModus(modus === 'wissel' ? 'verplaats' : 'wissel'); kies(null) }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {modus === 'wissel'
+                  ? <path d="M4 7h16m-4-4 4 4-4 4M20 17H4m4-4-4 4 4 4" />
+                  : <path d="M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3" />}
+              </svg>
+            </button>}
+          </div>
         </div>
       )}
 
     </div>
-
-    {magBewerken && <div className="veld-modus wissel-modus-eronder" role="group" aria-label="Spelers aanpassen">
-      <button type="button" aria-pressed={modus === 'wissel'} onClick={() => { setModus('wissel'); kies(null) }}>Wisselen</button>
-      <button type="button" aria-pressed={modus === 'verplaats'} onClick={() => { setModus('verplaats'); kies(null) }}>Alleen verplaatsen</button>
-    </div>}
 
     {/* Bewust onder de vouw: alleen bereikbaar door te scrollen, zodat je er niet per ongeluk op tikt */}
     {wisselsEronder.length > 0 && (
