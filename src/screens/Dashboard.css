@@ -392,9 +392,9 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.05;
 }
 
 .substitute-item .speeltijd {
@@ -404,35 +404,6 @@
   line-height: 1.1;
 }
 
-.veld-modus {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 4px;
-  padding: 3px;
-  border: 1px solid var(--rand);
-  border-radius: 10px;
-  background: var(--vlak-zacht);
-}
-.veld-modus button {
-  flex: 1 1 auto;
-  min-height: 44px;
-  padding: 6px 8px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--tekst-2);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-.veld-modus button[aria-pressed="true"] {
-  background: #1e40af;
-  color: white;
-}
-.veld-modus button:last-child[aria-pressed="true"] {
-  background: #fcd34d;
-  color: #422006;
-}
 .player-slot.geselecteerd,
 .substitute-item.geselecteerd {
   outline: 3px solid #a8caff;
@@ -447,12 +418,8 @@
 }
 .substitute-item:disabled { cursor: default; }
 .substitute-item:focus-visible,
-.veld-modus button:focus-visible,
+.wissel-modus-icoon:focus-visible,
 .player-slot:focus-visible { outline: 4px solid #60a5fa; outline-offset: 7px; }
-
-.substitutes-section .veld-modus { margin-top: 6px; }
-.substitutes-section .substitutes-list:empty { display: none; }
-.substitutes-section .substitutes-list:empty + .veld-modus { margin-top: 0; }
 
 .player-slot.geselecteerd::after {
   content: '✓';
@@ -475,11 +442,22 @@
 .substitute-item { border-radius: 12px; border-width: 1px; }
 .substitute-item .count { background: transparent; padding: 2px 0; font-size: max(18px, calc(var(--base-readable-size) * .82)); color: var(--tekst-zacht); }
 
-/* Meteen na het eerste scherm: een klein stukje scrollen maakt de keuze zichtbaar. */
-.wissel-modus-eronder {
-  flex: 0 0 auto;
-  margin: 6px;
-}
-
 /* Op volle rijen blijft zoveel mogelijk breedte over voor de volledige naam. */
 .field-row.rij-4 .player-slot { padding: 4px; }
+
+.substitutes-list.met-modus { grid-template-columns: repeat(2, minmax(0, 1fr)) 44px; align-items: center; }
+.wissel-modus-icoon {
+  grid-column: 3;
+  width: 44px;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--rand-sterk);
+  border-radius: 10px;
+  background: var(--vlak);
+  color: var(--blauw-tekst);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.wissel-modus-icoon[aria-pressed="true"] { background: #fcd34d; color: #422006; border-color: #f59e0b; }
