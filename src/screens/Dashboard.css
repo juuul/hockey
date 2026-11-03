@@ -192,7 +192,7 @@
   max-width: 100%;
   white-space: normal;
   overflow-wrap: anywhere;
-  font-size: max(16px, min(var(--base-readable-size), calc(var(--size) * .24)));
+  font-size: max(18px, min(var(--base-readable-size), calc(var(--size) * .27)));
   font-weight: 700;
   line-height: 1.05;
 }
