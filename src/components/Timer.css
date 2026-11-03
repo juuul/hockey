@@ -134,60 +134,41 @@
   background: #065f46;
 }
 
-/* Regel onder de score op het Dashboard (alleen tekst, geen knop) */
+/* Altijd zichtbare tijdsbalk: alleen het deel en de resterende tijd. */
 .klok-regel {
   flex: 0 0 auto;
   display: flex;
-  align-items: baseline;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  padding: 2px 8px;
-  border-radius: 8px;
+  padding: 5px 6px 5px 10px;
+  border-radius: 10px;
   background: var(--vlak-grijs);
   color: var(--tekst-2);
-  font-size: var(--base-readable-size);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.klok-regel-tekst {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
-}
-
-/* Met startknop: tekst links, knop rechts (knop minstens 60px hoog) */
-.klok-regel.met-knop {
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 0 0 8px;
-}
-
-.klok-regel .klok-regel-knop {
-  flex: 0 0 auto;
   min-height: 60px;
-  padding: 0 14px;
-  white-space: nowrap;
 }
-
-.klok-regel.loopt {
-  background: var(--groen-vlak);
-  color: var(--groen-tekst);
+.klok-regel-tekst { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.klok-regel-deel { font-size: max(14px, calc(var(--base-readable-size) * .65)); line-height: 1.1; }
+.klok-regel-tekst strong { font-size: var(--base-readable-size); line-height: 1.1; white-space: nowrap; }
+.klok-bediening { display: flex; flex: 0 0 auto; gap: 5px; }
+.klok-bediening button {
+  width: 46px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 9px;
+  padding: 0;
+  font-family: inherit;
+  font-size: 23px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
 }
-
-.klok-regel.in-pauze {
-  background: var(--geel-vlak);
-  color: var(--geel-tekst);
-}
-
-.klok-regel-nog {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  opacity: 0.85;
-}
+.klok-bediening .klok-sprong { background: var(--knop-grijs); color: var(--tekst-2); font-size: 18px; }
+.klok-bediening button:disabled { opacity: .35; cursor: default; }
+.klok-bediening button:focus-visible { outline: 3px solid #60a5fa; outline-offset: 2px; }
+.klok-regel.loopt { background: var(--groen-vlak); color: var(--groen-tekst); }
+.klok-regel.in-pauze { background: var(--geel-vlak); color: var(--geel-tekst); }
 
 /* Onder de vouw: per kwart een knop 'begint nu' */
 .timer-uitleg {
