@@ -132,7 +132,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         onClick={() => tik(player?.id, player ? undefined : pos)}
         aria-pressed={!!selectie && ('id' in selectie ? selectie.id === player?.id : selectie.leeg === pos)}
         disabled={!magBewerken}
-        aria-label={player ? undefined : `Lege plek ${POSITIE_LABEL[pos]}: iemand erin zetten`}
+        aria-label={player ? `${player.naam}, ${player.wisselCount} keer gewisseld` : `Lege plek ${POSITIE_LABEL[pos]}: iemand erin zetten`}
       >
         {player ? (
           <>
@@ -178,6 +178,10 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
       ) : <KlokRegel />}
 
       <div className="field-container">
+        <svg className="field-lines" viewBox="0 0 320 400" preserveAspectRatio="none" aria-hidden="true">
+          <rect x="8" y="8" width="304" height="384" rx="2" />
+          <path d="M8 200h304M8 106h304M8 294h304M70 8a90 86 0 0 0 180 0M70 392a90 86 0 0 1 180 0M138 8V3h44v5M138 392v5h44v-5" />
+        </svg>
         {/* Rondjes schalen mee met de breedste rij en het aantal rijen (11 spelers: rijen van 4 en een laatste man) */}
         <div
           className="field"

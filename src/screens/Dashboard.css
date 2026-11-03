@@ -109,10 +109,11 @@
 }
 
 .field-container {
-  background: linear-gradient(to bottom, var(--veld-boven), var(--veld-onder));
-  border-radius: 8px;
-  padding: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  background: repeating-linear-gradient(0deg, #1d4935 0, #1d4935 12.5%, #204e39 12.5%, #204e39 25%);
+  border-radius: 18px;
+  border: 1px solid #38644b;
+  padding: 8px;
+  box-shadow: inset 0 0 35px #0d2e2388, 0 3px 10px #071c1420;
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
@@ -130,16 +131,15 @@
   position: relative;
 }
 
-/* Middenlijn tussen middenveld en verdediging */
-.field::before {
-  content: '';
+.field-lines {
   position: absolute;
-  top: 50%;
-  left: 5%;
-  right: 5%;
-  height: 2px;
-  background: var(--vlak);
-  opacity: 0.25;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #a9c9b755;
+  stroke-width: 1.2;
+  pointer-events: none;
 }
 
 .field-row {
@@ -155,39 +155,31 @@
   padding: 0 10%;
 }
 
-/* Rij van 4 (11 spelers): krap, dus minder rand en de kleinst toegestane letter (22px) */
-.field-row.rij-4 .player-slot {
-  padding: 4px 5px;
-}
-
-.field-row.rij-4 .player-slot .name,
-.field-row.rij-4 .player-slot .count {
-  font-size: max(calc(var(--size) * 0.23), 22px);
-}
-
 .player-slot {
-  --size: min(calc(93cqw / var(--breedste, 3)), calc(96cqh / var(--rijen, 4)), 170px);
-  background: var(--vlak);
-  border: none;
-  border-radius: 50%;
-  width: auto;
+  --size: max(44px, min(calc(86cqw / var(--breedste, 3)), calc(84cqh / var(--rijen, 4)), 140px));
+  position: relative;
+  width: var(--size);
+  height: var(--size);
   min-width: var(--size);
-  height: auto;
   min-height: var(--size);
-  padding: 4px 14px;
-  white-space: nowrap;
+  padding: 4px;
+  border: 2px solid #72aa89;
+  border-radius: 50%;
+  background: #2b6046;
+  color: #f3fbf5;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  gap: 3px;
+  box-shadow: 0 4px 10px #0a211e66;
   text-align: center;
   font-weight: 600;
-  color: var(--blauw-tekst);
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform .15s, background .15s;
   flex-shrink: 0;
   font-family: inherit;
+  touch-action: manipulation;
 }
 
 .player-slot:active {
@@ -195,40 +187,31 @@
 }
 
 .player-slot .name {
-  font-size: max(calc(var(--size) * 0.23), var(--base-readable-size));
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: max(18px, min(var(--base-readable-size), calc(var(--size) * .26)));
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.15;
 }
-
 .player-slot .count {
-  line-height: 1.05;
-  font-size: max(calc(var(--size) * 0.21), var(--base-readable-size));
-  color: var(--rood-tel);
-  font-weight: 700;
-  margin-top: 2px;
+  line-height: 1;
+  font-size: max(16px, calc(var(--size) * .2));
+  color: #d2e4d5;
+  font-weight: 500;
 }
-
 .player-slot.keeper {
-  background: #fcd34d;
-  color: #7c2d12;
+  background: #4c5136;
+  border-color: #b5bd83;
+  color: #f6f8e6;
 }
+.player-slot.keeper .count { color: #e3e8c8; }
 
-.player-slot.keeper .count {
-  color: #7c2d12;
-}
-
-/* Informatief, op volgorde van invallen: rood = laatste 2 invallers, oranje = 2 daarvoor, groen = rest */
-.player-slot.groen {
-  box-shadow: 0 0 0 6px #16a34a, 0 2px 6px rgba(0,0,0,0.25);
-}
-
-.player-slot.oranje {
-  box-shadow: 0 0 0 6px #f59e0b, 0 2px 6px rgba(0,0,0,0.25);
-}
-
-.player-slot.rood {
-  box-shadow: 0 0 0 6px #dc2626, 0 2px 6px rgba(0,0,0,0.25);
-}
+/* Kleuren blijven informatief; ook de vulling volgt de invalvolgorde. */
+.player-slot.groen { background: #2b6046; border-color: #72aa89; }
+.player-slot.oranje { background: #69533c; border-color: #d4b575; }
+.player-slot.rood { background: #633f43; border-color: #d79396; }
 
 .player-slot.leeg {
   background: rgba(255, 255, 255, 0.25);
@@ -334,11 +317,11 @@
 }
 
 .player-slot:disabled {
-  color: var(--blauw-tekst);
+  color: #f3fbf5;
 }
 
 .player-slot.keeper:disabled {
-  color: #7c2d12;
+  color: #f6f8e6;
 }
 
 .player-slot.leeg:disabled {
@@ -451,8 +434,8 @@
 }
 .player-slot.geselecteerd,
 .substitute-item.geselecteerd {
-  outline: 4px solid #60a5fa;
-  outline-offset: 7px;
+  outline: 3px solid #a8caff;
+  outline-offset: 4px;
 }
 .substitute-item {
   width: 100%;
@@ -469,3 +452,24 @@
 .substitutes-section .veld-modus { margin-top: 6px; }
 .substitutes-section .substitutes-list:empty { display: none; }
 .substitutes-section .substitutes-list:empty + .veld-modus { margin-top: 0; }
+
+.player-slot.geselecteerd::after {
+  content: '✓';
+  position: absolute;
+  top: -7px;
+  right: -4px;
+  width: 23px;
+  height: 23px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid #27456c;
+  background: #bed6ff;
+  color: #0c355f;
+  font-size: 14px;
+  font-weight: 800;
+  pointer-events: none;
+}
+.substitutes-section { border-radius: 14px; padding: 6px; }
+.substitute-item { border-radius: 12px; border-width: 1px; }
+.substitute-item .count { background: transparent; padding: 4px 0; color: var(--tekst-zacht); }
