@@ -264,3 +264,16 @@ Deze expliciet geautoriseerde ronde krijgt tijdens activiteit een eigen dagbudge
 Voortgang staat atomair in `catalogus-aanvulling-status.json` (600): doel, aantal klaar/fout en rondestatus. Na alle clublijsten klaar stopt de ronde definitief en zet de worker één voltooiingsmail in de bestaande wachtrij (idempotentie via `evaluaties` met prefix `clubaanvulling:`). Een nieuwe ronde vraagt een nieuwe expliciete opdracht en id; geen automatische maandelijkse herstart via dit bestand. Het bestaande meetoverzicht en dagelijkse geregistreerde-poulecontrole blijven gelden. Tests: `python3 server/tests/catalogus-aanvulling.py` (ook de echte worker met uitsluitend nagebootste Docker/bronantwoorden), bestaande pilot-/clubtests en de netwerkloze Chrome-fixture met ongewijzigde officiële modules. Die fixture controleert ook clublijst/clubteamlijsten, correcte club-id en stoppen bij 429.
 
 Spreid de twee minuutcronregels: productie direct op de minuut, test met `sleep 30 &&` vóór dezelfde workeropdracht. Beide op hetzelfde seconde starten kan door de niet-blokkerende gedeelde bronlock één omgeving herhaaldelijk laten overslaan. Geen code-/containerherstart nodig voor deze crontabinstelling; bewaar eerst een private kopie van de bestaande crontab en wijzig alleen de ene testregel. De maandelijkse clublijstregels blijven op hun eigen tijdstippen. Een lang lopend bezoek houdt de gedeelde bronlock veilig vast; de andere omgeving probeert de volgende minuut opnieuw.
+
+
+### Regressiecontrole voor verdwenen wedstrijdlocaties
+
+`node server/tests/catalogus-locaties.cjs` voert de echte catalogussynchronisatie uit met fictieve records: lege locaties en navigatieadressen herstellen, eigen accommodaties/tijden/taken blijven behouden en een volgende officiële locatie-update werkt door. `server/tests/programma-sync.ts` test dat een oude lokale kopie zonder locatievelden bij het wijzigen van een notitie geen wisopdracht verstuurt, ook als de server intussen een andere locatie heeft.
+
+```bash
+node server/tests/catalogus-locaties.cjs
+node_modules/.bin/esbuild server/tests/programma-sync.ts --bundle --platform=node --format=esm --outfile=/tmp/hockey-programma-sync-test.mjs
+node /tmp/hockey-programma-sync-test.mjs
+```
+
+Beide tests gebruiken fictieve gegevens en bezoeken geen externe wedstrijdbron. Een bestaand team gericht herstellen kan via de bestaande native PocketBase-bronherstelfunctie per locatieveld, na back-up en controle op een databasekopie; tijden/taken en de overige bronafwijkingen blijven behouden. Een productieherstel van gegevens vervangt geen publicatie van de bescherming in frontend en backend.

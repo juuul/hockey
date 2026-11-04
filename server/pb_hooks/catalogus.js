@@ -104,7 +104,9 @@ function synchroniseer(app, team) {
     for (const k of Object.keys(nieuw)) {
       const huidig = k === "thuis" ? p.getBool(k) : p.getString(k)
       // Bij het eerste koppelen bestaande ingevulde waarden bewaren; lege tijd mag aangevuld.
-      const eigen = basis && huidig !== basis[k] && !(bestaand && huidig === "")
+      // Een lege locatie is ontbrekende informatie, geen blijvende handmatige accommodatie.
+      const legeLocatie = (k === "locatie" || k === "locatieAdres") && !huidig.trim()
+      const eigen = basis && huidig !== basis[k] && !(bestaand && huidig === "") && !legeLocatie
       if (eigen) {
         if (huidig !== nieuw[k]) wijzigingen[k] = nieuw[k]
       } else p.set(k, nieuw[k])
