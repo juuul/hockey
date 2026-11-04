@@ -344,3 +344,10 @@ a.prog-locatie:focus-visible { outline: 2px solid var(--rand-blauw); outline-off
 .tijd-keuze .keuze-knop { flex: 0 0 auto; }
 
 .prog-tijd-knop:focus-visible { outline: 3px solid var(--blauw-tekst); outline-offset: 2px; }
+
+.prog-bronverschil {
+  font-size: max(18px, calc(var(--base-readable-size) * .85));
+  color: var(--tekst-zacht);
+  padding-left: 9px;
+  border-left: 2px solid var(--rand-sterk);
+}

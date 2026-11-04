@@ -6,7 +6,7 @@ import { verzamelKeuze } from '../verzamelkeuze'
 import DatumTijdKiezer from '../components/DatumTijdKiezer'
 import { autoPlekken, rijdenTekst } from '../rijden'
 import { thuisUitBekend, thuisUitTekst } from '../programmaLocatie'
-import { programmaBronLink } from '../programmaBron'
+import { programmaBronLink, programmaAfwijkingen } from '../programmaBron'
 import { begeleidingProfiel, begeleidingStandaard, begeleidingPlekken, begeleidingAantal, kiesTaak } from '../begeleiding'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
@@ -134,7 +134,7 @@ export default function Programma({ naarDashboard }: { naarDashboard: () => void
         {p.bronPlanning && !p.bronId && <div className="prog-regel">{p.bronPlanning.spelvorm} · {p.bronPlanning.status === 'reserve' ? 'Reservedag — alleen als nodig' : p.bronPlanning.status === 'slotdag' ? 'Voorlopige slotdag' : p.bronPlanning.spelvorm === 'Zaal' ? 'Mogelijke zaal-speeldag' : 'Voorlopige speeldag'} {p.bronPlanning.omschrijving && !/^\d+$/.test(p.bronPlanning.omschrijving) ? ` · ${p.bronPlanning.omschrijving}` : ''}</div>}
         <WedstrijdLocatie locatie={p.locatie} adres={p.locatieAdres} />
         {p.bronStatus && /cancel/i.test(p.bronStatus) && <div className="prog-regel">Afgelast volgens de officiële bron</div>}
-        {Object.entries(p.bronWijziging || {}).some(([veld, waarde]) => (p[veld as keyof ProgrammaItem] ?? '') !== waarde) && <div className="prog-regel">De officiële gegevens zijn gewijzigd; jouw aanpassing is behouden.</div>}
+        {programmaAfwijkingen(p).map(verschil => <div key={verschil.veld} className="prog-regel prog-bronverschil">{verschil.tekst}</div>)}
         {p.notitie && <div className="prog-regel notitie">{p.notitie}</div>}
         {mijn.length > 0 && (
           <div className="prog-labels">{mijn.map(b => <span key={b} className="prog-label mijn">Jij: {b}</span>)}</div>
@@ -386,9 +386,9 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               </label>
             </>
           )}
-          {p.bronId && <p className="account-uitleg">Officiële wedstrijd. Verzameltijd en taken zijn eigen gegevens; handmatige wijzigingen blijven bij een bronupdate behouden.</p>}
-          {Object.entries(p.bronWijziging || {}).filter(([veld, waarde]) => veld !== 'spelen' && (p[veld as keyof ProgrammaItem] ?? '') !== waarde).map(([veld, waarde]) => <div key={veld}>
-            <p className="account-uitleg">Officiële {({ datum: 'datum', spelen: 'aanvangstijd', thuis: 'thuis/uit', tegenstander: 'tegenstander', locatie: 'locatie', locatieAdres: 'wedstrijdadres' } as Record<string, string>)[veld]}: {typeof waarde === 'boolean' ? waarde ? 'thuis' : 'uit' : waarde}. Jouw aanpassing is behouden.</p>
+          {p.bronId && <p className="account-uitleg">Je eigen afspraken en taken blijven staan als hockey.nl iets wijzigt.</p>}
+          {programmaAfwijkingen(p).filter(({ veld }) => veld !== 'spelen').map(({ veld, tekst }) => <div key={veld}>
+            <p className="account-uitleg">{tekst}</p>
             <button className="btn btn-secondary" onClick={async () => {
               try {
                 await pb.send(`/api/hockey/catalogus/programma/${p.id}/herstel`, { method: 'POST', body: { veld } })
