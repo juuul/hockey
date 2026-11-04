@@ -31,7 +31,11 @@ const TEKST = new Set(['voorkeur1', 'voorkeur2', 'clubId', 'tegenstander', 'opst
 
 export function schoon(soort: Soort, r: Record<string, unknown>): Record<string, unknown> {
   const uit: Record<string, unknown> = {}
-  for (const v of VELDEN[soort]) uit[v] = r[v] ?? (TEKST.has(v) ? '' : v === 'rijders' ? [] : v === 'thuis' || v === 'scoreNietBijgehouden' ? false : null)
+  for (const v of VELDEN[soort]) {
+    // Oude/offline kopieën kunnen deze bronvelden nog missen. Ontbrekend is geen opdracht om te wissen.
+    if (soort === 'programma' && (v === 'locatie' || v === 'locatieAdres') && r[v] == null) uit[v] = undefined
+    else uit[v] = r[v] ?? (TEKST.has(v) ? '' : v === 'rijders' ? [] : v === 'thuis' || v === 'scoreNietBijgehouden' ? false : null)
+  }
   return uit
 }
 
@@ -84,7 +88,7 @@ export function samenvoegen(lokaal: Records, basis: Records, server: Records, af
     if (perVeld && lokaalGewijzigd && basis[id] && server[id]) {
       r = { ...server[id] }
       for (const [veld, waarde] of Object.entries(lokaal[id])) {
-        if (!veld.startsWith('bron') && !gelijk(waarde, basis[id][veld])) r[veld] = waarde
+        if (waarde !== undefined && !veld.startsWith('bron') && !gelijk(waarde, basis[id][veld])) r[veld] = waarde
       }
     }
     if (r !== undefined) uit[id] = r
@@ -178,7 +182,7 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
       else if (a.soortActie === 'update') {
         const { id: _id, ...velden } = a.data!
         const gewijzigd = a.soort === 'programma'
-          ? Object.fromEntries(Object.entries(velden).filter(([veld, waarde]) => !veld.startsWith('bron') && !gelijk(waarde, basis[a.soort][a.id]?.[veld])))
+          ? Object.fromEntries(Object.entries(velden).filter(([veld, waarde]) => waarde !== undefined && !veld.startsWith('bron') && !gelijk(waarde, basis[a.soort][a.id]?.[veld])))
           : velden
         await col.update(a.id, gewijzigd)
       } else await col.delete(a.id)

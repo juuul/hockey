@@ -21,3 +21,29 @@ const samengevoegd = samenvoegen(lokaal.programma, basis.programma, { [id]: opSe
 assert.equal(samengevoegd[id].spelen, '09:30')
 assert.equal(samengevoegd[id].verzamelen, '08:15')
 console.log('Geslaagd: offline verzameltijd aanpassen behoudt een nieuwe officiële aanvangstijd.')
+
+// Een oude lokale kopie kent de later toegevoegde locatievelden niet.
+// Een eigen taak/notitie wijzigen mag die velden niet leeg naar de server sturen.
+const metLocatie = schoon('programma', { ...p, locatie: 'Sportpark Voorbeeld · Veld 2', locatieAdres: 'Voorbeeldweg 2', bronBasis: { spelen: '09:00', locatie: 'Sportpark Voorbeeld · Veld 2', locatieAdres: 'Voorbeeldweg 2' } })
+const oudeKopie = { ...metLocatie, notitie: 'Eigen teamafspraak' }
+delete oudeKopie.locatie
+delete oudeKopie.locatieAdres
+const basisLocatie: Alles = perSoort(() => ({}))
+basisLocatie.programma[id] = metLocatie
+const lokaalLocatie: Alles = perSoort(() => ({}))
+lokaalLocatie.programma[id] = schoon('programma', oudeKopie)
+const locatieServer = { ...metLocatie, locatie: 'Sportpark Voorbeeld · Veld 3', locatieAdres: 'Nieuwe Voorbeeldweg 3' }
+let locatiePatch: Record<string, unknown> = {}
+const locatieFake = { filter: () => '', collection: (soort: string) => ({
+  update: async (_: string, velden: Record<string, unknown>) => { locatiePatch = velden; Object.assign(locatieServer, velden) },
+  getFullList: async () => soort === 'programma' ? [locatieServer] : [],
+}) }
+const locatieUit = await synchroniseer(locatieFake as never, 'team', () => lokaalLocatie, basisLocatie)
+assert.deepEqual(locatiePatch, { notitie: 'Eigen teamafspraak' }, 'Ontbrekende lokale locatievelden mogen niets wissen')
+assert.equal(locatieUit.samengevoegd.programma[id].locatie, locatieServer.locatie)
+assert.equal(locatieUit.samengevoegd.programma[id].locatieAdres, locatieServer.locatieAdres)
+assert.equal(locatieUit.wachtend, 0)
+const bewustLeeg = { ...metLocatie, locatie: '', locatieAdres: '' }
+const bewustSamengevoegd = samenvoegen({ [id]: bewustLeeg }, { [id]: metLocatie }, { [id]: metLocatie }, new Set(), [], true)
+assert.equal(bewustSamengevoegd[id].locatie, '', 'Een expliciete tekstwijziging blijft herkenbaar als eigen invoer')
+console.log('PROGRAMMA_SYNC_LOCATIE_OK: oude kopieën wissen geen locaties; notities synchroniseren en actuele bronlocaties blijven behouden.')
