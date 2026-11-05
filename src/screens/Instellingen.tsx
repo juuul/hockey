@@ -128,10 +128,16 @@ function Melding({ tekst, fout }: { tekst: string | null; fout?: boolean }) {
 // Hoe staat het met versturen naar de server?
 function SyncRegel() {
   const { sync, live, nuSynchroniseren } = useHockey()
+  const [bezig, setBezig] = useState(false)
+  const ververs = async () => {
+    if (bezig) return
+    setBezig(true)
+    try { await nuSynchroniseren() } finally { setBezig(false) }
+  }
   if (!sync) return null
   const fout = sync.offline || sync.fout || (live && !live.verbonden)
-  if (fout) return <button className="account-sync fout" onClick={nuSynchroniseren}>
-    {sync.offline ? sync.wachtend ? 'Geen verbinding. Wijzigingen wachten.' : 'Geen verbinding. Tik om opnieuw te proberen.' : 'Synchroniseren lukt niet. Tik om opnieuw te proberen.'}
+  if (fout) return <button className="account-sync fout" onClick={ververs} disabled={bezig} aria-busy={bezig}>
+    {bezig ? 'Verbinding controleren…' : <>{sync.wachtend || live?.wachtend ? 'Wijzigingen wachten op verbinding. ' : 'Verbinding onderbroken. '}We proberen het automatisch opnieuw. Tik om nu te verversen.</>}
   </button>
   return <p className="instellingen-status" role="status">{!sync.geladen ? 'Gegevens ophalen…' : sync.wachtend || live?.wachtend ? 'Bijwerken…' : 'Alles bijgewerkt'}</p>
 }

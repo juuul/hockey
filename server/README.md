@@ -264,3 +264,19 @@ node /tmp/hockey-programma-sync-test.mjs
 
 Beide tests gebruiken fictieve gegevens en bezoeken geen externe wedstrijdbron. Een bestaand team gericht herstellen kan via de bestaande native PocketBase-bronherstelfunctie per locatieveld, na back-up en controle op een databasekopie; tijden/taken en de overige bronafwijkingen blijven behouden. Een productieherstel van gegevens vervangt geen publicatie van de bescherming in frontend en backend.
 
+
+### Automatisch herstel van de appverbinding
+
+Unitcontrole van wachttijden, handmatig versnellen, offline/verborgen pauzeren, opruimen en echte aanvraagtimeout:
+
+```bash
+node_modules/.bin/esbuild server/tests/herstel.ts --bundle --platform=node --format=esm --outfile=/tmp/hockey-herstel-test.mjs
+node /tmp/hockey-herstel-test.mjs
+```
+
+`server/tests/programma-sync.ts` controleert daarnaast dat tijdelijke 429/500/503 eigen wijzigingen voor een volgende poging bewaren. De browserfixture gebruikt de echte `useTeamSync` en `useLiveStand` tegen een gebundelde mockserver; alle Chrome-verzoeken worden onderschept. Zij simuleert lezen/live-aanmelden/opslaan dat na een storing herstelt en controleert uitroeptekenstatus, onverzonden score/notitie, invoer, scroll en het stoppen van retries na unmount. Alleen fictieve data; geen authenticatiesleutels, bestaande accounts, normale backend of wedstrijdbron.
+
+```bash
+node server/tests/sync-herstel-ui.cjs --build /tmp/hockey-sync-herstel-qa
+docker run --rm --network none --user 1000:1000 -v /tmp/hockey-sync-herstel-qa:/qa:ro -v "$PWD/server/tests/sync-herstel-ui.cjs:/test.cjs:ro" --entrypoint node zenika/alpine-chrome:with-puppeteer /test.cjs
+```
