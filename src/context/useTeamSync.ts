@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { HerstelPogingen, automatischHerstellen, verzoekMetTimeout } from '../herstel'
 import { pb } from '../server'
 import { lees, schrijf } from '../opslag'
 import { acties, Alles, GeenVerbinding, LEEG, perSoort, SOORTEN, synchroniseer, Verwijderd } from '../sync'
@@ -36,18 +37,24 @@ export function useTeamSync({ teamId, prefix, records, toepassen, verwijderd, ve
   const basisRef = useRef<Alles>(lees(prefix, 'basis', LEEG))
   const bezig = useRef(false)
   const nogEens = useRef(false)
+  const syncRef = useRef<(handmatig?: boolean) => Promise<void>>(async () => {})
+  const herstel = useMemo(() => new HerstelPogingen(h => { void syncRef.current(h) }), [teamId, prefix])
+  useEffect(() => { herstel.start(); return () => herstel.stop() }, [herstel])
 
-  const sync = useCallback(async () => {
+  const sync = useCallback(async (handmatig = false) => {
     if (!teamId || !pb.authStore.isValid) return
     if (bezig.current) {
       nogEens.current = true
       return
     }
+    if (!herstel.magProberen(handmatig)) return
     bezig.current = true
     try {
       do {
         nogEens.current = false
-        const uit = await synchroniseer(pb, teamId, () => recordsRef.current, basisRef.current, verwijderdRef.current)
+        const uit = await verzoekMetTimeout(signal => synchroniseer(pb, teamId, () => recordsRef.current, basisRef.current, verwijderdRef.current, signal))
+        if (!herstel.actief) return
+        herstel.gelukt()
         basisRef.current = uit.basis
         schrijf(prefix, 'basis', uit.basis)
         toepassenRef.current(uit.samengevoegd)
@@ -61,6 +68,8 @@ export function useTeamSync({ teamId, prefix, records, toepassen, verwijderd, ve
         setStatus({ geladen: true, wachtend: uit.wachtend, offline: false, fout: null, serverLeeg: uit.serverLeeg })
       } while (nogEens.current)
     } catch (err) {
+      if (!herstel.actief) return
+      herstel.mislukt()
       const offline = err instanceof GeenVerbinding
       setStatus(s => ({
         ...s,
@@ -71,7 +80,8 @@ export function useTeamSync({ teamId, prefix, records, toepassen, verwijderd, ve
     } finally {
       bezig.current = false
     }
-  }, [teamId, prefix])
+  }, [teamId, prefix, herstel])
+  syncRef.current = sync
 
   // Lokale wijziging: even wachten (meerdere tikken achter elkaar) en dan versturen
   const vingerafdruk = JSON.stringify(records) + JSON.stringify(verwijderd)
@@ -99,19 +109,19 @@ export function useTeamSync({ teamId, prefix, records, toepassen, verwijderd, ve
         .then(af => { if (gestopt) af().catch(() => {}); else afmelden.push(af) })
         .catch(() => {})
     }
-    const zichtbaar = () => { if (document.visibilityState === 'visible') straks() }
-    window.addEventListener('online', straks)
-    document.addEventListener('visibilitychange', zichtbaar)
-    const interval = setInterval(sync, 60_000)
+    const wakker = () => { if (automatischHerstellen()) void sync(true) }
+    window.addEventListener('online', wakker)
+    document.addEventListener('visibilitychange', wakker)
+    const interval = setInterval(() => { if (automatischHerstellen()) void sync() }, 60_000)
     return () => {
       gestopt = true
       clearTimeout(t)
       clearInterval(interval)
-      window.removeEventListener('online', straks)
-      document.removeEventListener('visibilitychange', zichtbaar)
+      window.removeEventListener('online', wakker)
+      document.removeEventListener('visibilitychange', wakker)
       afmelden.forEach(af => af().catch(() => {}))
     }
   }, [teamId, sync])
 
-  return { status, nuSynchroniseren: sync }
+  return { status, nuSynchroniseren: () => sync(true) }
 }

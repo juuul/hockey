@@ -169,7 +169,7 @@ export class GeenVerbinding extends Error {}
 
 // Eén ronde: eerst lokale verschillen versturen, dan de serverstand ophalen en samenvoegen.
 // 'lokaalNu' wordt na het versturen opnieuw gelezen: wat er intussen lokaal veranderde gaat niet verloren
-export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: () => Alles, basisVoor: Alles, verwijderd: Verwijderd = GEEN_VERWIJDERD) {
+export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: () => Alles, basisVoor: Alles, verwijderd: Verwijderd = GEEN_VERWIJDERD, signal?: AbortSignal) {
   const basis = kopie(basisVoor)
   const afgewezen: Record<Soort, Set<string>> = perSoort(() => new Set<string>())
   // Verwijderingen die de server heeft verwerkt (of die er al niet meer waren): mogen uit de lijst
@@ -178,14 +178,14 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
   for (const a of acties(lokaalNu(), basis, verwijderd)) {
     try {
       const col = pb.collection(a.soort)
-      if (a.soortActie === 'create') await col.create({ ...a.data, team: teamId })
+      if (a.soortActie === 'create') await col.create({ ...a.data, team: teamId }, { signal })
       else if (a.soortActie === 'update') {
         const { id: _id, ...velden } = a.data!
         const gewijzigd = a.soort === 'programma'
           ? Object.fromEntries(Object.entries(velden).filter(([veld, waarde]) => waarde !== undefined && !veld.startsWith('bron') && !gelijk(waarde, basis[a.soort][a.id]?.[veld])))
           : velden
-        await col.update(a.id, gewijzigd)
-      } else await col.delete(a.id)
+        await col.update(a.id, gewijzigd, { signal })
+      } else await col.delete(a.id, { signal })
       if (a.soortActie === 'delete') {
         delete basis[a.soort][a.id]
         verwerkt[a.soort].push(a.id)
@@ -193,7 +193,8 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
     } catch (err) {
       // Geen verbinding: later opnieuw. Geweigerd (geen rechten, ongeldig, al weg): terug naar de serverstand
       const status = (err as { status?: number }).status
-      if (status === 0) throw new GeenVerbinding()
+      if (status === 0 || signal?.aborted) throw new GeenVerbinding()
+      if (status === 429 || (status !== undefined && status >= 500)) throw err
       if (a.soortActie === 'delete') verwerkt[a.soort].push(a.id)
       afgewezen[a.soort].add(a.id)
     }
@@ -202,7 +203,7 @@ export async function synchroniseer(pb: PocketBase, teamId: string, lokaalNu: ()
   const server: Alles = { ...LEEG }
   try {
     for (const soort of SOORTEN) {
-      const lijst = await pb.collection(soort).getFullList({ filter: pb.filter('team = {:team}', { team: teamId }), batch: 500 })
+      const lijst = await pb.collection(soort).getFullList({ filter: pb.filter('team = {:team}', { team: teamId }), batch: 500, signal })
       server[soort] = perId(lijst, soort)
     }
   } catch (err) {

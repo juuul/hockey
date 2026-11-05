@@ -47,3 +47,11 @@ const bewustLeeg = { ...metLocatie, locatie: '', locatieAdres: '' }
 const bewustSamengevoegd = samenvoegen({ [id]: bewustLeeg }, { [id]: metLocatie }, { [id]: metLocatie }, new Set(), [], true)
 assert.equal(bewustSamengevoegd[id].locatie, '', 'Een expliciete tekstwijziging blijft herkenbaar als eigen invoer')
 console.log('PROGRAMMA_SYNC_LOCATIE_OK: oude kopieën wissen geen locaties; notities synchroniseren en actuele bronlocaties blijven behouden.')
+
+// Tijdelijke serverfouten mogen onverzonden wijzigingen niet als ongeldige invoer weggooien.
+for (const status of [429, 500, 503]) {
+  const tijdelijk = { filter: () => '', collection: () => ({ update: async () => { throw { status } } }) }
+  await assert.rejects(synchroniseer(tijdelijk as never, 'team', () => lokaal, basis), (err: unknown) => (err as { status: number }).status === status)
+  assert.equal(lokaal.programma[id].verzamelen, '08:15')
+}
+console.log('SYNC_HERSTEL_OK: tijdelijke serverfouten houden eigen wijzigingen vast voor de volgende poging.')
