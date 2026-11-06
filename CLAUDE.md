@@ -54,6 +54,7 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Speeltijd per speler** (`src/speeltijd.ts`): per linie (aanval/middenveld/verdediging/keeper) plus wissel als eigen groep, gemeten op de wedstrijdklok; wie niet meedoet telt niet. Getoond op de wisseltegels (min), per wedstrijd en per seizoen in Historie.
 
 ### Mailinhoud
+- Bevestigingslinks (`#bevestigen=`) openen een eigen appscherm. Alleen een expliciete klik bevestigt via PocketBase; daarna wordt de bestaande sessie zo mogelijk ververst. Dit maakt geen team aan en wijzigt geen rollen.
 - Processtap, ontvanger en vervolgactie per mail staan in `docs/mailprocessen.md`. Uitnodiging/reminder: accepteren bevestigt e-mailbezit en geeft toegang; zeven dagen gerekend vanaf oorspronkelijke verzending. Geen onvoorwaardelijke teamverwijdering beloven. Nieuw team aangemaakt betekent uitnodiging verstuurd, niet account geactiveerd. Nieuw-lidmail pas na acceptatie. PDF-versie eerst beoordelen; evaluatiemail en kopieeropdracht gebruiken dezelfde werkelijke meetperiode. Standaard verificatie-/e-mailwijzigingsmails worden niet door de app gebruikt; OTP/inlogmeldingen staan uit.
 
 ### Vaste keuzes van de gebruiker

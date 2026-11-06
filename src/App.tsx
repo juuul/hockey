@@ -148,7 +148,7 @@ function MetTeam() {
 
   // Links uit mail of app: #uitnodiging=…, #wachtwoord=…, #aanmelding=… of #kijk=… (meekijklink). Daarna het # weghalen, zodat verversen het niet opnieuw opent
   useEffect(() => {
-    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding|kijk|aanvraag|toegang)=(.+)$/)
+    const m = window.location.hash.match(/^#(uitnodiging|wachtwoord|aanmelding|kijk|aanvraag|toegang|bevestigen)=(.+)$/)
     if (!m) return
     setStart({ soort: m[1] as LinkSoort, token: decodeURIComponent(m[2]) })
     setScreen('instellingen')

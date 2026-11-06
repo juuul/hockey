@@ -22,7 +22,7 @@ De persoonlijke uitnodiging bevestigt het e-mailadres en geeft pas na accepteren
 
 ## Standaardmails buiten de appflow
 
-De PocketBase-templates voor e-mailverificatie en e-mailadreswijziging gebruiken standaard Engelstalige teksten met beheerpaneellinks. De app roept deze routes niet aan: e-mailbezit wordt via de uitnodiging bevestigd en er is geen scherm voor e-mailadreswijziging. De OTP- en nieuwe-inloglocatiemeldingen zijn uitgeschakeld. Deze controle voegt geen nieuwe authenticatiemethode toe en schakelt geen standaardmails in. Nieuwe UI voor zulke routes vereist eerst passende appschermen, links en teksten.
+De PocketBase-templates voor e-mailverificatie en e-mailadreswijziging gebruiken standaard Engelstalige teksten met beheerpaneellinks. De standaardtemplates worden niet door de app verstuurd. Een afzonderlijk beheerverzoek kan een persoonlijke bevestigingsmail met een `#bevestigen=`-link naar de app versturen; de ontvanger bevestigt daar expliciet via PocketBase. De mail legt uit dat bevestiging nodig is om een nieuw team te starten en dat oudere accounts door een technische fout onbevestigd kunnen zijn gebleven. Er is geen scherm voor e-mailadreswijziging. De OTP- en nieuwe-inloglocatiemeldingen zijn uitgeschakeld. Deze controle voegt geen nieuwe authenticatiemethode toe en schakelt geen standaardmails in. De bevestigingsmail moet naar het gepubliceerde appscherm verwijzen; de standaard beheerpaneellink is hiervoor ongeschikt.
 
 De gedeelde feedback/contactfunctie kan op test beschikbaar zijn zonder dat zij op productie is vrijgegeven. Deze mailcontrole activeert die functie niet op productie. Transport en IMAP-archivering maken geen extra mail aan de gebruiker: zij verzenden of bewaren alleen de bestaande berichten.
 

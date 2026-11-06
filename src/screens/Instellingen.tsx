@@ -11,10 +11,11 @@ import { leesThema, Thema, zetThema } from '../thema'
 import PlanningDocumenten from '../components/PlanningDocumenten'
 import VerzamelenInstellen from '../components/VerzamelenInstellen'
 import TeamAanmelden, { TeamKoppelen } from '../components/TeamSelectie'
+import EmailBevestigen from '../components/EmailBevestigen'
 import '../components/Modal.css'
 import './Instellingen.css'
 
-export type LinkSoort = 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk' | 'aanvraag' | 'toegang'
+export type LinkSoort = 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk' | 'aanvraag' | 'toegang' | 'bevestigen'
 export type AccountStart = { soort: LinkSoort; token: string } | null
 
 type InstellingMenu = 'wisselen' | 'teaminstellingen' | 'verzamelen' | 'weergave' | 'account' | 'aanvragen' | 'beheer' | 'globaal' | 'planning'
@@ -49,6 +50,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
 
   const titel =
     weergave.soort === 'uitnodiging' ? 'Uitnodiging'
+    : weergave.soort === 'bevestigen' ? 'E-mailadres bevestigen'
     : weergave.soort === 'wachtwoord' ? 'Nieuw wachtwoord'
     : weergave.soort === 'team' ? 'Leden'
     : weergave.soort === 'aanmelden' ? 'Team kiezen'
@@ -79,6 +81,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
       <div className="instellingen-inhoud">
         {weergave.soort === 'uitnodiging' && <UitnodigingAannemen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'wachtwoord' && <WachtwoordKiezen token={weergave.token} klaar={terug} />}
+        {weergave.soort === 'bevestigen' && <EmailBevestigen token={weergave.token} klaar={terug} />}
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
         {weergave.soort === 'aanmelden' && <TeamAanmelden startKeuze={weergave.keuze} stap={weergave.stap ?? 1} naarStap={stap => setWeergave(w => w.soort === 'aanmelden' ? { ...w, stap } : w)} />}
         {weergave.soort === 'gebruik' && gebruiker?.superadmin && <Gebruik />}
