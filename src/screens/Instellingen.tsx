@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { TeamAanmelding, ToegangAanvraag, useAccount } from '../context/AccountContext'
 import { useHockey } from '../context/HockeyContext'
-import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Uitnodiging } from '../server'
+import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Team, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
 import { useTerug } from '../terug'
 import DeelKijklink from '../components/DeelKijklink'
@@ -18,7 +18,7 @@ import './Instellingen.css'
 export type LinkSoort = 'uitnodiging' | 'wachtwoord' | 'aanmelding' | 'kijk' | 'aanvraag' | 'toegang' | 'bevestigen'
 export type AccountStart = { soort: LinkSoort; token: string } | null
 
-type InstellingMenu = 'wisselen' | 'teaminstellingen' | 'verzamelen' | 'weergave' | 'account' | 'aanvragen' | 'beheer' | 'globaal' | 'planning'
+type InstellingMenu = 'teams' | 'teaminstellingen' | 'verzamelen' | 'weergave' | 'account' | 'aanvragen' | 'beheer' | 'globaal' | 'planning'
 type Weergave = ({ soort: 'hoofd' } | { soort: 'team'; id: string } | { soort: 'aanmelden'; keuze: 'bestaand' | 'nieuw'; stap?: 1 | 2 | 3 } | { soort: 'gebruik' | InstellingMenu } | { soort: LinkSoort; token: string }) & { terugNaar?: InstellingMenu }
 
 const ROLLEN: Rol[] = ['beheerder', 'kijker']
@@ -38,7 +38,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
     document.querySelector('.content')?.scrollTo(0, 0)
   }, [weergave.soort])
   useEffect(() => {
-    if (!gebruiker) setWeergave(w => ['team', 'gebruik', 'wisselen', 'teaminstellingen', 'verzamelen', 'account', 'aanvragen', 'beheer', 'globaal', 'planning'].includes(w.soort) ? { soort: 'hoofd' } : w)
+    if (!gebruiker) setWeergave(w => ['team', 'gebruik', 'teams', 'teaminstellingen', 'verzamelen', 'account', 'aanvragen', 'beheer', 'globaal', 'planning'].includes(w.soort) ? { soort: 'hoofd' } : w)
   }, [gebruiker?.id])
 
   // Een link uit een mail wordt één keer geopend (niet opnieuw bij de volgende keer dit tabblad)
@@ -59,7 +59,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
     : weergave.soort === 'kijk' ? 'Meekijken'
     : weergave.soort === 'aanvraag' ? 'Account aanvragen'
     : weergave.soort === 'toegang' ? 'Toegangsaanvraag'
-    : weergave.soort === 'wisselen' ? 'Team wisselen'
+    : weergave.soort === 'teams' ? 'Teams beheren'
     : weergave.soort === 'teaminstellingen' ? 'Teaminstellingen'
     : weergave.soort === 'verzamelen' ? 'Verzameltijd'
     : weergave.soort === 'weergave' ? 'Weergave'
@@ -85,7 +85,7 @@ export default function Instellingen({ start, startGebruikt, naarDashboard }: { 
         {weergave.soort === 'team' && gebruiker && <TeamBeheer id={weergave.id} gebruiker={gebruiker} weg={terug} />}
         {weergave.soort === 'aanmelden' && <TeamAanmelden startKeuze={weergave.keuze} stap={weergave.stap ?? 1} naarStap={stap => setWeergave(w => w.soort === 'aanmelden' ? { ...w, stap } : w)} />}
         {weergave.soort === 'gebruik' && gebruiker?.superadmin && <Gebruik />}
-        {weergave.soort === 'wisselen' && gebruiker && <TeamWisselen gebruiker={gebruiker} gekozen={terug} aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze, terugNaar: 'wisselen' })} />}
+        {weergave.soort === 'teams' && gebruiker && <TeamsBeheren gebruiker={gebruiker} openTeam={id => setWeergave({ soort: 'team', id, terugNaar: 'teams' })} aanmelden={keuze => setWeergave({ soort: 'aanmelden', keuze, terugNaar: 'teams' })} />}
         {weergave.soort === 'teaminstellingen' && beheert && <TeamInstellingen key={actiefTeam?.id} />}
         {weergave.soort === 'verzamelen' && beheert && <VerzamelenInstellen key={actiefTeam!.id} team={actiefTeam!} />}
         {weergave.soort === 'weergave' && <Weergave />}
@@ -214,20 +214,22 @@ function MenuRegel({ tekst, sub, open }: { tekst: string; sub?: string; open: ()
 }
 
 function Overzicht({ gebruiker, openTeam, openMenu }: { gebruiker: Gebruiker; openTeam: (id: string) => void; openMenu: (menu: InstellingMenu) => void }) {
-  const { teamsLaden, actiefTeam, aanvragen, uitloggen } = useAccount()
+  const { teams, teamsLaden, actiefTeam, actiefTeamId, kiesTeam, aanvragen, uitloggen } = useAccount()
   const [fout, setFout] = useState<string | null>(null)
   useEffect(() => { teamsLaden().catch(err => setFout(foutTekst(err))) }, [teamsLaden])
   const rol = actiefTeam ? rolIn(actiefTeam, gebruiker.id) : null
   const beheert = !!actiefTeam && (gebruiker.superadmin || rol === 'beheerder')
   const aantal = aanvragen.toegang.length + aanvragen.teams.length
   return <div className="instellingen-overzicht">
-    <section className="instellingen-teamoverzicht" aria-label="Je team">
-      <h2>Je team</h2>
-      <div className="instellingen-actief-team">
-        <span><strong>{actiefTeam?.naam ?? 'Zonder team'}</strong><small>{actiefTeam ? rol ? ROL_TEKST[rol] : gebruiker.superadmin ? 'Superadmin' : 'Lid' : 'Alleen op deze telefoon'}</small></span>
-        <span className="instellingen-actief-label">Actief</span>
+    <section className="instellingen-teamoverzicht" aria-label="Mijn teams">
+      <h2>Mijn teams</h2>
+      <div className="instellingen-menu instellingen-teams">
+        {teams.map(team => <TeamKeuze key={team.id} team={team} gebruiker={gebruiker} actief={team.id === actiefTeamId} kies={() => { kiesTeam(team.id); tel('team-gekozen') }} />)}
+        <button className="instellingen-menuregel instellingen-teamknop" type="button" aria-pressed={actiefTeamId === null} onClick={() => { kiesTeam(null); tel('zonder-team') }}>
+          <span><strong>Zonder team</strong><small>Alleen op deze telefoon</small></span>{actiefTeamId === null && <ActiefLabel />}
+        </button>
       </div>
-      <MenuRegel tekst="Team wisselen" open={() => openMenu('wisselen')} />
+      {!gebruiker.gast && <MenuRegel tekst="Teams beheren" open={() => openMenu('teams')} />}
       <SyncRegel />
     </section>
     <DeelKijklink compact knop />
@@ -245,23 +247,60 @@ function Overzicht({ gebruiker, openTeam, openMenu }: { gebruiker: Gebruiker; op
   </div>
 }
 
-function TeamWisselen({ gebruiker, gekozen, aanmelden }: { gebruiker: Gebruiker; gekozen: () => void; aanmelden: (keuze: 'bestaand' | 'nieuw') => void }) {
-  const { teams, actiefTeamId, kiesTeam } = useAccount()
-  const kies = (id: string | null) => { kiesTeam(id); tel(id ? 'team-gekozen' : 'zonder-team'); gekozen() }
+function ActiefLabel() {
+  return <span className="instellingen-actief-label"><span aria-hidden="true">✓ </span>Actief</span>
+}
+
+function teamRol(team: Team, gebruiker: Gebruiker) {
+  const rol = rolIn(team, gebruiker.id)
+  return rol ? ROL_TEKST[rol] : gebruiker.superadmin ? 'Superadmin' : 'Lid'
+}
+
+function TeamKeuze({ team, gebruiker, actief, kies }: { team: Team; gebruiker: Gebruiker; actief: boolean; kies: () => void }) {
+  return <button className="instellingen-menuregel instellingen-teamknop" type="button" aria-pressed={actief} onClick={kies}>
+    <span><strong>{team.naam}</strong><small>{[team.expand?.officieelTeam?.spelvorm, teamRol(team, gebruiker)].filter(Boolean).join(' · ')}</small></span>
+    {actief && <ActiefLabel />}
+  </button>
+}
+
+function TeamsBeheren({ gebruiker, openTeam, aanmelden }: { gebruiker: Gebruiker; openTeam: (id: string) => void; aanmelden: (keuze: 'bestaand' | 'nieuw') => void }) {
+  const { teams, teamsLaden } = useAccount()
+  const [verlaat, setVerlaat] = useState<Team | null>(null)
+  const [bezig, setBezig] = useState(false)
+  const [melding, setMelding] = useState<string | null>(null)
+  const [fout, setFout] = useState<string | null>(null)
+  const verlaten = async () => {
+    if (!verlaat || bezig) return
+    const team = verlaat
+    setVerlaat(null); setBezig(true); setFout(null); setMelding(null)
+    try {
+      await pb.send(`/api/hockey/team/${team.id}/verlaten`, { method: 'POST' })
+      await teamsLaden()
+      setMelding(`Je hebt ${team.naam} verlaten.`)
+      tel('team-verlaten')
+    } catch (e) { setFout(foutTekst(e)) }
+    finally { setBezig(false) }
+  }
+  const laatste = (t: Team) => t.beheerders.includes(gebruiker.id) && t.beheerders.length === 1
   return <>
-    <div className="instellingen-menu">
-      {teams.map(team => <button key={team.id} className="instellingen-menuregel" aria-pressed={team.id === actiefTeamId} onClick={() => kies(team.id)}>
-        <span>{team.naam}<small>{rolIn(team, gebruiker.id) === 'beheerder' ? 'Beheerder' : gebruiker.superadmin ? 'Superadmin' : 'Kijker'}</small></span>
-        {team.id === actiefTeamId && <span className="instellingen-actief-label">Actief</span>}
-      </button>)}
-      <button className="instellingen-menuregel" aria-pressed={actiefTeamId === null} onClick={() => kies(null)}>
-        <span>Zonder team<small>Alleen op deze telefoon</small></span>{actiefTeamId === null && <span className="instellingen-actief-label">Actief</span>}
-      </button>
-    </div>
     <div className="account-form">
-      <button className="btn btn-primary" onClick={() => aanmelden('bestaand')}>Aansluiten bij een team</button>
-      <button className="btn btn-secondary" onClick={() => aanmelden('nieuw')}>Nieuw team starten</button>
+      <button className="btn btn-primary" disabled={bezig} onClick={() => aanmelden('bestaand')}>Aansluiten bij een team</button>
+      <button className="btn btn-secondary" disabled={bezig} onClick={() => aanmelden('nieuw')}>Nieuw team starten</button>
     </div>
+    <div className="instellingen-beheerteams">
+      {teams.map(team => <section className="instellingen-beheerteam" key={team.id} aria-label={team.naam}>
+        <strong>{team.naam}</strong>
+        <small>{teamRol(team, gebruiker)}</small>
+        <div className="instellingen-teamacties">
+          {(gebruiker.superadmin || rolIn(team, gebruiker.id) === 'beheerder') && <button className="btn btn-secondary" disabled={bezig} onClick={() => openTeam(team.id)}>Beheren</button>}
+          {rolIn(team, gebruiker.id) && <button className="btn btn-secondary" disabled={bezig || laatste(team)} onClick={() => setVerlaat(team)}>Verlaten</button>}
+        </div>
+        {laatste(team) && <small>Wijs eerst een andere beheerder aan om dit team te verlaten.</small>}
+      </section>)}
+    </div>
+    <Melding tekst={melding} />
+    <Melding tekst={fout} fout />
+    {verlaat && <ResetModal titel="Team verlaten?" regels={[{ icoon: '👥', tekst: `Je verlaat ${verlaat.naam}. Het team en de gegevens blijven bestaan.` }]} bevestig="Team verlaten" onConfirm={verlaten} onCancel={() => setVerlaat(null)} />}
   </>
 }
 

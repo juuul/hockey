@@ -285,3 +285,7 @@ docker run --rm --network none --user 1000:1000 -v /tmp/hockey-sync-herstel-qa:/
 ### Teamfilters voor zaalteams
 
 De frontend gebruikt `src/teamfilters.ts` voor ontbrekende filterkenmerken van zowel API-resultaten als bewaarde clublijsten. De officiële naam en ingevulde kenmerken blijven intact; zMO/zJO en zaal-seniorencodes worden herkend. Controle: bundel `server/tests/teamfilters.ts` met esbuild en draai met Node. `server/tests/teamselectie.cjs` controleert Meisjes + O11 + Zaal met ontbrekende bronkenmerken én een oude cache tijdens een verbindingsfout, naast de bestaande stappen/zoekflow. Alle API-antwoorden in die browsertest zijn fictief; er worden geen teams geregistreerd of mails verstuurd.
+
+### Zelf een team verlaten
+
+De route `POST /api/hockey/team/{team}/verlaten` gebruikt `teamtoegang.verlaten`: alleen eigen lidmaatschap verwijderen binnen een transactie, nooit de laatste beheerder of teamgegevens wissen. `server/tests/team-verlaten-fixture.pb.js` is uitsluitend een lokale CLI-fixture voor een lege geïsoleerde testdatabase (commando `team-verlaten-fixture`). Met de echte hooks op localhost:8099 controleert `node server/tests/team-verlaten-api.mjs` kijker-/beheervertrek, directe intrekking van leesrechten, bescherming van laatste beheerder en gegevensbehoud. Alle fixtureadressen zijn fictief; er wordt geen mail verstuurd. De volledige browserflow met fictieve API-antwoorden staat in `server/tests/instellingen.cjs`.

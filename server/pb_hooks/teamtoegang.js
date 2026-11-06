@@ -80,4 +80,17 @@ function deblokkeer(app, team, id, terug) {
     }
   })
 }
-module.exports = { blokkade, controleer, beheerder, aanmelden, blokkeer, deblokkeer }
+function verlaten(app, teamId, gebruiker) {
+  app.runInTransaction(tx => {
+    const team = tx.findRecordById("teams", teamId)
+    const beheerders = team.getStringSlice("beheerders")
+    const kijkers = team.getStringSlice("kijkers")
+    if (![...beheerders, ...kijkers].includes(gebruiker.id)) throw new ForbiddenError("Je bent geen lid van dit team")
+    if (beheerders.includes(gebruiker.id) && beheerders.length === 1) throw new BadRequestError("Wijs eerst een andere beheerder aan voordat je het team verlaat")
+    team.set("beheerders", beheerders.filter(id => id !== gebruiker.id))
+    team.set("kijkers", kijkers.filter(id => id !== gebruiker.id))
+    tx.save(team)
+  })
+}
+
+module.exports = { blokkade, controleer, beheerder, aanmelden, blokkeer, deblokkeer, verlaten }
