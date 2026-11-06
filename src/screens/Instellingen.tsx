@@ -235,8 +235,8 @@ function Overzicht({ gebruiker, openTeam, openMenu }: { gebruiker: Gebruiker; op
           <span><strong>Zonder team</strong><small>Alleen op deze telefoon</small></span>{actiefTeamId === null && <ActiefLabel />}
         </button>
       </div>
-      {!gebruiker.gast && <MenuRegel tekst="Teams beheren" open={() => openMenu('teams')} />}
       <SyncRegel />
+      {!gebruiker.gast && <MenuRegel tekst="Teams beheren" open={() => openMenu('teams')} />}
     </section>
     <DeelKijklink compact knop />
     <div className="instellingen-menu">
