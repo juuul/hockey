@@ -28,6 +28,8 @@ const stand = maakStand({ spelers: spelersStand(nietGeteld), wisselingen: [], sc
 assert.equal(stand.wisselsAltijdTellen, true, 'Oude klokafhankelijke keuze wordt niet overgenomen')
 assert.equal(kleuren(spelersMetStand(spelers, stand.spelers))['6'], 'groen')
 assert.ok(Object.values(kleuren(resetTellers(welGeteld))).every(k => k === 'groen'))
+assert.ok(resetTellers(welGeteld).every(s => s.wisselCount === 0), 'Reset zet ook bankspelers op nul')
+assert.deepEqual(resetTellers(welGeteld).map(({ wisselCount, inVolgorde, ...s }) => s), welGeteld.map(({ wisselCount, inVolgorde, ...s }) => s), 'Reset behoudt spelers, aanwezigheid, positie en keeper')
 const verplaatst = verplaatsSpelers(spelers, '4', '6')
 assert.equal(verplaatst.find(s => s.id === '6')!.inVolgorde, spelers.find(s => s.id === '4')!.inVolgorde)
 // Categorie vergroten haalt bankspelers naar het veld, zonder nieuwe invalkleur.

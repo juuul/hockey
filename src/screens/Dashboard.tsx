@@ -263,7 +263,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         <ResetModal
           titel="Wissels resetten?"
           regels={[
-            { icoon: '↺', tekst: 'Veldspelers op 0, wisselspelers op 1' },
+            { icoon: '↺', tekst: 'Alle wisseltellers op 0, ook op de bank' },
             { icoon: '🟢', tekst: 'Kleuren in het veld weer groen' },
             { icoon: '📍', tekst: 'Opstelling blijft staan' },
           ]}
