@@ -2,11 +2,11 @@ import { NIET_NODIG, type ProgrammaItem, type Spelvorm, isZaal } from './types'
 import type { TeamInstellingen } from './server'
 import { autoPlekken } from './rijden'
 
-export function begeleidingProfiel(vorm: Spelvorm, teamnaam = '') {
-  const leeftijd = Number(teamnaam.match(/(?:^|[^a-z])[jm]?o[-\s]?(7|8|9|10|11)(?=[^0-9]|$)/i)?.[1])
-  if (isZaal(vorm)) {
+export function begeleidingProfiel(vorm: Spelvorm, teamnaam = '', officieleSpelvorm = '') {
+  const leeftijd = Number(teamnaam.match(/(?:^|[^a-z])z?[jm]?o[-\s]?(7|8|9|10|11)(?=[^0-9]|$)/i)?.[1])
+  if (isZaal(vorm) || officieleSpelvorm === 'Zaal') {
     if (vorm === 'zaalmini3' || vorm === 'zaalmini4' || leeftijd === 7 || leeftijd === 8) return 'zaal-o8'
-    if (vorm === 'zaaljeugd6') return leeftijd === 10 ? 'o10' : leeftijd === 9 ? 'o9' : 'onbekend'
+    if (vorm === 'zaaljeugd6' || leeftijd === 9 || leeftijd === 10) return leeftijd === 10 ? 'o10' : leeftijd === 9 ? 'o9' : 'onbekend'
     return 'onbekend'
   }
   if (vorm === 'mini3') return 'o78'

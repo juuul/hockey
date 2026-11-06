@@ -307,3 +307,7 @@ De frontend gebruikt `src/teamfilters.ts` voor ontbrekende filterkenmerken van z
 ### Zelf een team verlaten
 
 De route `POST /api/hockey/team/{team}/verlaten` gebruikt `teamtoegang.verlaten`: alleen eigen lidmaatschap verwijderen binnen een transactie, nooit de laatste beheerder of teamgegevens wissen. `server/tests/team-verlaten-fixture.pb.js` is uitsluitend een lokale CLI-fixture voor een lege geïsoleerde testdatabase (commando `team-verlaten-fixture`). Met de echte hooks op localhost:8099 controleert `node server/tests/team-verlaten-api.mjs` kijker-/beheervertrek, directe intrekking van leesrechten, bescherming van laatste beheerder en gegevensbehoud. Alle fixtureadressen zijn fictief; er wordt geen mail verstuurd. De volledige browserflow met fictieve API-antwoorden staat in `server/tests/instellingen.cjs`.
+
+### Fluitkeuzes in de programma-editor
+
+`server/tests/begeleiding.ts` controleert de officiële zaalherkenning ondanks een oude veldopstelling en het bewaren van handmatig gekozen ouders bij standaard nul. Bundel met esbuild en draai met Node. `server/tests/rijden.cjs` gebruikt alleen lokale fictieve spelers/planning en blokkeert API/netwerkverkeer buiten de appbestanden. `TEST_URL` kiest de app; `OPSTELLING` kan 2-1-2, 2-3-2, 2-3-3 of zaal-2-1-2 zijn. De browsercontrole test beide zichtbare fluitkeuzes vóór Auto, verwijderde uitleg, opslaan, thuis/uit-behoud, automatische fruit/rij-koppeling en Mijn kind.

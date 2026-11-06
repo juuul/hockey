@@ -53,6 +53,8 @@ Iconen, alle even breed; alleen het actieve tabblad toont zijn naam. Gekozen tab
 - **Speelduur** per spelvorm in `src/speelduur.ts` (KNHB); klok stopt vanzelf aan het eind.
 - **Speeltijd per speler** (`src/speeltijd.ts`): per linie (aanval/middenveld/verdediging/keeper) plus wissel als eigen groep, gemeten op de wedstrijdklok; wie niet meedoet telt niet. Getoond op de wisseltegels (min), per wedstrijd en per seizoen in Historie.
 
+- **Fluitkeuzes in Programma**: altijd twee invulbare keuzes na Fruit en vóór Auto, ook bij standaard Geen/Niet nodig. Een gekoppeld officieel zaalteam bepaalt het zaalprofiel ondanks een oude veldopstelling; het z-prefix wordt herkend. Oude ouderkeuzes blijven staan, ook buiten het huidige roster. Geen uitleg bij de taakvelden of begeleidingsinstellingen.
+
 ### Mailinhoud
 - Bevestigingslinks (`#bevestigen=`) openen een eigen appscherm. Alleen een expliciete klik bevestigt via PocketBase; daarna wordt de bestaande sessie zo mogelijk ververst. Dit maakt geen team aan en wijzigt geen rollen.
 - Processtap, ontvanger en vervolgactie per mail staan in `docs/mailprocessen.md`. Uitnodiging/reminder: accepteren bevestigt e-mailbezit en geeft toegang; zeven dagen gerekend vanaf oorspronkelijke verzending. Geen onvoorwaardelijke teamverwijdering beloven. Nieuw team aangemaakt betekent uitnodiging verstuurd, niet account geactiveerd. Nieuw-lidmail pas na acceptatie. PDF-versie eerst beoordelen; evaluatiemail en kopieeropdracht gebruiken dezelfde werkelijke meetperiode. Standaard verificatie-/e-mailwijzigingsmails worden niet door de app gebruikt; OTP/inlogmeldingen staan uit.
