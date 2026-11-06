@@ -104,6 +104,10 @@
   display: block;
 }
 
+.instellingen-beheerteam > strong {
+  font-size: var(--base-readable-size);
+}
+
 .instellingen-beheerteam small {
   color: var(--tekst-zacht);
   font-size: 22px;
