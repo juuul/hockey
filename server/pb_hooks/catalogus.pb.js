@@ -119,7 +119,7 @@ routerAdd("POST", "/api/hockey/catalogus/omgeving", (e) => {
   if (!e.auth || e.auth.collection().name !== "users" || e.auth.getBool("gast") || !e.auth.verified()) throw new UnauthorizedError("Log in met een bevestigd account")
   const b = e.requestInfo().body
   const officieel = e.app.findRecordById("catalogus_teams", String(b.officieelTeam || ""))
-  let id
+  let id, spelersOvername
   e.app.runInTransaction((tx) => {
     const team = new Record(tx.findCollectionByNameOrId("teams"))
     const extra = String(b.omgevingNaam || "").trim().slice(0, 40)
@@ -127,9 +127,10 @@ routerAdd("POST", "/api/hockey/catalogus/omgeving", (e) => {
     team.set("omgevingNaam", extra); team.set("officieelTeam", officieel.id)
     team.set("vindbaar", true); team.set("beheerders", [e.auth.id]); tx.save(team)
     require(`${__hooks}/catalogus.js`).synchroniseer(tx, team)
+    spelersOvername = require(`${__hooks}/zaalspelers.js`).overnemen(tx, team, e.auth)
     id = team.id
   })
-  return e.json(200, { id })
+  return e.json(200, { id, spelersOvername })
 })
 // Bronwaarden herstellen is een expliciete beheeractie per wedstrijdveld.
 routerAdd("POST", "/api/hockey/catalogus/programma/{id}/herstel", (e) => {

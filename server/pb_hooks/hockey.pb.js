@@ -175,6 +175,7 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
       tx.save(user)
     }
     const team = tx.findRecordById("teams", inv.getString("team"))
+    const eersteBeheerder = !team.getStringSlice("beheerders").length && inv.getString("rol") === "beheerder"
     const wasLid = [...team.getStringSlice("beheerders"), ...team.getStringSlice("kijkers")].includes(user.id)
     for (const veld of Object.values(h.ROL_VELD)) {
       team.set(veld, team.getStringSlice(veld).filter((id) => id !== user.id))
@@ -183,6 +184,9 @@ routerAdd("POST", "/api/hockey/uitnodiging/{token}", (e) => {
     team.set(veld, [...team.getStringSlice(veld), user.id])
     if (!team.getStringSlice("beheerders").length && team.original().getStringSlice("beheerders").length) throw new BadRequestError("De laatste beheerder kan geen kijker worden; wijs eerst een andere beheerder aan")
     tx.save(team)
+    // Ook een bestaand account bewijst met deze persoonlijke uitnodigingslink het e-mailbezit.
+    if (!user.verified()) { user.setVerified(true); tx.save(user) }
+    if (eersteBeheerder) require(`${__hooks}/zaalspelers.js`).overnemen(tx, team, user)
     tx.delete(inv)
     if (!wasLid) nieuwLid = { team: team.id, naam: user.getString("name") || inv.getString("naam") || email }
   })

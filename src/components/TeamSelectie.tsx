@@ -253,9 +253,9 @@ export default function TeamAanmelden({ startKeuze = 'bestaand', stap, naarStap 
         await pb.send(`/api/hockey/catalogus/omgeving/${omgeving}/aanvraag`, { method: 'POST', body: { naam: gebruiker?.name || naam, email: gebruiker?.email || email, terug: appAdres() } })
         setMelding('Je ontvangt direct een uitnodiging per e-mail. Open de link om aan te sluiten.')
       } else if (gebruiker) {
-        const r = await pb.send<{ id: string }>('/api/hockey/catalogus/omgeving', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam } })
+        const r = await pb.send<{ id: string; spelersOvername?: { aantal: number; status: string } }>('/api/hockey/catalogus/omgeving', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam } })
         await teamsLaden(); kiesTeam(r.id)
-        setMelding('Groep aangemaakt. Je kunt nu leden uitnodigen.')
+        setMelding('Groep aangemaakt. ' + (r.spelersOvername?.aantal ? `${r.spelersOvername.aantal} spelers overgenomen van je veldteam. ` : r.spelersOvername?.status === 'meerdere-veldteams' ? 'Er zijn meerdere bijpassende veldgroepen; er zijn geen spelers overgenomen. ' : '') + 'Je kunt nu leden uitnodigen.')
       } else {
         await pb.send('/api/hockey/aanmelding', { method: 'POST', body: { officieelTeam: officieel.id, omgevingNaam, naam, email, terug: appAdres() } })
         setMelding(`Je krijgt een uitnodiging op ${email.trim()}.`)
