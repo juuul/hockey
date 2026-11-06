@@ -49,6 +49,22 @@
   color: white;
 }
 
+.spelvorm-knop:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spelvorm-blokkade {
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--rand);
+  border-radius: 8px;
+  background: var(--vlak-grijs);
+  color: var(--tekst-2);
+  font-size: var(--base-readable-size);
+  line-height: 1.4;
+}
+
 .section-header {
   display: flex;
   flex-wrap: wrap;

@@ -16,6 +16,9 @@ export default function Players() {
   const [playerToDelete, setPlayerToDelete] = useState<{ id: string; naam: string } | null>(null)
 
   const aantalMee = spelers.filter(s => s.meedoen).length
+  const wedstrijdBegonnen = timer.gestartOp !== null || timer.opgebouwd > 0
+  const opgeslagenSeconden = Math.floor(timer.opgebouwd / 1000)
+  const opgeslagenTijd = `${Math.floor(opgeslagenSeconden / 60)}:${String(opgeslagenSeconden % 60).padStart(2, '0')}`
 
   const handleDelete = (id: string, naam: string) => {
     setPlayerToDelete({ id, naam })
@@ -45,11 +48,17 @@ export default function Players() {
   return (
     <div className="players-screen">
       <div className="spelvorm-kop">Spelinstellingen</div>
-      <div className="spelvorm" role="radiogroup" aria-label="Veld of zaal">
-        {([false,true] as const).map(zaal => <button key={String(zaal)} className={`spelvorm-knop ${isZaal(spelvorm) === zaal ? 'actief' : ''}`} role="radio" aria-checked={isZaal(spelvorm) === zaal} disabled={!magBewerken || timer.gestartOp !== null || timer.opgebouwd > 0} onClick={() => kiesOpstelling(OPSTELLINGEN_PER_SPELVORM[zaal ? 'zaal6' : 11][0])}>{zaal ? 'Zaal' : 'Veld'}</button>)}
+      {(!magBewerken || wedstrijdBegonnen) && <p id="categorie-blokkade" className="spelvorm-blokkade">
+        {!magBewerken ? 'Alleen teambeheerders kunnen de categorie wijzigen.'
+          : timer.gestartOp !== null ? 'De wedstrijdklok loopt. Categorie en veld/zaal staan vast voor deze wedstrijd.'
+          : `De klok staat stil, maar bevat nog ${opgeslagenTijd} wedstrijdtijd. Categorie en veld/zaal staan daarom vast.`}
+        {magBewerken && ' Kies de categorie vóór de start van een nieuwe wedstrijd.'}
+      </p>}
+      <div className="spelvorm" role="radiogroup" aria-label="Veld of zaal" aria-describedby={!magBewerken || wedstrijdBegonnen ? 'categorie-blokkade' : undefined}>
+        {([false,true] as const).map(zaal => <button key={String(zaal)} className={`spelvorm-knop ${isZaal(spelvorm) === zaal ? 'actief' : ''}`} role="radio" aria-checked={isZaal(spelvorm) === zaal} disabled={!magBewerken || wedstrijdBegonnen} onClick={() => kiesOpstelling(OPSTELLINGEN_PER_SPELVORM[zaal ? 'zaal6' : 11][0])}>{zaal ? 'Zaal' : 'Veld'}</button>)}
       </div>
       <div className="spelvorm-kop">Categorie</div>
-      <div className="spelvorm spelvorm-categorie" role="radiogroup" aria-label="Categorie">
+      <div className="spelvorm spelvorm-categorie" role="radiogroup" aria-label="Categorie" aria-describedby={!magBewerken || wedstrijdBegonnen ? 'categorie-blokkade' : undefined}>
         {SPELVORMEN.filter(v => isZaal(v) === isZaal(spelvorm)).map(v => (
           <button
             key={v}
@@ -57,7 +66,7 @@ export default function Players() {
             aria-checked={spelvorm === v}
             className={`spelvorm-knop ${spelvorm === v ? 'actief' : ''}`}
             onClick={() => { if (v !== spelvorm) { kiesOpstelling(OPSTELLINGEN_PER_SPELVORM[v][0]); tel(`spelvorm-${v}`) } }}
-            disabled={!magBewerken || timer.gestartOp !== null || timer.opgebouwd > 0}
+            disabled={!magBewerken || wedstrijdBegonnen}
           >
             {CATEGORIE[v]}
           </button>
@@ -65,7 +74,6 @@ export default function Players() {
       </div>
       {['mini3','zaalmini3','zaalmini4','hockey5'].includes(String(spelvorm)) && <p className="spelvorm-uitleg">Wedstrijdduur kan per district of toernooi verschillen; dit is de gekozen standaard.</p>}
       <div className="spelvorm-uitleg">{aantalSpelers(spelvorm)} spelers {heeftKeeper(spelvorm) ? 'met keeper' : 'zonder keeper'} · {speelduurTekst(spelvorm)}</div>
-      {(timer.gestartOp !== null || timer.opgebouwd > 0) && <p className="spelvorm-uitleg">Begin een nieuwe wedstrijd om veld/zaal of categorie te veranderen.</p>}
       <div className="spelvorm" role="radiogroup" aria-label="Opstelling">
         {OPSTELLINGEN_PER_SPELVORM[spelvorm].map(naam => (
           <button
