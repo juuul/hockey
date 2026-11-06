@@ -294,3 +294,8 @@ node /tmp/hockey-herstel-test.mjs
 node server/tests/sync-herstel-ui.cjs --build /tmp/hockey-sync-herstel-qa
 docker run --rm --network none --user 1000:1000 -v /tmp/hockey-sync-herstel-qa:/qa:ro -v "$PWD/server/tests/sync-herstel-ui.cjs:/test.cjs:ro" --entrypoint node zenika/alpine-chrome:with-puppeteer /test.cjs
 ```
+
+
+### Teamfilters voor zaalteams
+
+De frontend gebruikt `src/teamfilters.ts` voor ontbrekende filterkenmerken van zowel API-resultaten als bewaarde clublijsten. De officiële naam en ingevulde kenmerken blijven intact; zMO/zJO en zaal-seniorencodes worden herkend. Controle: bundel `server/tests/teamfilters.ts` met esbuild en draai met Node. `server/tests/teamselectie.cjs` controleert Meisjes + O11 + Zaal met ontbrekende bronkenmerken én een oude cache tijdens een verbindingsfout, naast de bestaande stappen/zoekflow. Alle API-antwoorden in die browsertest zijn fictief; er worden geen teams geregistreerd of mails verstuurd.
