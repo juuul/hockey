@@ -7,7 +7,7 @@ import DatumTijdKiezer from '../components/DatumTijdKiezer'
 import { autoPlekken, rijdenTekst } from '../rijden'
 import { thuisUitBekend, thuisUitTekst } from '../programmaLocatie'
 import { programmaBronLink, programmaAfwijkingen } from '../programmaBron'
-import { begeleidingProfiel, begeleidingStandaard, begeleidingPlekken, begeleidingAantal, kiesTaak } from '../begeleiding'
+import { begeleidingProfiel, begeleidingStandaard, begeleidingPlekken, kiesTaak } from '../begeleiding'
 import { useState } from 'react'
 import VerzameltijdBerekenen from '../components/VerzameltijdBerekenen'
 import WedstrijdLocatie from '../components/WedstrijdLocatie'
@@ -38,7 +38,7 @@ const LEEG_ITEM = (inst: TeamInstellingen, profiel: string): ProgrammaItem => {
 export default function Programma({ naarDashboard }: { naarDashboard: () => void }) {
   const { programma, bewaarProgramma, spelers, clubs, magBeheren: magBewerken, wedstrijd, zetWedstrijd, allesResetten, score, timer, wedstrijden, afgesloten, spelvorm } = useHockey()
   const { mijnKinderen, zetMijnKinderen, teamInstellingen, actiefTeam } = useAccount()
-  const profiel = begeleidingProfiel(spelvorm, actiefTeam?.naam)
+  const profiel = begeleidingProfiel(spelvorm, actiefTeam?.naam, actiefTeam?.expand?.officieelTeam?.spelvorm)
   const metBegeleiding = (p: ProgrammaItem) => { const [begeleider1, begeleider2] = begeleidingPlekken(p, profiel, teamInstellingen); return { ...p, begeleider1, begeleider2 } }
   const [planningOpen, setPlanningOpen] = useState(false)
   const [bewerk, setBewerk] = useState<ProgrammaItem | null>(null)
@@ -235,7 +235,8 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
   useTerug(true, onClose)
   const { spelers, clubs, programma, clubToevoegen, bewaarProgramma, verwijderProgramma, spelvorm } = useHockey()
   const { teamInstellingen, actiefTeam } = useAccount()
-  const profiel = begeleidingProfiel(spelvorm, actiefTeam?.naam)
+  const profiel = begeleidingProfiel(spelvorm, actiefTeam?.naam, actiefTeam?.expand?.officieelTeam?.spelvorm)
+  const fluitLabel = ['o78', 'o9', 'o10', 'o11', 'zaal-o8'].includes(profiel) ? '🏑 Spelbegeleiding' : '🏑 Scheidsrechter'
   const [p, setP] = useState<ProgrammaItem>(() => {
     const [begeleider1, begeleider2] = begeleidingPlekken(start, profiel, teamInstellingen)
     return { ...start, begeleider1, begeleider2 }
@@ -301,6 +302,7 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               {fruit ? s.naam : `Ouder van ${s.naam}`} · {fruit ? '🍎' : '🏑'} {tel(s.id)}×
             </option>
           ))}
+          {p[veld] && p[veld] !== NIET_NODIG && !spelers.some(s => s.id === p[veld]) && <option value={p[veld]}>Eerder gekozen {fruit ? 'speler' : 'ouder'} (niet meer in team)</option>}
         </select>
       </label>
     )
@@ -365,12 +367,9 @@ function ProgrammaModal({ start, onClose }: { start: ProgrammaItem; onClose: () 
               <VerzameltijdBerekenen item={p} zet={zet} berekening={berekening} />
               {p.bronStatus && /cancel/i.test(p.bronStatus) && <p className="account-uitleg">Deze wedstrijd is volgens de officiële bron afgelast.</p>}
               {spelerSelect('🍎 Fruit', 'fruit')}
-              <p className="account-uitleg">De eerste ouderkeuze vult ook fruit, benodigde begeleiding en bij uit de eerste auto in. Je kunt elke taak daarna apart aanpassen.</p>
-              {(begeleidingAantal(profiel, p.thuis, teamInstellingen) >= 1 || p.begeleider1 !== NIET_NODIG) && spelerSelect('🏑 Spelbegeleiding 1', 'begeleider1')}
-              {(begeleidingAantal(profiel, p.thuis, teamInstellingen) >= 2 || p.begeleider2 !== NIET_NODIG) && spelerSelect('🏑 Spelbegeleiding 2', 'begeleider2')}
-              {p.begeleider1 === NIET_NODIG && p.begeleider2 === NIET_NODIG && <p className="account-uitleg">{!p.thuis && ['o9', 'o78'].includes(profiel) ? 'De thuisclub regelt de speelbegeleider.' : 'Voor ons team is geen speelbegeleider ingepland.'}</p>}
+              {spelerSelect(`${fluitLabel} 1`, 'begeleider1')}
+              {spelerSelect(`${fluitLabel} 2`, 'begeleider2')}
               {!p.thuis && <>
-                <p className="account-uitleg">{spelers.length} kinderen · {Math.ceil(spelers.length / 4)} auto’s · 4 kinderen per auto</p>
                 {autoPlekken(p, spelers.length).map((id, i) => <label className="prog-veld" key={i}>
                   🚗 Auto {i + 1}
                   <select className="modal-input" value={id} onChange={e => setP(kiesTaak(p, i, e.target.value, profiel, teamInstellingen, spelers.length))}>
@@ -436,12 +435,8 @@ function StandaardBegeleiding({ onClose }: { onClose: () => void }) {
   useTerug(true, onClose)
   const { teamInstellingen: inst, zetTeamInstellingen, actiefTeam } = useAccount()
   const { spelvorm } = useHockey()
-  const profiel = begeleidingProfiel(spelvorm, actiefTeam?.naam)
-  const uitleg = profiel === 'o9' ? 'O9: de thuisclub regelt één speelbegeleider. Bij uit regelt de tegenstander dit.'
-    : profiel === 'o10' ? 'O10: elk team levert één speelbegeleider, thuis én uit.'
-    : profiel === 'o78' ? 'O7/O8 veld: thuis één speelbegeleider per veldje, uit geen.'
-    : profiel === 'o11' ? 'O11 veld: bij uitwedstrijden is eigen spelbegeleiding n.v.t. Thuis blijven de ingestelde aantallen gelden.'
-    : 'Voor deze categorie is hier geen vaste standaard bevestigd. Kies de aantallen volgens je club of district.'
+  const profiel = begeleidingProfiel(spelvorm, actiefTeam?.naam, actiefTeam?.expand?.officieelTeam?.spelvorm)
+  const zaal = actiefTeam?.expand?.officieelTeam?.spelvorm === 'Zaal' || String(spelvorm).startsWith('zaal')
   const keuze = (thuis: boolean) => {
     const sleutel = thuis ? 'begeleidingThuis' : 'begeleidingUit'
     const oud = thuis ? 'thuisGeenBegeleiding' : 'uitGeenBegeleiding'
@@ -457,15 +452,13 @@ function StandaardBegeleiding({ onClose }: { onClose: () => void }) {
   return <div className="modal show"><div className="modal-content" role="dialog" aria-label="Standaard spelbegeleiding">
     <h2 className="modal-title">Spelbegeleiding</h2>
     <div className="prog-velden">
-      <p className="account-uitleg">{uitleg}</p>
       {profiel === 'o78' && <label className="prog-veld">Aantal veldjes tegelijk
         <select className="modal-input" value={inst.begeleidingVeldjes ?? 1} onChange={e => zetTeamInstellingen({ ...inst, begeleidingVeldjes: Number(e.target.value) as 1 | 2 })}>
           <option value={1}>1 veldje</option><option value={2}>2 veldjes</option>
         </select>
       </label>}
       {keuze(true)}{keuze(false)}
-      <p className="account-uitleg">Benodigde plekken beginnen op Nog te bepalen. Gekozen ouders blijven staan.</p>
-      <a href={profiel === 'o11' ? 'https://www.knhb.nl/app/uploads/2025/01/Spelregels-en-veldindeling-9x9-O11.pdf' : profiel === 'zaal-o8' || String(spelvorm).startsWith('zaal') ? 'https://www.knhb.nl/competitie/zaalcompetitie/competitieaanbod/jongste-jeugd' : 'https://www.knhb.nl/competitie/veldcompetitie/competitieaanbod/jongste-jeugd'} target="_blank" rel="noreferrer">KNHB-regels</a>
+      <a href={profiel === 'o11' ? 'https://www.knhb.nl/app/uploads/2025/01/Spelregels-en-veldindeling-9x9-O11.pdf' : zaal ? ['o9', 'o10', 'zaal-o8'].includes(profiel) ? 'https://www.knhb.nl/competitie/zaalcompetitie/competitieaanbod/jongste-jeugd' : 'https://www.knhb.nl/competitie/zaalcompetitie/regelgeving/spelregels' : 'https://www.knhb.nl/competitie/veldcompetitie/competitieaanbod/jongste-jeugd'} target="_blank" rel="noreferrer">KNHB-regels</a>
     </div>
     <div className="modal-actions"><button className="btn btn-primary" onClick={onClose}>Klaar</button></div>
   </div></div>
