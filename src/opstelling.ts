@@ -85,7 +85,8 @@ export function stempelInkomers(oud: Player[], nieuw: Player[], tellen = true): 
   const volgende = Math.max(0, ...oud.map(s => s.inVolgorde ?? 0)) + 1
   return nieuw.map(s => {
     const voorheen = oud.find(o => o.id === s.id)
-    return s.inVeld && !voorheen?.inVeld ? { ...s, inVolgorde: tellen ? volgende : 0 } : s
+    const komtOpVeld = s.inVeld && (!voorheen?.inVeld || (!tellen && voorheen.isKeeper && !s.isKeeper))
+    return komtOpVeld ? { ...s, inVolgorde: tellen ? volgende : 0 } : s
   })
 }
 

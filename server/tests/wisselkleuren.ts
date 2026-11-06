@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { stempelInkomers, veldKleuren, resetTellers, verplaatsSpelers } from '../../src/opstelling'
+import { stempelInkomers, veldKleuren, resetTellers, verplaatsSpelers, pasSpelvormAan } from '../../src/opstelling'
 import { maakStand, spelersStand, spelersMetStand } from '../../src/live'
 import type { Player } from '../../src/types'
 
@@ -30,4 +30,22 @@ assert.equal(kleuren(spelersMetStand(spelers, stand.spelers))['6'], 'groen')
 assert.ok(Object.values(kleuren(resetTellers(welGeteld))).every(k => k === 'groen'))
 const verplaatst = verplaatsSpelers(spelers, '4', '6')
 assert.equal(verplaatst.find(s => s.id === '6')!.inVolgorde, spelers.find(s => s.id === '4')!.inVolgorde)
-console.log('WISSELKLEUREN_OK: invalvolgorde, live-opslag, compatibiliteit zonder klokkeuze, reset en verplaatsen.')
+// Categorie vergroten haalt bankspelers naar het veld, zonder nieuwe invalkleur.
+const ploeg: Player[] = Array.from({ length: 12 }, (_, i) => ({ id: `kind${i}`, naam: `T ${i}`, positie: i === 0 ? 'K' : 'LW', isKeeper: i === 0, inVeld: i === 0, meedoen: true, wisselCount: 4, inVolgorde: i === 0 ? 99 : 0 }))
+const klein = pasSpelvormAan(ploeg, '2-1-2')
+const groot = stempelInkomers(klein, pasSpelvormAan(klein, '3-4-3'), false)
+assert.equal(groot.filter(s => s.inVeld).length, 11)
+assert.ok(Object.values(kleuren(groot)).every(k => k === 'groen'))
+assert.deepEqual(groot.map(s => s.wisselCount), ploeg.map(s => s.wisselCount))
+// Ook een oud positief bankstempel mag niet opnieuw rood worden bij uitbreiden.
+const oudeBankkleur = klein.map(s => !s.inVeld ? { ...s, inVolgorde: 50 } : s)
+const terug = stempelInkomers(oudeBankkleur, pasSpelvormAan(oudeBankkleur, '3-4-3'), false)
+assert.ok(terug.filter(s => s.inVeld && !oudeBankkleur.find(o => o.id === s.id)!.inVeld).every(s => s.inVolgorde === 0))
+// Keeper naar een vorm zonder keeper: geen hergebruik van een oud invallersnummer.
+const zonderKeeper = stempelInkomers(groot, pasSpelvormAan(groot, 'hockeyzeven-2-3-2'), false)
+assert.ok(Object.values(kleuren(zonderKeeper)).every(k => k === 'groen'))
+const keeperNaarVeld = stempelInkomers([ploeg[0]], [{ ...ploeg[0], isKeeper: false, positie: 'LW' }], false)
+assert.equal(keeperNaarVeld[0].inVolgorde, 0)
+// Kleuren van spelers die al op het veld stonden veranderen niet door de normalisatie.
+assert.equal(stempelInkomers(welGeteld, welGeteld.map(s => s.id === '4' ? { ...s, inVeld: true } : s), false).find(s => s.id === '6')!.inVolgorde, 51)
+console.log('WISSELKLEUREN_OK: invalvolgorde, live-opslag, compatibiliteit zonder klokkeuze, reset/verplaatsen, categorie vergroten, oude bankkleur en keeper naar veld zonder nieuwe kleuren.')

@@ -139,7 +139,8 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
     return saved ? JSON.parse(saved) : { wij: 0, zij: 0 }
   })
 
-  const setSpelers = (nieuw: Player[]) => zetSpelersRuw(stempelInkomers(spelers, nieuw))
+  // Alleen een echte wissel maakt een nieuwe invalkleur; opstelling en beheer doen dat niet.
+  const setSpelers = (nieuw: Player[], echteWissel = false) => zetSpelersRuw(stempelInkomers(spelers, nieuw, echteWissel))
 
   // Scorers van onze doelpunten, in volgorde; null = onbekend
   const [doelpunten, setDoelpunten] = useState<(string | null)[]>(() => {
@@ -339,7 +340,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
         return { ...s, inVeld: false, wisselCount: s.wisselCount + 1 }
       }
       return s
-    }))
+    }), true)
 
     const newWissel: Wissel = {
       id: Date.now().toString(),
