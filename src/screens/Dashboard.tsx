@@ -277,7 +277,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         <ResetModal
           titel="Nieuwe opstelling?"
           regels={[
-            { icoon: '🔀', tekst: 'Loten wie begint, daarna gelden de voorkeuren' },
+            { icoon: '🔀', tekst: heeftKeeper(spelvorm) ? 'Keeper op voorkeur, daarna loten om de veldplekken' : 'Loten wie begint, daarna gelden de voorkeuren' },
             { icoon: '🔢', tekst: 'Wissels blijven staan' },
           ]}
           bevestig="Ja, nieuwe opstelling"

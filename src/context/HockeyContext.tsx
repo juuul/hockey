@@ -366,7 +366,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
 
   const nieuweOpstelling = () => {
     remember()
-    zetSpelersRuw(lootOpstelling(spelers, vastePosities, posities).map(s => ({ ...s, inVolgorde: 0 })))
+    zetSpelersRuw(lootOpstelling(spelers, vastePosities, posities, heeftKeeper(spelvorm)).map(s => ({ ...s, inVolgorde: 0 })))
   }
 
   const kiesOpstelling = (nieuw: OpstellingNaam) => {
@@ -380,7 +380,7 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   // Nieuwe wedstrijd: opnieuw loten, tellers, score en timer terug. Spelers, aanwezigheid, voorkeuren en opstelling blijven
   const allesResetten = () => {
     remember()
-    zetSpelersRuw(resetTellers(lootOpstelling(spelers, vastePosities, posities).map(s => ({ ...s, inVolgorde: 0 }))))
+    zetSpelersRuw(resetTellers(lootOpstelling(spelers, vastePosities, posities, heeftKeeper(spelvorm)).map(s => ({ ...s, inVolgorde: 0 }))))
     setWisselingen([])
     setScore({ wij: 0, zij: 0 })
     setDoelpunten([])

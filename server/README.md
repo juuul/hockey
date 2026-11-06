@@ -293,3 +293,9 @@ De route `POST /api/hockey/team/{team}/verlaten` gebruikt `teamtoegang.verlaten`
 ### Fluitkeuzes in de programma-editor
 
 `server/tests/begeleiding.ts` controleert de officiële zaalherkenning ondanks een oude veldopstelling en het bewaren van handmatig gekozen ouders bij standaard nul. Bundel met esbuild en draai met Node. `server/tests/rijden.cjs` gebruikt alleen lokale fictieve spelers/planning en blokkeert API/netwerkverkeer buiten de appbestanden. `TEST_URL` kiest de app; `OPSTELLING` kan 2-1-2, 2-3-2, 2-3-3 of zaal-2-1-2 zijn. De browsercontrole test beide zichtbare fluitkeuzes vóór Auto, verwijderde uitleg, opslaan, thuis/uit-behoud, automatische fruit/rij-koppeling en Mijn kind.
+
+### Keeper mee laten loten
+
+`src/opstelling.ts` kiest bij vormen met keeper eerst een aanwezige keeper op 1e/2e voorkeur (gelijke voorkeur: loting). Zonder keepervoorkeur blijft de huidige aanwezige keeper, anders wordt één aanwezige speler geloot. Daarna loten de overige aanwezigen onafhankelijk om de veldplekken en gelden de veldvoorkeuren. Beide lotingsaanroepen in HockeyContext geven expliciet aan of de spelvorm een keeper heeft. Nieuwe opstelling behoudt tellers; Nieuwe wedstrijd reset ze zoals voorheen; Undo herstelt ook de vorige keeper.
+
+Bundel `server/tests/keeper-loting.ts` met esbuild en draai met Node voor voorkeurvolgorde, afwezigen, korte/lege rosters en alle veld-/zaalvormen. `server/tests/keeper-loting-ui.cjs` controleert de echte app met lokale fictieve spelers: voorkeur kiezen, loten, bewaren, Undo en Nieuwe wedstrijd. `TEST_URL` kiest de testpagina; alle API-verzoeken zijn geblokkeerd.
