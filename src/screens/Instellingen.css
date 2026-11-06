@@ -65,29 +65,61 @@
   margin-bottom: 8px;
 }
 
-.instellingen-actief-team {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.instellingen-actief-team > span:first-child,
+.instellingen-teamknop > span:first-child,
 .instellingen-menuregel > span:first-child {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.instellingen-actief-team strong,
-.instellingen-actief-team small {
+.instellingen-teamknop strong {
   display: block;
   font-size: var(--base-readable-size);
 }
 
-.instellingen-actief-team small,
+.instellingen-teamknop small,
 .instellingen-menuregel small {
   color: var(--tekst-zacht);
   font-size: max(22px, calc(var(--base-readable-size) * 0.92));
+}
+
+.instellingen-teams {
+  margin-bottom: 8px;
+}
+
+.instellingen-beheerteams {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.instellingen-beheerteam {
+  padding: 12px;
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+.instellingen-beheerteam > strong,
+.instellingen-beheerteam > small {
+  display: block;
+}
+
+.instellingen-beheerteam small {
+  color: var(--tekst-zacht);
+  font-size: 22px;
+}
+
+.instellingen-teamacties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.instellingen-teamacties button {
+  flex: 1;
+  min-height: 48px;
+  font-size: max(22px, calc(var(--base-readable-size) * 0.85));
 }
 
 .instellingen-actief-label {

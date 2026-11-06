@@ -12,6 +12,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
   let instellingenFout = false
   let wijzigingen = []
   let kindKeuze = ['kind-a', 'kind-b']
+  let verlaatVerzoeken = []
   const fouten = []
   try {
     const open = async ({ kijker = false, superadmin = false, aanvragen = false } = {}) => {
@@ -22,7 +23,7 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
       await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }])
       const gebruiker = { id: 'oudertest1234567', email: 'ouder@example.invalid', name: 'Testouder', superadmin }
       const ouder = { id: 'ouderkindtest01', name: 'Andere testouder', email: 'andere-ouder@example.invalid', kinderen: { testteam0000001: kindKeuze, testteam0000002: ['kind-anders'] } }
-      const teams = [1, 2].map(n => ({ id: `testteam000000${n}`, naam: `Testteam ${n}`, beheerders: kijker ? [] : [gebruiker.id], kijkers: kijker ? [gebruiker.id] : n === 1 ? [ouder.id] : [], officieelTeam: `officieel${n}`, vindbaar: true, expand: { beheerders: kijker ? [] : [gebruiker], kijkers: kijker ? [gebruiker] : n === 1 ? [ouder] : [], officieelTeam: n === 1 ? { bronId: '46179', pouleId: '183769' } : { bronId: '123', pouleId: '456' } } }))
+      const teams = [1, 2].map(n => ({ id: `testteam000000${n}`, naam: `Testteam ${n}`, beheerders: kijker ? [] : [gebruiker.id], kijkers: kijker ? [gebruiker.id] : n === 1 ? [ouder.id] : [], officieelTeam: `officieel${n}`, vindbaar: true, expand: { beheerders: kijker ? [] : [gebruiker], kijkers: kijker ? [gebruiker] : n === 1 ? [ouder] : [], officieelTeam: n === 1 ? { bronId: '46179', pouleId: '183769', spelvorm: 'Veld' } : { bronId: '123', pouleId: '456', spelvorm: 'Zaal' } } }))
       const reistijden = {}
       await page.evaluateOnNewDocument(({ token, gebruiker, teams }) => {
         localStorage.clear()
@@ -50,7 +51,14 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
         if (!url.pathname.includes('/api/')) return url.hostname === new URL(appUrl).hostname ? req.continue() : req.abort()
         const lijst = items => ({ page: 1, perPage: 1000, totalPages: 1, totalItems: items.length, items })
         let body = lijst([])
-        if (url.pathname.endsWith('/auth-refresh')) body = { token, record: gebruiker }
+        if (url.pathname.endsWith('/verlaten') && req.method() === 'POST') {
+          verlaatVerzoeken.push(url.pathname)
+          const id = url.pathname.split('/').at(-2)
+          const index = teams.findIndex(t => t.id === id)
+          if (index >= 0) teams.splice(index, 1)
+          body = { ok: true }
+        }
+        else if (url.pathname.endsWith('/auth-refresh')) body = { token, record: gebruiker }
         else if (url.pathname.includes('/teams/records')) {
           if (req.method() === 'PATCH') {
             if (instellingenFout) return req.respond({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ message: 'Instellingen niet opgeslagen' }) })
@@ -111,10 +119,18 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     assert.equal(await page.$('input'), null)
     assert.equal(await heeftKnop('Uitloggen'), false)
     assert.equal(await heeftKnop('Nieuwe link maken'), false)
-    assert.equal(await page.$eval('.instellingen-actief-label', n => n.textContent), 'Actief')
-    assert.equal(await page.evaluate(() => document.body.textContent.includes('Testteam 2')), false)
+    assert.match(await page.$eval('.instellingen-actief-label', n => n.textContent), /✓.*Actief/)
+    assert.equal(await page.evaluate(() => document.body.textContent.includes('Testteam 2')), true)
+    assert.equal(await heeftKnop('Team wisselen'), false)
+    assert.equal(await page.$$eval('.instellingen-teams button[aria-pressed="true"]', ns => ns.length), 1)
+    assert.match(await page.$eval('.instellingen-teams', e => e.textContent), /Veld.*Zaal/)
     assert.equal(await page.$eval('.instellingen-overzicht > .kijklink button', b => b.classList.contains('btn-primary')), true)
     if (process.env.PREVIEW_PATH) await page.screenshot({ path: process.env.PREVIEW_PATH })
+    if (process.env.NARROW_PREVIEW_PATH) {
+      await page.setViewport({ width: 320, height: 640 }); await page.screenshot({ path: process.env.NARROW_PREVIEW_PATH });
+      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      await page.setViewport({ width: 390, height: 844 });
+    }
     await klik('Teamlink delen')
     await page.waitForFunction(() => window.gedeeldeLinks.length === 1)
     assert.deepEqual(await page.evaluate(() => Object.keys(window.gedeeldeLinks[0])), ['url'])
@@ -229,26 +245,34 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await terug()
     assert.equal(await page.$eval('html', el => el.dataset.thema), 'licht')
     assert.ok(await page.evaluate(() => [...document.querySelectorAll('.instellingen-menuregel')].some(b => b.textContent.includes('WeergaveLicht'))))
-    await klik('Team wisselen')
+    if (process.env.LIGHT_PREVIEW_PATH) await page.screenshot({ path: process.env.LIGHT_PREVIEW_PATH })
     await klik('Testteam 2')
-    await page.waitForFunction(() => document.querySelector('.instellingen-actief-team strong')?.textContent === 'Testteam 2')
+    await page.waitForFunction(() => document.querySelector('.instellingen-teams button[aria-pressed="true"] strong')?.textContent === 'Testteam 2')
     await controleerBronLink('https://www.hockey.nl/match-center#/team/123|456/program')
-    await klik('Team wisselen')
     await klik('Zonder team')
-    await page.waitForFunction(() => document.querySelector('.instellingen-actief-team strong')?.textContent === 'Zonder team')
+    await page.waitForFunction(() => document.querySelector('.instellingen-teams button[aria-pressed="true"] strong')?.textContent === 'Zonder team')
     await controleerBronLink(null)
     assert.equal(await heeftKnop('Teaminstellingen'), false)
     assert.equal(await heeftKnop('Verzameltijd'), false)
     assert.equal(await heeftKnop('Teamlink delen'), false)
-    await klik('Team wisselen')
+    await klik('Teams beheren')
     await klik('Aansluiten bij een team')
     await page.waitForSelector('input[type="search"]')
     await page.click('.instellingen-terug')
-    await page.waitForFunction(() => document.querySelector('.instellingen-kop-titel').textContent === 'Team wisselen')
+    await page.waitForFunction(() => document.querySelector('.instellingen-kop-titel').textContent === 'Teams beheren')
     await terug()
     await klik('Account')
     await klik('Uitloggen')
     await page.waitForFunction(() => document.body.textContent.includes('Wachtwoord vergeten'))
+
+    await open()
+    await klik('Teams beheren')
+    if (process.env.MANAGE_PREVIEW_PATH) await page.screenshot({ path: process.env.MANAGE_PREVIEW_PATH })
+    assert.ok(await page.$eval('.instellingen-beheerteam button:last-child', b => b.disabled), 'Laatste beheerder kan niet vertrekken')
+    await page.click('.instellingen-beheerteam button')
+    await page.waitForFunction(() => document.querySelector('.instellingen-kop-titel').textContent === 'Leden')
+    await page.click('.instellingen-terug')
+    await page.waitForFunction(() => document.querySelector('.instellingen-kop-titel').textContent === 'Teams beheren')
 
     await open({ kijker: true })
     for (const tekst of ['Leden', 'Teaminstellingen', 'Verzameltijd', 'Beheer']) assert.equal(await heeftKnop(tekst), false)
@@ -258,6 +282,20 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await klik('Weergave')
     await page.goBack()
     await page.waitForSelector('.instellingen-overzicht')
+
+    await klik('Teams beheren')
+    await page.click('.instellingen-beheerteam button')
+    await page.waitForSelector('.reset-modal-overlay')
+    await klik('Annuleren')
+    assert.equal(verlaatVerzoeken.length, 0)
+    await page.click('.instellingen-beheerteam button')
+    await page.waitForSelector('.reset-modal-overlay')
+    await klik('Team verlaten')
+    await page.waitForSelector('.instellingen-overzicht')
+    await page.waitForFunction(() => !document.body.textContent.includes('Testteam 1'))
+    assert.equal(verlaatVerzoeken.length, 1)
+    assert.ok(verlaatVerzoeken[0].endsWith('/testteam0000001/verlaten'))
+    assert.equal(await page.$eval('.instellingen-teams button[aria-pressed="true"] strong', e => e.textContent), 'Testteam 2')
 
     await open({ superadmin: true, aanvragen: true })
     await klik('Aanvragen (1)')
@@ -303,6 +341,6 @@ const token = `${Buffer.from('{}').toString('base64url')}.${Buffer.from(JSON.str
     await page.click('.score-team.wij')
     await page.waitForFunction(() => document.body.textContent.includes('Wie scoorde?'))
     assert.deepEqual(fouten, [])
-    console.log('INSTELLINGEN_OK: compact overzicht, Actief-label, delen zonder tekst, vindbaarheid, leden, verzameltijd met standaardwaarden/herstel/validatie/laadherstel, thema, teamwissel, Zonder team, account/uitloggen, kijkerrechten, aanvragen, superadmin, terug en sync-herstel.')
+    console.log('INSTELLINGEN_OK: alle teams direct selecteerbaar, actief vinkje, Teams beheren, beschermd laatste beheerder/terug, verlaten annuleren/bevestigen, delen zonder tekst, vindbaarheid, leden, verzameltijd met standaardwaarden/herstel/validatie/laadherstel, thema, teamwissel, Zonder team, account/uitloggen, kijkerrechten, aanvragen, superadmin, terug en sync-herstel.')
   } finally { await browser.close() }
 })().catch(err => { console.error(err); process.exit(1) })

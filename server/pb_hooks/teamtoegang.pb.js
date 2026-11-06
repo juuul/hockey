@@ -19,3 +19,9 @@ routerAdd("POST", "/api/hockey/teamtoegang/{team}", e => {
   else throw new BadRequestError("Onbekende actie")
   return e.json(200, { ok: true })
 })
+// Alleen het eigen lidmaatschap opzeggen; gegevens en overige leden blijven staan.
+routerAdd("POST", "/api/hockey/team/{team}/verlaten", e => {
+  if (!e.auth || e.auth.collection().name !== "users" || e.auth.getBool("gast")) throw new UnauthorizedError("Log eerst in met je eigen account")
+  require(`${__hooks}/teamtoegang.js`).verlaten(e.app, e.request.pathValue("team"), e.auth)
+  return e.json(200, { ok: true })
+})
