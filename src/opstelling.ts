@@ -9,31 +9,37 @@ function schud<T>(lijst: T[]): T[] {
   return kopie
 }
 
-// Eerst eerlijk loten wie begint, pas daarna plaatsen: anders zitten spelers met een vaste positie nooit op de bank.
-// Eerst krijgt iedereen zo mogelijk zijn 1e keuze, daarna zijn 2e. Door de geschudde volgorde wint bij een dubbele keuze een willekeurige speler.
-export function nieuweOpstelling(spelers: Player[], vastePosities: Record<string, string[]>, posities: Position[]): Player[] {
-  const geschud = schud(spelers.filter(s => !s.isKeeper && s.meedoen))
+// Keeper op voorkeur (1e, dan 2e); zonder keepervoorkeur de huidige aanwezige keeper,
+// anders een gelote aanwezige speler. De overige spelers loten eerst om de veldplekken.
+export function nieuweOpstelling(spelers: Player[], vastePosities: Record<string, string[]>, posities: Position[], metKeeper = true): Player[] {
+  const aanwezig = schud(spelers.filter(s => s.meedoen))
+  const keeper = metKeeper ? aanwezig.find(s => vastePosities[s.id]?.[0] === 'K')
+    ?? aanwezig.find(s => vastePosities[s.id]?.[1] === 'K')
+    ?? aanwezig.find(s => s.isKeeper)
+    ?? aanwezig[0] : undefined
+  const geschud = schud(aanwezig.filter(s => s.id !== keeper?.id))
   const basis = geschud.slice(0, posities.length)
   const bank = geschud.slice(posities.length)
 
   const placed = new Map<string, Player>()
+  if (keeper) placed.set(keeper.id, { ...keeper, positie: 'K', isKeeper: true, inVeld: true })
   const vrij = [...posities]
   for (const keuze of [0, 1]) {
     basis.filter(s => !placed.has(s.id)).forEach(s => {
       const wens = vastePosities[s.id]?.[keuze] as Position | undefined
       if (wens && vrij.includes(wens)) {
         vrij.splice(vrij.indexOf(wens), 1)
-        placed.set(s.id, { ...s, inVeld: true, positie: wens })
+        placed.set(s.id, { ...s, inVeld: true, positie: wens, isKeeper: false })
       }
     })
   }
   const vrijGeschud = schud(vrij)
   basis.filter(s => !placed.has(s.id)).forEach((s, i) => {
-    placed.set(s.id, { ...s, inVeld: true, positie: vrijGeschud[i] })
+    placed.set(s.id, { ...s, inVeld: true, positie: vrijGeschud[i], isKeeper: false })
   })
-  bank.forEach(s => placed.set(s.id, { ...s, inVeld: false }))
+  bank.forEach(s => placed.set(s.id, { ...s, inVeld: false, isKeeper: false }))
 
-  return spelers.map(s => placed.get(s.id) ?? (s.meedoen ? s : { ...s, inVeld: false }))
+  return spelers.map(s => placed.get(s.id) ?? { ...s, inVeld: false, isKeeper: false })
 }
 
 // Wie op de bank zit, staat al één keer 'uit' en begint daarom op 1

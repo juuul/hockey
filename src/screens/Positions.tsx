@@ -20,7 +20,7 @@ export default function Positions() {
   return (
     <div className="positions-screen">
       <h2>Voorkeursposities</h2>
-      <p className="help-text">Bij "Nieuwe opstelling" wordt eerst geloot wie begint. Wie begint, krijgt zo mogelijk de 1e keuze, anders de 2e. Hebben meerdere spelers dezelfde keuze, dan wordt geloot wie hem krijgt.{heeftKeeper(spelvorm) && ' Keeper kun je als voorkeur bewaren; wie op doel staat kies je op het veld.'}</p>
+      <p className="help-text">{heeftKeeper(spelvorm) && 'De keeper wordt gekozen op voorkeur: eerst de 1e, dan de 2e keuze. Bij gelijke voorkeur wordt geloot. '}Voor de veldplekken wordt geloot wie begint, zo mogelijk op de 1e of 2e voorkeurspositie.</p>
 
       <div className="positions-list">
         {fieldPlayers.map(player => (
