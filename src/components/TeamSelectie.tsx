@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { useAccount } from '../context/AccountContext'
 import { appAdres, foutTekst, pb } from '../server'
 import { clubKomtOvereen, teamKomtOvereen } from '../clubzoeken'
+import { teamFilterWaarden } from '../teamfilters'
 import './TeamSelectie.css'
 import { lees, OPSLAG, schrijf } from '../opslag'
 
@@ -17,7 +18,7 @@ interface OphaalStatus { status: 'nieuw' | 'bezig' | 'fout' | 'klaar'; opnieuwNa
 const TEAMVELDEN = ['id', 'bronId', 'clubBronId', 'naam', 'seizoen', 'geslacht', 'leeftijd', 'categorie', 'spelvorm', 'klasse', 'gecontroleerd'] as const
 function bewaardeTeams(club: string): OfficieelTeam[] {
   const lijst = lees<unknown>(OPSLAG, `catalogus_teams_${club}`, [])
-  return Array.isArray(lijst) ? lijst.filter(t => t && t.clubBronId === club && typeof t.id === 'string' && typeof t.naam === 'string') : []
+  return Array.isArray(lijst) ? lijst.filter(t => t && t.clubBronId === club && typeof t.id === 'string' && typeof t.naam === 'string').map(teamFilterWaarden) : []
 }
 
 function bewaardeClubs(): CatalogusClub[] {
@@ -97,9 +98,10 @@ export function TeamKiezer({ gekozen, kies, stap, naarStap }: { gekozen: Officie
           pb.send<OphaalStatus>(`/api/hockey/catalogus/club/${club.id}/status`, { signal: controller.signal }).catch(() => null),
         ])
         if (actief) {
-          setTeams(lijst); setLaden(false); setFout('')
+          const volledig = lijst.map(teamFilterWaarden)
+          setTeams(volledig); setLaden(false); setFout('')
           setOphaalStatus(status && ['nieuw','bezig','fout','klaar'].includes(status.status) ? status : null)
-          schrijf(OPSLAG, `catalogus_teams_${club.bronId}`, lijst.map(t => Object.fromEntries(TEAMVELDEN.map(k => [k, t[k] ?? '']))))
+          schrijf(OPSLAG, `catalogus_teams_${club.bronId}`, volledig.map(t => Object.fromEntries(TEAMVELDEN.map(k => [k, t[k] ?? '']))))
         }
       } catch (e) { if (actief) { setFout(foutTekst(e)); setLaden(false) } }
       finally { bezig = false; clearTimeout(timeout) }

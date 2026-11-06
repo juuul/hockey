@@ -12,12 +12,12 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     let aanvraag
     let nieuweGroep
     let enkeleGroep = false
-    let toonExtraTeams = false
+    let toonExtraTeams = false, toonZaalTeams = false
     let clubStoringen = 0
     let teamStoring = false, legeTeams = false
     let bronStatus = { status: 'klaar', opnieuwNa: null }
     const clubs = [{ id: 'club1', bronId: 'SCHC123', naam: 'SCHC', plaats: 'Bilthoven' }]
-    const teams = [1, 2].map(n => ({ id: `team${n}`, bronId: String(n), clubBronId: 'SCHC123', naam: `SCHC MO11-${n}`, seizoen: '2026-2027', geslacht: 'Meisjes', leeftijd: 'O11', categorie: 'Jeugd', spelvorm: 'Veld', klasse: n === 1 ? '5e klasse' : '', gecontroleerd: '2026-10-15T12:00:00Z' }))
+    const teams = [1, 2].map(n => ({ id: `team${n}`, bronId: String(n), clubBronId: 'SCHC123', naam: `SCHC MO11-${n}`, seizoen: '2026-2027', geslacht: 'Meisjes / dames', leeftijd: 'O11', categorie: 'Jeugd', spelvorm: 'Veld', klasse: n === 1 ? '5e klasse' : '', gecontroleerd: '2026-10-15T12:00:00Z' }))
     const omgevingen = [{ id: 'groep1', naam: 'MO11-1 ouders' }, { id: 'groep2', naam: 'MO11-1 begeleiding' }]
     await page.setRequestInterception(true)
     page.on('request', req => {
@@ -35,6 +35,12 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
         else if (url.pathname.endsWith('/club1/status')) body = bronStatus
         else if (url.pathname.includes('catalogus_teams/records') && teamStoring) return req.abort('connectionfailed')
         else if (url.pathname.includes('catalogus_teams/records') && legeTeams) body = lijst([])
+        else if (url.pathname.includes('catalogus_teams/records') && toonZaalTeams) body = lijst([...teams,
+          { ...teams[0], id: 'zaal1', naam: 'SCHC zMO11-1', spelvorm: 'Zaal', geslacht: '', leeftijd: '' },
+          { ...teams[1], id: 'zaal2', naam: 'SCHC zMO11-2', spelvorm: 'Zaal', geslacht: '', leeftijd: 'O11' },
+          { ...teams[0], id: 'jongens1', naam: 'SCHC JO11-1', geslacht: 'Jongens / heren' },
+          { ...teams[0], id: 'ouder12', naam: 'SCHC MO12-1', leeftijd: 'O12' },
+        ])
         else if (url.pathname.includes('catalogus_teams/records')) body = lijst(toonExtraTeams ? [...teams, { ...teams[0], id: 'team3', naam: 'SCHC MO12-1', leeftijd: 'O12', spelvorm: 'Zaal' }] : teams)
         else if (url.pathname.includes('catalogus_wedstrijden/records')) body = lijst([])
         else if (url.pathname.endsWith('/team1/omgevingen')) body = enkeleGroep ? omgevingen.slice(0, 1) : omgevingen
@@ -176,6 +182,34 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     await page.waitForFunction(() => document.body.textContent.includes('Geen teams gevonden.'))
     toonExtraTeams = false
 
+    // Zaalteams met oude ontbrekende metadata blijven vindbaar met gecombineerde filters.
+    toonZaalTeams = true
+    const filter = async (label, waarde) => {
+      const el = await page.evaluateHandle(label => [...document.querySelectorAll('.teamselectie-filters label')].find(l => l.firstChild.textContent.trim() === label).querySelector('select'), label)
+      await el.asElement().select(waarde)
+    }
+    const zaalFilters = async () => {
+      await page.click('.teamselectie-filters summary')
+      await filter('Leeftijd', 'O11')
+      await filter('Teamtype', 'Meisjes / dames')
+      await filter('Veld of zaal', 'Zaal')
+      await page.waitForFunction(() => document.querySelectorAll('[aria-label="Gevonden teams"] button').length === 2)
+      assert.deepEqual(await page.$$eval('[aria-label="Gevonden teams"] strong', es => es.map(e => e.textContent)), ['SCHC zMO11-1', 'SCHC zMO11-2'])
+    }
+    await begin()
+    await zaalFilters()
+    // Ook een bestaande cache met lege kenmerken werkt tijdens een netwerkfout.
+    await page.evaluate(() => {
+      const key = 'hockey_test_catalogus_teams_SCHC123'
+      const lijst = JSON.parse(localStorage.getItem(key))
+      for (const t of lijst) if (t.spelvorm === 'Zaal') { t.geslacht = ''; t.leeftijd = '' }
+      localStorage.setItem(key, JSON.stringify(lijst))
+    })
+    teamStoring = true
+    await begin()
+    await zaalFilters()
+    teamStoring = false; toonZaalTeams = false
+
     // Eerste keer zonder cache: een laadfout is nooit een leeg zoekresultaat.
     await page.evaluate(() => localStorage.removeItem('hockey_test_catalogus_clubs'))
     clubStoringen = 1
@@ -236,7 +270,7 @@ const appUrl = process.env.TEST_URL || 'http://127.0.0.1:5187/'
     await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }])
     await page.waitForFunction(donker => getComputedStyle(document.querySelector('.teamselectie-vraag')).color !== donker, {}, donkereTekst)
     if (process.env.LIGHT_PREVIEW_PATH) await page.screenshot({ path: process.env.LIGHT_PREVIEW_PATH })
-    console.log('TEAMSELECTIE_OK: één stap per scherm, club/team zoeken, optionele filters, Enter verstuurt niets, app-/browserterug bewaart invoer, teamwissel wist groep, aanvragen en nieuwe groep, smalle schermen en licht/donker.')
+    console.log('TEAMSELECTIE_OK: Meisjes + O11 + Zaal inclusief oude cache tijdens uitval;  één stap per scherm, club/team zoeken, optionele filters, Enter verstuurt niets, app-/browserterug bewaart invoer, teamwissel wist groep, aanvragen en nieuwe groep, smalle schermen en licht/donker.')
     console.log('CLUBVERBINDING_OK: automatische herpoging, geen foutieve lege resultaten, openbare cache, handmatig opnieuw laden en herstel bij online.')
   } finally {
     await browser.close()
