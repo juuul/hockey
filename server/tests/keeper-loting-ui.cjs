@@ -53,7 +53,7 @@ const url = process.env.TEST_URL || 'http://127.0.0.1:5189/'
   await p.goto(url);await p.waitForFunction(()=>[...document.querySelectorAll('button')].some(b=>b.textContent==='Nieuwe wedstrijd'))
   await p.evaluate(()=>[...document.querySelectorAll('button')].find(b=>b.textContent==='Nieuwe wedstrijd').click())
   await p.waitForFunction(()=>JSON.parse(localStorage.getItem('hockey_test_spelers')).find(s=>s.isKeeper)?.id==='kind1')
-  assert.ok(await p.evaluate(()=>JSON.parse(localStorage.getItem('hockey_test_spelers')).every(s=>s.wisselCount===(s.inVeld?0:1))))
+  assert.ok(await p.evaluate(()=>JSON.parse(localStorage.getItem('hockey_test_spelers')).every(s=>s.wisselCount===0)))
   console.log('KEEPER_LOTING_UI_OK: voorkeur via app, keeper op doel in veld/zaal, afwezige overgeslagen, precies één keeper, tellers behouden, Undo herstelt en Nieuwe wedstrijd loot keeper/reset tellers.')
  } finally {await browser.close()}
 })().catch(e=>{console.error(e);process.exit(1)})
