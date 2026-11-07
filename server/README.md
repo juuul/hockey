@@ -309,3 +309,7 @@ Alleen `wissel()` vraagt een nieuw invalvolgnummer aan. Andere spelersupdates pl
 ### Wisseltellers resetten
 
 Reset wissels en Nieuwe wedstrijd zetten iedereen op nul, ook de bank; er zijn geen fictieve beginwissels. Nieuwe opstelling behoudt bestaande tellers. `server/tests/wissels-reset-ui.cjs` controleert de echte app met fictieve veld-/zaalteams: reset behoudt opstelling/score, Undo herstelt de vorige tellers, opnieuw loten blijft na reset op nul en de eerste echte wissel telt precies één. `TEST_URL` kiest de testpagina; API-verzoeken worden geblokkeerd. De keeperlotingtest controleert ook de nulstand na Nieuwe wedstrijd.
+
+### O11 buiten: 1-3-3-1
+
+De vier veldrijen bevatten één spits, drie middenvelders, drie verdedigers en een libero (`LIB`, verdediging), met de keeper apart. `server/tests/spelvormen.ts` controleert negen spelers, unieke posities, label, juiste categorie en live-opslag. `server/tests/o11-opstelling-ui.cjs` controleert via echte knoppen op 390×844: alleen beschikbaar bij O11 buiten, vijf niet-overlappende rijen, Undo, libero als voorkeur, opnieuw loten, echte wissel en bewaren na verversen. Draai deze tegen de lokaal gebouwde app via `vite preview`; `TEST_URL` kiest het adres. Alleen fictieve lokale gegevens, alle API-verzoeken geblokkeerd.
