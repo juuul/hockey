@@ -2,6 +2,10 @@
 
 Uitgebreide beschrijving per scherm, regel en accountfunctie. Kort overzicht en werkafspraken: `CLAUDE.md`. Bij wijzigingen ook dit bestand bijwerken (huidige stand, geen logboek).
 
+## Controle vóór publicatie
+
+Elke appwijziging wordt lokaal gebouwd en daarna via `vite preview` in een echte browser gecontroleerd op de gebouwde bestanden. De relevante gebruikersacties en bestaande toestanden worden met fictieve lokale gegevens getest, zonder echte accounts of API-mutaties. Alleen typecheck, een geslaagde build of controles tegen de ontwikkelserver zijn niet voldoende. Na publicatie volgt controle van de werkelijk gepubliceerde test- of productieversie.
+
 ## Tabbladen
 1. **Dashboard** (het tabblad heet naar de klaargezette tegenstander, bv. "HC Heidebloem", lang afgekapt met …; zonder tegenstander "Wedstrijd")
    - Bovenaan de compacte scoreregel (minimaal 52px hoog, min-knoppen 44px breed): `[−] [Wij n] [Zij n] [−]`. Stand en naamgrootte blijven gelijk; de extra ruimte gaat naar het veld. Tik op **Wij** opent "Wie scoorde?" (veld van voor naar achter, dan keeper, dan wissels, of "Weet ik niet"). **Zij** telt direct +1. `−` bij Zij haalt er één af; `−` bij Wij vraagt "Welk doelpunt weghalen?" (scorers met aantal, `KiesDoelpuntWeg`), behalve als er maar één scorer is: dan meteen weg.
