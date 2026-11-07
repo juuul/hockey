@@ -9,20 +9,23 @@ export function assetVersie(doc: Document, basis: string): string {
     .filter(pad => pad.includes('/assets/')).sort().join('|')
 }
 
-export async function verversAppVersie(vak: HTMLElement, gegevensKlaar: Promise<unknown> = Promise.resolve()): Promise<void> {
+// true betekent: nieuwe versie beschikbaar, maar veilig herladen moet nog wachten.
+export async function verversAppVersie(vak: HTMLElement, gegevensKlaar: Promise<unknown> = Promise.resolve(), magHerladen: () => boolean = () => true): Promise<boolean> {
   const huidig = assetVersie(document, location.href)
-  if (!huidig) return // Lokale ontwikkelserver gebruikt geen gepubliceerde assetnamen.
+  if (!huidig) return false // Lokale ontwikkelserver gebruikt geen gepubliceerde assetnamen.
   const url = new URL(location.href)
   url.hash = ''
   url.searchParams.set('v', String(Date.now()))
   const antwoord = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(8000) })
-  if (!antwoord.ok) return
+  if (!antwoord.ok) return false
   const doc = new DOMParser().parseFromString(await antwoord.text(), 'text/html')
   const nieuw = assetVersie(doc, url.href)
-  if (!nieuw || nieuw === huidig) return
+  if (!nieuw || nieuw === huidig) return false
   // Controleer de versie parallel, maar rond eerst gegevensopslag af vóór echt herladen.
   await gegevensKlaar
-  if (invoerOpen()) return
+  // Laat de sync-status eerst in React renderen voordat de bewaarbeveiliging hem leest.
+  await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
+  if (document.visibilityState !== 'visible' || invoerOpen() || !magHerladen()) return true
   const posities = [vak, ...vak.querySelectorAll<HTMLElement>('*')].filter(el => el.scrollTop > 0).map(el => {
     const stappen: number[] = []
     for (let node = el; node !== vak; node = node.parentElement!) stappen.unshift([...node.parentElement!.children].indexOf(node))
@@ -30,6 +33,53 @@ export async function verversAppVersie(vak: HTMLElement, gegevensKlaar: Promise<
   })
   try { sessionStorage.setItem(SLEUTEL, JSON.stringify({ tijd: Date.now(), posities })) } catch { /* Geen opslag. */ }
   location.replace(url.href)
+  return false
+}
+
+// Chrome kan een tabblad uit het geheugen/bfcache herstellen zonder de app opnieuw te laden.
+// Bundel de bijbehorende events en controleer hoogstens eens per 30 seconden.
+export function automatischVerversen(vak: HTMLElement, gegevens: () => Promise<unknown>, magHerladen: () => boolean): () => void {
+  let gestopt = false, bezig = false
+  let laatst = -Infinity
+  let uitgesteld = false
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const controleer = async () => {
+    if (gestopt || bezig || document.visibilityState !== 'visible' || !navigator.onLine) return
+    clearTimeout(timer)
+    const wacht = 30_000 - (Date.now() - laatst)
+    if (wacht > 0) {
+      if (uitgesteld) timer = setTimeout(() => { void controleer() }, wacht)
+      return
+    }
+    laatst = Date.now(); bezig = true
+    try {
+      // Ook bij versiecontrole bestaande gegevens veilig opslaan/synchroniseren.
+      let opgeslagen = false
+      const klaar = gegevens().then(() => { opgeslagen = true }, () => {})
+      uitgesteld = await verversAppVersie(vak, klaar, () => !gestopt && opgeslagen && magHerladen())
+      await klaar
+    } catch { /* Offline of mislukte controle: de bestaande app blijft bruikbaar. */ }
+    finally {
+      bezig = false
+      if (!gestopt && uitgesteld && document.visibilityState === 'visible') timer = setTimeout(() => { void controleer() }, 30_000)
+    }
+  }
+  const wakker = () => { void controleer() }
+  const invoerGesloten = () => { if (uitgesteld) wakker() }
+  window.addEventListener('pageshow', wakker)
+  window.addEventListener('focus', wakker)
+  window.addEventListener('online', wakker)
+  document.addEventListener('visibilitychange', wakker)
+  document.addEventListener('focusout', invoerGesloten)
+  void controleer()
+  return () => {
+    gestopt = true; clearTimeout(timer)
+    window.removeEventListener('pageshow', wakker)
+    window.removeEventListener('focus', wakker)
+    window.removeEventListener('online', wakker)
+    document.removeEventListener('visibilitychange', wakker)
+    document.removeEventListener('focusout', invoerGesloten)
+  }
 }
 
 export function herstelScrollNaUpdate(vak: HTMLElement): () => void {

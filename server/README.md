@@ -331,3 +331,7 @@ Reset wissels en Nieuwe wedstrijd zetten iedereen op nul, ook de bank; er zijn g
 ### O11 buiten: 1-3-3-1
 
 De vier veldrijen bevatten één spits, drie middenvelders, drie verdedigers en een libero (`LIB`, verdediging), met de keeper apart. `server/tests/spelvormen.ts` controleert negen spelers, unieke posities, label, juiste categorie en live-opslag. `server/tests/o11-opstelling-ui.cjs` controleert via echte knoppen op 390×844: alleen beschikbaar bij O11 buiten, vijf niet-overlappende rijen, Undo, libero als voorkeur, opnieuw loten, echte wissel en bewaren na verversen. Draai deze tegen de lokaal gebouwde app via `vite preview`; `TEST_URL` kiest het adres. Alleen fictieve lokale gegevens, alle API-verzoeken geblokkeerd.
+
+### Automatisch actuele app bij openen/terugkeer
+
+`server/tests/app-wakker-ui.cjs` test uitsluitend de lokaal gebouwde app. Mount de testbuild read-only als `/site`, start `vite preview` op 5190 en geef het adres via `TEST_URL` door. De browser onderschept twee nagebootste publicaties met de echte gebundelde code, zonder accounts/API-verkeer. Controleert opstarten, bundelen van focus/pageshow/visibility-events, dezelfde versie zonder herladen, nieuwe versie met behoud van score/tabblad/scroll, open invoer en lopende klok uitstellen, alsnog bijwerken en HTTP 503 zonder herlaadlus. De verversfunctie wacht op gegevensopslag en een geslaagde sync-status; geen nieuwe KNHB-broncontroles.

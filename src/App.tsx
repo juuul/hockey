@@ -15,7 +15,7 @@ import { OPSLAG } from './opslag'
 import { useTerug } from './terug'
 import { heeftShootouts } from './types'
 import './App.css'
-import { herstelScrollNaUpdate, verversAppVersie } from './appVerversen'
+import { automatischVerversen, herstelScrollNaUpdate, verversAppVersie } from './appVerversen'
 
 type Scherm = 'dashboard' | 'shootout' | 'players' | 'positions' | 'programma' | 'historie' | 'instellingen'
 
@@ -41,7 +41,7 @@ interface Navigatie {
 function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   const scrollVak = useRef<HTMLDivElement>(null)
   useEffect(() => scrollVak.current ? herstelScrollNaUpdate(scrollVak.current) : undefined, [])
-  const { sync, live, demo, clubs, wedstrijd, spelvorm, nuSynchroniseren } = useHockey()
+  const { sync, live, demo, clubs, wedstrijd, spelvorm, timer, nuSynchroniseren } = useHockey()
   // Shoot-out alleen bij O10 en O9; bij een andere categorie terug naar het Dashboard
   const tabs = TABS.filter(t => t.id !== 'shootout' || heeftShootouts(spelvorm))
   if (!tabs.some(t => t.id === screen)) screen = 'dashboard'
@@ -54,6 +54,13 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
   // Open aanvragen (toegang tot een team, nieuwe teams): aantal op het tandwiel
   const { aanvragen, teamsLaden, aanvragenLaden } = useAccount()
   const aantalAanvragen = aanvragen.toegang.length + aanvragen.teams.length
+  const verversRef = useRef(() => Promise.resolve<unknown>(undefined))
+  verversRef.current = () => Promise.all([nuSynchroniseren(), teamsLaden(), aanvragenLaden()])
+  const veiligRef = useRef(false)
+  veiligRef.current = !start && !location.hash && timer.gestartOp === null
+    && (!sync || (sync.geladen && !sync.wachtend && !sync.offline && !sync.fout))
+    && (!live || (live.verbonden && !live.wachtend))
+  useEffect(() => scrollVak.current ? automatischVerversen(scrollVak.current, () => verversRef.current(), () => veiligRef.current) : undefined, [])
 
   return (
     <div className="mobile-frame">
@@ -95,7 +102,7 @@ function AppContent({ screen, setScreen, start, startGebruikt }: Navigatie) {
       </div>
       <Verversen scrollVak={scrollVak} onVervers={async () => {
         const gegevens = Promise.allSettled([nuSynchroniseren(), teamsLaden(), aanvragenLaden()])
-        await Promise.allSettled([gegevens, scrollVak.current ? verversAppVersie(scrollVak.current, gegevens) : undefined])
+        await Promise.allSettled([gegevens, scrollVak.current ? verversAppVersie(scrollVak.current, gegevens, () => veiligRef.current) : undefined])
       }} />
       <OvernemenVraag />
     </div>
