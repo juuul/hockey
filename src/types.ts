@@ -1,4 +1,4 @@
-export type Position = 'LW' | 'CV' | 'RW' | 'LM' | 'LCM' | 'CM' | 'RCM' | 'RM' | 'LBM' | 'LCA' | 'CBM' | 'RCA' | 'RBM' | 'K';
+export type Position = 'LW' | 'CV' | 'RW' | 'LM' | 'LCM' | 'CM' | 'RCM' | 'RM' | 'LBM' | 'LCA' | 'CBM' | 'RCA' | 'RBM' | 'LIB' | 'K';
 
 export interface Player {
   id: string;
@@ -33,16 +33,17 @@ export const POSITIE_LABEL: Record<Position, string> = {
   CBM: 'centraal achter',
   RCA: 'rechts centraal',
   RBM: 'rechts achter',
+  LIB: 'libero',
   K: 'keeper',
 };
 
 // Van voor naar achter; ook de sorteervolgorde voor elke opstelling
-export const VELD_VOLGORDE: Position[] = ['LW', 'CV', 'RW', 'LM', 'LCM', 'CM', 'RCM', 'RM', 'LBM', 'LCA', 'CBM', 'RCA', 'RBM'];
+export const VELD_VOLGORDE: Position[] = ['LW', 'CV', 'RW', 'LM', 'LCM', 'CM', 'RCM', 'RM', 'LBM', 'LCA', 'CBM', 'RCA', 'RBM', 'LIB'];
 
 // Totaal aantal spelers incl. keeper
 export type Spelvorm = 11 | 9 | 8 | 6 | 'mini3' | 'zaal6' | 'zaaljeugd6' | 'zaalmini3' | 'zaalmini4' | 'hockey5' | 'hockey7';
 
-export type OpstellingNaam = '3-3-4' | '3-4-3' | '2-3-3' | '3-3-2' | '3-2-3' | '2-3-2' | '1-3-3' | '2-2-3' | '2-1-2' | '2-2-1' | '1-2-2' | 'mini-1-2' | 'mini-2-1' | 'zaalmini-1-2' | 'zaalmini-2-1' | 'zaalmini-2-2' | 'zaal-2-1-2' | 'zaal-2-2-1' | 'zaal-1-2-2' | 'zaaljeugd-2-1-2' | 'zaaljeugd-2-2-1' | 'zaaljeugd-1-2-2' | 'hockeyvijf-2-2' | 'hockeyvijf-1-2-1' | 'hockeyzeven-2-3-2' | 'hockeyzeven-3-2-2';
+export type OpstellingNaam = '3-3-4' | '3-4-3' | '2-3-3' | '3-3-2' | '3-2-3' | '1-3-3-1' | '2-3-2' | '1-3-3' | '2-2-3' | '2-1-2' | '2-2-1' | '1-2-2' | 'mini-1-2' | 'mini-2-1' | 'zaalmini-1-2' | 'zaalmini-2-1' | 'zaalmini-2-2' | 'zaal-2-1-2' | 'zaal-2-2-1' | 'zaal-1-2-2' | 'zaaljeugd-2-1-2' | 'zaaljeugd-2-2-1' | 'zaaljeugd-1-2-2' | 'hockeyvijf-2-2' | 'hockeyvijf-1-2-1' | 'hockeyzeven-2-3-2' | 'hockeyzeven-3-2-2';
 
 // Rijen van voor naar achter (keeper staat er altijd los onder)
 export const OPSTELLINGEN: Record<OpstellingNaam, Position[][]> = {
@@ -53,6 +54,7 @@ export const OPSTELLINGEN: Record<OpstellingNaam, Position[][]> = {
   '2-3-3': [['LW', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'CBM', 'RBM']],
   '3-3-2': [['LW', 'CV', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'RBM']],
   '3-2-3': [['LW', 'CV', 'RW'], ['LM', 'RM'], ['LBM', 'CBM', 'RBM']],
+  '1-3-3-1': [['CV'], ['LM', 'CM', 'RM'], ['LBM', 'CBM', 'RBM'], ['LIB']],
   '2-3-2': [['LW', 'RW'], ['LM', 'CM', 'RM'], ['LBM', 'RBM']],
   '1-3-3': [['CV'], ['LM', 'CM', 'RM'], ['LBM', 'CBM', 'RBM']],
   '2-2-3': [['LW', 'RW'], ['LM', 'RM'], ['LBM', 'CBM', 'RBM']],
@@ -79,7 +81,7 @@ export const OPSTELLINGEN: Record<OpstellingNaam, Position[][]> = {
 // De eerste is de standaard bij die spelvorm
 export const OPSTELLINGEN_PER_SPELVORM: Record<Spelvorm, OpstellingNaam[]> = {
   11: ['3-4-3', '3-3-4'],
-  9: ['2-3-3', '3-3-2', '3-2-3'],
+  9: ['2-3-3', '3-3-2', '3-2-3', '1-3-3-1'],
   8: ['2-3-2', '1-3-3', '2-2-3'],
   6: ['2-1-2', '2-2-1', '1-2-2'],
   mini3: ['mini-1-2','mini-2-1'],
