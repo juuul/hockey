@@ -8,7 +8,7 @@ Web-app om langs het veld (op een telefoon) de opstelling, wissels, score en tij
 - Repo: github.com/juuul/hockey
 
 ## Werkwijze (belangrijk)
-- Werk op branch `test`. Elke wijziging: typecheck (`npx tsc --noEmit -p .`), commit, push naar `test`, wacht op de deploy en controleer de test-URL.
+- Werk op branch `test`. Elke appwijziging: typecheck (`npx tsc --noEmit -p .`), lokaal bouwen (`npm run build`, met `-- --mode test` voor test), daarna de gebouwde bestanden via `vite preview` in een echte browser controleren vóór commit/publicatie. Test de geraakte gebruikersactie met fictieve lokale gegevens, inclusief relevante bestaande toestanden (bv. stilstaande, gepauzeerde en lopende klok); alleen een geslaagde build of testen tegen de ontwikkelserver is niet voldoende. Daarna commit, push naar `test`, wacht op de deploy en controleer de test-URL. Voor productie dezelfde controle op de gebouwde productieversie.
 - **CLAUDE.md en `docs/functionaliteit.md` altijd bijwerken** bij elke wijziging in werking, regels of opzet, in dezelfde commit. CLAUDE.md blijft kort (overzicht, werkafspraken, valkuilen); details horen in de docs. Beschrijf hoe het nu is, geen logboek: geen datums, geen "sinds", geen wat-er-gebeurde; vervang verouderde tekst in plaats van eraan toe te voegen.
 - Naar `main` (live) alleen als de gebruiker dat expliciet zegt ("zet live", "zet maar door", "naar main"). Dan `git merge --ff-only test` op `main` en pushen.
 - De gebruiker is Nederlandstalig en test op de telefoon; antwoord in het Nederlands, kort.

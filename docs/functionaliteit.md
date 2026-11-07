@@ -2,6 +2,10 @@
 
 Uitgebreide beschrijving per scherm, regel en accountfunctie. Kort overzicht en werkafspraken: `CLAUDE.md`. Bij wijzigingen ook dit bestand bijwerken (huidige stand, geen logboek).
 
+## Controle vóór publicatie
+
+Elke appwijziging wordt lokaal gebouwd en daarna via `vite preview` in een echte browser gecontroleerd op de gebouwde bestanden. De relevante gebruikersacties en bestaande toestanden worden met fictieve lokale gegevens getest, zonder echte accounts of API-mutaties. Alleen typecheck, een geslaagde build of controles tegen de ontwikkelserver zijn niet voldoende. Na publicatie volgt controle van de werkelijk gepubliceerde test- of productieversie.
+
 ## Ontwerpvoorstellen, nog niet in de app
 
 De aparte testpagina `/test/ontwerpen/spelerwissels/` bevat drie klikbare voorstellen voor spelers kiezen op het veld: direct Tik & tik, vooraf Wisselen/Posities kiezen en Sleep of tik. Ze maken zichtbaar wanneer veld/bank-ruilen een wissel telt en wanneer posities of een bewuste correctie niet tellen. Dit zijn zelfstandige HTML-mockups met fictieve namen, zonder API-verzoeken of opslag; ze wijzigen het echte Dashboard, de wissellogica en productie niet. De gebruiker kiest eerst een voorstel voordat implementatie volgt. Afbeeldingen en verdere uitleg staan in `public/ontwerpen/spelerwissels/`.
