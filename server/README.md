@@ -105,6 +105,20 @@ Elke mail bevat een kopieerbare chatopdracht voor broncontrole en veilige verwer
 
 Controle: `python3 server/tests/catalogus-meldingen.py` test baseline, verschilvelden, nieuwe/verplaatste/historische wedstrijden, herstart, storingsdeduplicatie/herstel, SMTP-herpogingen, HTML-escaping, omgeving en read-only bronselectie. Echte testverzending uitsluitend naar Mailpit. Productieactivering verandert geen bronkoppeling: een ontoegankelijke wedstrijdbron blijft beoordeling vragen, geen verzonnen gegevens of automatische alternatieve scraper.
 
+## Regressiecheck vóór publicatie naar test
+
+`python3 server/tests/regressie.py` (± 30 s; `--zonder-browser` slaat de Chrome-stap over) moet eindigen met `REGRESSIE_OK`:
+
+1. Typecheck en `node --check` van alle hooks.
+2. Alle offline unit-tests: elke `tests/*.ts` (esbuild, ESM), elke `tests/*.py` behalve `catalogus-licht-modules.py` (haalt CDN-modules op) en de netwerkloze Node-tests uit `NODE_TESTS`. Nieuwe netwerkloze tests in die map lopen automatisch mee; voeg een nieuwe netwerkloze `.cjs`/`.mjs` toe aan `NODE_TESTS`.
+3. `tests/catalogus-vindbaar.ts` op een read-only export van uitsluitend openbare catalogusvelden uit test én productie: elk actief team moet met de echte app-logica (`src/teamfilters.ts`, `src/clubzoeken.ts`) vindbaar zijn op eigen naam en eigen filters, elk team met MO/JO-code heeft teamtype en leeftijd, elke club is vindbaar op naam, `sc` vindt SCHC en Meisjes + O11 + Zaal vindt zMO11 bij SCHC.
+4. Het fictieve regressieteam op de testserver (inloggen via de gewone API): de vastgelegde eigen waarden in `planning_documenten/test/regressie-verwachting.json` zijn ongewijzigd (eigen aanvang, taken, handmatige en bewust lege verzameltijd, eigen locatie, rijders, handmatige datums), de bewust verwijderde bronwedstrijd komt niet terug, het veldteam heeft nog bronwedstrijden en het zaalteam heeft dezelfde 11 spelers als het veldteam.
+5. `vite build --mode test` met `VITE_SERVER=http://localhost:8091`, `vite preview` op localhost 8799 (staat in de testorigins) en `tests/regressie-ui.cjs` in `zenika/alpine-chrome:with-puppeteer` met `--network host`: niet ingelogd SCHC zoeken en zMO11-1 vinden met Zaal + Meisjes + O11 en met `zmo11`; als regressieaccount de eigen afspraken zien in Programma van veld- en zaalteam, zonder JavaScript-fouten. Daarna stap 4 opnieuw, zodat ook de sync van de nieuwe frontend niets heeft overschreven.
+
+Het regressieaccount `regressie@example.invalid` is via de gewone aanmeld-/uitnodigingsroute (mail in Mailpit) gemaakt; het wachtwoord staat alleen in `planning_documenten/test/regressie-account.json` (600). Het zaalteam is via `POST /api/hockey/catalogus/omgeving` gemaakt en kreeg zijn spelers via de zaalovername. Beide teams zijn aan de echte officiële SCHC-teams gekoppeld, zodat de gewone werker echte brondata blijft binnenhalen binnen de bestaande pilotgrenzen (dezelfde poule als het MO11-1-voorbeeld, plus de zaalpoule). Het testtoken gaat via de omgeving naar de container en nooit via de opdrachtregel. Bij een bewuste wijziging van de afspraken: eerst aanpassen via de app of API, daarna `python3 server/tests/regressie.py --vastleggen`. Productie wordt alleen read-only gelezen voor stap 3; er komt nooit een regressieteam op productie.
+
+Een backend-wijziging eerst op een losse container testen (zie CLAUDE.md); de regressiecheck controleert daarna de bijgewerkte testserver.
+
 ## Controle en livegang
 
 ```sh
@@ -298,7 +312,7 @@ docker run --rm --network none --user 1000:1000 -v /tmp/hockey-sync-herstel-qa:/
 
 ### Teamfilters voor zaalteams
 
-De frontend gebruikt `src/teamfilters.ts` voor ontbrekende filterkenmerken van zowel API-resultaten als bewaarde clublijsten. De officiële naam en ingevulde kenmerken blijven intact; zMO/zJO en zaal-seniorencodes worden herkend. Controle: bundel `server/tests/teamfilters.ts` met esbuild en draai met Node. `server/tests/teamselectie.cjs` controleert Meisjes + O11 + Zaal met ontbrekende bronkenmerken én een oude cache tijdens een verbindingsfout, naast de bestaande stappen/zoekflow. Alle API-antwoorden in die browsertest zijn fictief; er worden geen teams geregistreerd of mails verstuurd.
+De frontend gebruikt `src/teamfilters.ts` voor de filterlogica (`teamsMetFilters`, `teamFilterKeuzes`) en voor ontbrekende filterkenmerken van zowel API-resultaten als bewaarde clublijsten. De officiële naam en ingevulde kenmerken blijven intact; zMO/zJO en zaal-seniorencodes worden herkend. Controle: bundel `server/tests/teamfilters.ts` met esbuild en draai met Node. `server/tests/teamselectie.cjs` controleert Meisjes + O11 + Zaal met ontbrekende bronkenmerken én een oude cache tijdens een verbindingsfout, naast de bestaande stappen/zoekflow. Alle API-antwoorden in die browsertest zijn fictief; er worden geen teams geregistreerd of mails verstuurd.
 
 ### Veldspelers overnemen bij start van zaalteam
 

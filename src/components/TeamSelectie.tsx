@@ -2,7 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { useAccount } from '../context/AccountContext'
 import { appAdres, foutTekst, pb } from '../server'
 import { clubKomtOvereen, teamKomtOvereen } from '../clubzoeken'
-import { teamFilterWaarden } from '../teamfilters'
+import { teamFilterKeuzes, teamFilterWaarden, teamsMetFilters } from '../teamfilters'
 import './TeamSelectie.css'
 import { lees, OPSLAG, schrijf } from '../opslag'
 
@@ -112,10 +112,8 @@ export function TeamKiezer({ gekozen, kies, stap, naarStap }: { gekozen: Officie
     const timer = setInterval(laad, 10_000)
     return () => { actief = false; controller?.abort(); clearInterval(timer) }
   }, [clubId, ververs, clubs])
-  const velden = [['seizoen', 'Seizoen'], ['geslacht', 'Teamtype'], ['leeftijd', 'Leeftijd'], ['spelvorm', 'Veld of zaal']] as const
-  const lijst = teams.filter(t => teamKomtOvereen(t.naam, teamZoek) && velden.every(([veld]) => !filters[veld] || t[veld] === filters[veld]))
-  const filterKeuzes = velden.map(([veld, label]) => ({ veld, label, waarden: [...new Set(teams.filter(t => velden.every(([ander]) => ander === veld || !filters[ander] || t[ander] === filters[ander])).map(t => t[veld]).filter(Boolean))].sort().reverse() }))
-    .filter(({ veld, waarden }) => waarden.length > 1 || filters[veld])
+  const lijst = teamsMetFilters(teams, filters).filter(t => teamKomtOvereen(t.naam, teamZoek))
+  const filterKeuzes = teamFilterKeuzes(teams, filters)
   const gevondenClubs = clubs.filter(c => clubKomtOvereen(c.naam, c.plaats, zoek)).sort((a, b) =>
     Number(!a.naam.toLowerCase().startsWith(zoek.trim().toLowerCase())) - Number(!b.naam.toLowerCase().startsWith(zoek.trim().toLowerCase())) || a.naam.localeCompare(b.naam, 'nl'))
   return <>

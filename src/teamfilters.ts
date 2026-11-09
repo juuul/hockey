@@ -8,3 +8,18 @@ export function teamFilterWaarden<T extends { naam: string; geslacht?: string; l
     : /^(G|X|MIX)/.test(code) ? 'Gemengd' : ''
   return { ...team, geslacht: team.geslacht || geslacht, leeftijd: team.leeftijd || code.match(/O\d{1,2}/)?.[0] || '' }
 }
+
+export const TEAMFILTER_VELDEN = [['seizoen', 'Seizoen'], ['geslacht', 'Teamtype'], ['leeftijd', 'Leeftijd'], ['spelvorm', 'Veld of zaal']] as const
+type FilterVeld = typeof TEAMFILTER_VELDEN[number][0]
+type Filterbaar = { [K in FilterVeld]?: string }
+const past = (t: Filterbaar, filters: Record<string, string>, behalve?: FilterVeld) =>
+  TEAMFILTER_VELDEN.every(([veld]) => veld === behalve || !filters[veld] || t[veld] === filters[veld])
+
+// Teams die bij de gekozen filters horen, en per filter de keuzes die bij de overige filters nog iets opleveren.
+export function teamsMetFilters<T extends Filterbaar>(teams: T[], filters: Record<string, string>) {
+  return teams.filter(t => past(t, filters))
+}
+export function teamFilterKeuzes(teams: Filterbaar[], filters: Record<string, string>) {
+  return TEAMFILTER_VELDEN.map(([veld, label]) => ({ veld, label, waarden: [...new Set(teams.filter(t => past(t, filters, veld)).map(t => t[veld]).filter((w): w is string => !!w))].sort().reverse() }))
+    .filter(({ veld, waarden }) => waarden.length > 1 || filters[veld])
+}
