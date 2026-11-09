@@ -4,8 +4,10 @@
 1. Typecheck en syntaxcontrole van de hooks.
 2. Alle offline unit-tests (TypeScript, Python, Node) zonder netwerk.
 3. Vindbaarheid van álle catalogusclubs/-teams uit test én productie (read-only, alleen openbare velden).
-4. Het fictieve regressieteam op de testserver: eigen afspraken, verwijderde bronwedstrijd, zaalovername.
-5. De gebouwde testapp in headless Chrome tegen de testserver; daarna stap 4 opnieuw.
+4. Echte bron: de poules van het veld- en zaalregressieteam zijn vandaag bij hockey.nl opgehaald
+   (anders meteen wachten op de gewone werker) en de gegevens hebben nog de verwachte vorm.
+5. Het fictieve regressieteam op de testserver: eigen afspraken, verwijderde bronwedstrijd, zaalovername.
+6. De gebouwde testapp in headless Chrome tegen de testserver; daarna stap 4 opnieuw.
 
 Privé (buiten git): planning_documenten/test/regressie-account.json en regressie-verwachting.json.
 Gebruik: python3 server/tests/regressie.py [--zonder-browser] [--vastleggen]
@@ -21,7 +23,9 @@ import tempfile
 import time
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 REPO = Path(__file__).resolve().parents[2]
 SERVER = REPO / 'server'
@@ -30,6 +34,10 @@ ESBUILD = REPO / 'node_modules' / '.bin' / 'esbuild'
 NODE_TESTS = ['catalogus-browser.cjs', 'catalogus-locaties.cjs', 'deellink.cjs', 'mailteksten.cjs', 'zaalspelers.cjs', 'kalenders.mjs', 'reiscache.mjs']
 # Velden die de gebruiker zelf beheert; bron- en automatische velden mogen wel veranderen.
 EIGEN_VELDEN = ['datum', 'soort', 'thuis', 'spelen', 'verzamelen', 'verzamelDatum', 'verzamelModus', 'tegenstander', 'locatie', 'locatieAdres', 'fruit', 'begeleider1', 'begeleider2', 'rijders', 'notitie']
+PILOT = SERVER / 'planning_documenten' / 'catalogus-pilot.db'
+ZONE = ZoneInfo('Europe/Amsterdam')
+BRONVELDEN = ('bronId', 'datum', 'thuisBronId', 'uitBronId', 'thuisNaam', 'uitNaam', 'status')
+BRON_WACHT = 180  # seconden; de werker draait elke minuut
 PREVIEW_POORT = 8799  # staat in de --origins van de testserver
 
 resultaten = []
@@ -147,6 +155,62 @@ def regressieteam():
     return f"{len(v['records'])} eigen afspraken ongewijzigd, verwijdering blijft, {met_bron} veld- en {zaal_bron} zaalbronwedstrijden, {v['aantalSpelers']} spelers in veld én zaal"
 
 
+def lees(uri, sql, args=()):
+    db = sqlite3.connect(uri, uri=True)
+    db.row_factory = sqlite3.Row
+    try:
+        return [dict(r) for r in db.execute(sql, args)]
+    finally:
+        db.close()
+
+
+def bron():
+    """Kijkt mee met de gewone pilot; doet zelf nooit een bronbezoek en verzet geen limieten."""
+    v = json.loads((PRIVE / 'regressie-verwachting.json').read_text())
+    testdb = (SERVER / 'pb_test_data' / 'data.db').resolve().as_uri() + '?mode=ro'
+    pilot = PILOT.resolve().as_uri() + '?mode=ro'
+    teams = lees(testdb, """SELECT o.naam, o.bronId, o.seizoen, o.spelvorm, o.pouleId FROM teams t
+                           JOIN catalogus_teams o ON o.id = t.officieelTeam WHERE t.id IN (?, ?)""", (v['veldteam'], v['zaalteam']))
+    if len(teams) != 2 or not all(t['pouleId'] for t in teams):
+        raise RuntimeError(f'Regressieteams niet (meer) gekoppeld aan een officiële poule: {teams}')
+    middernacht = datetime.now(ZONE).replace(hour=0, minute=0, second=0, microsecond=0).timestamp()
+    uitleg, fouten = [], []
+    for t in teams:
+        sleutel = f"{t['seizoen']}:{t['spelvorm']}:{t['pouleId']}"
+        eind = time.time() + BRON_WACHT
+        while True:
+            vandaag = lees(pilot, "SELECT status, bron, code FROM runs WHERE omgeving='test' AND sleutel=? AND begonnen>=? ORDER BY id DESC LIMIT 1", (sleutel, middernacht))
+            if (vandaag and vandaag[0]['status'] != 'bezig') or time.time() > eind or datetime.now(ZONE).hour < 5:
+                break
+            time.sleep(10)  # vandaag nog niet opgehaald: meteen wachten op de minuutwerker
+        echt = lees(pilot, "SELECT status, code, klaar, omgeving FROM runs WHERE sleutel=? AND bron='browser' ORDER BY id DESC LIMIT 1", (sleutel,))
+        grens = dict((r['sleutel'], r['waarde']) for r in lees(pilot, 'SELECT sleutel, waarde FROM grenzen'))
+        if echt and echt[0]['status'] == 'fout':
+            fouten.append(f"{t['naam']}: laatste echte ophaalpoging bij hockey.nl mislukt (HTTP {echt[0]['code'] or '?'})")
+        elif not echt or not echt[0]['klaar'] or time.time() - echt[0]['klaar'] > 30 * 3600:
+            pauze = grens.get('pauzeTot', 0)
+            fouten.append(f"{t['naam']}: al meer dan 30 uur niet echt opgehaald" + (f"; bron gepauzeerd tot {datetime.fromtimestamp(pauze, ZONE):%d-%m %H:%M}" if pauze > time.time() else ''))
+        elif datetime.now(ZONE).hour >= 5 and not vandaag:
+            fouten.append(f"{t['naam']}: test heeft deze poule vandaag nog niet verwerkt (na {BRON_WACHT // 60} min wachten)")
+        elif vandaag and vandaag[0]['status'] == 'fout':
+            fouten.append(f"{t['naam']}: verwerking op test vandaag mislukt (HTTP {vandaag[0]['code'] or '?'})")
+        # Vorm van de echte brongegevens: zou een API-wijziging zichtbaar maken, ook als het ophalen 'lukt'.
+        cache = lees(pilot, 'SELECT inhoud FROM cache WHERE sleutel=?', (sleutel,))
+        wedstrijden = json.loads(cache[0]['inhoud']).get('wedstrijden', []) if cache else []
+        eigen = [w for w in wedstrijden if t['bronId'] in (w.get('thuisBronId'), w.get('uitBronId'))]
+        if not eigen:
+            fouten.append(f"{t['naam']}: geen eigen wedstrijden in de laatste brongegevens")
+        for w in eigen:
+            mist = [k for k in BRONVELDEN if not w.get(k)]  # aanvang mag onbekend zijn
+            if mist:
+                fouten.append(f"{t['naam']}: bronwedstrijd {w.get('bronId')} mist {', '.join(mist)}"); break
+        if not echt or echt[0]['status'] != 'fout':
+            uitleg.append(f"{t['spelvorm'].lower()} {len(eigen)} wedstrijden, echt opgehaald {datetime.fromtimestamp(echt[0]['klaar'], ZONE):%d-%m %H:%M}" if echt and echt[0]['klaar'] else t['naam'])
+    if fouten:
+        raise RuntimeError('\n  ' + '\n  '.join(fouten))
+    return '; '.join(uitleg)
+
+
 def browser(tmp):
     v = json.loads((PRIVE / 'regressie-verwachting.json').read_text())
     s = Testserver()
@@ -185,6 +249,7 @@ def main():
         stap('Unit-tests', lambda: unit(tmp))
         stap('Vindbaarheid catalogus test', lambda: catalogus(tmp, 'test', 'pb_test_data'))
         stap('Vindbaarheid catalogus productie (alleen lezen)', lambda: catalogus(tmp, 'productie', 'pb_data'))
+        stap('Echte bron hockey.nl voor regressieteams', bron)
         stap('Regressieteam op testserver', regressieteam)
         if not args.zonder_browser:
             stap('Gebouwde testapp in Chrome', lambda: browser(tmp))
