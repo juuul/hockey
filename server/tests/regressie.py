@@ -38,6 +38,7 @@ PILOT = SERVER / 'planning_documenten' / 'catalogus-pilot.db'
 ZONE = ZoneInfo('Europe/Amsterdam')
 BRONVELDEN = ('bronId', 'datum', 'thuisBronId', 'uitBronId', 'thuisNaam', 'uitNaam', 'status')
 BRON_WACHT = 180  # seconden; de werker draait elke minuut
+UI_FIXTURES = ['uitnodiging-herpoging-ui.cjs']
 PREVIEW_POORT = 8799  # staat in de --origins van de testserver
 
 resultaten = []
@@ -231,9 +232,14 @@ def browser(tmp):
                     # Via de omgeving, zodat het testtoken nooit in een foutmelding met de opdrachtregel staat.
                     env={**os.environ, 'REGRESSIE_SESSIE': json.dumps({'token': s.sessie['token'], 'record': s.sessie['record']}),
                          'REGRESSIE_TEKSTEN': json.dumps(v['teksten'], ensure_ascii=False)})
+        # Browsertests met uitsluitend fictieve API-antwoorden, op dezelfde gebouwde app.
+        for test in UI_FIXTURES:
+            uit += draai(['docker', 'run', '--rm', '--network', 'host', '--user', f'{os.getuid()}:{os.getgid()}',
+                          '-v', f"{SERVER / 'tests' / test}:/test.cjs:ro", '-e', f'TEST_URL=http://localhost:{PREVIEW_POORT}/',
+                          '--entrypoint', 'node', 'zenika/alpine-chrome:with-puppeteer', '/test.cjs'], timeout=240)
     finally:
         preview.terminate(); preview.wait(10)
-    return uit.strip().split(': ', 1)[-1]
+    return f"{uit.strip().splitlines()[0].split(': ', 1)[-1]} + {len(UI_FIXTURES)} fixture-test(s)"
 
 
 def main():

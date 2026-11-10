@@ -47,3 +47,22 @@ export async function verzoekMetTimeout<T>(actie: (signal: AbortSignal) => Promi
   const timer = setTimeout(() => controller.abort(), 15_000)
   try { return await actie(controller.signal) } finally { clearTimeout(timer) }
 }
+
+// Eenmalige gebruikersactie (zoals een account maken) bij een haperende verbinding: zelf nog een paar keer proberen.
+// Alleen geen-antwoord/verbindingsfouten en tijdelijke serverfouten; een inhoudelijke fout (4xx) gaat direct terug.
+export const tijdelijkeFout = (fout: unknown) => {
+  const status = (fout as { status?: number })?.status
+  return status === undefined || status === 0 || status === 429 || status >= 500
+}
+export async function metHerpogingen<T>(actie: (signal: AbortSignal, poging: number) => Promise<T>, opties: {
+  pauzes?: number[]; opnieuw?: (poging: number) => void; wacht?: (ms: number) => Promise<void>; timeout?: <U>(a: (signal: AbortSignal) => Promise<U>) => Promise<U>
+} = {}): Promise<T> {
+  const { pauzes = [2_000, 5_000], opnieuw, wacht = ms => new Promise(r => setTimeout(r, ms)), timeout = verzoekMetTimeout } = opties
+  for (let poging = 0; ; poging++) {
+    try { return await timeout(signal => actie(signal, poging)) } catch (fout) {
+      if (poging >= pauzes.length || !tijdelijkeFout(fout)) throw fout
+      opnieuw?.(poging + 1)
+      await wacht(pauzes[poging])
+    }
+  }
+}

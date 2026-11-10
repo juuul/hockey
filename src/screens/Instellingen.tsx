@@ -3,6 +3,7 @@ import { TeamAanmelding, ToegangAanvraag, useAccount } from '../context/AccountC
 import { useHockey } from '../context/HockeyContext'
 import { appAdres, foutTekst, Gebruiker, pb, Rol, ROL_TEKST, ROL_UITLEG, ROL_VELD, rolIn, Team, Uitnodiging } from '../server'
 import { tel } from '../statistiek'
+import { metHerpogingen } from '../herstel'
 import { useTerug } from '../terug'
 import DeelKijklink from '../components/DeelKijklink'
 import ResetModal from '../components/ResetModal'
@@ -688,6 +689,7 @@ function UitnodigingAannemen({ token, klaar }: { token: string; klaar: () => voi
   const [naam, setNaam] = useState('')
   const [wachtwoord, setWachtwoord] = useState('')
   const [bezig, setBezig] = useState(false)
+  const [herpoging, setHerpoging] = useState(0)
   const [inlogNodig, setInlogNodig] = useState<string | null>(null)
 
   useEffect(() => {
@@ -700,11 +702,27 @@ function UitnodigingAannemen({ token, klaar }: { token: string; klaar: () => voi
     if (!info) return
     setBezig(true)
     setFout(null)
+    setHerpoging(0)
     try {
-      await pb.send(`/api/hockey/uitnodiging/${encodeURIComponent(token)}`, { method: 'POST', body: { naam, wachtwoord } })
+      // Bij een haperende verbinding zelf opnieuw proberen. Kwam een eerdere poging wél aan, dan is de
+      // uitnodiging al gebruikt: dat is dan geen fout, het account bestaat al.
+      await metHerpogingen(async (signal, poging) => {
+        try {
+          await pb.send(`/api/hockey/uitnodiging/${encodeURIComponent(token)}`, { method: 'POST', body: { naam, wachtwoord }, signal })
+        } catch (err) {
+          if (!(poging > 0 && (err as { status?: number }).status === 404)) throw err
+        }
+      }, { opnieuw: setHerpoging })
       tel('uitnodiging-aangenomen')
       if (!info.bestaat) {
-        await inloggen(info.email, wachtwoord)
+        try {
+          await metHerpogingen(() => inloggen(info.email, wachtwoord), { opnieuw: setHerpoging })
+        } catch {
+          // Het account bestaat; alleen het inloggen lukte (nog) niet.
+          setInlogNodig(info.email)
+          setBezig(false)
+          return
+        }
         klaar()
       } else if (gebruiker?.email === info.email) {
         await teamsLaden()
@@ -727,7 +745,7 @@ function UitnodigingAannemen({ token, klaar }: { token: string; klaar: () => voi
   if (inlogNodig) {
     return (
       <>
-        <p className="account-melding">Je bent toegevoegd. Log in met je bestaande wachtwoord.</p>
+        <p className="account-melding">{info?.bestaat ? 'Je bent toegevoegd. Log in met je bestaande wachtwoord.' : 'Je account is aangemaakt. Log in met het wachtwoord dat je net hebt gekozen.'}</p>
         <Inloggen email={inlogNodig} />
       </>
     )
@@ -760,8 +778,9 @@ function UitnodigingAannemen({ token, klaar }: { token: string; klaar: () => voi
       )}
       <Melding tekst={fout} fout />
       <button className="btn btn-primary" type="submit" disabled={bezig || (!info.bestaat && wachtwoord.length < 8)}>
-        {info.bestaat ? 'Toevoegen aan team' : 'Account maken'}
+        {bezig && herpoging ? 'Geen antwoord, opnieuw proberen…' : bezig ? 'Even geduld…' : info.bestaat ? 'Toevoegen aan team' : 'Account maken'}
       </button>
+      {bezig && herpoging > 0 && <p className="account-uitleg" role="status">De verbinding hapert. We proberen het automatisch opnieuw ({herpoging + 1} van 3).</p>}
     </form>
   )
 }

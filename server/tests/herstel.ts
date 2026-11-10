@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { HerstelPogingen, verzoekMetTimeout, type HerstelKlok } from '../../src/herstel'
+import { HerstelPogingen, metHerpogingen, tijdelijkeFout, verzoekMetTimeout, type HerstelKlok } from '../../src/herstel'
 let nu = 0, nummer = 0
 const timers = new Map<number, { op: number; actie: () => void }>()
 const klok: HerstelKlok = { nu: () => nu, zet: (actie, ms) => { const id = ++nummer; timers.set(id, { op: nu + ms, actie }); return id as unknown as ReturnType<typeof setTimeout> }, wis: id => { timers.delete(id as unknown as number) } }
@@ -38,4 +38,19 @@ try {
   const aanvraag = verzoekMetTimeout(signal => new Promise<void>((_, reject) => signal.addEventListener('abort', () => reject(new Error('afgebroken')))))
   afbreken(); await assert.rejects(aanvraag, /afgebroken/); assert.ok(gewist)
 } finally { globalThis.setTimeout = oudZet; globalThis.clearTimeout = oudWis }
-console.log('HERSTEL_OK: begrensde pauzes, geen foutlus, handmatig limiet, zichtbaarheid/online, cleanup en echte aanvraagtimeout.')
+// Eenmalige gebruikersactie: maximaal drie pogingen bij geen antwoord of tijdelijke serverfout, niet bij een inhoudelijke fout.
+{
+  const gewacht: number[] = [], gemeld: number[] = []
+  const opties = { wacht: async (ms: number) => { gewacht.push(ms) }, opnieuw: (p: number) => gemeld.push(p), timeout: <U>(a: (s: AbortSignal) => Promise<U>) => a(new AbortController().signal) }
+  let pogingen = 0
+  assert.equal(await metHerpogingen(async (_s, p) => { pogingen++; if (p < 2) throw Object.assign(new Error('weg'), { status: 0 }); return 'ok' }, opties), 'ok')
+  assert.deepEqual([pogingen, gewacht, gemeld], [3, [2000, 5000], [1, 2]])
+  pogingen = 0
+  await assert.rejects(metHerpogingen(async () => { pogingen++; throw Object.assign(new Error('weg'), { status: 0 }) }, opties), /weg/)
+  assert.equal(pogingen, 3, 'Na drie pogingen stoppen')
+  pogingen = 0
+  await assert.rejects(metHerpogingen(async () => { pogingen++; throw Object.assign(new Error('kort'), { status: 400 }) }, opties), /kort/)
+  assert.equal(pogingen, 1, 'Inhoudelijke fout niet herhalen')
+  for (const [status, tijdelijk] of [[0, true], [undefined, true], [429, true], [502, true], [400, false], [404, false], [403, false]] as const) assert.equal(tijdelijkeFout({ status }), tijdelijk, String(status))
+}
+console.log('HERSTEL_OK: begrensde pauzes, geen foutlus, handmatig limiet, zichtbaarheid/online, cleanup, echte aanvraagtimeout en herpogingen bij eenmalige acties.')
