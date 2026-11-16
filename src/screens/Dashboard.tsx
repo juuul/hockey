@@ -51,11 +51,11 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
   // Eén regel wissels past in beeld; de rest staat onder de vouw, bereikbaar door de pagina te scrollen
   const wisselsInBeeld = substitutes.slice(0, 2)
   const wisselsEronder = substitutes.slice(2)
-  // Tijd in de huidige wisselbeurt op de wisseltegels (elke beurt vanaf 0); elke 15 s bijwerken zolang de klok loopt
+  // Tijd in de huidige wisselbeurt op de wisseltegels (m:ss, elke beurt vanaf 0); elke seconde bijwerken zolang de klok loopt
   const [, setTik] = useState(0)
   useEffect(() => {
     if (timer.gestartOp === null) return
-    const id = setInterval(() => setTik(t => t + 1), 15000)
+    const id = setInterval(() => setTik(t => t + 1), 1000)
     return () => clearInterval(id)
   }, [timer.gestartOp])
   const klok = klokMs(timer)
@@ -69,7 +69,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
         {sub.naam}
         {speeltijdBijhouden && (() => {
           const sec = wisselbeurt(speeltijdLog, sub.id, klok)
-          return sec !== null && <span className="speeltijd" aria-label={`${Math.floor(sec / 60)} minuten op de bank`}>{Math.floor(sec / 60)} min</span>
+          return sec !== null && <span className="speeltijd" aria-label={`${Math.floor(sec / 60)} minuten en ${sec % 60} seconden op de bank`}>{Math.floor(sec / 60)}:{String(sec % 60).padStart(2, '0')}</span>
         })()}
       </span>
       <span className="count">{sub.wisselCount}×</span>
