@@ -38,7 +38,7 @@ PILOT = SERVER / 'planning_documenten' / 'catalogus-pilot.db'
 ZONE = ZoneInfo('Europe/Amsterdam')
 BRONVELDEN = ('bronId', 'datum', 'thuisBronId', 'uitBronId', 'thuisNaam', 'uitNaam', 'status')
 BRON_WACHT = 180  # seconden; de werker draait elke minuut
-UI_FIXTURES = ['uitnodiging-herpoging-ui.cjs']
+UI_FIXTURES = ['uitnodiging-herpoging-ui.cjs', 'wisseltijd-ui.cjs']
 PREVIEW_POORT = 8799  # staat in de --origins van de testserver
 
 resultaten = []
@@ -214,6 +214,12 @@ def bron():
 
 def browser(tmp):
     v = json.loads((PRIVE / 'regressie-verwachting.json').read_text())
+    # Voorbije datums staan niet meer in Programma: alleen afspraken vanaf vandaag controleren.
+    vandaag = datetime.now(ZONE).date().isoformat()
+    teksten = [{**t, 'teksten': [tekst for datum, tekst in t['teksten'] if datum >= vandaag]} for t in v['teksten']]
+    if sum(len(t['teksten']) for t in teksten) < 3:
+        raise RuntimeError('Minder dan 3 toekomstige regressieafspraken over: zet nieuwe eigen afspraken op latere wedstrijden en draai --vastleggen')
+    teksten = [t for t in teksten if t['teksten']]
     s = Testserver()
     dist = Path(tmp) / 'dist'
     env = {**os.environ, 'VITE_SERVER': f"http://localhost:{urllib.parse.urlparse(s.a['server']).port}"}
@@ -231,7 +237,7 @@ def browser(tmp):
                      '--entrypoint', 'node', 'zenika/alpine-chrome:with-puppeteer', '/test.cjs'], timeout=240,
                     # Via de omgeving, zodat het testtoken nooit in een foutmelding met de opdrachtregel staat.
                     env={**os.environ, 'REGRESSIE_SESSIE': json.dumps({'token': s.sessie['token'], 'record': s.sessie['record']}),
-                         'REGRESSIE_TEKSTEN': json.dumps(v['teksten'], ensure_ascii=False)})
+                         'REGRESSIE_TEKSTEN': json.dumps(teksten, ensure_ascii=False)})
         # Browsertests met uitsluitend fictieve API-antwoorden, op dezelfde gebouwde app.
         for test in UI_FIXTURES:
             uit += draai(['docker', 'run', '--rm', '--network', 'host', '--user', f'{os.getuid()}:{os.getgid()}',

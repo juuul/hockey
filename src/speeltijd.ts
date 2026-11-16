@@ -58,3 +58,12 @@ export function speeltijden(log: SpeeltijdMoment[], nu: number): Record<string, 
 
 export const opVeld = (t: Partial<Tijden>) => (t.a ?? 0) + (t.m ?? 0) + (t.v ?? 0) + (t.k ?? 0)
 export const minuten = (sec: number) => Math.round(sec / 60)
+
+// Seconden in de huidige wisselbeurt op de wedstrijdklok: begint bij elke beurt op de bank opnieuw bij 0.
+// null als de speler nu niet als wissel in de log staat (bijv. in het veld, afgemeld of speeltijd uit).
+export function wisselbeurt(log: SpeeltijdMoment[], id: string, nu: number): number | null {
+  if (log[log.length - 1]?.g[id] !== 'w') return null
+  let i = log.length - 1
+  while (i > 0 && log[i - 1].g[id] === 'w') i--
+  return Math.max(0, Math.round((nu - log[i].t) / 1000))
+}

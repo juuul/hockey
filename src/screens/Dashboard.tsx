@@ -10,7 +10,7 @@ import { WedstrijdAfsluitenKnop } from '../components/DezeWedstrijd'
 import KiesDoelpuntWeg, { scorersVan } from '../components/KiesDoelpuntWeg'
 import { tel } from '../statistiek'
 import { sorteerWissels, veldKleuren } from '../opstelling'
-import { klokMs, minuten, opVeld, speeltijden } from '../speeltijd'
+import { klokMs, wisselbeurt } from '../speeltijd'
 import './Dashboard.css'
 
 export default function Dashboard({ naarInstellingen }: { naarInstellingen: () => void }) {
@@ -51,7 +51,7 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
   // Eén regel wissels past in beeld; de rest staat onder de vouw, bereikbaar door de pagina te scrollen
   const wisselsInBeeld = substitutes.slice(0, 2)
   const wisselsEronder = substitutes.slice(2)
-  // Speeltijd (minuten in het veld) op de wisseltegels; elke 15 s bijwerken zolang de klok loopt
+  // Tijd in de huidige wisselbeurt op de wisseltegels (elke beurt vanaf 0); elke 15 s bijwerken zolang de klok loopt
   const [, setTik] = useState(0)
   useEffect(() => {
     if (timer.gestartOp === null) return
@@ -59,7 +59,6 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
     return () => clearInterval(id)
   }, [timer.gestartOp])
   const klok = klokMs(timer)
-  const tijden = klok > 0 ? speeltijden(speeltijdLog, klok) : {}
   const wisselTegel = (sub: typeof substitutes[number]) => (
     <button key={sub.id} type="button"
       className={`substitute-item ${selectie && 'id' in selectie && selectie.id === sub.id ? 'geselecteerd' : ''}`}
@@ -68,7 +67,10 @@ export default function Dashboard({ naarInstellingen }: { naarInstellingen: () =
 
       <span className="name">
         {sub.naam}
-        {speeltijdBijhouden && tijden[sub.id] && <span className="speeltijd">{minuten(opVeld(tijden[sub.id]))} min</span>}
+        {speeltijdBijhouden && (() => {
+          const sec = wisselbeurt(speeltijdLog, sub.id, klok)
+          return sec !== null && <span className="speeltijd" aria-label={`${Math.floor(sec / 60)} minuten op de bank`}>{Math.floor(sec / 60)} min</span>
+        })()}
       </span>
       <span className="count">{sub.wisselCount}×</span>
     </button>

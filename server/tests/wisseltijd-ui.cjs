@@ -1,0 +1,36 @@
+// Wisseltijd op de wisseltegels in de gebouwde app, alleen met lokale voorbeeldgegevens (niet ingelogd, geen server).
+const assert = require('node:assert/strict')
+const puppeteer = require('/usr/src/app/node_modules/puppeteer')
+;(async () => {
+  const browser = await puppeteer.launch({ executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] })
+  try {
+    const page = await browser.newPage(); await page.setViewport({ width: 360, height: 640, deviceScaleFactor: 2 })
+    const fouten = []; page.on('pageerror', e => fouten.push(e.message))
+    await page.setRequestInterception(true)
+    page.on('request', r => new URL(r.url()).hostname === new URL(process.env.TEST_URL).hostname ? r.continue() : r.abort())
+    await page.goto(process.env.TEST_URL, { waitUntil: 'load' })
+    await page.waitForSelector('.substitute-item')
+    // Eerste bezoek: voorbeeldgegevens en indeling op klokstand 0. Daarna de klok stilstaand op 10:00 zetten.
+    await page.waitForFunction(() => JSON.parse(localStorage.getItem('hockey_test_speeltijd') || '[]').length > 0)
+    const log = await page.evaluate(() => JSON.parse(localStorage.getItem('hockey_test_speeltijd')))
+    assert.equal(log.length, 1); assert.equal(log[0].t, 0)
+    const tegels = () => page.$$eval('.substitute-item', bs => bs.map(b => ({ naam: b.querySelector('.name').firstChild.textContent, tijd: b.querySelector('.speeltijd')?.textContent || null })))
+    for (const t of await tegels()) assert.equal(t.tijd, '0 min', 'Vóór de aftrap staat iedere wissel op 0 min')
+    await page.evaluate(() => localStorage.setItem('hockey_test_timer', JSON.stringify({ gestartOp: null, opgebouwd: 600000 })))
+    await page.reload({ waitUntil: 'load' }); await page.waitForSelector('.substitute-item')
+    const voor = await tegels()
+    for (const t of voor) assert.equal(t.tijd, '10 min', `${t.naam} staat al 10 minuten op de bank`)
+    // Wissel: eerste wisselspeler erin voor een veldspeler. De uitvaller begint op 0, de invaller verdwijnt van de bank.
+    await page.click('.substitute-item')
+    const uit = await page.evaluate(() => { const b = [...document.querySelectorAll('.player-slot:not(.keeper):not(.leeg)')][0]; const n = b.querySelector('.name').textContent; b.click(); return n })
+    await page.waitForFunction(n => [...document.querySelectorAll('.substitute-item .name')].some(e => e.firstChild.textContent === n), {}, uit)
+    const na = await tegels()
+    assert.equal(na.find(t => t.naam === uit).tijd, '0 min', 'Wie eruit gaat begint opnieuw bij 0')
+    assert.ok(!na.some(t => t.naam === voor[0].naam), 'Invaller staat niet meer op de bank')
+    for (const t of na.filter(t => t.naam !== uit)) assert.equal(t.tijd, '10 min', 'Andere wissels lopen door')
+    await page.evaluate(() => document.querySelector('.substitute-item').scrollIntoView({ block: 'center' }))
+    if (process.env.SCREENSHOT) await page.screenshot({ path: process.env.SCREENSHOT })
+    assert.deepEqual(fouten, [])
+    console.log('WISSELTIJD_UI_OK: 0 min vóór aftrap, 10 min na 10:00 stilstaande klok, uitvaller opnieuw 0 min, overige wissels lopen door.')
+  } finally { await browser.close() }
+})().catch(e => { console.error(e); process.exit(1) })
