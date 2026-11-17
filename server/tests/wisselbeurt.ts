@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { logBij, wisselbeurt, type SpeeltijdMoment } from '../../src/speeltijd'
+import { klokTerug, logBij, speeltijden, wisselbeurt, type SpeeltijdMoment } from '../../src/speeltijd'
 const min = (m: number) => m * 60_000
 let log: SpeeltijdMoment[] = []
 log = logBij(log, 0, { anna: 'a', bo: 'w', cleo: 'v' })
@@ -22,4 +22,23 @@ assert.equal(wisselbeurt(log, 'bo', min(13)), 60)
 log = logBij(log, min(14), {})
 assert.equal(wisselbeurt(log, 'bo', min(15)), null)
 assert.equal(wisselbeurt([], 'bo', 0), null)
-console.log('WISSELBEURT_OK: elke beurt op de bank vanaf 0 op de wedstrijdklok, doorlopend bij andere wijzigingen, niet bij veldspelers/afgemeld/speeltijd uit.')
+// Klok terug: latere momenten schuiven naar de nieuwe klokstand, zodat een nieuwe wisselbeurt meteen meeloopt.
+{
+  let l: SpeeltijdMoment[] = logBij([], 0, { a: 'a', b: 'w', c: 'w' })
+  l = logBij(l, min(10), { a: 'w', b: 'a', c: 'w' })        // wissel op 10:00
+  assert.equal(klokTerug(l, min(12)), l, 'Vooruit of gelijk: log ongewijzigd')
+  l = klokTerug(l, min(9))                                   // klok één minuut terug
+  assert.deepEqual(l.map(m => m.t), [0, min(9)])
+  assert.equal(wisselbeurt(l, 'a', min(9) + 5000), 5, 'Eerder gewisselde speler loopt vanaf de nieuwe klokstand')
+  l = logBij(l, min(9) + 30_000, { a: 'w', b: 'w', c: 'a' }) // nog een wissel op 9:30
+  assert.equal(wisselbeurt(l, 'b', min(9) + 35_000), 5, 'Nieuwe wisselbeurt loopt meteen mee')
+  assert.equal(wisselbeurt(l, 'a', min(9) + 35_000), 35)
+  assert.equal(wisselbeurt(l, 'c', min(9) + 35_000), null)
+  // Stop (klok naar 0): alleen de huidige indeling vanaf 0.
+  assert.deepEqual(klokTerug(l, 0), [{ t: 0, g: { a: 'w', b: 'w', c: 'a' } }])
+  // Gelijke opeenvolgende indelingen worden samengevoegd; gemeten tijd vóór de nieuwe klokstand blijft.
+  const m = klokTerug([{ t: 0, g: { a: 'a' } }, { t: min(5), g: { a: 'w' } }, { t: min(8), g: { a: 'a' } }], min(3))
+  assert.deepEqual(m, [{ t: 0, g: { a: 'a' } }])
+  assert.equal(speeltijden(m, min(3)).a.a, 180)
+}
+console.log('WISSELBEURT_OK: klok terug laat geen beurt in de toekomst beginnen;  elke beurt op de bank vanaf 0 op de wedstrijdklok, doorlopend bij andere wijzigingen, niet bij veldspelers/afgemeld/speeltijd uit.')

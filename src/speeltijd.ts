@@ -39,6 +39,21 @@ export function logBij(log: SpeeltijdMoment[], t: number, g: Record<string, Lini
   return [...log, { t, g }]
 }
 
+// De wedstrijdklok ging terug (vorig deel, bijstellen, stop): momenten ná de nieuwe klokstand zijn nog niet
+// gebeurd. Zet ze op de nieuwe stand (de laatste indeling geldt vanaf nu), zodat geen beurt 'in de toekomst' begint.
+// Zonder latere momenten blijft de log ongewijzigd (zelfde referentie).
+export function klokTerug(log: SpeeltijdMoment[], t: number): SpeeltijdMoment[] {
+  if (!log.some(m => m.t > t)) return log
+  const uit: SpeeltijdMoment[] = []
+  for (const m of log) {
+    const n = { t: Math.min(m.t, t), g: m.g }
+    if (uit.length && uit[uit.length - 1].t === n.t) uit.pop()
+    if (uit.length && zelfde(uit[uit.length - 1].g, n.g)) continue
+    uit.push(n)
+  }
+  return uit
+}
+
 export const klokMs = (timer: { gestartOp: number | null; opgebouwd: number }, nu = Date.now()) => timer.opgebouwd + (timer.gestartOp !== null ? nu - timer.gestartOp : 0)
 
 const leeg = (): Tijden => ({ a: 0, m: 0, v: 0, k: 0, w: 0 })

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react'
-import { indeling, klokMs, logBij, SpeeltijdMoment, speeltijden } from '../speeltijd'
+import { indeling, klokMs, klokTerug, logBij, SpeeltijdMoment, speeltijden } from '../speeltijd'
 import { Club, GespeeldeWedstrijd, ProgrammaItem, isOpstelling, leesOpstelling, OpstellingNaam, OPSTELLINGEN_PER_SPELVORM, Player, Position, Shootout, Spelvorm, spelvormVan, veldPosities, heeftKeeper, Wissel, WedstrijdInfo } from '../types'
 import { nieuweOpstelling as lootOpstelling, resetTellers, stempelInkomers, haalUitVeld, zetMeedoen as zetMeedoenIn, plaatsIn as plaatsInOpstelling, pasOpstellingAan, pasSpelvormAan, naamBezet, verplaatsSpelers } from '../opstelling'
 import { vandaag, vindClub } from '../historie'
@@ -219,6 +219,12 @@ export function HockeyProvider({ children, teamId = null, magBewerken = true, de
   const [wedstrijd, zetWedstrijd] = useState<WedstrijdInfo>(() => lees(P, 'wedstrijd', LEGE_WEDSTRIJD))
   // Alleen het toestel dat bijhoudt legt vast (de rest krijgt het via de live stand); niet na afsluiten
   const indelingNu = JSON.stringify(indeling(spelers))
+  // Klok teruggezet: speeltijdlog niet laten 'vooruitlopen' (anders blijft een nieuwe wisselbeurt op 0:00 staan).
+  useEffect(() => {
+    if (!magBewerken) return
+    const k = klokMs(timer)
+    setSpeeltijdLog(l => klokTerug(l, k))
+  }, [timer, magBewerken])
   useEffect(() => {
     if (!magBewerken || wedstrijd.afgesloten) return
     // Een leeg moment sluit de lopende meting af, zonder eerder gemeten tijd te wissen.
